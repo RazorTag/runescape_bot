@@ -9,3 +9,6 @@ C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.pdb
 C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.dll
 C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.pdb
 C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.xml
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.exe.config
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.exe
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.pdb
