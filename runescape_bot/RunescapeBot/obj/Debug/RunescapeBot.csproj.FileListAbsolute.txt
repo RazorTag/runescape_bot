@@ -1,0 +1,11 @@
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\RunescapeBot.exe.config
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\RunescapeBot.exe
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\RunescapeBot.pdb
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Start.resources
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.csproj.GenerateResource.Cache
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.exe
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.pdb
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.dll
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.pdb
+C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.xml
