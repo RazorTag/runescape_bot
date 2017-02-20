@@ -99,20 +99,17 @@ namespace WindowsFormsApplication1
 
             foreach (Process process in processlist)
             {
-                if (!String.IsNullOrEmpty(process.MainWindowTitle))
+                if (!String.IsNullOrEmpty(process.MainWindowTitle) && process.MainWindowTitle.Contains(windowName))
                 {
-                    if (process.MainWindowTitle.Contains(windowName))
+                    if (String.IsNullOrEmpty(username))
                     {
-                        if (String.IsNullOrEmpty(username))
+                        return process;
+                    }
+                    else    //verify that the username matches that specified by the user
+                    {
+                        if (process.MainWindowTitle.Contains(username))
                         {
                             return process;
-                        }
-                        else    //verify that the username matches that specified by the user
-                        {
-                            if (process.MainWindowTitle.Contains(username))
-                            {
-                                return process;
-                            }
                         }
                     }
                 }
