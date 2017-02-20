@@ -78,7 +78,6 @@
             this.Username.Name = "Username";
             this.Username.Size = new System.Drawing.Size(310, 20);
             this.Username.TabIndex = 3;
-            this.Username.Text = "Scythermain";
             // 
             // label2
             // 
