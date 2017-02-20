@@ -12,3 +12,12 @@ C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.xml
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.exe.config
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.exe
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.pdb
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.exe
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.pdb
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.dll
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.pdb
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.xml
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Start.resources
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csproj.GenerateResource.Cache
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache

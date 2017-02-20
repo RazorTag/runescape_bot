@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WindowsFormsApplication1
 {
+    /// <summary>
+    /// Initializes the programs and starts the UI (Start.cs)
+    /// </summary>
     static class Program
     {
         /// <summary>

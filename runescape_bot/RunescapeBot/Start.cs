@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApplication1.BotPrograms;
 
@@ -15,8 +9,14 @@ namespace WindowsFormsApplication1
 {
     public partial class Start : Form
     {
+        /// <summary>
+        /// List of running bot programs
+        /// </summary>
         private ArrayList runningBots;
 
+        /// <summary>
+        /// List of existing bot programs. Add a new bot program to this list.
+        /// </summary>
         public enum BotActions : int {
                 [Description("Gold Bracelets")]
                 GoldBracelets,
@@ -24,6 +24,11 @@ namespace WindowsFormsApplication1
                 LesserDemon
             };
 
+        /// <summary>
+        /// Gets the display name for an enum
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>The description attribute from the given enum value</returns>
         public string GetDescription(Enum value)
         {
             Type type = value.GetType();
@@ -45,6 +50,9 @@ namespace WindowsFormsApplication1
             return null;
         }
 
+        /// <summary>
+        /// Initializes the controls on the startup form
+        /// </summary>
         public Start()
         {
             InitializeComponent();
@@ -58,15 +66,22 @@ namespace WindowsFormsApplication1
             runningBots = new ArrayList();
         }
 
+        /// <summary>
+        /// Starts a bot program when the user presses Start
+        /// You can specify timeout and/or iterations for bot program
+        /// </summary>
+        /// <param name="sender">not used</param>
+        /// <param name="e">not used</param>
         private void StartButton_Click(object sender, EventArgs e)
         {
             StartParams startParams = CollectStartParams();
-            BotProgram botProgram;
+            BotProgram botProgram = null;
 
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
                 case BotActions.GoldBracelets:
                     botProgram = new GoldBracelets(startParams);
+
                     break;
 
                 case BotActions.LesserDemon:
@@ -74,25 +89,43 @@ namespace WindowsFormsApplication1
                     break;
 
                 default:
-                    botProgram = null;
                     break;
             }
 
             RunBotProgram(botProgram);
         }
 
+        /// <summary>
+        /// Gets the start parameters specified by the user in the startup form
+        /// </summary>
+        /// <returns></returns>
         private StartParams CollectStartParams()
         {
             StartParams startParams = new StartParams();
             startParams.username = Username.Text;
+            startParams.RunUntil = RunUntil.Value;
+            startParams.Iterations = (int) Iterations.Value;
 
             return startParams;
         }
 
+        /// <summary>
+        /// Starts the chosen bot program
+        /// </summary>
+        /// <param name="botProgram">bot program to start</param>
         private void RunBotProgram(BotProgram botProgram)
         {
-            if (botProgram == null) { return; }
+            if(botProgram == null) { return; }
+
             botProgram.Start(runningBots);
+        }
+
+        private void RunUntil_ValueChanged(object sender, EventArgs e)
+        {
+            if (RunUntil.Value < DateTime.Now)
+            {
+                RunUntil.Value = DateTime.Now;
+            }
         }
     }
 }
