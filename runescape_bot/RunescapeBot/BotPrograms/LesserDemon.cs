@@ -24,15 +24,13 @@ namespace WindowsFormsApplication1.BotPrograms
         /// </summary>
         protected override void Execute()
         {
-            //use this to test visually
-            //ScreenScraper.CaptureWindowToFile(RSClient, "c:\\Projects\\RunescapeBot\\test_pictures\\test.jpg", ImageFormat.Jpeg);
-
             Bitmap bitmap;
 
-            //Make sure the read is successful before using the bitmap values
-            if (ReadWindow(out bitmap))
+            bitmap = ReadWindow();
+            if (bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
-                ScreenScraper.LeftMouseClick(800, 500, RSClient);
+                //LeftClick(1000, 500);
+                //ScreenScraper.WriteBitmapToFile(bitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\saveBitmap.jpg", ImageFormat.Jpeg);
             }
 
             Done();

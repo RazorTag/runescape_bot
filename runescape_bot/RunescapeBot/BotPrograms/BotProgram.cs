@@ -59,26 +59,6 @@ namespace WindowsFormsApplication1
             FrameRate = startParams.FrameRate;
             EndTime = startParams.EndTime;
         }
-
-        /// <summary>
-        /// Attempts to read the screen in the game window. Fails if the window is hidden.
-        /// </summary>
-        /// <returns>True if the read appears to succeed.</returns>
-        public bool ReadWindow(out Bitmap bitmap)
-        {
-            bitmap = null;
-            try
-            {
-                IntPtr bmp = ScreenScraper.CaptureWindow(RSClient);
-                bitmap = Image.FromHbitmap(bmp);
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
-        }
        
         /// <summary>
         /// Begins execution of the bot program. Fails if a bot program is already running for the selected process.
@@ -189,6 +169,35 @@ namespace WindowsFormsApplication1
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Wrapper for ScreenScraper.CaptureWindow
+        /// </summary>
+        /// <returns></returns>
+        protected Bitmap ReadWindow()
+        {
+            return ScreenScraper.CaptureWindow(RSClient);
+        }
+
+        /// <summary>
+        /// Wrapper for ScreenScraper.LeftMouseCLick
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        protected void LeftClick(int x, int y)
+        {
+            ScreenScraper.LeftMouseClick(x, y, RSClient);
+        }
+
+        /// <summary>
+        /// Wrapper for ScreenScraper.RightMouseClick
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        protected void RightClick(int x, int y)
+        {
+            ScreenScraper.RightMouseClick(x, y, RSClient);
         }
     }
 }

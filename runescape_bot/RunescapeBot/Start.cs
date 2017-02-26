@@ -15,6 +15,11 @@ namespace WindowsFormsApplication1
         private ArrayList runningBots;
 
         /// <summary>
+        /// Set to true if a user has selected a date to run until
+        /// </summary>
+        private bool EndTimeSelected;
+
+        /// <summary>
         /// List of existing bot programs. Add a new bot program to this list.
         /// </summary>
         public enum BotActions : int {
@@ -106,8 +111,15 @@ namespace WindowsFormsApplication1
             startParams.username = Username.Text;
             startParams.RunUntil = RunUntil.Value;
             startParams.Iterations = (int) Iterations.Value;
-            startParams.EndTime = RunUntil.Value;
-
+            if (EndTimeSelected)
+            {
+                startParams.EndTime = RunUntil.Value;
+            }
+            else
+            {
+                startParams.EndTime = DateTime.MaxValue;
+            }
+            
             return startParams;
         }
 
@@ -122,11 +134,16 @@ namespace WindowsFormsApplication1
             botProgram.Start(runningBots);
         }
 
+        /// <summary>
+        /// Flags the end time as selected when a user selects a DateTime
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RunUntil_ValueChanged(object sender, EventArgs e)
         {
             if (RunUntil.Value < DateTime.Now)
             {
-                RunUntil.Value = DateTime.Now;
+                EndTimeSelected = true;
             }
         }
     }

@@ -107,7 +107,7 @@ namespace WindowsFormsApplication1
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
         /// <returns></returns>
-        public static IntPtr CaptureWindow(Process rsClient)
+        public static Bitmap CaptureWindow(Process rsClient)
         {
             User32.SetForegroundWindow(rsClient.MainWindowHandle.ToInt32());
 
@@ -120,7 +120,7 @@ namespace WindowsFormsApplication1
             User32.GetWindowRect(handle, ref windowRect);
             if (!TrimOSBuddy(ref windowRect))
             {
-                throw new HiddenWindowException();
+                return null;
             }
 
             int width = windowRect.right - windowRect.left;
@@ -140,7 +140,20 @@ namespace WindowsFormsApplication1
             GDI32.DeleteDC(hdcDest);
             User32.ReleaseDC(handle, hdcSrc);
 
-            return hBitmap;
+            return Image.FromHbitmap(hBitmap);
+        }
+
+        /// <summary>
+        /// Saves a Bitmap object to file as an image
+        /// </summary>
+        /// <param name="bitmap"></param>
+        /// <param name="fileName"></param>
+        /// <param name="format"></param>
+        public static void WriteBitmapToFile(Bitmap bitmap, string fileName, ImageFormat format)
+        {
+            IntPtr hBitmap = bitmap.GetHbitmap();
+            Image img = Image.FromHbitmap(hBitmap);
+            img.Save(fileName, format);
         }
 
         /// <summary>
@@ -149,25 +162,25 @@ namespace WindowsFormsApplication1
         /// <param name="handle"></param>
         /// <param name="filename"></param>
         /// <param name="format"></param>
-        public static void CaptureWindowToFile(Process rsClient, string filename, ImageFormat format)
-        {
-            // get a .NET image object for it
-            IntPtr bitmap = new IntPtr();
+        //public static void CaptureWindowToFile(Process rsClient, string filename, ImageFormat format)
+        //{
+        //    // get a .NET image object for it
+        //    IntPtr bitmap = new IntPtr();
 
-            try
-            {
-                bitmap = CaptureWindow(rsClient);
-            }
-            catch (HiddenWindowException e)
-            {
-                return;
-            }
+        //    try
+        //    {
+        //        bitmap = CaptureWindow(rsClient);
+        //    }
+        //    catch (HiddenWindowException e)
+        //    {
+        //        return;
+        //    }
             
-            Image img = Image.FromHbitmap(bitmap);
-            img.Save(filename, format);
-            // free up the Bitmap object
-            GDI32.DeleteObject(bitmap);
-        }
+        //    Image img = Image.FromHbitmap(bitmap);
+        //    img.Save(filename, format);
+        //    // free up the Bitmap object
+        //    GDI32.DeleteObject(bitmap);
+        //}
         #endregion
 
         #region OSBuddy
