@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,7 +14,7 @@ namespace WindowsFormsApplication1
     /// </summary>
     public class BotProgram
     {
-        protected ArrayList runningBots;
+        protected List<BotProgram> runningBots;
         protected string loadError;
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace WindowsFormsApplication1
         /// </summary>
         /// <param name="runningBots"></param>
         /// <param name="iterations"></param>
-        public void Start(ArrayList runningBots)
+        public void Start(List<BotProgram> runningBots)
         {
             if (!String.IsNullOrEmpty(loadError))
             {
@@ -80,11 +80,18 @@ namespace WindowsFormsApplication1
             }
             runningBots.Add(this);
 
-            RunThread = new Thread(Run);
+            RunThread = new Thread(Process);
             RunThread.Start();
+        }
 
-            RunThread = new Thread(Iterate);
-            RunThread.Start();
+        /// <summary>
+        /// Handles the sequential calling of the methods used to do bot work
+        /// </summary>
+        private void Process()
+        {
+            Run();
+            Iterate();
+            Done();
         }
 
         /// <summary>
@@ -139,7 +146,7 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// Removes this bot program from the list of running programs
         /// </summary>
-        protected void Done()
+        private void Done()
         {
             runningBots.Remove(this);
         }

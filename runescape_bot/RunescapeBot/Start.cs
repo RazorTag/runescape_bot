@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Forms;
@@ -12,7 +13,7 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// List of running bot programs
         /// </summary>
-        private ArrayList runningBots;
+        private List<BotProgram> RunningBots;
 
         /// <summary>
         /// Set to true if a user has selected a date to run until
@@ -68,7 +69,7 @@ namespace WindowsFormsApplication1
                 names[i] = GetDescription((Enum) actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
-            runningBots = new ArrayList();
+            RunningBots = new List<BotProgram>();
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace WindowsFormsApplication1
         {
             if(botProgram == null) { return; }
 
-            botProgram.Start(runningBots);
+            botProgram.Start(RunningBots);
         }
 
         /// <summary>
@@ -144,6 +145,19 @@ namespace WindowsFormsApplication1
             if (RunUntil.Value < DateTime.Now)
             {
                 EndTimeSelected = true;
+            }
+        }
+
+        /// <summary>
+        /// Stops execution of any remaining bot programs before closing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Start_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            while (RunningBots.Count > 0)
+            {
+                RunningBots[RunningBots.Count - 1].Stop();
             }
         }
     }

@@ -10,8 +10,6 @@
         protected override void Run()
         {
             System.Windows.Forms.MessageBox.Show("GoldBracelets running");
-
-            Done();
         }
     }
 }

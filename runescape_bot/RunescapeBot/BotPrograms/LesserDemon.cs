@@ -29,11 +29,9 @@ namespace WindowsFormsApplication1.BotPrograms
             bitmap = ReadWindow();
             if (bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
-                //LeftClick(1000, 500);
-                //ScreenScraper.WriteBitmapToFile(bitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\saveBitmap.jpg", ImageFormat.Jpeg);
+                LeftClick(1000, 500);
+                ScreenScraper.WriteBitmapToFile(bitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\saveBitmap.jpg", ImageFormat.Jpeg);
             }
-
-            Done();
         }
     }
 }

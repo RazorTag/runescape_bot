@@ -144,6 +144,7 @@
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Runescape Bot";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Start_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

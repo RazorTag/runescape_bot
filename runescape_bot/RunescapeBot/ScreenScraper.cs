@@ -14,6 +14,7 @@ namespace WindowsFormsApplication1
     {
         private static int OSBUDDY_TOOLBAR_WIDTH = 31;  //does not include the border underneath the toolbar
         private static int OSBUDDY_BORDER_WIDTH = 2;
+        public const int SW_RESTORE = 9;
 
         #region custom structs
         [StructLayout(LayoutKind.Sequential)]
@@ -103,13 +104,27 @@ namespace WindowsFormsApplication1
 
         #region screenreader
         /// <summary>
+        /// Brings the client window to th fireground and shows it
+        /// </summary>
+        /// <param name="rsHandle"></param>
+        private static void BringToForeGround(int rsHandle)
+        {
+            if (User32.IsIconic(rsHandle))
+            {
+                User32.ShowWindow(rsHandle, SW_RESTORE);
+            }
+            User32.SetForegroundWindow(rsHandle);
+        }
+
+        /// <summary>
         /// Creates an Image object containing a screen shot of a specific window
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
         /// <returns></returns>
         public static Bitmap CaptureWindow(Process rsClient)
         {
-            User32.SetForegroundWindow(rsClient.MainWindowHandle.ToInt32());
+            int rsHandle = rsClient.MainWindowHandle.ToInt32();
+            
 
             IntPtr handle = rsClient.MainWindowHandle;
 
@@ -294,7 +309,11 @@ namespace WindowsFormsApplication1
             [DllImport("User32.dll")]
             public static extern bool SetForegroundWindow(int hWnd);
             [DllImport("User32.dll")]
-            public static extern Int32 GetTopWindow(IntPtr hWnd);
+            public static extern int GetTopWindow(int hWnd);
+            [DllImport("user32.dll")]
+            public static extern bool IsIconic(int handle);
+            [DllImport("user32.dll")]
+            public static extern bool ShowWindow(int handle, int nCmdShow);
         }
         #endregion
     }
