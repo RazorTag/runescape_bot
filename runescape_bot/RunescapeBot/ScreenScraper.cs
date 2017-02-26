@@ -54,6 +54,7 @@ namespace WindowsFormsApplication1
         /// <param name="y">pixels from top of client</param>
         public static void LeftMouseClick(int x, int y, Process rsClient)
         {
+            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
             POINT originalCursorPos;
 
             User32.SetForegroundWindow(rsClient.MainWindowHandle.ToInt32());
@@ -72,6 +73,7 @@ namespace WindowsFormsApplication1
         /// <param name="y">pixels from top of client</param>
         public static void RightMouseClick(int x, int y, Process rsClient)
         {
+            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
             POINT originalCursorPos;
 
             User32.SetForegroundWindow(rsClient.MainWindowHandle.ToInt32());
@@ -123,8 +125,7 @@ namespace WindowsFormsApplication1
         /// <returns></returns>
         public static Bitmap CaptureWindow(Process rsClient)
         {
-            int rsHandle = rsClient.MainWindowHandle.ToInt32();
-            
+            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
 
             IntPtr handle = rsClient.MainWindowHandle;
 
