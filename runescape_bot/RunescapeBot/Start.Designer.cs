@@ -103,19 +103,9 @@
             // 
             this.Iterations.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Iterations.Location = new System.Drawing.Point(89, 165);
-            this.Iterations.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             this.Iterations.Name = "Iterations";
             this.Iterations.Size = new System.Drawing.Size(89, 22);
             this.Iterations.TabIndex = 6;
-            this.Iterations.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // label4
             // 

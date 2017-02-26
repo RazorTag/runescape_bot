@@ -18,10 +18,10 @@ namespace WindowsFormsApplication1
         /// List of existing bot programs. Add a new bot program to this list.
         /// </summary>
         public enum BotActions : int {
-                [Description("Gold Bracelets")]
-                GoldBracelets,
                 [Description("Lesser Demon")]
-                LesserDemon
+                LesserDemon,
+                [Description("Gold Bracelets")]
+                GoldBracelets
             };
 
         /// <summary>
@@ -85,6 +85,7 @@ namespace WindowsFormsApplication1
                     break;
 
                 case BotActions.LesserDemon:
+                    startParams.FrameRate = 0.5;
                     botProgram = new LesserDemon(startParams);
                     break;
 
@@ -105,6 +106,7 @@ namespace WindowsFormsApplication1
             startParams.username = Username.Text;
             startParams.RunUntil = RunUntil.Value;
             startParams.Iterations = (int) Iterations.Value;
+            startParams.EndTime = RunUntil.Value;
 
             return startParams;
         }

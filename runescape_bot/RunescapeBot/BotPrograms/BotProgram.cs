@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -13,13 +15,17 @@ namespace WindowsFormsApplication1
     public class BotProgram
     {
         protected ArrayList runningBots;
-        protected Thread runThread;
         protected string loadError;
 
         /// <summary>
         /// Process to which this bot program is attached
         /// </summary>
-        public Process Process { get; set; }
+        public Process RSClient { get; set; }
+
+        /// <summary>
+        /// Thread in which the run method is executed
+        /// </summary>
+        public Thread RunThread { get; set; }
 
         /// <summary>
         /// Time when the bot program should cease execution
@@ -32,14 +38,46 @@ namespace WindowsFormsApplication1
         public int Iterations { get; set; }
 
         /// <summary>
+        /// Rate at which to iterate in units of Hz
+        /// </summary>
+        public double FrameRate { get; set; }
+
+        /// <summary>
+        /// Time at which to end execution if it hasn't ended already
+        /// </summary>
+        public DateTime EndTime { get; set; }
+
+        /// <summary>
         /// Initializes a bot program with a client matching startParams
         /// </summary>
         /// <param name="startParams">specifies the username to search for</param>
         public BotProgram(StartParams startParams)
         {
-            Process = ScreenScraper.GetOSBuddy(startParams, ref loadError);
+            RSClient = ScreenScraper.GetOSBuddy(startParams, out loadError);
             RunUntil = startParams.RunUntil;
             Iterations = startParams.Iterations;
+            FrameRate = startParams.FrameRate;
+            EndTime = startParams.EndTime;
+        }
+
+        /// <summary>
+        /// Attempts to read the screen in the game window. Fails if the window is hidden.
+        /// </summary>
+        /// <returns>True if the read appears to succeed.</returns>
+        public bool ReadWindow(out Bitmap bitmap)
+        {
+            bitmap = null;
+            try
+            {
+                IntPtr bmp = ScreenScraper.CaptureWindow(RSClient);
+                bitmap = Image.FromHbitmap(bmp);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
        
         /// <summary>
@@ -56,21 +94,64 @@ namespace WindowsFormsApplication1
             }
 
             this.runningBots = runningBots;
-            if (ProcessExists(Process)) {
+            if (ProcessExists(RSClient)) {
                 MessageBox.Show("A bot is already running for the selected process.");
                 return;
             }
             runningBots.Add(this);
 
-            runThread = new Thread(Run);
-            Run();
+            RunThread = new Thread(Run);
+            RunThread.Start();
+
+            RunThread = new Thread(Iterate);
+            RunThread.Start();
         }
 
         /// <summary>
         /// Contains the logic that determines what an implemented bot program does
+        /// Executes before beginning iteration
         /// <param name="timeout">length of time after which the bot program should quit</param>
         /// </summary>
         protected virtual void Run()
+        {
+            return;
+        }
+
+        /// <summary>
+        /// Begins iterating after Run is called. Called for the number of iterations specified by the user.
+        /// Is only called if both Iterations and FrameRate are specified.
+        /// </summary>
+        private void Iterate()
+        {
+            int iterationTime = (int)(1000 * (1 / FrameRate));   //iteration refresh time in milliseconds
+            if (Iterations == 0)
+            {
+                Iterations = int.MaxValue;
+            }
+
+            for (int i = 0; i < Iterations; i++)
+            {
+                if (DateTime.Now > EndTime)
+                {
+                    break; //quit if we have gone over our time limit
+                }
+
+                Stopwatch watch = Stopwatch.StartNew();
+                Execute();
+                watch.Stop();
+                if (watch.ElapsedMilliseconds < iterationTime)
+                {
+                    Thread.Sleep(iterationTime - (int)watch.ElapsedMilliseconds);
+                }
+            }
+
+            return;
+        }
+
+        /// <summary>
+        /// A single iteration
+        /// </summary>
+        protected virtual void Execute()
         {
             return;
         }
@@ -88,7 +169,7 @@ namespace WindowsFormsApplication1
         /// </summary>
         public void Stop()
         {
-            runThread.Abort();
+            RunThread.Abort();
             Done();
         }
 
@@ -101,7 +182,7 @@ namespace WindowsFormsApplication1
         {
             foreach (BotProgram bot in runningBots)
             {
-                if (bot.Process.MainWindowHandle == newProcess.MainWindowHandle)
+                if (bot.RSClient.MainWindowHandle == newProcess.MainWindowHandle)
                 {
                     return true;
                 }
