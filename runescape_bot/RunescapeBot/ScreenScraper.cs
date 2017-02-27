@@ -177,32 +177,6 @@ namespace WindowsFormsApplication1
             Image img = Image.FromHbitmap(hBitmap);
             img.Save(fileName, format);
         }
-
-        /// <summary>
-        /// Captures a screen shot of a specific window, and saves it to a file
-        /// </summary>
-        /// <param name="handle"></param>
-        /// <param name="filename"></param>
-        /// <param name="format"></param>
-        //public static void CaptureWindowToFile(Process rsClient, string filename, ImageFormat format)
-        //{
-        //    // get a .NET image object for it
-        //    IntPtr bitmap = new IntPtr();
-
-        //    try
-        //    {
-        //        bitmap = CaptureWindow(rsClient);
-        //    }
-        //    catch (HiddenWindowException e)
-        //    {
-        //        return;
-        //    }
-            
-        //    Image img = Image.FromHbitmap(bitmap);
-        //    img.Save(filename, format);
-        //    // free up the Bitmap object
-        //    GDI32.DeleteObject(bitmap);
-        //}
         #endregion
 
         #region OSBuddy
