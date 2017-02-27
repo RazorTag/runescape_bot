@@ -131,6 +131,7 @@ namespace WindowsFormsApplication1
 
             // get the hDC of the target window
             IntPtr hdcSrc = User32.GetWindowDC(handle);
+
             // get the size
             RECT windowRect = new RECT();
             User32.GetWindowRect(handle, ref windowRect);
@@ -138,20 +139,25 @@ namespace WindowsFormsApplication1
             {
                 return null;
             }
-
             int width = windowRect.right - windowRect.left;
             int height = windowRect.bottom - windowRect.top;
+
             // create a device context we can copy to
             IntPtr hdcDest = GDI32.CreateCompatibleDC(hdcSrc);
+
             // create a bitmap we can copy it to,
             // using GetDeviceCaps to get the width/height
             IntPtr hBitmap = GDI32.CreateCompatibleBitmap(hdcSrc, width, height);
+
             // select the bitmap object
             IntPtr hOld = GDI32.SelectObject(hdcDest, hBitmap);
+
             // bitblt over
             GDI32.BitBlt(hdcDest, 0, 0, width, height, hdcSrc, OSBUDDY_BORDER_WIDTH, OSBUDDY_TOOLBAR_WIDTH + OSBUDDY_BORDER_WIDTH, GDI32.SRCCOPY);
+
             // restore selection
             GDI32.SelectObject(hdcDest, hOld);
+
             // clean up 
             GDI32.DeleteDC(hdcDest);
             User32.ReleaseDC(handle, hdcSrc);

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace WindowsFormsApplication1.BotPrograms
+namespace WindowsFormsApplication1
 {
     /// <summary>
     /// Used to store a bitmap of pixel values

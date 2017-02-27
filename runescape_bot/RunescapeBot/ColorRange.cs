@@ -10,12 +10,12 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// The color with the values closest to black that occur in an artifact
         /// </summary>
-        public Color darkestColor { get; set; }
+        public Color DarkestColor { get; set; }
 
         /// <summary>
         /// The color with the values closest to white that occur in an artifact
         /// </summary>
-        public Color lightestColor { get; set; }
+        public Color LightestColor { get; set; }
 
         /// <summary>
         /// Sets the color range
@@ -24,8 +24,8 @@ namespace WindowsFormsApplication1
         /// <param name="lightestColor">The color with the values closest to white that occur in an artifact</param>
         public ColorRange(Color darkestColor, Color lightestColor)
         {
-            this.darkestColor = darkestColor;
-            this.lightestColor = lightestColor;
+            this.DarkestColor = darkestColor;
+            this.LightestColor = lightestColor;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace WindowsFormsApplication1
         /// <returns>true if the red component is inside of this color range</returns>
         public bool RedInRange(Color color)
         {
-            return (color.R >= darkestColor.R) && (color.R <= lightestColor.R);
+            return (color.R >= DarkestColor.R) && (color.R <= LightestColor.R);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace WindowsFormsApplication1
         /// <returns>true if the green component is inside of this color range</returns>
         public bool GreenInRange(Color color)
         {
-            return (color.G >= darkestColor.G) && (color.G <= lightestColor.G);
+            return (color.G >= DarkestColor.G) && (color.G <= LightestColor.G);
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace WindowsFormsApplication1
         /// <returns>true if the blue component is inside of this color range</returns>
         public bool BlueInRange(Color color)
         {
-            return (color.B >= darkestColor.B) && (color.B <= lightestColor.B);
+            return (color.B >= DarkestColor.B) && (color.B <= LightestColor.B);
         }
     }
 }
