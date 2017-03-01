@@ -12,8 +12,6 @@ namespace WindowsFormsApplication1.BotPrograms
         private static ColorRange LesserDemonSkin;
         private static ColorRange LesserDemonHorn;
 
-        public static Bitmap Bitmap;
-
         public LesserDemon(StartParams startParams) : base(startParams)
         {
             GetReferenceColors();

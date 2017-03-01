@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -46,6 +45,11 @@ namespace WindowsFormsApplication1
         /// Time at which to end execution if it hasn't ended already
         /// </summary>
         public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// Stores the most recently acquired bitmap of the client
+        /// </summary>
+        protected Bitmap Bitmap { get; set; }
 
         /// <summary>
         /// Initializes a bot program with a client matching startParams
