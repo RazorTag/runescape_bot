@@ -47,9 +47,14 @@ namespace WindowsFormsApplication1
         public DateTime EndTime { get; set; }
 
         /// <summary>
-        /// Stores the most recently acquired bitmap of the client
+        /// Stores a bitmap of the client window
         /// </summary>
         protected Bitmap Bitmap { get; set; }
+
+        /// <summary>
+        /// Stores a Color array of the client window
+        /// </summary>
+        protected Color[,] ColorArray { get; set; }
 
         /// <summary>
         /// Initializes a bot program with a client matching startParams
@@ -185,10 +190,21 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// Wrapper for ScreenScraper.CaptureWindow
         /// </summary>
-        /// <returns></returns>
-        protected Bitmap ReadWindow()
+        protected void ReadWindow()
         {
-            return ScreenScraper.CaptureWindow(RSClient);
+            Bitmap = ScreenScraper.CaptureWindow(RSClient);
+            ColorArray = ScreenScraper.GetRGB(Bitmap);
+        }
+
+        /// <summary>
+        /// Retrieve the color of a single pixel
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        protected Color GetPixel(int x, int y)
+        {
+            return ColorArray[x, y];
         }
 
         /// <summary>

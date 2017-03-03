@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -22,19 +23,26 @@ namespace WindowsFormsApplication1.BotPrograms
         /// </summary>
         protected override void Run()
         {
-            Bitmap = ReadWindow();
+            //Stopwatch watch = Stopwatch.StartNew();
+
+            ReadWindow();   //Read the game window color values into Bitmap and ColorArray
+            ScreenScraper.SaveImageToFile(ColorArray, "C:\\Projects\\RunescapeBot\\test_pictures\\RGBTest.jpg", ImageFormat.Jpeg);
+
             if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
                 bool[,] skinPixels;
                 bool[,] hornPixels;
                 FindDemonPixels(out skinPixels, out hornPixels);
 
-                TestMask(LesserDemonSkin, "Skin", skinPixels);
-                TestMask(LesserDemonHorn, "Horn", hornPixels);
+                //TestMask(LesserDemonSkin, "Skin", skinPixels);
+                //TestMask(LesserDemonHorn, "Horn", hornPixels);
                 //LeftClick(1000, 500);
                 //ScreenScraper.WriteBitmapToFile(skinBitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\TestMaskSkin.jpg", ImageFormat.Jpeg);
                 //ScreenScraper.WriteBitmapToFile(hornBitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\TestMaskHorn.jpg", ImageFormat.Jpeg);
             }
+
+            //watch.Stop();
+            //Console.WriteLine(watch.ElapsedMilliseconds);
         }
 
         /// <summary>
@@ -53,14 +61,14 @@ namespace WindowsFormsApplication1.BotPrograms
         private void FindDemonPixels(out bool[,] skinPixels, out bool[,] hornPixels)
         {
             Color pixelColor;
-            skinPixels = new bool[Bitmap.Width, Bitmap.Height];     //don't use the zero indices
+            skinPixels = new bool[Bitmap.Width, Bitmap.Height];
             hornPixels = new bool[Bitmap.Width, Bitmap.Height];
 
             for (int x = 0; x < Bitmap.Width; x++)
             {
                 for (int y = 0; y < Bitmap.Height; y++)
                 {
-                    pixelColor = Bitmap.GetPixel(x, y);
+                    pixelColor = GetPixel(x, y);
                     if (LesserDemonSkin.ColorInRange(pixelColor))
                     {
                         skinPixels[x, y] = true;
@@ -133,11 +141,11 @@ namespace WindowsFormsApplication1.BotPrograms
             }
 
             string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            ScreenScraper.WriteBitmapToFile(redBitmap, directory + saveName + "_RedMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.WriteBitmapToFile(greenBitmap, directory + saveName + "_GreenMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.WriteBitmapToFile(blueBitmap, directory + saveName + "_BlueMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.WriteBitmapToFile(bitmap, directory + saveName + "_TotalMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.WriteBitmapToFile(Bitmap, directory + "Original.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_RedMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_GreenMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_BlueMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(bitmap, directory + saveName + "_TotalMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(Bitmap, directory + "Original.jpg", ImageFormat.Jpeg);
         }
 
         /// <summary>

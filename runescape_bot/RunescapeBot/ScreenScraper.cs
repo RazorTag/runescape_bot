@@ -166,16 +166,80 @@ namespace WindowsFormsApplication1
         }
 
         /// <summary>
+        /// Makes an RGB 
+        /// </summary>
+        /// <param name="bitmap"></param>
+        public static Color[,] GetRGB(this Bitmap bitmap)
+        {
+            const int PixelWidth = 3;
+            const PixelFormat PixelFormat = PixelFormat.Format24bppRgb;
+            int width, height, pixelOffset;
+            Color[,] rgbArray;
+            
+            if (bitmap == null) throw new ArgumentNullException("image");
+
+            width = bitmap.Width;
+            height = bitmap.Height;
+            rgbArray = new Color[width, height];
+
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat);
+            try
+            {
+                byte[] pixelData = new Byte[data.Stride];
+                for (int y = 0; y < height; y++)
+                {
+                    Marshal.Copy(data.Scan0 + (y * data.Stride), pixelData, 0, data.Stride);
+                    for (int x = 0; x < width; x++)
+                    {
+                        // PixelFormat.Format32bppRgb means the data is stored
+                        // in memory as BGR. We want RGB, so we must do some 
+                        // bit-shuffling.
+                        pixelOffset = x * PixelWidth;
+                        rgbArray[x, y] = Color.FromArgb(
+                            pixelData[pixelOffset + 2], // R 
+                            pixelData[pixelOffset + 1], // G
+                            pixelData[pixelOffset]      // B
+                        );
+                    }
+                }
+            }
+            finally
+            {
+                bitmap.UnlockBits(data);
+            }
+            return rgbArray;
+        }
+
+        /// <summary>
         /// Saves a Bitmap object to file as an image
         /// </summary>
         /// <param name="bitmap"></param>
         /// <param name="fileName"></param>
         /// <param name="format"></param>
-        public static void WriteBitmapToFile(Bitmap bitmap, string fileName, ImageFormat format)
+        public static void SaveImageToFile(Bitmap bitmap, string fileName, ImageFormat format)
         {
             IntPtr hBitmap = bitmap.GetHbitmap();
             Image img = Image.FromHbitmap(hBitmap);
             img.Save(fileName, format);
+        }
+
+        /// <summary>
+        /// Saves an RGB array to file as an image
+        /// </summary>
+        /// <param name="rgbArray"></param>
+        /// <param name="fileName"></param>
+        /// <param name="format"></param>
+        public static void SaveImageToFile(Color[,] rgbArray, string fileName, ImageFormat format)
+        {
+            Bitmap bitmap = new Bitmap(rgbArray.GetLength(0), rgbArray.GetLength(1));
+            for(int x = 0; x < rgbArray.GetLength(0); x++)
+            {
+                for(int y = 0; y < rgbArray.GetLength(1); y++)
+                {
+                    bitmap.SetPixel(x, y, rgbArray[x, y]);
+                }
+            }
+            SaveImageToFile(bitmap, fileName, format);
         }
         #endregion
 

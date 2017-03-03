@@ -27,6 +27,11 @@ namespace WindowsFormsApplication1
             Bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppPArgb, BitsHandle.AddrOfPinnedObject());
         }
 
+        public Color GetPixel(int x, int y)
+        {
+            return Color.FromArgb(Bits[x*y + x]);
+        }
+
         public void Dispose()
         {
             if (Disposed) return;
