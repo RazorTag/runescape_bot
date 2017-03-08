@@ -133,7 +133,10 @@ namespace WindowsFormsApplication1
                 }
 
                 Stopwatch watch = Stopwatch.StartNew();
-                Execute();
+                if (!Execute())
+                {
+                    break;
+                }
                 watch.Stop();
                 if (watch.ElapsedMilliseconds < iterationTime)
                 {
@@ -145,11 +148,11 @@ namespace WindowsFormsApplication1
         }
 
         /// <summary>
-        /// A single iteration
+        /// A single iteration. Return false to stop execution.
         /// </summary>
-        protected virtual void Execute()
+        protected virtual bool Execute()
         {
-            return;
+            return false;
         }
 
         /// <summary>
@@ -167,6 +170,16 @@ namespace WindowsFormsApplication1
         {
             RunThread.Abort();
             Done();
+        }
+
+        /// <summary>
+        /// Creates a boolean array to represent that match 
+        /// </summary>
+        /// <param name="artifactColor"></param>
+        /// <returns></returns>
+        protected bool[,] ColorFilter(ColorRange artifactColor)
+        {
+            return ImageProcessing.ColorFilter(ColorArray, artifactColor);
         }
 
         /// <summary>
@@ -190,10 +203,12 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// Wrapper for ScreenScraper.CaptureWindow
         /// </summary>
-        protected void ReadWindow()
+        protected bool ReadWindow()
         {
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
+
+            return Bitmap != null;
         }
 
         /// <summary>

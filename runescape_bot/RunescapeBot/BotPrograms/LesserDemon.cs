@@ -30,14 +30,10 @@ namespace WindowsFormsApplication1.BotPrograms
 
             if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
-                bool[,] skinPixels;
-                bool[,] hornPixels;
-                FindDemonPixels(out skinPixels, out hornPixels);
+                bool[,] skinPixels = ColorFilter(LesserDemonSkin);
 
-                //TestMask(LesserDemonSkin, "Skin", skinPixels);
-                //TestMask(LesserDemonHorn, "Horn", hornPixels);
+                TestMask(LesserDemonSkin, "Skin", skinPixels);
                 //LeftClick(1000, 500);
-                //ScreenScraper.WriteBitmapToFile(skinBitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\TestMaskSkin.jpg", ImageFormat.Jpeg);
                 //ScreenScraper.WriteBitmapToFile(hornBitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\TestMaskHorn.jpg", ImageFormat.Jpeg);
             }
 
@@ -48,9 +44,9 @@ namespace WindowsFormsApplication1.BotPrograms
         /// <summary>
         /// Called periodically on a timer
         /// </summary>
-        protected override void Execute()
+        protected override bool Execute()
         {
-            
+            return false;
         }
 
         /// <summary>
@@ -163,7 +159,7 @@ namespace WindowsFormsApplication1.BotPrograms
         /// <returns></returns>
         private static void GetSkinColor()
         {
-            Color dark = Color.FromArgb(50, 2, 0);
+            Color dark = Color.FromArgb(30, 2, 0);
             Color light = Color.FromArgb(99, 39, 28);
             LesserDemonSkin = new ColorRange(dark, light);
         }
