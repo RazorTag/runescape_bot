@@ -3,3 +3,6 @@
 -1792 ms cumulatively spent on Bitmap.GetPixel
 -334 ms to loop through all of the pixels withut doing anything
 -125 ms to initialize the 2 pixel arrays
+
+
+(1175, 483)

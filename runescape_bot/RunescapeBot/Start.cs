@@ -87,11 +87,10 @@ namespace WindowsFormsApplication1
             {
                 case BotActions.GoldBracelets:
                     botProgram = new GoldBracelets(startParams);
-
                     break;
 
                 case BotActions.LesserDemon:
-                    startParams.FrameRate = 0.5;
+                    startParams.FrameTime = 5000;
                     botProgram = new LesserDemon(startParams);
                     break;
 

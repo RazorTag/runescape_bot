@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace WindowsFormsApplication1
@@ -54,16 +55,7 @@ namespace WindowsFormsApplication1
         /// <param name="y">pixels from top of client</param>
         public static void LeftMouseClick(int x, int y, Process rsClient)
         {
-            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
-            POINT originalCursorPos;
-
-            User32.SetForegroundWindow(rsClient.MainWindowHandle.ToInt32());
-            TranslateClick(ref x, ref y, rsClient);
-            User32.GetCursorPos(out originalCursorPos);
-            User32.SetCursorPos(x, y);
-            User32.mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
-            User32.mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
-            User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
+            MouseClick(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP);
         }
 
         /// <summary>
@@ -73,15 +65,29 @@ namespace WindowsFormsApplication1
         /// <param name="y">pixels from top of client</param>
         public static void RightMouseClick(int x, int y, Process rsClient)
         {
+            MouseClick(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP);
+        }
+
+        /// <summary>
+        /// Click down and release a mouse button
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="rsClient"></param>
+        /// <param name="clickTypeDown"></param>
+        /// <param name="clickTypeUp"></param>
+        private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
+        {
             BringToForeGround(rsClient.MainWindowHandle.ToInt32());
             POINT originalCursorPos;
 
-            User32.SetForegroundWindow(rsClient.MainWindowHandle.ToInt32());
             TranslateClick(ref x, ref y, rsClient);
             User32.GetCursorPos(out originalCursorPos);
             User32.SetCursorPos(x, y);
-            User32.mouse_event(MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0);
-            User32.mouse_event(MOUSEEVENTF_RIGHTUP, x, y, 0, 0);
+            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
+            Thread.Sleep(50);
+            User32.mouse_event(clickTypeDown, x, y, 0, 0);
+            User32.mouse_event(clickTypeUp, x, y, 0, 0);
             User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
         }
 
@@ -99,14 +105,14 @@ namespace WindowsFormsApplication1
             y += windowRect.top;
 
             //adjust for the borders and toolbar
-            x -= OSBUDDY_BORDER_WIDTH;
-            y -= OSBUDDY_TOOLBAR_WIDTH + OSBUDDY_BORDER_WIDTH;
+            x += OSBUDDY_BORDER_WIDTH;
+            y += OSBUDDY_TOOLBAR_WIDTH + OSBUDDY_BORDER_WIDTH;
         }
         #endregion
 
         #region screenreader
         /// <summary>
-        /// Brings the client window to th fireground and shows it
+        /// Brings the client window to the foreground and shows it
         /// </summary>
         /// <param name="rsHandle"></param>
         private static void BringToForeGround(int rsHandle)

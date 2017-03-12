@@ -6,9 +6,9 @@ namespace WindowsFormsApplication1
     {
         public StartParams()
         {
-            if (FrameRate == 0)
+            if (FrameTime == 0)
             {
-                FrameRate = 1.0;
+                FrameTime = 3000;
             }
         }
 
@@ -35,7 +35,7 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// Rate at which to iterate in units of Hz
         /// </summary>
-        public double FrameRate { get; set; }
+        public int FrameTime { get; set; }
 
         /// <summary>
         /// Time at which to end execution if it hasn't ended already

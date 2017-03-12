@@ -37,9 +37,9 @@ namespace WindowsFormsApplication1
         public int Iterations { get; set; }
 
         /// <summary>
-        /// Rate at which to iterate in units of Hz
+        /// Time between iteration in milliseconds
         /// </summary>
-        public double FrameRate { get; set; }
+        public int FrameTime { get; set; }
 
         /// <summary>
         /// Time at which to end execution if it hasn't ended already
@@ -65,7 +65,7 @@ namespace WindowsFormsApplication1
             RSClient = ScreenScraper.GetOSBuddy(startParams, out loadError);
             RunUntil = startParams.RunUntil;
             Iterations = startParams.Iterations;
-            FrameRate = startParams.FrameRate;
+            FrameTime = startParams.FrameTime;
             EndTime = startParams.EndTime;
         }
        
@@ -119,7 +119,6 @@ namespace WindowsFormsApplication1
         /// </summary>
         private void Iterate()
         {
-            int iterationTime = (int)(1000 * (1 / FrameRate));   //iteration refresh time in milliseconds
             if (Iterations == 0)
             {
                 Iterations = int.MaxValue;
@@ -138,9 +137,9 @@ namespace WindowsFormsApplication1
                     break;
                 }
                 watch.Stop();
-                if (watch.ElapsedMilliseconds < iterationTime)
+                if (watch.ElapsedMilliseconds < FrameTime)
                 {
-                    Thread.Sleep(iterationTime - (int)watch.ElapsedMilliseconds);
+                    Thread.Sleep(FrameTime - (int)watch.ElapsedMilliseconds);
                 }
             }
 
@@ -220,6 +219,17 @@ namespace WindowsFormsApplication1
         protected Color GetPixel(int x, int y)
         {
             return ColorArray[x, y];
+        }
+
+        /// <summary>
+        /// Determines the portion of the screen taken up by a blob
+        /// </summary>
+        /// <param name="artifact"></param>
+        /// <returns></returns>
+        protected double ArtifactSize(Blob artifact)
+        {
+            double screenSize = Bitmap.Size.Width * Bitmap.Size.Height;
+            return artifact.Size / screenSize;
         }
 
         /// <summary>

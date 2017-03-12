@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -10,35 +11,30 @@ namespace WindowsFormsApplication1.BotPrograms
     /// </summary>
     public class LesserDemon : BotProgram
     {
+        private const int maxDemonSpawnTime = 28000;    //max possible lesser demon spawn time in milliseconds
         private static ColorRange LesserDemonSkin;
         private static ColorRange LesserDemonHorn;
+
+        /// <summary>
+        /// Count of the number of consecutive prior frames where no demon has been found
+        /// </summary>
+        private int missedDemons;
+
+        /// <summary>
+        /// Number of times that the minimum required size of a lesser demon has been reduced due to no demon being found
+        /// </summary>
+        private int minSizeReductions;
+
+        /// <summary>
+        /// Theminimum required screen size for a lesser demon
+        /// </summary>
+        private double minDemonSize;
+
 
         public LesserDemon(StartParams startParams) : base(startParams)
         {
             GetReferenceColors();
-        }
-
-        /// <summary>
-        /// Called once before execute
-        /// </summary>
-        protected override void Run()
-        {
-            //Stopwatch watch = Stopwatch.StartNew();
-
-            ReadWindow();   //Read the game window color values into Bitmap and ColorArray
-            ScreenScraper.SaveImageToFile(ColorArray, "C:\\Projects\\RunescapeBot\\test_pictures\\RGBTest.jpg", ImageFormat.Jpeg);
-
-            if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
-            {
-                bool[,] skinPixels = ColorFilter(LesserDemonSkin);
-
-                TestMask(LesserDemonSkin, "Skin", skinPixels);
-                //LeftClick(1000, 500);
-                //ScreenScraper.WriteBitmapToFile(hornBitmap, "C:\\Projects\\RunescapeBot\\test_pictures\\TestMaskHorn.jpg", ImageFormat.Jpeg);
-            }
-
-            //watch.Stop();
-            //Console.WriteLine(watch.ElapsedMilliseconds);
+            minDemonSize = 0.0005;
         }
 
         /// <summary>
@@ -46,35 +42,81 @@ namespace WindowsFormsApplication1.BotPrograms
         /// </summary>
         protected override bool Execute()
         {
+            ReadWindow();   //Read the game window color values into Bitmap and ColorArray
+
+            if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
+            {
+                bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+                Blob demon = ImageProcessing.BiggestBlob(skinPixels);
+                Point demonCenter = demon.Center;
+                double cloveRange = 2 * Math.Sqrt(demon.Size);
+
+                if (MinimumSizeMet(demon) && ClovesWithinRange(demonCenter, cloveRange))
+                {
+                    LeftClick(demonCenter.X, demonCenter.Y);
+                    missedDemons = 0;
+                    minDemonSize = ArtifactSize(demon) / 2.0;
+                }
+                else
+                {
+                    missedDemons++;
+                }
+
+                if (missedDemons * FrameTime > maxDemonSpawnTime)
+                {
+                    minDemonSize /= 2.0;
+                    missedDemons = 0;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines if a demon blob meets the minimum size requirement
+        /// </summary>
+        /// <param name="demon"></param>
+        /// <returns></returns>
+        private bool MinimumSizeMet(Blob demon)
+        {
+            double demonScreenSize = ArtifactSize(demon);
+            if (demonScreenSize > minDemonSize)
+            {
+                return true;
+            }
+
             return false;
         }
 
         /// <summary>
-        /// Locates the pixels in a Bitmap that match the parts of the lesser demon to search for
+        /// Determines if there are enough cloves close enough to the demon
         /// </summary>
-        /// <param name="skinPixels">Color range representing a lesser demon's skin</param>
-        /// <param name="hornPixels">Color range representing a lesser demon's horn, hoofs, or tail spike</param>
-        private void FindDemonPixels(out bool[,] skinPixels, out bool[,] hornPixels)
+        /// <param name="demonCenter"></param>
+        /// <param name="cloveRange"></param>
+        /// <returns></returns>
+        private bool ClovesWithinRange(Point demonCenter, double cloveRange)
         {
-            Color pixelColor;
-            skinPixels = new bool[Bitmap.Width, Bitmap.Height];
-            hornPixels = new bool[Bitmap.Width, Bitmap.Height];
+            int requiredCloves = 3;
+            int clovesToCheck = 8;
+            int clovesFound = 0;
+            bool[,] hornPixels = ColorFilter(LesserDemonHorn);
+            List<Blob> demonCloves = Blob.SortBlobs(ImageProcessing.FindBlobs(hornPixels));
+            clovesToCheck = Math.Min(demonCloves.Count, 8);
 
-            for (int x = 0; x < Bitmap.Width; x++)
+            for (int i = 0; i < clovesToCheck; i++)
             {
-                for (int y = 0; y < Bitmap.Height; y++)
+                if (demonCloves[i].DistanceTo(demonCenter) < cloveRange)
                 {
-                    pixelColor = GetPixel(x, y);
-                    if (LesserDemonSkin.ColorInRange(pixelColor))
-                    {
-                        skinPixels[x, y] = true;
-                    }
-                    if (LesserDemonHorn.ColorInRange(pixelColor))
-                    {
-                        hornPixels[x, y] = true;
-                    }
+                    clovesFound++;
+                }
+
+                if (clovesFound >= requiredCloves)
+                {
+                    return true;
                 }
             }
+
+            return true;
         }
 
         /// <summary>
