@@ -85,7 +85,7 @@ namespace WindowsFormsApplication1
             User32.GetCursorPos(out originalCursorPos);
             User32.SetCursorPos(x, y);
             BringToForeGround(rsClient.MainWindowHandle.ToInt32());
-            Thread.Sleep(50);
+            Thread.Sleep(100);
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
             User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
