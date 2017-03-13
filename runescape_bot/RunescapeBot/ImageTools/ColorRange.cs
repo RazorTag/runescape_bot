@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace WindowsFormsApplication1
+namespace RunescapeBot
 {
     /// <summary>
     /// Represents a range of RGB colors used to identify artifacts of a known color

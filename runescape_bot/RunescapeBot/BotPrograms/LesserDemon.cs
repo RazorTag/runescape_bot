@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace WindowsFormsApplication1.BotPrograms
+namespace RunescapeBot.BotPrograms
 {
     /// <summary>
     /// Targets the lesser demon trapped in the Wizards' Tower
@@ -19,11 +19,6 @@ namespace WindowsFormsApplication1.BotPrograms
         /// Count of the number of consecutive prior frames where no demon has been found
         /// </summary>
         private int missedDemons;
-
-        /// <summary>
-        /// Number of times that the minimum required size of a lesser demon has been reduced due to no demon being found
-        /// </summary>
-        private int minSizeReductions;
 
         /// <summary>
         /// Theminimum required screen size for a lesser demon
@@ -46,13 +41,18 @@ namespace WindowsFormsApplication1.BotPrograms
 
             if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
+                int xOffset, yOffset, maxOffset;
                 bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+                EraseClientUIFromMask(ref skinPixels);
                 Blob demon = ImageProcessing.BiggestBlob(skinPixels);
                 Point demonCenter = demon.Center;
                 double cloveRange = 2 * Math.Sqrt(demon.Size);
 
                 if (MinimumSizeMet(demon) && ClovesWithinRange(demonCenter, cloveRange))
                 {
+                    maxOffset = (int) (0.05 * cloveRange);
+                    xOffset = RNG.Next(-maxOffset, maxOffset + 1);
+                    yOffset = RNG.Next(-maxOffset, maxOffset + 1);
                     LeftClick(demonCenter.X, demonCenter.Y);
                     missedDemons = 0;
                     minDemonSize = ArtifactSize(demon) / 2.0;
@@ -100,6 +100,7 @@ namespace WindowsFormsApplication1.BotPrograms
             int clovesToCheck = 8;
             int clovesFound = 0;
             bool[,] hornPixels = ColorFilter(LesserDemonHorn);
+            EraseClientUIFromMask(ref hornPixels);
             List<Blob> demonCloves = Blob.SortBlobs(ImageProcessing.FindBlobs(hornPixels));
             clovesToCheck = Math.Min(demonCloves.Count, 8);
 

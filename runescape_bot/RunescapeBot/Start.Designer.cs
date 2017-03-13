@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace RunescapeBot
 {
     /// <summary>
     /// UI for the user to select a bot program to run

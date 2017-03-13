@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WindowsFormsApplication1
+namespace RunescapeBot
 {
     public class StartParams
     {
@@ -36,6 +36,11 @@ namespace WindowsFormsApplication1
         /// Rate at which to iterate in units of Hz
         /// </summary>
         public int FrameTime { get; set; }
+
+        /// <summary>
+        /// Set to true to slightly vary the time between frames
+        /// </summary>
+        public bool RandomizeFrames { get; set; }
 
         /// <summary>
         /// Time at which to end execution if it hasn't ended already

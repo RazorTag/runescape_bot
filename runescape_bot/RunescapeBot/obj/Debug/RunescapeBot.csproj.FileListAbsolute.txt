@@ -18,11 +18,11 @@ C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.dll
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.pdb
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.xml
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Start.resources
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csproj.GenerateResource.Cache
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\ImageProcessor.dll
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.exe.manifest
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.application
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.exe.manifest
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.application
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.Start.resources
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache

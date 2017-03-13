@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+namespace RunescapeBot
 {
     /// <summary>
     /// Initializes the programs and starts the UI (Start.cs)

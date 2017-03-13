@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Forms;
-using WindowsFormsApplication1.BotPrograms;
+using RunescapeBot.BotPrograms;
 
-namespace WindowsFormsApplication1
+namespace RunescapeBot
 {
     public partial class Start : Form
     {
@@ -91,6 +91,7 @@ namespace WindowsFormsApplication1
 
                 case BotActions.LesserDemon:
                     startParams.FrameTime = 5000;
+                    startParams.RandomizeFrames = true;
                     botProgram = new LesserDemon(startParams);
                     break;
 

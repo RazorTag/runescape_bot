@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace RunescapeBot.BotPrograms
 {
     /// <summary>
     /// Smiths gold bracelets at the furnace in Port Phasmatys

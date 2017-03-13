@@ -1,11 +1,12 @@
-﻿using System;
+﻿using RunescapeBot.BotPrograms.Debug;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+namespace RunescapeBot.BotPrograms
 {
     /// <summary>
     /// Base class for bot programs that handles starting and stopping of bot programs
@@ -19,32 +20,37 @@ namespace WindowsFormsApplication1
         /// <summary>
         /// Process to which this bot program is attached
         /// </summary>
-        public Process RSClient { get; set; }
+        protected Process RSClient { get; set; }
 
         /// <summary>
         /// Thread in which the run method is executed
         /// </summary>
-        public Thread RunThread { get; set; }
+        protected Thread RunThread { get; set; }
 
         /// <summary>
         /// Time when the bot program should cease execution
         /// </summary>
-        public DateTime RunUntil { get; set; }
+        protected DateTime RunUntil { get; set; }
 
         /// <summary>
         /// Number of iterations after which the bot program should cease execution
         /// </summary>
-        public int Iterations { get; set; }
+        protected int Iterations { get; set; }
 
         /// <summary>
         /// Time between iteration in milliseconds
         /// </summary>
-        public int FrameTime { get; set; }
+        protected int FrameTime { get; set; }
+
+        /// <summary>
+        /// If set to true, slightly varies the wait time between executions
+        /// </summary>
+        protected bool RandomizeFrames { get; set; }
 
         /// <summary>
         /// Time at which to end execution if it hasn't ended already
         /// </summary>
-        public DateTime EndTime { get; set; }
+        protected DateTime EndTime { get; set; }
 
         /// <summary>
         /// Stores a bitmap of the client window
@@ -57,6 +63,18 @@ namespace WindowsFormsApplication1
         protected Color[,] ColorArray { get; set; }
 
         /// <summary>
+        /// Stores the simulated user actions that have been taken by this program (click, etc)
+        /// </summary>
+        protected BotProgramActions BotActions { get; set; }
+
+        /// <summary>
+        /// Stock random number generator
+        /// </summary>
+        protected Random RNG { get; set; }
+
+
+
+        /// <summary>
         /// Initializes a bot program with a client matching startParams
         /// </summary>
         /// <param name="startParams">specifies the username to search for</param>
@@ -66,7 +84,10 @@ namespace WindowsFormsApplication1
             RunUntil = startParams.RunUntil;
             Iterations = startParams.Iterations;
             FrameTime = startParams.FrameTime;
+            RandomizeFrames = startParams.RandomizeFrames;
             EndTime = startParams.EndTime;
+            BotActions = new BotProgramActions();
+            RNG = new Random();
         }
        
         /// <summary>
@@ -119,9 +140,20 @@ namespace WindowsFormsApplication1
         /// </summary>
         private void Iterate()
         {
+            int randomFrameOffset, randomFrameTime;
+
             if (Iterations == 0)
             {
                 Iterations = int.MaxValue;
+            }
+
+            if (RandomizeFrames)
+            {
+                randomFrameOffset = (int) (0.1 * FrameTime);
+            }
+            else
+            {
+                randomFrameOffset = 0;
             }
 
             for (int i = 0; i < Iterations; i++)
@@ -132,12 +164,15 @@ namespace WindowsFormsApplication1
                 }
 
                 Stopwatch watch = Stopwatch.StartNew();
-                if (!Execute())
+                if (!Execute()) //quit by an override Execute method
                 {
                     break;
                 }
+
+                randomFrameTime = FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
+                randomFrameTime = Math.Max(0, randomFrameTime);
                 watch.Stop();
-                if (watch.ElapsedMilliseconds < FrameTime)
+                if (watch.ElapsedMilliseconds < randomFrameTime)
                 {
                     Thread.Sleep(FrameTime - (int)watch.ElapsedMilliseconds);
                 }
@@ -233,13 +268,14 @@ namespace WindowsFormsApplication1
         }
 
         /// <summary>
-        /// Wrapper for ScreenScraper.LeftMouseCLick
+        /// Wrapper for ScreenScraper.LeftMouseClick
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         protected void LeftClick(int x, int y)
         {
             ScreenScraper.LeftMouseClick(x, y, RSClient);
+            BotActions.SaveClick(x, y);
         }
 
         /// <summary>
@@ -250,6 +286,45 @@ namespace WindowsFormsApplication1
         protected void RightClick(int x, int y)
         {
             ScreenScraper.RightMouseClick(x, y, RSClient);
+            BotActions.SaveClick(x, y, true);
+        }
+
+        /// <summary>
+        /// Sets the pixels in client UI areas to false.
+        /// This should only be used with untrimmed images.
+        /// </summary>
+        /// <param name="mask"></param>
+        protected void EraseClientUIFromMask(ref bool[,] mask)
+        {
+            int width = mask.GetLength(0);
+            int height = mask.GetLength(1);
+
+            //erase chat box
+            for (int x = 0; x < 519; x++)
+            {
+                for (int y = height - 159; y < height; y++)
+                {
+                    mask[x, y] = false;
+                }
+            }
+
+            //erase inventory
+            for (int x = width - 241; x < width; x++)
+            {
+                for (int y = height - 336; y < height; y++)
+                {
+                    mask[x, y] = false;
+                }
+            }
+
+            //erase minimap
+            for (int x = width - 211; x < width; x++)
+            {
+                for (int y = 0; y < 192; y++)
+                {
+                    mask[x, y] = false;
+                }
+            }
         }
     }
 }

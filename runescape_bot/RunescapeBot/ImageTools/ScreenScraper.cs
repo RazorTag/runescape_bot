@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+namespace RunescapeBot
 {
     /// <summary>
     /// Responsible for interacting with the RS client
@@ -83,9 +83,9 @@ namespace WindowsFormsApplication1
 
             TranslateClick(ref x, ref y, rsClient);
             BringToForeGround(rsClient.MainWindowHandle.ToInt32());
-            Thread.Sleep(100);
             User32.GetCursorPos(out originalCursorPos);
             User32.SetCursorPos(x, y);
+            Thread.Sleep(100);  //wait for RS client to recognize that the cursor is hovering over the demon
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
             User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
