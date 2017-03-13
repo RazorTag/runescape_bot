@@ -32,6 +32,18 @@ namespace RunescapeBot.BotPrograms
             minDemonSize = 0.0005;
         }
 
+        protected override void Run()
+        {
+            ////test code to save mask pictures
+            //ReadWindow();
+            //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+            //EraseClientUIFromMask(ref skinPixels);
+            //TestMask(LesserDemonSkin, "Skin", skinPixels);
+            //bool[,] hornPixels = ColorFilter(LesserDemonHorn);
+            //EraseClientUIFromMask(ref hornPixels);
+            //TestMask(LesserDemonHorn, "horn", hornPixels);
+        }
+
         /// <summary>
         /// Called periodically on a timer
         /// </summary>

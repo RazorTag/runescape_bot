@@ -131,7 +131,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void Run()
         {
-            return;
+            
         }
 
         /// <summary>
@@ -213,6 +213,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool[,] ColorFilter(ColorRange artifactColor)
         {
+            if (ColorArray == null)
+            {
+                return null;
+            }
+
             return ImageProcessing.ColorFilter(ColorArray, artifactColor);
         }
 

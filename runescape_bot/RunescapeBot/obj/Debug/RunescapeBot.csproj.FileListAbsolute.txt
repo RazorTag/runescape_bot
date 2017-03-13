@@ -25,4 +25,3 @@ C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\RunescapeBot.appli
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.exe.manifest
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.application
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.Start.resources
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache
