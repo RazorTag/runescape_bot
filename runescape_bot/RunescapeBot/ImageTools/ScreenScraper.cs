@@ -1,113 +1,23 @@
-﻿using System;
+﻿using RunescapeBot.UITools;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
+using static RunescapeBot.UITools.User32;
 
-namespace RunescapeBot
+namespace RunescapeBot.ImageTools
 {
     /// <summary>
     /// Responsible for interacting with the RS client
     /// </summary>
     public static class ScreenScraper
     {
-        private static int OSBUDDY_TOOLBAR_WIDTH = 31;  //does not include the border underneath the toolbar
-        private static int OSBUDDY_BORDER_WIDTH = 2;
-        public const int SW_RESTORE = 9;
-
-        #region custom structs
-        [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
-        {
-            public int X;
-            public int Y;
-
-            public static implicit operator Point(POINT point)
-            {
-                return new Point(point.X, point.Y);
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
-        {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
-        }
-        #endregion
-
         #region constants
-        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        private const int MOUSEEVENTF_LEFTUP = 0x04;
-        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-        private const int MOUSEEVENTF_RIGHTUP = 0x10;
-        #endregion
-
-        #region click handlers
-        /// <summary>
-        /// Execute a left mouse click and return the mouse to its original position
-        /// </summary>
-        /// <param name="x">pixels from left of client</param>
-        /// <param name="y">pixels from top of client</param>
-        public static void LeftMouseClick(int x, int y, Process rsClient)
-        {
-            MouseClick(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP);
-        }
-
-        /// <summary>
-        /// Execute a right mouse click and return the mouse to its original position
-        /// </summary>
-        /// <param name="x">pixels from left of client</param>
-        /// <param name="y">pixels from top of client</param>
-        public static void RightMouseClick(int x, int y, Process rsClient)
-        {
-            MouseClick(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP);
-        }
-
-        /// <summary>
-        /// Click down and release a mouse button
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="rsClient"></param>
-        /// <param name="clickTypeDown"></param>
-        /// <param name="clickTypeUp"></param>
-        private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
-        {
-            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
-            POINT originalCursorPos;
-
-            TranslateClick(ref x, ref y, rsClient);
-            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
-            User32.GetCursorPos(out originalCursorPos);
-            User32.SetCursorPos(x, y);
-            Thread.Sleep(100);  //wait for RS client to recognize that the cursor is hovering over the demon
-            User32.mouse_event(clickTypeDown, x, y, 0, 0);
-            User32.mouse_event(clickTypeUp, x, y, 0, 0);
-            User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
-        }
-
-        /// <summary>
-        /// Translate a click location from a position within the diplay portion of OSBuddy to a position on the screen.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        private static void TranslateClick(ref int x, ref int y, Process rsClient)
-        {
-            //adjust for the position of the OSBuddy window
-            RECT windowRect = new RECT();
-            User32.GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
-            x += windowRect.left;
-            y += windowRect.top;
-
-            //adjust for the borders and toolbar
-            x += OSBUDDY_BORDER_WIDTH;
-            y += OSBUDDY_TOOLBAR_WIDTH + OSBUDDY_BORDER_WIDTH;
-        }
+        public static int OSBUDDY_TOOLBAR_WIDTH = 31;  //does not include the border underneath the toolbar
+        public static int OSBUDDY_BORDER_WIDTH = 2;
+        public const int SW_RESTORE = 9;
         #endregion
 
         #region screenreader
@@ -115,7 +25,7 @@ namespace RunescapeBot
         /// Brings the client window to the foreground and shows it
         /// </summary>
         /// <param name="rsHandle"></param>
-        private static void BringToForeGround(int rsHandle)
+        public static void BringToForeGround(int rsHandle)
         {
             if (User32.IsIconic(rsHandle))
             {
@@ -294,77 +204,6 @@ namespace RunescapeBot
             windowRect.left += OSBUDDY_BORDER_WIDTH;
 
             return (windowRect.top > 0) || (windowRect.right > 0) || (windowRect.bottom > 0) || (windowRect.left > 0);
-        }
-        #endregion
-
-        #region private inner classes
-        /// <summary>
-        /// Helper class containing Gdi32 API functions
-        /// </summary>
-        private class GDI32
-        {
-            public const int SRCCOPY = 0x00CC0020; // BitBlt dwRop parameter
-
-            [DllImport("gdi32.dll")]
-            public static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest,
-                int nWidth, int nHeight, IntPtr hObjectSource,
-                int nXSrc, int nYSrc, int dwRop);
-            [DllImport("gdi32.dll")]
-            public static extern IntPtr CreateCompatibleBitmap(IntPtr hDC, int nWidth,
-                int nHeight);
-            [DllImport("gdi32.dll")]
-            public static extern IntPtr CreateCompatibleDC(IntPtr hDC);
-            [DllImport("gdi32.dll")]
-            public static extern bool DeleteDC(IntPtr hDC);
-            [DllImport("gdi32.dll")]
-            public static extern bool DeleteObject(IntPtr hObject);
-            [DllImport("gdi32.dll")]
-            public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
-        }
-
-        /// <summary>
-        /// Helper class containing User32 API functions
-        /// </summary>
-        private class User32
-        {
-            [DllImport("user32.dll")]
-            public static extern IntPtr GetDesktopWindow();
-            [DllImport("user32.dll")]
-            public static extern IntPtr GetWindowDC(IntPtr hWnd);
-            [DllImport("user32.dll")]
-            public static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
-            [DllImport("user32.dll")]
-            public static extern IntPtr GetWindowRect(IntPtr hWnd, ref RECT rect);
-
-            [DllImport("user32.dll", SetLastError = true)]
-            public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-            /// <summary>
-            /// Retrieves the cursor's position, in screen coordinates.
-            /// </summary>
-            /// <see>See MSDN documentation for further information.</see>
-            [DllImport("user32.dll")]
-            public static extern bool GetCursorPos(out POINT point);
-
-            /// <summary>
-            /// Sets the cursor's position, in screen coordinates.
-            /// </summary>
-            /// <param name="x"></param>
-            /// <param name="y"></param>
-            /// <returns></returns>
-            [DllImport("user32.dll")]
-            public static extern bool SetCursorPos(int x, int y);
-
-            [DllImport("user32.dll")]
-            public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-            [DllImport("User32.dll")]
-            public static extern bool SetForegroundWindow(int hWnd);
-            [DllImport("User32.dll")]
-            public static extern int GetTopWindow(int hWnd);
-            [DllImport("user32.dll")]
-            public static extern bool IsIconic(int handle);
-            [DllImport("user32.dll")]
-            public static extern bool ShowWindow(int handle, int nCmdShow);
         }
         #endregion
     }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RunescapeBot
+namespace RunescapeBot.ImageTools
 {
     public static class ImageProcessing
     {

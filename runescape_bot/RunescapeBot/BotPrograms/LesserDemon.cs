@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.ImageTools;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -57,6 +58,8 @@ namespace RunescapeBot.BotPrograms
                 bool[,] skinPixels = ColorFilter(LesserDemonSkin);
                 EraseClientUIFromMask(ref skinPixels);
                 Blob demon = ImageProcessing.BiggestBlob(skinPixels);
+                if (demon == null) { return true; }
+
                 Point demonCenter = demon.Center;
                 double cloveRange = 2 * Math.Sqrt(demon.Size);
 

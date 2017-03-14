@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace RunescapeBot
+namespace RunescapeBot.ImageTools
 {
     /// <summary>
     /// Represents a range of RGB colors used to identify artifacts of a known color

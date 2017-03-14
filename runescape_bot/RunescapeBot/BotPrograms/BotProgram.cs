@@ -1,4 +1,6 @@
 ﻿using RunescapeBot.BotPrograms.Debug;
+using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -277,9 +279,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void LeftClick(int x, int y)
+        protected void LeftClick(int x, int y, bool preserveMousePosition = false)
         {
-            ScreenScraper.LeftMouseClick(x, y, RSClient);
+            MouseActions.LeftMouseClick(x, y, RSClient, preserveMousePosition);
             BotActions.SaveClick(x, y);
         }
 
@@ -288,9 +290,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y)
+        protected void RightClick(int x, int y, bool preserveMousePosition = false)
         {
-            ScreenScraper.RightMouseClick(x, y, RSClient);
+            MouseActions.RightMouseClick(x, y, RSClient, preserveMousePosition);
             BotActions.SaveClick(x, y, true);
         }
 
