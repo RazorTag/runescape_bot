@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.BotPrograms;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -27,12 +28,10 @@ namespace RunescapeBot.ImageTools
                 for (int y = 0; y < height; y++)
                 {
                     pixelColor = rgbImage[x, y];
-                    if (artifactColor.ColorInRange(pixelColor))
-                    {
-                        filterPixels[x, y] = true;
-                    }
+                    filterPixels[x, y] = artifactColor.ColorInRange(pixelColor);
                 }
             }
+
             return filterPixels;
         }
 

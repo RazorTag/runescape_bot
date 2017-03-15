@@ -45,6 +45,12 @@ namespace RunescapeBot.UITools
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(int handle, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetCapture(int hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern long ReleaseCapture();
+
         #region custom structs
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT

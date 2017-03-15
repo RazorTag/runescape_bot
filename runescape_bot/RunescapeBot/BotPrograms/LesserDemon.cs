@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Threading;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -22,7 +23,7 @@ namespace RunescapeBot.BotPrograms
         private int missedDemons;
 
         /// <summary>
-        /// Theminimum required screen size for a lesser demon
+        /// The minimum required proportion of screen for a lesser demon
         /// </summary>
         private double minDemonSize;
 
@@ -30,19 +31,20 @@ namespace RunescapeBot.BotPrograms
         public LesserDemon(StartParams startParams) : base(startParams)
         {
             GetReferenceColors();
-            minDemonSize = 0.0005;
+            minDemonSize = 0.001;
         }
 
         protected override void Run()
         {
-            ////test code to save mask pictures
-            //ReadWindow();
-            //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
-            //EraseClientUIFromMask(ref skinPixels);
+            //test code to save mask pictures
+            ReadWindow();
+            bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+            EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
-            //bool[,] hornPixels = ColorFilter(LesserDemonHorn);
-            //EraseClientUIFromMask(ref hornPixels);
+            bool[,] hornPixels = ColorFilter(LesserDemonHorn);
+            EraseClientUIFromMask(ref hornPixels);
             //TestMask(LesserDemonHorn, "horn", hornPixels);
+            TestSkinAndHorn(skinPixels, hornPixels);
         }
 
         /// <summary>
@@ -135,6 +137,24 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
+        private void TestSkinAndHorn(bool[,] skin, bool[,] horn)
+        {
+            Bitmap bitmap = (Bitmap) Bitmap.Clone();
+
+            for (int x = 0; x < Bitmap.Width; x++)
+            {
+                for (int y = 0; y < Bitmap.Height; y++)
+                {
+                    if (!skin[x, y] && !horn[x, y])
+                    {
+                        bitmap.SetPixel(x, y, Color.White);
+                    }
+                }
+            }
+            string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            ScreenScraper.SaveImageToFile(bitmap, directory + "SkinAndHorn.jpg", ImageFormat.Jpeg);
+        }
+
         /// <summary>
         /// Colors the pixels where the given feature was found in Bitmap.
         /// Does not modify Bitmap. Creates a copy and returns the copy with masking applied.
@@ -147,6 +167,9 @@ namespace RunescapeBot.BotPrograms
             Bitmap redBitmap = (Bitmap) Bitmap.Clone();
             Bitmap greenBitmap = (Bitmap) Bitmap.Clone();
             Bitmap blueBitmap = (Bitmap) Bitmap.Clone();
+            Bitmap hueBitmap = (Bitmap) Bitmap.Clone();
+            Bitmap saturationBitmap = (Bitmap)Bitmap.Clone();
+            Bitmap brightnessBitmap = (Bitmap)Bitmap.Clone();
             Bitmap bitmap = (Bitmap) Bitmap.Clone();
             Color pixel;
 
@@ -154,36 +177,68 @@ namespace RunescapeBot.BotPrograms
             {
                 for (int y = 0; y < Bitmap.Height; y++)
                 {
-                    pixel = Bitmap.GetPixel(x, y);
+                    pixel = ColorArray[x, y];
 
-                    //make red bitmap
-                    if (pixel.R < bodyPart.DarkestColor.R)
+                    if ((bodyPart.DarkestColor != null) && (bodyPart.LightestColor != null))
                     {
-                        redBitmap.SetPixel(x, y, Color.Black);
-                    }
-                    else if (pixel.R > bodyPart.LightestColor.R)
-                    {
-                        redBitmap.SetPixel(x, y, Color.White);
+                        //make red bitmap
+                        if (pixel.R < bodyPart.DarkestColor.R)
+                        {
+                            redBitmap.SetPixel(x, y, Color.Black);
+                        }
+                        else if (pixel.R > bodyPart.LightestColor.R)
+                        {
+                            redBitmap.SetPixel(x, y, Color.White);
+                        }
+
+                        //make green bitmap
+                        if (pixel.G < bodyPart.DarkestColor.G)
+                        {
+                            greenBitmap.SetPixel(x, y, Color.Black);
+                        }
+                        else if (pixel.G > bodyPart.LightestColor.G)
+                        {
+                            greenBitmap.SetPixel(x, y, Color.White);
+                        }
+
+                        //make blue bitmap
+                        if (pixel.B < bodyPart.DarkestColor.B)
+                        {
+                            blueBitmap.SetPixel(x, y, Color.Black);
+                        }
+                        else if (pixel.B > bodyPart.LightestColor.B)
+                        {
+                            blueBitmap.SetPixel(x, y, Color.White);
+                        }
                     }
 
-                    //make green bitmap
-                    if (pixel.G < bodyPart.DarkestColor.G)
+                    if (bodyPart.HSBRange != null)
                     {
-                        greenBitmap.SetPixel(x, y, Color.Black);
-                    }
-                    else if (pixel.G > bodyPart.LightestColor.G)
-                    {
-                        greenBitmap.SetPixel(x, y, Color.White);
-                    }
+                        //make hue bitmap
+                        if (!bodyPart.HSBRange.HueInRange(pixel))
+                        {
+                            hueBitmap.SetPixel(x, y, Color.White);
+                        }
 
-                    //make blue bitmap
-                    if (pixel.B < bodyPart.DarkestColor.B)
-                    {
-                        blueBitmap.SetPixel(x, y, Color.Black);
-                    }
-                    else if (pixel.B > bodyPart.LightestColor.B)
-                    {
-                        blueBitmap.SetPixel(x, y, Color.White);
+                        //make saturation bitmap
+                        if (pixel.GetSaturation() < bodyPart.HSBRange.MinimumSaturation)
+                        {
+                            saturationBitmap.SetPixel(x, y, Color.Black);
+                        }
+                        else if (pixel.GetSaturation() > bodyPart.HSBRange.MaximumSaturation)
+                        {
+                            saturationBitmap.SetPixel(x, y, Color.White);
+                        }
+
+                        //make brightness bitmap
+                        if (pixel.GetBrightness() < bodyPart.HSBRange.MinimumBrightness)
+                        {
+                            brightnessBitmap.SetPixel(x, y, Color.Black);
+                        }
+                        else if (pixel.GetBrightness() > bodyPart.HSBRange.MaximumBrightness)
+                        {
+                            brightnessBitmap.SetPixel(x, y, Color.White);
+                        }
                     }
 
                     //make combined bitmap
@@ -195,11 +250,31 @@ namespace RunescapeBot.BotPrograms
             }
 
             string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_RedMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_GreenMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_BlueMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(hueBitmap, directory + saveName + "_HSBHueMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(saturationBitmap, directory + saveName + "_HSBSaturationMaskTest.jpg", ImageFormat.Jpeg);
+            ScreenScraper.SaveImageToFile(brightnessBitmap, directory + saveName + "_HSBBrightnessMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(bitmap, directory + saveName + "_TotalMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(Bitmap, directory + "Original.jpg", ImageFormat.Jpeg);
+        }
+
+        public static int SizeOfMatch(bool[,] mask)
+        {
+            int matches = 0;
+
+            for (int x = 0; x < mask.GetLength(0); x++)
+            {
+                for (int y = 0; y < mask.GetLength(1); y++)
+                {
+                    if (mask[x, y])
+                    {
+                        matches++;
+                    }
+                }
+            }
+            return matches;
         }
 
         /// <summary>
@@ -217,9 +292,10 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         private static void GetSkinColor()
         {
-            Color dark = Color.FromArgb(30, 2, 0);
-            Color light = Color.FromArgb(99, 39, 28);
-            LesserDemonSkin = new ColorRange(dark, light);
+            Color dark = Color.FromArgb(25, 5, 0);
+            Color light = Color.FromArgb(140, 70, 50);
+            HSBRange hsbRange = new HSBRange(355, 20, 0.4f, 1f, 0.05f, 0.5f);
+            LesserDemonSkin = new ColorRange(dark, light, hsbRange);
         }
 
         /// <summary>
@@ -229,8 +305,9 @@ namespace RunescapeBot.BotPrograms
         private static void GetHornColor()
         {
             Color dark = Color.FromArgb(0, 0, 0);
-            Color light = Color.FromArgb(12, 12, 12);
-            LesserDemonHorn = new ColorRange(dark, light);
+            Color light = Color.FromArgb(30, 30, 30);
+            HSBRange hsbRange = new HSBRange(0, 0, 0.05f, 0.3f, 0.02f, 0.12f);
+            LesserDemonHorn = new ColorRange(dark, light, hsbRange);
         }
     }
 }

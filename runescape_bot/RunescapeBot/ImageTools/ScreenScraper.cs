@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.ImageTools
@@ -39,7 +40,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
         /// <returns></returns>
-        public static Bitmap CaptureWindow(Process rsClient)
+        public static Bitmap CaptureWindowLegacy(Process rsClient)
         {
             BringToForeGround(rsClient.MainWindowHandle.ToInt32());
 
@@ -79,6 +80,31 @@ namespace RunescapeBot.ImageTools
             User32.ReleaseDC(handle, hdcSrc);
 
             return Image.FromHbitmap(hBitmap);
+        }
+
+        /// <summary>
+        /// Creates an Image object containing a screen shot of a specific window
+        /// </summary>
+        /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
+        /// <returns></returns>
+        public static Bitmap CaptureWindow(Process rsClient)
+        {
+            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
+
+            RECT windowRect = new RECT();
+            User32.GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            if (!TrimOSBuddy(ref windowRect))
+            {
+                return null;
+            }
+
+            int width = windowRect.right - windowRect.left;
+            int height = windowRect.bottom - windowRect.top;
+            Bitmap screenShot = new Bitmap(width, height, PixelFormat.Format32bppRgb);
+            Graphics gScreen = Graphics.FromImage(screenShot);
+            gScreen.CopyFromScreen(windowRect.left, windowRect.top, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
+
+            return screenShot;
         }
 
         /// <summary>

@@ -246,6 +246,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected bool ReadWindow()
         {
+            if (Bitmap != null)
+            {
+                Bitmap.Dispose();
+            }
+                
+            //Bitmap = ScreenScraper.CaptureWindowLegacy(RSClient);
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
 
@@ -275,7 +281,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Wrapper for ScreenScraper.LeftMouseClick
+        /// Wrapper for MouseActions.LeftMouseClick
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -286,7 +292,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Wrapper for ScreenScraper.RightMouseClick
+        /// Wrapper for MouseActions.RightMouseClick
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>

@@ -87,6 +87,7 @@
     <Compile Include="BotPrograms\GoldBracelets.cs" />
     <Compile Include="BotPrograms\LesserDemon.cs" />
     <Compile Include="ImageTools\ColorRange.cs" />
+    <Compile Include="ImageTools\HSBRange.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />
     <Compile Include="Start.cs">

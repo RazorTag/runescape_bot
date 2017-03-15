@@ -48,21 +48,18 @@ namespace RunescapeBot.UITools
         /// <param name="clickTypeUp"></param>
         private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, bool preserveMousePosition)
         {
-            ScreenScraper.BringToForeGround(rsClient.MainWindowHandle.ToInt32());
             POINT originalCursorPos;
+            int hWnd = rsClient.MainWindowHandle.ToInt32();
+            ScreenScraper.BringToForeGround(hWnd);
 
             TranslateClick(ref x, ref y, rsClient);
-            ScreenScraper.BringToForeGround(rsClient.MainWindowHandle.ToInt32());
+            ScreenScraper.BringToForeGround(hWnd);
             User32.GetCursorPos(out originalCursorPos);
             User32.SetCursorPos(x, y);
             Thread.Sleep(100);  //wait for RS client to recognize that the cursor is hovering over the demon
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
-
-            if (preserveMousePosition)
-            {
-                User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
-            }
+            User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
         }
 
         /// <summary>

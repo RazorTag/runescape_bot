@@ -66,14 +66,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunescapeBot.exe" size="102824">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunescapeBot.exe" size="106920">
       <assemblyIdentity name="RunescapeBot" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>FrHVa3VpzzNgPnUuMe8/FgYPXxDMr9g2jc6uu1i8wG4=</dsig:DigestValue>
+        <dsig:DigestValue>9Nh2sMVrAXoM/YEPYm7H90UoloErGaP9RaMxOfpaDak=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

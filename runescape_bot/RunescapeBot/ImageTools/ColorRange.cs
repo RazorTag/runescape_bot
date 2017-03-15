@@ -18,6 +18,11 @@ namespace RunescapeBot.ImageTools
         public Color LightestColor { get; set; }
 
         /// <summary>
+        /// The acceptable range of hues
+        /// </summary>
+        public HSBRange HSBRange { get; set; }
+
+        /// <summary>
         /// Sets the color range
         /// </summary>
         /// <param name="darkestColor">The color with the values closest to black that occur in an artifact</param>
@@ -26,6 +31,31 @@ namespace RunescapeBot.ImageTools
         {
             this.DarkestColor = darkestColor;
             this.LightestColor = lightestColor;
+            this.HSBRange = null;
+        }
+
+        /// <summary>
+        /// Sets the color range
+        /// </summary>
+        /// <param name="darkestColor">The color with the values closest to black that occur in an artifact</param>
+        /// <param name="lightestColor">The color with the values closest to white that occur in an artifact</param>
+        public ColorRange(HSBRange hsbRange)
+        {
+            this.DarkestColor = Color.FromArgb(0, 0, 0);
+            this.LightestColor = Color.FromArgb(255, 255, 255);
+            this.HSBRange = hsbRange;
+        }
+
+        /// <summary>
+        /// Sets the color range
+        /// </summary>
+        /// <param name="darkestColor">The color with the values closest to black that occur in an artifact</param>
+        /// <param name="lightestColor">The color with the values closest to white that occur in an artifact</param>
+        public ColorRange(Color darkestColor, Color lightestColor, HSBRange hsbRange)
+        {
+            this.DarkestColor = darkestColor;
+            this.LightestColor = lightestColor;
+            this.HSBRange = hsbRange;
         }
 
         /// <summary>
@@ -35,7 +65,36 @@ namespace RunescapeBot.ImageTools
         /// <returns>true if the given color falls within this color range</returns>
         public bool ColorInRange(Color color)
         {
-            return RedInRange(color) && GreenInRange(color) && BlueInRange(color);
+            return  RGBInRange(color) && HSBInRange(color);
+        }
+
+        /// <summary>
+        /// Determines if a color falls within the hue range
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns>true if the color is in hue range or if the hue is unspecified</returns>
+        public bool HSBInRange(Color color)
+        {
+            if (HSBRange == null)
+            {
+                return true;
+            }
+            
+            return HSBRange.ColorInRange(color);
+        }
+
+
+        public bool RGBInRange(Color color)
+        {
+            if ((DarkestColor == null) && (LightestColor == null))
+            {
+                return true;
+            }
+
+            else
+            {
+                return RedInRange(color) && GreenInRange(color) && BlueInRange(color);
+            }
         }
 
         /// <summary>
