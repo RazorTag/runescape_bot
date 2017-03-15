@@ -19,46 +19,55 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static bool[,] ColorFilter(Color[,] rgbImage, ColorRange artifactColor)
         {
-            Color pixelColor;
             int width = rgbImage.GetLength(0);
             int height = rgbImage.GetLength(1);
+            int xDivider = width / 2;
+            int yDivider = height / 2;
             bool[,] filterPixels = new bool[width, height];
 
-            for (int x = 0; x < width; x++)
+            //Create the threads
+            Thread upperLeft = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, 0, xDivider, 0, yDivider));
+            Thread upperRight = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, xDivider, width, 0, yDivider));
+            Thread lowerLeft = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, 0, xDivider, yDivider, height));
+            Thread lowerRight = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, xDivider, width, yDivider, height));
+
+            //Start the threads
+            upperLeft.Start();
+            upperRight.Start();
+            lowerLeft.Start();
+            lowerRight.Start();
+
+            //Wait for all threads to finish
+            upperLeft.Join();
+            upperRight.Join();
+            lowerLeft.Join();
+            lowerRight.Join();
+
+            return filterPixels;
+        }
+
+        /// <summary>
+        /// Filters a portion of the rgbImage into a binary image
+        /// </summary>
+        /// <param name="rgbImage">unfiltered image</param>
+        /// <param name="artifactColor">color range to use for filtering</param>
+        /// <param name="filterPixels">filtered binary image</param>
+        /// <param name="xMin">inclusive</param>
+        /// <param name="xMax">exclusive</param>
+        /// <param name="yMin">inclusive</param>
+        /// <param name="yMax">exclusive</param>
+        public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filterPixels, int xMin, int xMax, int yMin, int yMax)
+        {
+            Color pixelColor;
+
+            for (int x = xMin; x < xMax; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (int y = yMin; y < yMax; y++)
                 {
                     pixelColor = rgbImage[x, y];
                     filterPixels[x, y] = artifactColor.ColorInRange(pixelColor);
                 }
             }
-
-            //ParameterizedThreadStart threadStart = new ParameterizedThreadStart(ColorFilterPiece);
-            //Thread upperLeft = new Thread(ColorFilterPiece);
-
-            //return filterPixels;
-
-
-            //Color pixelColor;
-            //int width = rgbImage.GetLength(0);
-            //int height = rgbImage.GetLength(1);
-            //bool[,] filterPixels = new bool[width, height];
-
-            //for (int x = 0; x < width; x++)
-            //{
-            //    for (int y = 0; y < height; y++)
-            //    {
-            //        pixelColor = rgbImage[x, y];
-            //        filterPixels[x, y] = artifactColor.ColorInRange(pixelColor);
-            //    }
-            //}
-
-            return filterPixels;
-        }
-
-        public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filteredImage)
-        {
-
         }
 
         //public delegate void 
