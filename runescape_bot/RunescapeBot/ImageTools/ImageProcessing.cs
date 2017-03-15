@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RunescapeBot.ImageTools
@@ -32,7 +33,32 @@ namespace RunescapeBot.ImageTools
                 }
             }
 
+            ParameterizedThreadStart threadStart = new ParameterizedThreadStart(ColorFilterPiece);
+            Thread upperLeft = new Thread(ColorFilterPiece);
+
             return filterPixels;
+
+
+            //Color pixelColor;
+            //int width = rgbImage.GetLength(0);
+            //int height = rgbImage.GetLength(1);
+            //bool[,] filterPixels = new bool[width, height];
+
+            //for (int x = 0; x < width; x++)
+            //{
+            //    for (int y = 0; y < height; y++)
+            //    {
+            //        pixelColor = rgbImage[x, y];
+            //        filterPixels[x, y] = artifactColor.ColorInRange(pixelColor);
+            //    }
+            //}
+
+            //return filterPixels;
+        }
+
+        public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filteredImage)
+        {
+
         }
 
         /// <summary>

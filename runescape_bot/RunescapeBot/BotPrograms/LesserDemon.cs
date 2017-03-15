@@ -37,14 +37,14 @@ namespace RunescapeBot.BotPrograms
         protected override void Run()
         {
             //test code to save mask pictures
-            ReadWindow();
-            bool[,] skinPixels = ColorFilter(LesserDemonSkin);
-            EraseClientUIFromMask(ref skinPixels);
+            //ReadWindow();
+            //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+            //EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
-            bool[,] hornPixels = ColorFilter(LesserDemonHorn);
-            EraseClientUIFromMask(ref hornPixels);
+            //bool[,] hornPixels = ColorFilter(LesserDemonHorn);
+            //EraseClientUIFromMask(ref hornPixels);
             //TestMask(LesserDemonHorn, "horn", hornPixels);
-            TestSkinAndHorn(skinPixels, hornPixels);
+            //TestSkinAndHorn(skinPixels, hornPixels);
         }
 
         /// <summary>
@@ -52,17 +52,36 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected override bool Execute()
         {
+            long readWindow, colorFilter, eraseUI, biggestBlob, center, minimumSizeAndCloves;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
             ReadWindow();   //Read the game window color values into Bitmap and ColorArray
+            watch.Stop();
+            readWindow = watch.ElapsedMilliseconds;
+            watch.Restart();
 
             if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
                 int xOffset, yOffset, maxOffset;
                 bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+                watch.Stop();
+                colorFilter = watch.ElapsedMilliseconds;
+                watch.Restart();
                 EraseClientUIFromMask(ref skinPixels);
+                watch.Stop();
+                eraseUI = watch.ElapsedMilliseconds;
+                watch.Restart();
                 Blob demon = ImageProcessing.BiggestBlob(skinPixels);
+                watch.Stop();
+                biggestBlob = watch.ElapsedMilliseconds;
+                watch.Restart();
                 if (demon == null) { return true; }
 
                 Point demonCenter = demon.Center;
+                watch.Stop();
+                center = watch.ElapsedMilliseconds;
+                watch.Restart();
                 double cloveRange = 2 * Math.Sqrt(demon.Size);
 
                 if (MinimumSizeMet(demon) && ClovesWithinRange(demonCenter, cloveRange))
@@ -84,6 +103,9 @@ namespace RunescapeBot.BotPrograms
                     minDemonSize /= 2.0;
                     missedDemons = 0;
                 }
+                watch.Stop();
+                minimumSizeAndCloves = watch.ElapsedMilliseconds;
+                watch.Restart();
             }
 
             return true;
