@@ -33,10 +33,10 @@ namespace RunescapeBot.ImageTools
                 }
             }
 
-            ParameterizedThreadStart threadStart = new ParameterizedThreadStart(ColorFilterPiece);
-            Thread upperLeft = new Thread(ColorFilterPiece);
+            //ParameterizedThreadStart threadStart = new ParameterizedThreadStart(ColorFilterPiece);
+            //Thread upperLeft = new Thread(ColorFilterPiece);
 
-            return filterPixels;
+            //return filterPixels;
 
 
             //Color pixelColor;
@@ -53,13 +53,15 @@ namespace RunescapeBot.ImageTools
             //    }
             //}
 
-            //return filterPixels;
+            return filterPixels;
         }
 
         public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filteredImage)
         {
 
         }
+
+        //public delegate void 
 
         /// <summary>
         /// Finds 
