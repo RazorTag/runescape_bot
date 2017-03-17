@@ -9,6 +9,7 @@ namespace RunescapeBot
             if (FrameTime == 0)
             {
                 FrameTime = 3000;
+                RandomizeFrames = true;
             }
         }
 
@@ -43,8 +44,8 @@ namespace RunescapeBot
         public bool RandomizeFrames { get; set; }
 
         /// <summary>
-        /// Time at which to end execution if it hasn't ended already
+        /// Used by the bot to inform that is has completed its task
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public BotResponse TaskComplete;
     }
 }

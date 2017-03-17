@@ -1,0 +1,11 @@
+C:\Users\Evan\Downloads\globalhook2_src\GlobalHook\Gma.UserActivityMonitor\bin\Debug\Gma.xml
+C:\Users\Evan\Downloads\globalhook2_src\GlobalHook\Gma.UserActivityMonitor\bin\Debug\Gma.UserActivityMonitor.dll
+C:\Users\Evan\Downloads\globalhook2_src\GlobalHook\Gma.UserActivityMonitor\bin\Debug\Gma.UserActivityMonitor.pdb
+C:\Users\Evan\Downloads\globalhook2_src\GlobalHook\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.csprojResolveAssemblyReference.cache
+C:\Users\Evan\Downloads\globalhook2_src\GlobalHook\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.dll
+C:\Users\Evan\Downloads\globalhook2_src\GlobalHook\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.pdb
+C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\bin\Debug\Gma.xml
+C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\bin\Debug\Gma.UserActivityMonitor.dll
+C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\bin\Debug\Gma.UserActivityMonitor.pdb
+C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.dll
+C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.pdb

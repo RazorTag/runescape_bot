@@ -12,10 +12,12 @@ namespace RunescapeBot.UITools
 {
     public static class MouseActions
     {
+        #region constants
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        #endregion
 
         #region click handlers
         /// <summary>
@@ -59,7 +61,10 @@ namespace RunescapeBot.UITools
             Thread.Sleep(100);  //wait for RS client to recognize that the cursor is hovering over the demon
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
-            User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
+            if (preserveMousePosition)
+            {
+                User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
+            }
         }
 
         /// <summary>

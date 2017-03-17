@@ -5,15 +5,26 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Forms;
 using RunescapeBot.BotPrograms;
+using RunescapeBot.UITools;
 
 namespace RunescapeBot
 {
+    /// <summary>
+    /// Used by the bot to inform that is has completed its task
+    /// </summary>
+    public delegate void BotResponse();
+
     public partial class Start : Form
     {
         /// <summary>
         /// List of running bot programs
         /// </summary>
-        private List<BotProgram> RunningBots;
+        private BotProgram RunningBot;
+
+        /// <summary>
+        /// True if a bot is currently running
+        /// </summary>
+        private bool BotIsRunning;
 
         /// <summary>
         /// Set to true if a user has selected a date to run until
@@ -69,7 +80,6 @@ namespace RunescapeBot
                 names[i] = GetDescription((Enum) actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
-            RunningBots = new List<BotProgram>();
         }
 
         /// <summary>
@@ -80,26 +90,30 @@ namespace RunescapeBot
         /// <param name="e">not used</param>
         private void StartButton_Click(object sender, EventArgs e)
         {
+            if (BotIsRunning)
+            {
+                MessageBox.Show("There is already a bot running.");
+                return;
+            }
+
             StartParams startParams = CollectStartParams();
-            BotProgram botProgram = null;
 
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
                 case BotActions.GoldBracelets:
-                    botProgram = new GoldBracelets(startParams);
+                    RunningBot = new GoldBracelets(startParams);
                     break;
 
                 case BotActions.LesserDemon:
                     startParams.FrameTime = 5000;
-                    startParams.RandomizeFrames = true;
-                    botProgram = new LesserDemon(startParams);
+                    RunningBot = new LesserDemon(startParams);
                     break;
 
                 default:
-                    break;
+                    return;
             }
 
-            RunBotProgram(botProgram);
+            RunBotProgram(RunningBot);
         }
 
         /// <summary>
@@ -110,17 +124,17 @@ namespace RunescapeBot
         {
             StartParams startParams = new StartParams();
             startParams.username = Username.Text;
-            startParams.RunUntil = RunUntil.Value;
             startParams.Iterations = (int) Iterations.Value;
             if (EndTimeSelected)
             {
-                startParams.EndTime = RunUntil.Value;
+                startParams.RunUntil = RunUntil.Value;
             }
             else
             {
-                startParams.EndTime = DateTime.MaxValue;
+                startParams.RunUntil = DateTime.MaxValue;
             }
-            
+            startParams.TaskComplete = new BotResponse(BotDone);
+
             return startParams;
         }
 
@@ -132,7 +146,8 @@ namespace RunescapeBot
         {
             if(botProgram == null) { return; }
 
-            botProgram.Start(RunningBots);
+            botProgram.Start();
+            BotIsRunning = true;
         }
 
         /// <summary>
@@ -142,10 +157,7 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void RunUntil_ValueChanged(object sender, EventArgs e)
         {
-            if (RunUntil.Value < DateTime.Now)
-            {
-                EndTimeSelected = true;
-            }
+            EndTimeSelected = true;
         }
 
         /// <summary>
@@ -155,9 +167,46 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void Start_FormClosing(object sender, FormClosingEventArgs e)
         {
-            while (RunningBots.Count > 0)
+            if (RunningBot != null)
             {
-                RunningBots[RunningBots.Count - 1].Stop();
+                RunningBot.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Respond to the bot stopping
+        /// </summary>
+        public void BotDone()
+        {
+            BotIsRunning = false;
+            RunningBot = null;
+        }
+
+        /// <summary>
+        /// Stops the currently running bot if one exists
+        /// </summary>
+        private void StopBot()
+        {
+            if (RunningBot != null)
+            {
+                RunningBot.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Responds to keyboard input
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GlobalEventProvider_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            int keyCode = (int) e.KeyChar;
+
+            switch (keyCode)
+            {
+                case (int) Keys.Escape:
+                    StopBot();
+                    break;
             }
         }
     }

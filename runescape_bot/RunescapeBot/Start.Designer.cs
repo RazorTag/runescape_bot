@@ -41,6 +41,7 @@
             this.Iterations = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.RunUntil = new System.Windows.Forms.DateTimePicker();
+            this.GlobalEventProvider = new Gma.UserActivityMonitor.GlobalEventProvider();
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).BeginInit();
             this.SuspendLayout();
             // 
@@ -128,6 +129,10 @@
             this.RunUntil.TabIndex = 8;
             this.RunUntil.ValueChanged += new System.EventHandler(this.RunUntil_ValueChanged);
             // 
+            // GlobalEventProvider
+            // 
+            this.GlobalEventProvider.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GlobalEventProvider_KeyPress);
+            // 
             // Start
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -142,7 +147,9 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.BotActionSelect);
             this.Controls.Add(this.StartButton);
+            this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Runescape Bot";
@@ -164,6 +171,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.DateTimePicker RunUntil;
+        private Gma.UserActivityMonitor.GlobalEventProvider GlobalEventProvider;
     }
 }
 

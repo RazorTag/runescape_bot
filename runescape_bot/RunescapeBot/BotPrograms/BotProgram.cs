@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms.Debug;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -11,13 +12,20 @@ using System.Windows.Forms;
 namespace RunescapeBot.BotPrograms
 {
     /// <summary>
+    /// Used by the bot to inform that is has completed its task
+    /// </summary>
+    public delegate void BotResponse();
+
+    /// <summary>
     /// Base class for bot programs that handles starting and stopping of bot programs
     /// Implement Run in a derived class to tell a bot program what to do
     /// </summary>
     public class BotProgram
     {
-        protected List<BotProgram> runningBots;
-        protected string loadError;
+        /// <summary>
+        /// Error message to show the user for a start error
+        /// </summary>
+        private string loadError;
 
         /// <summary>
         /// Process to which this bot program is attached
@@ -30,29 +38,9 @@ namespace RunescapeBot.BotPrograms
         protected Thread RunThread { get; set; }
 
         /// <summary>
-        /// Time when the bot program should cease execution
+        /// Specifies how the bot should be run
         /// </summary>
-        protected DateTime RunUntil { get; set; }
-
-        /// <summary>
-        /// Number of iterations after which the bot program should cease execution
-        /// </summary>
-        protected int Iterations { get; set; }
-
-        /// <summary>
-        /// Time between iteration in milliseconds
-        /// </summary>
-        protected int FrameTime { get; set; }
-
-        /// <summary>
-        /// If set to true, slightly varies the wait time between executions
-        /// </summary>
-        protected bool RandomizeFrames { get; set; }
-
-        /// <summary>
-        /// Time at which to end execution if it hasn't ended already
-        /// </summary>
-        protected DateTime EndTime { get; set; }
+        protected StartParams RunParams;
 
         /// <summary>
         /// Stores a bitmap of the client window
@@ -65,15 +53,14 @@ namespace RunescapeBot.BotPrograms
         protected Color[,] ColorArray { get; set; }
 
         /// <summary>
-        /// Stores the simulated user actions that have been taken by this program (click, etc)
-        /// </summary>
-        protected BotProgramActions BotActions { get; set; }
-
-        /// <summary>
         /// Stock random number generator
         /// </summary>
         protected Random RNG { get; set; }
 
+        /// <summary>
+        /// Tells anyone listening to stop at their convenience
+        /// </summary>
+        protected bool StopFlag { get; set; }
 
 
         /// <summary>
@@ -83,12 +70,7 @@ namespace RunescapeBot.BotPrograms
         public BotProgram(StartParams startParams)
         {
             RSClient = ScreenScraper.GetOSBuddy(startParams, out loadError);
-            RunUntil = startParams.RunUntil;
-            Iterations = startParams.Iterations;
-            FrameTime = startParams.FrameTime;
-            RandomizeFrames = startParams.RandomizeFrames;
-            EndTime = startParams.EndTime;
-            BotActions = new BotProgramActions();
+            this.RunParams = startParams;
             RNG = new Random();
         }
        
@@ -97,21 +79,13 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="runningBots"></param>
         /// <param name="iterations"></param>
-        public void Start(List<BotProgram> runningBots)
+        public void Start()
         {
             if (!String.IsNullOrEmpty(loadError))
             {
                 MessageBox.Show(loadError);
                 return;
             }
-
-            this.runningBots = runningBots;
-            if (ProcessExists(RSClient)) {
-                MessageBox.Show("A bot is already running for the selected process.");
-                return;
-            }
-            runningBots.Add(this);
-
             RunThread = new Thread(Process);
             RunThread.Start();
         }
@@ -133,7 +107,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void Run()
         {
-            
+            if (StopFlag) { return; }
         }
 
         /// <summary>
@@ -144,23 +118,26 @@ namespace RunescapeBot.BotPrograms
         {
             int randomFrameOffset, randomFrameTime;
 
-            if (Iterations == 0)
+            if (StopFlag) { return; }
+            if (RunParams.Iterations == 0)
             {
-                Iterations = int.MaxValue;
+                RunParams.Iterations = int.MaxValue;
             }
 
-            if (RandomizeFrames)
+            if (RunParams.RandomizeFrames)
             {
-                randomFrameOffset = (int) (0.1 * FrameTime);
+                randomFrameOffset = (int) (0.1 * RunParams.FrameTime);
             }
             else
             {
                 randomFrameOffset = 0;
             }
 
-            for (int i = 0; i < Iterations; i++)
+            for (int i = 0; i < RunParams.Iterations; i++)
             {
-                if (DateTime.Now > EndTime)
+                if (StopFlag) { return; }
+
+                if (DateTime.Now > RunParams.RunUntil)
                 {
                     break; //quit if we have gone over our time limit
                 }
@@ -170,13 +147,14 @@ namespace RunescapeBot.BotPrograms
                 {
                     break;
                 }
+                if (StopFlag) { return; }
 
-                randomFrameTime = FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
+                randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
                 randomFrameTime = Math.Max(0, randomFrameTime);
                 watch.Stop();
                 if (watch.ElapsedMilliseconds < randomFrameTime)
                 {
-                    Thread.Sleep(FrameTime - (int)watch.ElapsedMilliseconds);
+                    Thread.Sleep(RunParams.FrameTime - (int)watch.ElapsedMilliseconds);
                 }
             }
 
@@ -192,11 +170,12 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Removes this bot program from the list of running programs
+        /// Clean up
         /// </summary>
         private void Done()
         {
-            runningBots.Remove(this);
+            Bitmap.Dispose();
+            RunParams.TaskComplete();
         }
 
         /// <summary>
@@ -204,8 +183,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public void Stop()
         {
-            RunThread.Abort();
-            Done();
+            StopFlag = true;
+            //RunThread.Abort();
+            //Done();
         }
 
         /// <summary>
@@ -221,24 +201,6 @@ namespace RunescapeBot.BotPrograms
             }
 
             return ImageProcessing.ColorFilter(ColorArray, artifactColor);
-        }
-
-        /// <summary>
-        /// Checks the processes attached to running bot programs for one that matches the given process
-        /// </summary>
-        /// <param name="newProcess"></param>
-        /// <returns></returns>
-        private bool ProcessExists(Process newProcess)
-        {
-            foreach (BotProgram bot in runningBots)
-            {
-                if (bot.RSClient.MainWindowHandle == newProcess.MainWindowHandle)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -288,7 +250,6 @@ namespace RunescapeBot.BotPrograms
         protected void LeftClick(int x, int y, bool preserveMousePosition = false)
         {
             MouseActions.LeftMouseClick(x, y, RSClient, preserveMousePosition);
-            BotActions.SaveClick(x, y);
         }
 
         /// <summary>
@@ -299,7 +260,6 @@ namespace RunescapeBot.BotPrograms
         protected void RightClick(int x, int y, bool preserveMousePosition = false)
         {
             MouseActions.RightMouseClick(x, y, RSClient, preserveMousePosition);
-            BotActions.SaveClick(x, y, true);
         }
 
         /// <summary>

@@ -82,7 +82,7 @@ namespace RunescapeBot.BotPrograms
                     missedDemons++;
                 }
 
-                if (missedDemons * FrameTime > maxDemonSpawnTime)
+                if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
                 {
                     minDemonSize /= 2.0;
                     missedDemons = 0;
@@ -140,6 +140,12 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
+        /// <summary>
+        /// Colors the pixels where either the skin of the horn were found in Bitmap.
+        /// Does not modify Bitmap. Creates a copy and returns the copy with masking applied.
+        /// </summary>
+        /// <param name="skin"></param>
+        /// <param name="horn"></param>
         private void TestSkinAndHorn(bool[,] skin, bool[,] horn)
         {
             Bitmap bitmap = (Bitmap) Bitmap.Clone();
