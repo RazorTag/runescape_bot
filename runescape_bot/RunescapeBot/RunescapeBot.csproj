@@ -103,6 +103,7 @@
     <Compile Include="CustomExceptions\UserDefinedExceptions.cs" />
     <Compile Include="UITools\GDI32.cs" />
     <Compile Include="UITools\MouseActions.cs" />
+    <Compile Include="UITools\SplineInterpolator.cs" />
     <Compile Include="UITools\User32.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -21,27 +21,41 @@ namespace RunescapeBot.ImageTools
         {
             int width = rgbImage.GetLength(0);
             int height = rgbImage.GetLength(1);
-            int xDivider = width / 2;
-            int yDivider = height / 2;
             bool[,] filterPixels = new bool[width, height];
+            int numThreads = Math.Max(1, Environment.ProcessorCount - 1);
+            int heavyThreads = width % numThreads;
+            int lightWidth = (width - heavyThreads) / numThreads;
+            Thread[] threadPool = new Thread[numThreads];
+            int assignedColumns = 0;
 
-            //Create the threads
-            Thread upperLeft = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, 0, xDivider, 0, yDivider));
-            Thread upperRight = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, xDivider, width, 0, yDivider));
-            Thread lowerLeft = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, 0, xDivider, yDivider, height));
-            Thread lowerRight = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, xDivider, width, yDivider, height));
+            //Create the n+1 width threads
+            for (int i = 0; i < heavyThreads; i++)
+            {
+                int start = assignedColumns;
+                int end = assignedColumns + lightWidth + 1;
+                threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, start, end));
+                assignedColumns += lightWidth + 1;
+            }
+            //Create the n width threads
+            for (int i = heavyThreads; i < numThreads; i++)
+            {
+                int start = assignedColumns;
+                int end = assignedColumns + lightWidth;
+                threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, start, end));
+                assignedColumns += lightWidth + 1;
+            }
 
-            //Start the threads
-            upperLeft.Start();
-            upperRight.Start();
-            lowerLeft.Start();
-            lowerRight.Start();
+            //Sart the threads
+            for(int i = 0; i < numThreads; i++)
+            {
+                threadPool[i].Start();
+            }
 
             //Wait for all threads to finish
-            upperLeft.Join();
-            upperRight.Join();
-            lowerLeft.Join();
-            lowerRight.Join();
+            for (int i = 0; i < numThreads; i++)
+            {
+                threadPool[i].Join();
+            }
 
             return filterPixels;
         }
@@ -56,13 +70,14 @@ namespace RunescapeBot.ImageTools
         /// <param name="xMax">exclusive</param>
         /// <param name="yMin">inclusive</param>
         /// <param name="yMax">exclusive</param>
-        public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filterPixels, int xMin, int xMax, int yMin, int yMax)
+        public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filterPixels, int xMin, int xMax)
         {
             Color pixelColor;
+            int height = rgbImage.GetLength(1);
 
             for (int x = xMin; x < xMax; x++)
             {
-                for (int y = yMin; y < yMax; y++)
+                for (int y = 0; y < height; y++)
                 {
                     pixelColor = rgbImage[x, y];
                     filterPixels[x, y] = artifactColor.ColorInRange(pixelColor);

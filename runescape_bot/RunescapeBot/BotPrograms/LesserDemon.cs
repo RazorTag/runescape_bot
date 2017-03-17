@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Threading;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -56,13 +55,16 @@ namespace RunescapeBot.BotPrograms
             watch.Start();
 
             ReadWindow();   //Read the game window color values into Bitmap and ColorArray
+            if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
 
             if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
             {
                 int xOffset, yOffset, maxOffset;
                 bool[,] skinPixels = ColorFilter(LesserDemonSkin);
+                if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
                 EraseClientUIFromMask(ref skinPixels);
                 Blob demon = ImageProcessing.BiggestBlob(skinPixels);
+                if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
                 if (demon == null) { return true; }
 
                 Point demonCenter = demon.Center;

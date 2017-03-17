@@ -184,8 +184,6 @@ namespace RunescapeBot.BotPrograms
         public void Stop()
         {
             StopFlag = true;
-            //RunThread.Abort();
-            //Done();
         }
 
         /// <summary>
@@ -212,7 +210,8 @@ namespace RunescapeBot.BotPrograms
             {
                 Bitmap.Dispose();
             }
-                
+            if (StopFlag) { return false; }
+
             //Bitmap = ScreenScraper.CaptureWindowLegacy(RSClient);
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
@@ -247,9 +246,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void LeftClick(int x, int y, bool preserveMousePosition = false)
+        protected void LeftClick(int x, int y)
         {
-            MouseActions.LeftMouseClick(x, y, RSClient, preserveMousePosition);
+            if (!StopFlag)  //don't click if the stop flag has been raised
+            {
+                MouseActions.LeftMouseClick(x, y, RSClient);
+            }
         }
 
         /// <summary>
@@ -257,9 +259,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y, bool preserveMousePosition = false)
+        protected void RightClick(int x, int y)
         {
-            MouseActions.RightMouseClick(x, y, RSClient, preserveMousePosition);
+            if (!StopFlag)  //don't click if the stop flag has been raised
+            {
+                MouseActions.RightMouseClick(x, y, RSClient);
+            }
         }
 
         /// <summary>

@@ -1,11 +1,7 @@
 ﻿using RunescapeBot.ImageTools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.UITools
@@ -17,6 +13,16 @@ namespace RunescapeBot.UITools
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+
+        /// <summary>
+        /// Pixels per second to move the mouse
+        /// </summary>
+        private const double MOUSE_MOVE_SPEED = 2000.0;
+
+        /// <summary>
+        /// Mouse movements per second to execute when moving the mouse smoothly
+        /// </summary>
+        private const double MOUSE_MOVE_RATE = 60.0;
         #endregion
 
         #region click handlers
@@ -25,9 +31,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftMouseClick(int x, int y, Process rsClient, bool preserveMousePosition)
+        public static void LeftMouseClick(int x, int y, Process rsClient)
         {
-            MouseClick(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, preserveMousePosition);
+            MouseClick(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP);
         }
 
         /// <summary>
@@ -35,9 +41,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightMouseClick(int x, int y, Process rsClient, bool preserveMousePosition)
+        public static void RightMouseClick(int x, int y, Process rsClient)
         {
-            MouseClick(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, preserveMousePosition);
+            MouseClick(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP);
         }
 
         /// <summary>
@@ -48,23 +54,15 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient"></param>
         /// <param name="clickTypeDown"></param>
         /// <param name="clickTypeUp"></param>
-        private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, bool preserveMousePosition)
+        private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
         {
-            POINT originalCursorPos;
             int hWnd = rsClient.MainWindowHandle.ToInt32();
             ScreenScraper.BringToForeGround(hWnd);
-
             TranslateClick(ref x, ref y, rsClient);
-            ScreenScraper.BringToForeGround(hWnd);
-            User32.GetCursorPos(out originalCursorPos);
-            User32.SetCursorPos(x, y);
+            MoveMouseSmoothly(x, y);
             Thread.Sleep(100);  //wait for RS client to recognize that the cursor is hovering over the demon
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
-            if (preserveMousePosition)
-            {
-                User32.SetCursorPos(originalCursorPos.X, originalCursorPos.Y);    //return the cursor to its original position
-            }
         }
 
         /// <summary>
@@ -83,6 +81,77 @@ namespace RunescapeBot.UITools
             //adjust for the borders and toolbar
             x += ScreenScraper.OSBUDDY_BORDER_WIDTH;
             y += ScreenScraper.OSBUDDY_TOOLBAR_WIDTH + ScreenScraper.OSBUDDY_BORDER_WIDTH;
+        }
+
+        /// <summary>
+        /// Moves a mouse across a screen in a straight line
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public static void MoveMouse(int x, int y)
+        {
+            int discreteMovements, sleepTime;
+            double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY;
+            POINT startingPosition;
+            GetCursorPos(out startingPosition);
+            currentX = startingPosition.X;
+            currentY = startingPosition.Y;
+            xDistance = x - currentX;
+            yDistance = y - currentY;
+            totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
+            moveDistance = MOUSE_MOVE_SPEED / MOUSE_MOVE_RATE;
+            discreteMovements = (int) (totalDistance / moveDistance);
+            xMoveDistance = xDistance / discreteMovements;
+            yMoveDistance = yDistance / discreteMovements;
+            sleepTime = (int) (1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
+
+            SplineInterpolator spline = new SplineInterpolator(startingPosition, new System.Drawing.Point(x, y));
+
+            for (int i = 0; i < discreteMovements; i++)
+            {
+                currentX += xMoveDistance;
+                currentY += yMoveDistance;
+                User32.SetCursorPos((int) currentX, (int) currentY);
+                Thread.Sleep(sleepTime);
+            }
+            User32.SetCursorPos(x, y);
+        }
+
+        /// <summary>
+        /// Moves a mouse across a screen like a human would
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public static void MoveMouseSmoothly(int x, int y)
+        {
+            int discreteMovements, sleepTime;
+            double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY, mouseMoveSpeed;
+            POINT startingPosition;
+            Random rng = new Random();
+            GetCursorPos(out startingPosition);
+            currentX = startingPosition.X;
+            currentY = startingPosition.Y;
+            xDistance = x - currentX;
+            yDistance = y - currentY;
+            totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
+            mouseMoveSpeed = Math.Max(1.0, rng.Next((int)(0.6 * MOUSE_MOVE_SPEED), (int)(1.6 * MOUSE_MOVE_SPEED)));
+            moveDistance = mouseMoveSpeed / MOUSE_MOVE_RATE;
+            discreteMovements = (int)(totalDistance / moveDistance);
+            xMoveDistance = xDistance / discreteMovements;
+            yMoveDistance = yDistance / discreteMovements;
+            sleepTime = (int)(1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
+
+            SplineInterpolator spline = new SplineInterpolator(startingPosition, new System.Drawing.Point(x, y));
+
+            for (int i = 0; i < discreteMovements; i++)
+            {
+                currentX += xMoveDistance;
+                currentY = spline.GetValue(currentX);
+                User32.SetCursorPos((int)currentX, (int)currentY);
+
+                Thread.Sleep(sleepTime);
+            }
+            MoveMouse(x, y);
         }
         #endregion
     }
