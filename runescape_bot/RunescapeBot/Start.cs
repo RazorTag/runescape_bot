@@ -199,7 +199,10 @@ namespace RunescapeBot
         {
             BotIsRunning = false;
             RunningBot = null;
-            this.Text = FORM_NAME;
+            this.Invoke((MethodInvoker)(() =>
+            {
+                this.Text = FORM_NAME;
+            }));
         }
 
         /// <summary>
