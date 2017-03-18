@@ -9,3 +9,4 @@ C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\bin\Debug\Gma.Use
 C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\bin\Debug\Gma.UserActivityMonitor.pdb
 C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.dll
 C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.pdb
+C:\Projects\RunescapeBot\runescape_bot\Gma.UserActivityMonitor\obj\Debug\Gma.UserActivityMonitor.csprojResolveAssemblyReference.cache

@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>12</ApplicationRevision>
+    <ApplicationRevision>13</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -61,10 +61,6 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ImageProcessor, Version=2.5.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.2.5.2\lib\net45\ImageProcessor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="InputSimulator">
       <HintPath>..\InputSimulator.0.1.0.0-bin\Release\InputSimulator.dll</HintPath>
     </Reference>
