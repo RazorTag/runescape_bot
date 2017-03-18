@@ -49,7 +49,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>3Gs7olWzpKNMJIVjdvK3MgxgQyteZC5t+lyQMIzm7l0=</dsig:DigestValue>
+        <dsig:DigestValue>DCSebGxCdaWUAol0k4upYaXDqpU/xs7I9bALPN7LTK4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -78,14 +78,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunescapeBot.exe" size="109992">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RunescapeBot.exe" size="110504">
       <assemblyIdentity name="RunescapeBot" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Kn0IuM+Ww2v9KQGmo8B7IhWKdSGK6EZPurHvJnon0xM=</dsig:DigestValue>
+        <dsig:DigestValue>ZS+nWEHLWi2lzc1oj3MUBKbiiV8+71IEKupttaUzwoo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

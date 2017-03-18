@@ -51,9 +51,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected override bool Execute()
         {
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-
             ReadWindow();   //Read the game window color values into Bitmap and ColorArray
             if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
 
@@ -69,7 +66,6 @@ namespace RunescapeBot.BotPrograms
 
                 Point demonCenter = demon.Center;
                 double cloveRange = 2 * Math.Sqrt(demon.Size);
-
                 if (MinimumSizeMet(demon) && ClovesWithinRange(demonCenter, cloveRange))
                 {
                     maxOffset = (int) (0.05 * cloveRange);
