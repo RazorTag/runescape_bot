@@ -13,6 +13,7 @@ namespace RunescapeBot
             }
         }
 
+        #region settings
         /// <summary>
         /// Username to search for when locating a RS client
         /// </summary>
@@ -42,10 +43,13 @@ namespace RunescapeBot
         /// Set to true to slightly vary the time between frames
         /// </summary>
         public bool RandomizeFrames { get; set; }
+        #endregion
 
+        #region delegates
         /// <summary>
         /// Used by the bot to inform that is has completed its task
         /// </summary>
         public BotResponse TaskComplete;
+        #endregion
     }
 }

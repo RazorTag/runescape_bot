@@ -40,7 +40,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Specifies how the bot should be run
         /// </summary>
-        protected StartParams RunParams;
+        public StartParams RunParams;
 
         /// <summary>
         /// Stores a bitmap of the client window

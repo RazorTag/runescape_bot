@@ -16,6 +16,10 @@ namespace RunescapeBot
 
     public partial class Start : Form
     {
+        private const string FORM_NAME = "Runescape Bot";
+        private const string BOT_STOPPING = " is stopping";
+        private const string BOT_RUNNING = " is running";
+
         /// <summary>
         /// List of running bot programs
         /// </summary>
@@ -46,7 +50,7 @@ namespace RunescapeBot
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The description attribute from the given enum value</returns>
-        public string GetDescription(Enum value)
+        private string GetDescription(Enum value)
         {
             Type type = value.GetType();
             string name = Enum.GetName(type, value);
@@ -65,6 +69,20 @@ namespace RunescapeBot
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Gets the bot's user-facing status
+        /// </summary>
+        /// <returns>The bot's display name and current status</returns>
+        private string GetBotName()
+        {
+            if (RunningBot == null)
+            {
+                return string.Empty;
+            }
+
+            return GetDescription(RunningBot.RunParams.BotAction);
         }
 
         /// <summary>
@@ -146,6 +164,7 @@ namespace RunescapeBot
         {
             if(botProgram == null) { return; }
 
+            this.Text = GetBotName() + BOT_RUNNING;
             botProgram.Start();
             BotIsRunning = true;
         }
@@ -180,6 +199,7 @@ namespace RunescapeBot
         {
             BotIsRunning = false;
             RunningBot = null;
+            this.Text = FORM_NAME;
         }
 
         /// <summary>
@@ -189,7 +209,12 @@ namespace RunescapeBot
         {
             if (RunningBot != null)
             {
+                this.Text = GetBotName() + BOT_STOPPING;
                 RunningBot.Stop();
+            }
+            else
+            {
+                this.Text = FORM_NAME;
             }
         }
 
