@@ -42,7 +42,7 @@ namespace RunescapeBot.ImageTools
                 int start = assignedColumns;
                 int end = assignedColumns + lightWidth;
                 threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, start, end));
-                assignedColumns += lightWidth + 1;
+                assignedColumns += lightWidth;
             }
 
             //Sart the threads
@@ -206,6 +206,17 @@ namespace RunescapeBot.ImageTools
         {
             blob.AddPixel(new Point(x, y));
             artifactImage[x, y] = false;
+        }
+
+        /// <summary>
+        /// Determines if two colors have the same RGB values
+        /// </summary>
+        /// <param name="color1"></param>
+        /// <param name="color2"></param>
+        /// <returns>true if the colors match on RGB values</returns>
+        public static bool ColorsAreEqual(Color color1, Color color2)
+        {
+            return (color1.R == color2.R) && (color1.B == color2.B) && (color1.G == color2.G);
         }
     }
 }

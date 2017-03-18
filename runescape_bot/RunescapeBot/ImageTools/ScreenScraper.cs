@@ -19,6 +19,7 @@ namespace RunescapeBot.ImageTools
         public static int OSBUDDY_TOOLBAR_WIDTH = 31;  //does not include the border underneath the toolbar
         public static int OSBUDDY_BORDER_WIDTH = 2;
         public const int SW_RESTORE = 9;
+        public const int LOGIN_WINDOW_HEIGHT = 503;    //y--cordinate of a pixe directly below the login window
         #endregion
 
         #region screenreader

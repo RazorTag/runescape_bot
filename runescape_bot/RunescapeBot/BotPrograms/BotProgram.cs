@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -116,9 +117,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Iterate()
         {
+            if (StopFlag) { return; }
             int randomFrameOffset, randomFrameTime;
 
-            if (StopFlag) { return; }
             if (RunParams.Iterations == 0)
             {
                 RunParams.Iterations = int.MaxValue;
@@ -135,19 +136,23 @@ namespace RunescapeBot.BotPrograms
 
             for (int i = 0; i < RunParams.Iterations; i++)
             {
-                if (StopFlag) { return; }
-
                 if (DateTime.Now > RunParams.RunUntil)
                 {
-                    break; //quit if we have gone over our time limit
+                    return; //quit if we have gone over our time limit
                 }
 
                 Stopwatch watch = Stopwatch.StartNew();
-                if (!Execute()) //quit by an override Execute method
+                ReadWindow();               //Read the game window color values into Bitmap and ColorArray
+                if (StopFlag || !LogIn()) { return; }   //quit immediately if the stop flag has been raised
+
+                if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
                 {
-                    break;
+                    if (!Execute()) //quit by an override Execute method
+                    {
+                        return;
+                    }
+                    if (StopFlag) { return; }
                 }
-                if (StopFlag) { return; }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
                 randomFrameTime = Math.Max(0, randomFrameTime);
@@ -156,6 +161,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     Thread.Sleep(RunParams.FrameTime - (int)watch.ElapsedMilliseconds);
                 }
+                if (StopFlag) { return; }
             }
 
             return;
@@ -277,32 +283,44 @@ namespace RunescapeBot.BotPrograms
             int width = mask.GetLength(0);
             int height = mask.GetLength(1);
 
-            //erase chat box
-            for (int x = 0; x < 519; x++)
+            EraseFromMask(ref mask, 0, 519, height - 159, height);                  //erase chat box
+            EraseFromMask(ref mask, width - 241, width, height - 336, height);      //erase inventory
+            EraseFromMask(ref mask, width - 211, width, 0, 192);                    //erase minimap
+        }
+
+        /// <summary>
+        /// Clears a rectangle from a boolean mask
+        /// </summary>
+        /// <param name="mask"></param>
+        /// <param name="xMin">Inclusive</param>
+        /// <param name="xMax">Exclusive</param>
+        /// <param name="yMin">Inclusive</param>
+        /// <param name="yMax">Exclusive</param>
+        protected void EraseFromMask(ref bool[,] mask, int xMin, int xMax, int yMin, int yMax)
+        {
+            for (int x = xMin; x < xMax; x++)
             {
-                for (int y = height - 159; y < height; y++)
+                for (int y = yMin; y < yMax; y++)
                 {
                     mask[x, y] = false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Determines if the user is logged out and logs him back in if he is.
+        /// If the bot does not have valid login information, then it will quit.
+        /// </summary>
+        private bool LogIn()
+        {
+            int width = ColorArray.GetLength(0);
+            Color color = ColorArray[width / 2, ScreenScraper.LOGIN_WINDOW_HEIGHT];
+            if (ImageProcessing.ColorsAreEqual(color, Color.Black))
+            {
+
             }
 
-            //erase inventory
-            for (int x = width - 241; x < width; x++)
-            {
-                for (int y = height - 336; y < height; y++)
-                {
-                    mask[x, y] = false;
-                }
-            }
-
-            //erase minimap
-            for (int x = width - 211; x < width; x++)
-            {
-                for (int y = 0; y < 192; y++)
-                {
-                    mask[x, y] = false;
-                }
-            }
+            return true;
         }
     }
 }

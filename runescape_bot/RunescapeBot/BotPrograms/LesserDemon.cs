@@ -51,40 +51,34 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected override bool Execute()
         {
-            ReadWindow();   //Read the game window color values into Bitmap and ColorArray
+            int xOffset, yOffset, maxOffset;
+            bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
+            EraseClientUIFromMask(ref skinPixels);
+            Blob demon = ImageProcessing.BiggestBlob(skinPixels);
+            if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
+            if (demon == null) { return true; }
 
-            if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
+            Point demonCenter = demon.Center;
+            double cloveRange = 2 * Math.Sqrt(demon.Size);
+            if (MinimumSizeMet(demon) && ClovesWithinRange(demonCenter, cloveRange))
             {
-                int xOffset, yOffset, maxOffset;
-                bool[,] skinPixels = ColorFilter(LesserDemonSkin);
-                if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
-                EraseClientUIFromMask(ref skinPixels);
-                Blob demon = ImageProcessing.BiggestBlob(skinPixels);
-                if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
-                if (demon == null) { return true; }
+                maxOffset = (int) (0.05 * cloveRange);
+                xOffset = RNG.Next(-maxOffset, maxOffset + 1);
+                yOffset = RNG.Next(-maxOffset, maxOffset + 1);
+                LeftClick(demonCenter.X, demonCenter.Y);
+                missedDemons = 0;
+                minDemonSize = ArtifactSize(demon) / 2.0;
+            }
+            else
+            {
+                missedDemons++;
+            }
 
-                Point demonCenter = demon.Center;
-                double cloveRange = 2 * Math.Sqrt(demon.Size);
-                if (MinimumSizeMet(demon) && ClovesWithinRange(demonCenter, cloveRange))
-                {
-                    maxOffset = (int) (0.05 * cloveRange);
-                    xOffset = RNG.Next(-maxOffset, maxOffset + 1);
-                    yOffset = RNG.Next(-maxOffset, maxOffset + 1);
-                    LeftClick(demonCenter.X, demonCenter.Y);
-                    missedDemons = 0;
-                    minDemonSize = ArtifactSize(demon) / 2.0;
-                }
-                else
-                {
-                    missedDemons++;
-                }
-
-                if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
-                {
-                    minDemonSize /= 2.0;
-                    missedDemons = 0;
-                }
+            if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
+            {
+                minDemonSize /= 2.0;
+                missedDemons = 0;
             }
 
             return true;
