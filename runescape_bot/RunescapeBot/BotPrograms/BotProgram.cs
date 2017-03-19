@@ -156,7 +156,7 @@ namespace RunescapeBot.BotPrograms
                 watch.Stop();
                 if (watch.ElapsedMilliseconds < randomFrameTime)
                 {
-                    Thread.Sleep(randomFrameTime - (int)watch.ElapsedMilliseconds);
+                    SafeWait(randomFrameTime - (int)watch.ElapsedMilliseconds);
                 }
                 if (StopFlag) { return; }
             }
@@ -317,7 +317,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             //see if we have login and password to log in
-            if (false)//string.IsNullOrEmpty(RunParams.Login) || string.IsNullOrEmpty(RunParams.Password))
+            if (string.IsNullOrEmpty(RunParams.Login) || string.IsNullOrEmpty(RunParams.Password))
             {
                 MessageBox.Show("Cannot log in without login information");
                 return false;
@@ -370,16 +370,39 @@ namespace RunescapeBot.BotPrograms
         {
             Color color;
             int width = ColorArray.GetLength(0);
+            int height = ColorArray.GetLength(1);
             int center = width / 2;
+            int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);
             for (int i = center - 10; i <= center + 10; i++)    //check 21 pixels for blackness
             {
-                color = ColorArray[i, ScreenScraper.LOGIN_WINDOW_HEIGHT];
+                color = ColorArray[i, checkRow];  //50 safety pixels below where the bottom of the login picture should be
                 if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Waits for the specified time while periodically checking for the stop flag
+        /// </summary>
+        /// <param name="waitTime"></param>
+        private void SafeWait(int waitTime)
+        {
+            int nextWaitTime;
+            int waitInterval = 1000;
+            int numIntervals = (int) Math.Ceiling((double)waitTime / (double)waitInterval);
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            for (int i = 0; i < numIntervals; i++)
+            {
+                nextWaitTime = Math.Min(waitInterval, (waitTime - (int)watch.ElapsedMilliseconds));
+                nextWaitTime = Math.Max(0, nextWaitTime);
+                Thread.Sleep(nextWaitTime);
+                if (StopFlag) { return; }
+            }
         }
     }
 }

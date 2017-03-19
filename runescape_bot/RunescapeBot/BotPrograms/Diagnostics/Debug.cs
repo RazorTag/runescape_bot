@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace RunescapeBot.BotPrograms.Debug
+namespace RunescapeBot.BotPrograms.Diagnostics
 {
     public class BotProgramActions
     {
