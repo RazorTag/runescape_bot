@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -309,22 +310,76 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
         private bool CheckLogIn()
-        {
-            int width = ColorArray.GetLength(0);
-            Color color = ColorArray[width / 2, ScreenScraper.LOGIN_WINDOW_HEIGHT];
-            if (ImageProcessing.ColorsAreEqual(color, Color.Black))
+        { 
+            if (IsLoggedIn())
             {
-                if (string.IsNullOrEmpty(RunParams.Login) || string.IsNullOrEmpty(RunParams.Password))
-                {
-                    return false;
-                }
-                else
-                {
-                    //log in
-                }
+                return true;    //already logged in
             }
 
-            return true;
+            //see if we have login and password to log in
+            if (false)//string.IsNullOrEmpty(RunParams.Login) || string.IsNullOrEmpty(RunParams.Password))
+            {
+                MessageBox.Show("Cannot log in without login information");
+                return false;
+            }
+            else
+            {
+                return LogIn();
+            }
+        }
+
+        /// <summary>
+        /// Tries to log in. Make sure the client window has focus before calling this method.
+        /// </summary>
+        /// <returns>true if login is successful, false if login fails</returns>
+        private bool LogIn()
+        {
+            int center = ColorArray.GetLength(0) / 2;
+
+            //Click existing account. Clicks in a dead space if we are already on the login screen.
+            LeftClick(center + 16, 288);
+
+            //fill in login
+            LeftClick(center + 137, 259);
+            Keyboard.Backspace(350);
+            Keyboard.WriteLine(RunParams.Login);
+
+            //fill in password
+            Keyboard.Tab();
+            Keyboard.Backspace(20);
+            Keyboard.WriteLine(RunParams.Password);
+
+            //trigger the login button
+            Keyboard.Enter();
+
+            //click the "CLICK HERE TO PLAY" button
+            Thread.Sleep(5000);
+            LeftClick(center, 337);
+            Thread.Sleep(5000);
+
+            //verify the log in
+            ReadWindow();
+            return IsLoggedIn();
+        }
+
+        /// <summary>
+        /// Determines if the client is logged in
+        /// </summary>
+        /// <returns>true if we are logged in, false if we are logged out</returns>
+        private bool IsLoggedIn()
+        {
+            Color color;
+            int width = ColorArray.GetLength(0);
+            int center = width / 2;
+            for (int i = center - 10; i <= center + 10; i++)    //check 21 pixels for blackness
+            {
+                color = ColorArray[i, ScreenScraper.LOGIN_WINDOW_HEIGHT];
+                if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

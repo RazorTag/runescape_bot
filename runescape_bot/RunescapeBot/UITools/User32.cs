@@ -7,7 +7,12 @@ namespace RunescapeBot.UITools
 {
     public static class User32
     {
+        public const int GWL_STYLE = -16;
         public const int ESCAPE_HOTKEY_ID = 1;
+        public const int SW_MAXIMIZE = 3;
+        public const int SW_MINIMIZE = 6;
+        public const int SW_RESTORE = 9;
+        public const UInt32 WS_MAXIMIZE = 0x1000000;
 
         // DLL libraries used to manage hotkeys
         [DllImport("user32.dll")]
@@ -49,6 +54,8 @@ namespace RunescapeBot.UITools
         public static extern bool SetForegroundWindow(int hWnd);
         [DllImport("User32.dll")]
         public static extern int GetTopWindow(int hWnd);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
         public static extern bool IsIconic(int handle);
         [DllImport("user32.dll")]

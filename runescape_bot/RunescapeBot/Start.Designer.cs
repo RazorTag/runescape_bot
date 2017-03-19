@@ -43,17 +43,18 @@ namespace RunescapeBot
             this.Iterations = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.RunUntil = new System.Windows.Forms.DateTimePicker();
-            this.GlobalEventProvider = new GlobalEventProvider();
             this.label5 = new System.Windows.Forms.Label();
             this.Password = new System.Windows.Forms.TextBox();
+            this.GlobalEventProvider = new RunescapeBot.GMA.GlobalEventProvider();
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).BeginInit();
             this.SuspendLayout();
             // 
             // StartButton
             // 
-            this.StartButton.Location = new System.Drawing.Point(168, 257);
+            this.StartButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.StartButton.Location = new System.Drawing.Point(151, 257);
             this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(100, 41);
+            this.StartButton.Size = new System.Drawing.Size(125, 55);
             this.StartButton.TabIndex = 11;
             this.StartButton.Text = "Start";
             this.StartButton.UseVisualStyleBackColor = true;
@@ -61,11 +62,12 @@ namespace RunescapeBot
             // 
             // BotActionSelect
             // 
+            this.BotActionSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BotActionSelect.FormattingEnabled = true;
             this.BotActionSelect.Location = new System.Drawing.Point(100, 110);
             this.BotActionSelect.MaxDropDownItems = 12;
             this.BotActionSelect.Name = "BotActionSelect";
-            this.BotActionSelect.Size = new System.Drawing.Size(310, 21);
+            this.BotActionSelect.Size = new System.Drawing.Size(310, 28);
             this.BotActionSelect.TabIndex = 6;
             // 
             // label1
@@ -80,9 +82,10 @@ namespace RunescapeBot
             // 
             // Login
             // 
+            this.Login.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Login.Location = new System.Drawing.Point(100, 20);
             this.Login.Name = "Login";
-            this.Login.Size = new System.Drawing.Size(310, 20);
+            this.Login.Size = new System.Drawing.Size(310, 26);
             this.Login.TabIndex = 2;
             // 
             // label2
@@ -107,10 +110,10 @@ namespace RunescapeBot
             // 
             // Iterations
             // 
-            this.Iterations.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Iterations.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Iterations.Location = new System.Drawing.Point(100, 205);
             this.Iterations.Name = "Iterations";
-            this.Iterations.Size = new System.Drawing.Size(89, 22);
+            this.Iterations.Size = new System.Drawing.Size(89, 26);
             this.Iterations.TabIndex = 10;
             // 
             // label4
@@ -125,17 +128,13 @@ namespace RunescapeBot
             // 
             // RunUntil
             // 
-            this.RunUntil.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RunUntil.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RunUntil.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.RunUntil.Location = new System.Drawing.Point(100, 159);
             this.RunUntil.Name = "RunUntil";
-            this.RunUntil.Size = new System.Drawing.Size(310, 22);
+            this.RunUntil.Size = new System.Drawing.Size(310, 26);
             this.RunUntil.TabIndex = 8;
             this.RunUntil.ValueChanged += new System.EventHandler(this.RunUntil_ValueChanged);
-            // 
-            // GlobalEventProvider
-            // 
-            this.GlobalEventProvider.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GlobalEventProvider_KeyPress);
             // 
             // label5
             // 
@@ -149,10 +148,16 @@ namespace RunescapeBot
             // 
             // Password
             // 
+            this.Password.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Password.Location = new System.Drawing.Point(100, 65);
             this.Password.Name = "Password";
-            this.Password.Size = new System.Drawing.Size(310, 20);
+            this.Password.PasswordChar = '*';
+            this.Password.Size = new System.Drawing.Size(310, 26);
             this.Password.TabIndex = 4;
+            // 
+            // GlobalEventProvider
+            // 
+            this.GlobalEventProvider.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GlobalEventProvider_KeyPress);
             // 
             // Start
             // 

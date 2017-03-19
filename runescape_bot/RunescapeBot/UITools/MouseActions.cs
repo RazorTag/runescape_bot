@@ -57,11 +57,11 @@ namespace RunescapeBot.UITools
         private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
         {
             int hWnd = rsClient.MainWindowHandle.ToInt32();
-            ScreenScraper.BringToForeGround(hWnd);
+            ScreenScraper.BringToForeGround(rsClient);
             TranslateClick(ref x, ref y, rsClient);
             MoveMouseSmoothly(x, y);
             Random rng = new Random();
-            Thread.Sleep(rng.Next(0, 50));  //wait for RS client to recognize that the cursor is hovering over the demon
+            Thread.Sleep(rng.Next(10, 40));  //wait for RS client to recognize the cursor hover
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
         }

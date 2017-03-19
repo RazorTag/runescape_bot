@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.ImageTools
@@ -18,8 +17,7 @@ namespace RunescapeBot.ImageTools
         #region constants
         public static int OSBUDDY_TOOLBAR_WIDTH = 31;  //does not include the border underneath the toolbar
         public static int OSBUDDY_BORDER_WIDTH = 2;
-        public const int SW_RESTORE = 9;
-        public const int LOGIN_WINDOW_HEIGHT = 503;    //y--cordinate of a pixe directly below the login window
+        public const int LOGIN_WINDOW_HEIGHT = 503;    //y-cordinate of a pixe directly below the login window
         #endregion
 
         #region screenreader
@@ -27,13 +25,30 @@ namespace RunescapeBot.ImageTools
         /// Brings the client window to the foreground and shows it
         /// </summary>
         /// <param name="rsHandle"></param>
-        public static void BringToForeGround(int rsHandle)
+        public static void BringToForeGround(Process rsClient)
         {
+            int rsHandle = (int)rsClient.MainWindowHandle;
             if (User32.IsIconic(rsHandle))
             {
                 User32.ShowWindow(rsHandle, SW_RESTORE);
             }
             User32.SetForegroundWindow(rsHandle);
+            MaximizeWindow(rsClient);
+        }
+
+        /// <summary>
+        /// Maximizes a window if it isn;t already
+        /// </summary>
+        /// <param name="rsClient"></param>
+        /// <returns></returns>
+        private static void MaximizeWindow(Process rsClient)
+        {
+            int style = GetWindowLong(rsClient.MainWindowHandle, GWL_STYLE);
+            if ((style & WS_MAXIMIZE) != WS_MAXIMIZE)
+            {
+                User32.ShowWindow((int)rsClient.MainWindowHandle, SW_MAXIMIZE);
+                Thread.Sleep(1000);  //wait for the window to maximize
+            }
         }
 
         /// <summary>
@@ -43,7 +58,7 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static Bitmap CaptureWindow(Process rsClient)
         {
-            BringToForeGround(rsClient.MainWindowHandle.ToInt32());
+            BringToForeGround(rsClient);
 
             RECT windowRect = new RECT();
             User32.GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
@@ -178,6 +193,19 @@ namespace RunescapeBot.ImageTools
             windowRect.left += OSBUDDY_BORDER_WIDTH;
 
             return (windowRect.top > 0) || (windowRect.right > 0) || (windowRect.bottom > 0) || (windowRect.left > 0);
+        }
+
+        /// <summary>
+        /// Gets the width and height of a window
+        /// </summary>
+        /// <param name="OSBuddy"></param>
+        /// <returns>Point(width, height)</returns>
+        public static Point GetOSBuddyWindowSize(Process OSBuddy)
+        {
+            RECT windowRect = new RECT();
+            User32.GetWindowRect(OSBuddy.MainWindowHandle, ref windowRect);
+            ScreenScraper.TrimOSBuddy(ref windowRect);
+            return new Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
         }
         #endregion
     }
