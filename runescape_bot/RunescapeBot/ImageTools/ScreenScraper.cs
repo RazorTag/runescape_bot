@@ -150,14 +150,13 @@ namespace RunescapeBot.ImageTools
         {
             loadError = "";
             string windowName = "OSBUDDY";
-            string username = startParams.username.ToUpper();
             string mainWindowTitle;
             Process[] processlist = Process.GetProcesses();
 
             foreach (Process process in processlist)
             {
                 mainWindowTitle = process.MainWindowTitle.ToUpper();
-                if (mainWindowTitle.Contains(windowName) && mainWindowTitle.Contains(username))
+                if (mainWindowTitle.Contains(windowName))
                 {
                     return process;
                 }

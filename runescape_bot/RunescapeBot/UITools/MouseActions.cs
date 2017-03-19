@@ -17,7 +17,7 @@ namespace RunescapeBot.UITools
         /// <summary>
         /// Pixels per second to move the mouse
         /// </summary>
-        private const double MOUSE_MOVE_SPEED = 2000.0;
+        private const double MOUSE_MOVE_SPEED = 3000.0;
 
         /// <summary>
         /// Mouse movements per second to execute when moving the mouse smoothly
@@ -60,7 +60,8 @@ namespace RunescapeBot.UITools
             ScreenScraper.BringToForeGround(hWnd);
             TranslateClick(ref x, ref y, rsClient);
             MoveMouseSmoothly(x, y);
-            Thread.Sleep(100);  //wait for RS client to recognize that the cursor is hovering over the demon
+            Random rng = new Random();
+            Thread.Sleep(rng.Next(0, 50));  //wait for RS client to recognize that the cursor is hovering over the demon
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
         }
@@ -127,6 +128,7 @@ namespace RunescapeBot.UITools
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY, mouseMoveSpeed;
             POINT startingPosition;
+            Stopwatch watch = new Stopwatch();
             Random rng = new Random();
             GetCursorPos(out startingPosition);
             currentX = startingPosition.X;
@@ -145,11 +147,12 @@ namespace RunescapeBot.UITools
 
             for (int i = 0; i < discreteMovements; i++)
             {
+                watch.Restart();
                 currentX += xMoveDistance;
                 currentY = spline.GetValue(currentX);
                 User32.SetCursorPos((int)currentX, (int)currentY);
-
-                Thread.Sleep(sleepTime);
+                watch.Stop();
+                Thread.Sleep(sleepTime - (int)watch.ElapsedMilliseconds);
             }
             MoveMouse(x, y);
         }

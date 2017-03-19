@@ -141,7 +141,8 @@ namespace RunescapeBot
         private StartParams CollectStartParams()
         {
             StartParams startParams = new StartParams();
-            startParams.username = Username.Text;
+            startParams.Login = Login.Text;
+            startParams.Password = Password.Text;
             startParams.Iterations = (int) Iterations.Value;
             if (EndTimeSelected)
             {

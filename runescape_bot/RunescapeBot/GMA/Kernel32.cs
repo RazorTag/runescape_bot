@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Gma.UserActivityMonitor
+namespace RunescapeBot.GMA
 {
     /// <summary>
     /// Provides kernal-based services

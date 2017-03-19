@@ -15,9 +15,14 @@ namespace RunescapeBot
 
         #region settings
         /// <summary>
-        /// Username to search for when locating a RS client
+        /// Username to use when logging in
         /// </summary>
-        public string username { get; set; }
+        public string Login { get; set; }
+
+        /// <summary>
+        /// Password to use when logging in
+        /// </summary>
+        public string Password { get; set; }
 
         /// <summary>
         /// Bot program to run
@@ -35,7 +40,7 @@ namespace RunescapeBot
         public int Iterations { get; set; }
 
         /// <summary>
-        /// Rate at which to iterate in units of Hz
+        /// Average number of milliseconds between frames
         /// </summary>
         public int FrameTime { get; set; }
 

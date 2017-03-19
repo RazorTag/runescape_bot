@@ -1,12 +1,8 @@
-﻿using RunescapeBot.BotPrograms.Debug;
-using RunescapeBot.Common;
-using RunescapeBot.ImageTools;
+﻿using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -127,7 +123,7 @@ namespace RunescapeBot.BotPrograms
 
             if (RunParams.RandomizeFrames)
             {
-                randomFrameOffset = (int) (0.1 * RunParams.FrameTime);
+                randomFrameOffset = (int) (0.6 * RunParams.FrameTime);
             }
             else
             {
@@ -143,7 +139,7 @@ namespace RunescapeBot.BotPrograms
 
                 Stopwatch watch = Stopwatch.StartNew();
                 ReadWindow();               //Read the game window color values into Bitmap and ColorArray
-                if (StopFlag || !LogIn()) { return; }   //quit immediately if the stop flag has been raised
+                if (StopFlag || !CheckLogIn()) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
                 if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
                 {
@@ -159,7 +155,7 @@ namespace RunescapeBot.BotPrograms
                 watch.Stop();
                 if (watch.ElapsedMilliseconds < randomFrameTime)
                 {
-                    Thread.Sleep(RunParams.FrameTime - (int)watch.ElapsedMilliseconds);
+                    Thread.Sleep(randomFrameTime - (int)watch.ElapsedMilliseconds);
                 }
                 if (StopFlag) { return; }
             }
@@ -311,13 +307,21 @@ namespace RunescapeBot.BotPrograms
         /// Determines if the user is logged out and logs him back in if he is.
         /// If the bot does not have valid login information, then it will quit.
         /// </summary>
-        private bool LogIn()
+        /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
+        private bool CheckLogIn()
         {
             int width = ColorArray.GetLength(0);
             Color color = ColorArray[width / 2, ScreenScraper.LOGIN_WINDOW_HEIGHT];
             if (ImageProcessing.ColorsAreEqual(color, Color.Black))
             {
-
+                if (string.IsNullOrEmpty(RunParams.Login) || string.IsNullOrEmpty(RunParams.Password))
+                {
+                    return false;
+                }
+                else
+                {
+                    //log in
+                }
             }
 
             return true;

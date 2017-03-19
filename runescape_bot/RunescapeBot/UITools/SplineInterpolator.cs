@@ -33,8 +33,8 @@ namespace RunescapeBot.UITools
 
             rise = end.Y - start.Y;
             run = end.X - start.X;
-            variationX = (int) Math.Abs(rise / 30.0);
-            variationY = (int) Math.Abs(run / 30.0);
+            variationX = (int) Math.Abs(rise / 100.0);
+            variationY = (int) Math.Abs(run / 100.0);
             distance = Math.Sqrt(Math.Pow(run, 2.0) + Math.Pow(rise, 2.0));
             if (distance < 20.0)
             {
@@ -64,9 +64,7 @@ namespace RunescapeBot.UITools
                 throw new ArgumentException("At least two point required for interpolation.");
             }
 
-            nodesX.Sort();
             _keys = nodesX.ToArray();
-            nodesY.Sort();
             _values = nodesY.ToArray();
             _a = new double[n];
             _h = new double[n];
