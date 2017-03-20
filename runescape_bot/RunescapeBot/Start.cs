@@ -6,17 +6,19 @@ using System.Reflection;
 using System.Windows.Forms;
 using RunescapeBot.BotPrograms;
 using RunescapeBot.UITools;
+using RunescapeBot.FileIO;
+using RunescapeBot.ImageTools;
 
 namespace RunescapeBot
 {
     /// <summary>
     /// Used by the bot to inform that is has completed its task
     /// </summary>
-    public delegate void BotResponse();
+    //public delegate void BotResponse();
 
     public partial class Start : Form
     {
-        private const string FORM_NAME = "Runescape Bot";
+        private const string FORM_NAME = "Roboport";
         private const string BOT_STOPPING = " is stopping";
         private const string BOT_RUNNING = " is running";
 
@@ -24,6 +26,11 @@ namespace RunescapeBot
         /// List of running bot programs
         /// </summary>
         private BotProgram RunningBot;
+
+        /// <summary>
+        /// Saved startup settings for each bot program
+        /// </summary>
+        private BotSettings Settings;
 
         /// <summary>
         /// True if a bot is currently running
@@ -90,6 +97,7 @@ namespace RunescapeBot
         /// </summary>
         public Start()
         {
+            Settings = new BotSettings();
             InitializeComponent();
             Array actions = Enum.GetValues(typeof(BotActions));
             string[] names = new string[actions.Length];
@@ -98,6 +106,9 @@ namespace RunescapeBot
                 names[i] = GetDescription((Enum) actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
+            BotActionSelect.SelectedIndex = (int) Settings.BotAction;
+            Login.Text = Settings.Login;
+            Password.Text = Settings.Password;
         }
 
         /// <summary>
@@ -168,6 +179,7 @@ namespace RunescapeBot
             this.Text = GetBotName() + BOT_RUNNING;
             botProgram.Start();
             BotIsRunning = true;
+            Settings.SaveBot(botProgram.RunParams);
         }
 
         /// <summary>
@@ -205,6 +217,9 @@ namespace RunescapeBot
                 this.Invoke((MethodInvoker)(() =>
                 {
                     this.Text = FORM_NAME;
+                    User32.RECT windowRect = new User32.RECT();
+                    User32.GetWindowRect(this.Handle, ref windowRect);
+                    MouseActions.MoveMouse(windowRect.left + 150, windowRect.top + 15);
                 }));
             }
         }
@@ -214,6 +229,8 @@ namespace RunescapeBot
         /// </summary>
         private void StopBot()
         {
+            User32.SetForegroundWindow(Handle.ToInt32());
+
             if (RunningBot != null)
             {
                 this.Text = GetBotName() + BOT_STOPPING;
@@ -240,6 +257,16 @@ namespace RunescapeBot
                     StopBot();
                     break;
             }
+        }
+
+        /// <summary>
+        /// Saves the user's form settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Start_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Settings.Save();
         }
     }
 }

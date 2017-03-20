@@ -1,4 +1,5 @@
-﻿using RunescapeBot.UITools;
+﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.UITools;
 using System;
 using System.Diagnostics;
 using System.Drawing;

@@ -56,7 +56,7 @@ namespace RunescapeBot
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(125, 55);
             this.StartButton.TabIndex = 11;
-            this.StartButton.Text = "Start";
+            this.StartButton.Text = "&Start";
             this.StartButton.UseVisualStyleBackColor = true;
             this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
@@ -180,8 +180,9 @@ namespace RunescapeBot
             this.KeyPreview = true;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Runescape Bot";
+            this.Text = "Roboport";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Start_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Start_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

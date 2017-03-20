@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RunescapeBot</RootNamespace>
-    <AssemblyName>RunescapeBot</AssemblyName>
+    <AssemblyName>Roboport</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -17,15 +17,16 @@
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
+    <UpdateMode>Background</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdatePeriodically>true</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <UpdateUrl>http://45.55.225.235/var/www/runescape_bot/</UpdateUrl>
+    <ProductName>Roboport</ProductName>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>16</ApplicationRevision>
+    <ApplicationRevision>18</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -71,6 +72,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,6 +87,8 @@
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Diagnostics\Debug.cs" />
     <Compile Include="Common\PrimitiveWrapper.cs" />
+    <Compile Include="FileIO\BotSettings.cs" />
+    <Compile Include="FileIO\SettingsData.cs" />
     <Compile Include="GMA\GlobalEventProvider.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -95,8 +99,8 @@
     <Compile Include="GMA\Kernel32.cs" />
     <Compile Include="GMA\MouseEventExtArgs.cs" />
     <Compile Include="ImageTools\Blob.cs" />
-    <Compile Include="BotPrograms\GoldBracelets.cs" />
-    <Compile Include="BotPrograms\LesserDemon.cs" />
+    <Compile Include="BotPrograms\Bots\GoldBracelets.cs" />
+    <Compile Include="BotPrograms\Bots\LesserDemon.cs" />
     <Compile Include="ImageTools\ColorRange.cs" />
     <Compile Include="ImageTools\HSBRange.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
@@ -109,7 +113,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StartParams.cs" />
+    <Compile Include="BotPrograms\StartParams.cs" />
     <Compile Include="CustomExceptions\UserDefinedExceptions.cs" />
     <Compile Include="UITools\GDI32.cs" />
     <Compile Include="UITools\Kernel32.cs" />
