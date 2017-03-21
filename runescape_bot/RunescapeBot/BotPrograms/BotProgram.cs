@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -61,19 +60,19 @@ namespace RunescapeBot.BotPrograms
         protected bool StopFlag { get; set; }
 
         /// <summary>
-        /// Horizontal center of the screen
+        /// Center of the screen
         /// </summary>
-        protected int CenterX
+        protected Point Center
         {
             get
             {
                 if (ColorArray == null)
                 {
-                    return 0;
+                    return new Point(0, 0);
                 }
                 else
                 {
-                    return ColorArray.GetLength(0) / 2;
+                    return new Point(ColorArray.GetLength(0) / 2, ColorArray.GetLength(1) / 2);
                 }
             }
         }
@@ -443,7 +442,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we are on the welcome screen, false otherwise</returns>
         private bool IsWelcomeScreen()
         {
-            int centerX = CenterX;
+            int centerX = Center.X;
             int centerY = 337;
             int offsetX = 110;
             int offsetY = 40;
@@ -488,9 +487,8 @@ namespace RunescapeBot.BotPrograms
         private bool IsLoggedIn()
         {
             Color color;
-            int width = ColorArray.GetLength(0);
             int height = ColorArray.GetLength(1);
-            int centerX = width / 2;
+            int centerX = Center.X;
             int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);    //50 pixels below where the bottom of the login picture should be
             int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 50;
             for (int x = centerX - xOffset; x < centerX + xOffset; x++)  //check 21 pixels for blackness

@@ -64,54 +64,54 @@ namespace RunescapeBot
             // 
             this.BotActionSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BotActionSelect.FormattingEnabled = true;
-            this.BotActionSelect.Location = new System.Drawing.Point(100, 110);
+            this.BotActionSelect.Location = new System.Drawing.Point(123, 110);
             this.BotActionSelect.MaxDropDownItems = 12;
             this.BotActionSelect.Name = "BotActionSelect";
-            this.BotActionSelect.Size = new System.Drawing.Size(310, 28);
+            this.BotActionSelect.Size = new System.Drawing.Size(287, 28);
             this.BotActionSelect.TabIndex = 6;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(23, 113);
+            this.label1.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(23, 116);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 16);
+            this.label1.Size = new System.Drawing.Size(56, 18);
             this.label1.TabIndex = 5;
             this.label1.Text = "Action:";
             // 
             // Login
             // 
             this.Login.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Login.Location = new System.Drawing.Point(100, 20);
+            this.Login.Location = new System.Drawing.Point(123, 20);
             this.Login.Name = "Login";
-            this.Login.Size = new System.Drawing.Size(310, 26);
+            this.Login.Size = new System.Drawing.Size(287, 26);
             this.Login.TabIndex = 2;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(23, 21);
+            this.label2.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(23, 26);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(43, 16);
+            this.label2.Size = new System.Drawing.Size(51, 18);
             this.label2.TabIndex = 1;
             this.label2.Text = "Login:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(23, 207);
+            this.label3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(23, 209);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 16);
+            this.label3.Size = new System.Drawing.Size(75, 18);
             this.label3.TabIndex = 9;
             this.label3.Text = "Iterations:";
             // 
             // Iterations
             // 
             this.Iterations.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Iterations.Location = new System.Drawing.Point(100, 205);
+            this.Iterations.Location = new System.Drawing.Point(123, 207);
             this.Iterations.Name = "Iterations";
             this.Iterations.Size = new System.Drawing.Size(89, 26);
             this.Iterations.TabIndex = 10;
@@ -119,10 +119,10 @@ namespace RunescapeBot
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(23, 164);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(65, 16);
+            this.label4.Size = new System.Drawing.Size(73, 18);
             this.label4.TabIndex = 7;
             this.label4.Text = "Run Until:";
             // 
@@ -130,29 +130,29 @@ namespace RunescapeBot
             // 
             this.RunUntil.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RunUntil.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.RunUntil.Location = new System.Drawing.Point(100, 159);
+            this.RunUntil.Location = new System.Drawing.Point(123, 159);
             this.RunUntil.Name = "RunUntil";
-            this.RunUntil.Size = new System.Drawing.Size(310, 26);
+            this.RunUntil.Size = new System.Drawing.Size(287, 26);
             this.RunUntil.TabIndex = 8;
             this.RunUntil.ValueChanged += new System.EventHandler(this.RunUntil_ValueChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(23, 66);
+            this.label5.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(23, 71);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(69, 16);
+            this.label5.Size = new System.Drawing.Size(82, 18);
             this.label5.TabIndex = 3;
             this.label5.Text = "Password:";
             // 
             // Password
             // 
             this.Password.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Password.Location = new System.Drawing.Point(100, 65);
+            this.Password.Location = new System.Drawing.Point(123, 65);
             this.Password.Name = "Password";
             this.Password.PasswordChar = '*';
-            this.Password.Size = new System.Drawing.Size(310, 26);
+            this.Password.Size = new System.Drawing.Size(287, 26);
             this.Password.TabIndex = 4;
             // 
             // GlobalEventProvider
@@ -175,6 +175,7 @@ namespace RunescapeBot
             this.Controls.Add(this.label1);
             this.Controls.Add(this.BotActionSelect);
             this.Controls.Add(this.StartButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;

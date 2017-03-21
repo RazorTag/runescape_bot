@@ -8,13 +8,13 @@ using RunescapeBot.BotPrograms;
 using RunescapeBot.UITools;
 using RunescapeBot.FileIO;
 using RunescapeBot.ImageTools;
+using System.Drawing;
 
 namespace RunescapeBot
 {
     /// <summary>
     /// Used by the bot to inform that is has completed its task
     /// </summary>
-    //public delegate void BotResponse();
 
     public partial class Start : Form
     {
@@ -25,32 +25,33 @@ namespace RunescapeBot
         /// <summary>
         /// List of running bot programs
         /// </summary>
-        private BotProgram RunningBot;
+        private BotProgram runningBot;
 
         /// <summary>
         /// Saved startup settings for each bot program
         /// </summary>
-        private BotSettings Settings;
+        private BotSettings settings;
 
         /// <summary>
         /// True if a bot is currently running
         /// </summary>
-        private bool BotIsRunning;
+        private bool botIsRunning;
 
         /// <summary>
         /// Set to true if a user has selected a date to run until
         /// </summary>
-        private bool EndTimeSelected;
+        private bool endTimeSelected;
 
         /// <summary>
         /// List of existing bot programs. Add a new bot program to this list.
         /// </summary>
-        public enum BotActions : int {
-                [Description("Lesser Demon")]
-                LesserDemon,
-                [Description("Gold Bracelets")]
-                GoldBracelets
-            };
+        public enum BotActions : int
+        {
+            [Description("Lesser Demon")]
+            LesserDemon,
+            [Description("Gold Bracelets")]
+            GoldBracelets
+        };
 
         /// <summary>
         /// Gets the display name for an enum
@@ -84,12 +85,12 @@ namespace RunescapeBot
         /// <returns>The bot's display name and current status</returns>
         private string GetBotName()
         {
-            if (RunningBot == null)
+            if (runningBot == null)
             {
                 return string.Empty;
             }
 
-            return GetDescription(RunningBot.RunParams.BotAction);
+            return GetDescription(runningBot.RunParams.BotAction);
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace RunescapeBot
         /// </summary>
         public Start()
         {
-            Settings = new BotSettings();
+            settings = new BotSettings();
             InitializeComponent();
             Array actions = Enum.GetValues(typeof(BotActions));
             string[] names = new string[actions.Length];
@@ -106,9 +107,10 @@ namespace RunescapeBot
                 names[i] = GetDescription((Enum) actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
-            BotActionSelect.SelectedIndex = (int) Settings.BotAction;
-            Login.Text = Settings.Login;
-            Password.Text = Settings.Password;
+            BotActionSelect.SelectedIndex = (int) settings.BotAction;
+            Login.Text = settings.Login;
+            Password.Text = settings.Password;
+            SetIdleState();
         }
 
         /// <summary>
@@ -119,7 +121,7 @@ namespace RunescapeBot
         /// <param name="e">not used</param>
         private void StartButton_Click(object sender, EventArgs e)
         {
-            if (BotIsRunning)
+            if (botIsRunning)
             {
                 MessageBox.Show("There is already a bot running.");
                 return;
@@ -130,19 +132,19 @@ namespace RunescapeBot
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
                 case BotActions.GoldBracelets:
-                    RunningBot = new GoldBracelets(startParams);
+                    runningBot = new GoldBracelets(startParams);
                     break;
 
                 case BotActions.LesserDemon:
                     startParams.FrameTime = 5000;
-                    RunningBot = new LesserDemon(startParams);
+                    runningBot = new LesserDemon(startParams);
                     break;
 
                 default:
                     return;
             }
 
-            RunBotProgram(RunningBot);
+            RunBotProgram(runningBot);
         }
 
         /// <summary>
@@ -155,7 +157,7 @@ namespace RunescapeBot
             startParams.Login = Login.Text;
             startParams.Password = Password.Text;
             startParams.Iterations = (int) Iterations.Value;
-            if (EndTimeSelected)
+            if (endTimeSelected)
             {
                 startParams.RunUntil = RunUntil.Value;
             }
@@ -176,10 +178,10 @@ namespace RunescapeBot
         {
             if(botProgram == null) { return; }
 
-            this.Text = GetBotName() + BOT_RUNNING;
+            SetTransitionalState();
             botProgram.Start();
-            BotIsRunning = true;
-            Settings.SaveBot(botProgram.RunParams);
+            SetActiveState();
+            settings.SaveBot(botProgram.RunParams);
         }
 
         /// <summary>
@@ -189,7 +191,7 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void RunUntil_ValueChanged(object sender, EventArgs e)
         {
-            EndTimeSelected = true;
+            endTimeSelected = true;
         }
 
         /// <summary>
@@ -199,9 +201,9 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void Start_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (RunningBot != null)
+            if (runningBot != null)
             {
-                RunningBot.Stop();
+                runningBot.Stop();
             }
         }
 
@@ -210,17 +212,11 @@ namespace RunescapeBot
         /// </summary>
         public void BotDone()
         {
-            BotIsRunning = false;
-            RunningBot = null;
             if (this.IsHandleCreated)
             {
                 this.Invoke((MethodInvoker)(() =>
                 {
-                    this.Text = FORM_NAME;
-                    //Move mouse back to the start form
-                    //User32.RECT windowRect = new User32.RECT();
-                    //User32.GetWindowRect(this.Handle, ref windowRect);
-                    //User32.SetCursorPos(windowRect.left + 150, windowRect.top + 15);
+                    SetIdleState();
                 }));
             }
         }
@@ -232,14 +228,14 @@ namespace RunescapeBot
         {
             User32.SetForegroundWindow(Handle.ToInt32());
 
-            if (RunningBot != null)
+            if (runningBot != null)
             {
-                this.Text = GetBotName() + BOT_STOPPING;
-                RunningBot.Stop();
+                SetTransitionalState();
+                runningBot.Stop();
             }
             else
             {
-                this.Text = FORM_NAME;
+                SetIdleState();
             }
         }
 
@@ -267,7 +263,37 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void Start_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Settings.Save();
+            settings.Save();
+        }
+
+        /// <summary>
+        /// Sets up the Start form for the idle state
+        /// </summary>
+        private void SetIdleState()
+        {
+            runningBot = null;
+            botIsRunning = false;
+            Text = FORM_NAME;
+            StartButton.BackColor = ColorTranslator.FromHtml("#874C48");
+        }
+
+        /// <summary>
+        /// Sets up the Start for for a transitional state
+        /// </summary>
+        private void SetTransitionalState()
+        {
+            Text = GetBotName() + BOT_STOPPING;
+            StartButton.BackColor = ColorTranslator.FromHtml("#7E7E37");
+        }
+
+        /// <summary>
+        /// Sets up the Start form for when a bot is running
+        /// </summary>
+        private void SetActiveState()
+        {
+            botIsRunning = true;
+            this.Text = GetBotName() + BOT_RUNNING;
+            StartButton.BackColor = ColorTranslator.FromHtml("#527E3F");
         }
     }
 }
