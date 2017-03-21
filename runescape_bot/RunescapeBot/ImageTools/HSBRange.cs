@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace RunescapeBot.ImageTools
 {
     public class HSBRange
     {
+        /// <summary>
+        /// The hue range is assumed to run clockwise.
+        /// A hue range with a minimum of 355 and a maximum of 20 covers an arc of 25 degrees.
+        /// A hue range with a minimum of 20 and a maximum of 355 covers an arc of 335 degrees.
+        /// </summary>
+        /// <param name="minimumHue"></param>
+        /// <param name="maximumHue"></param>
+        /// <param name="minimumSaturation"></param>
+        /// <param name="maximumSaturation"></param>
+        /// <param name="minimumBrightness"></param>
+        /// <param name="maximumBrightness"></param>
         public HSBRange(int minimumHue, int maximumHue, float minimumSaturation, float maximumSaturation, float minimumBrightness, float maximumBrightness)
         {
             this.MinimumHue = minimumHue;
