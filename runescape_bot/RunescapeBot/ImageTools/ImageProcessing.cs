@@ -185,7 +185,7 @@ namespace RunescapeBot.ImageTools
             }
             else
             {
-                return null;
+                return new Blob();
             }
 
             foreach (Blob blob in blobs)

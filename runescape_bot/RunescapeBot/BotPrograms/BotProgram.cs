@@ -60,6 +60,24 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected bool StopFlag { get; set; }
 
+        /// <summary>
+        /// Horizontal center of the screen
+        /// </summary>
+        protected int CenterX
+        {
+            get
+            {
+                if (ColorArray == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return ColorArray.GetLength(0) / 2;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Initializes a bot program with a client matching startParams
@@ -139,10 +157,10 @@ namespace RunescapeBot.BotPrograms
                 }
 
                 Stopwatch watch = Stopwatch.StartNew();
-                ReadWindow();               //Read the game window color values into Bitmap and ColorArray
+                ReadWindow();   //Read the game window color values into Bitmap and ColorArray
                 if (StopFlag || !CheckLogIn()) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
-                if (Bitmap != null)     //Make sure the read is successful before using the bitmap values
+                if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                 {
                     if (!Execute()) //quit by an override Execute method
                     {
@@ -190,7 +208,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Creates a boolean array to represent that match 
+        /// Creates a boolean array to represent a color filter match
         /// </summary>
         /// <param name="artifactColor"></param>
         /// <returns></returns>
@@ -200,8 +218,54 @@ namespace RunescapeBot.BotPrograms
             {
                 return null;
             }
-
             return ImageProcessing.ColorFilter(ColorArray, artifactColor);
+        }
+
+        /// <summary>
+        /// Creates a boolean array of a portion of the screen to represent a color filter match
+        /// </summary>
+        /// <param name="artifactColor"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
+        /// <returns></returns>
+        protected bool[,] ColorFilterPiece(ColorRange artifactColor, int left, int right, int top, int bottom)
+        {
+            Color[,] colorArray = ScreenPiece(left, right, top, bottom);
+            if (ColorArray == null)
+            {
+                return null;
+            }
+            return ImageProcessing.ColorFilter(colorArray, artifactColor);
+        }
+
+        /// <summary>
+        /// Gets a rectangle from ColorArray
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        protected Color[,] ScreenPiece(int left, int right, int top, int bottom)
+        {
+            left = Math.Max(left, 0);
+            right = Math.Min(right, ColorArray.GetLength(0));
+            top = Math.Max(top, 0);
+            bottom = Math.Min(bottom, ColorArray.GetLength(1));
+            if ((left > right) || (top > bottom))
+            {
+                return null;
+            }
+            Color[,] screenPiece = new Color[right - left + 1, bottom - top + 1];
+
+            for (int x = left; x <= right; x++)
+            {
+                for (int y = top; y <= bottom; y++)
+                {
+                    screenPiece[x - left, y - top] = ColorArray[x, y];
+                }
+            }
+            return screenPiece;
         }
 
         /// <summary>
@@ -336,30 +400,85 @@ namespace RunescapeBot.BotPrograms
         {
             int center = ColorArray.GetLength(0) / 2;
 
-            //Click existing account. Clicks in a dead space if we are already on the login screen.
-            LeftClick(center + 16, 288);
+            //log in at the login screen
+            if (!IsWelcomeScreen())
+            {
+                //Click existing account. Clicks in a dead space if we are already on the login screen.
+                LeftClick(center + 16, 288);
 
-            //fill in login
-            LeftClick(center + 137, 259);
-            Keyboard.Backspace(350);
-            Keyboard.WriteLine(RunParams.Login);
+                //fill in login
+                LeftClick(center + 137, 259);
+                Keyboard.Backspace(350);
+                Keyboard.WriteLine(RunParams.Login);
 
-            //fill in password
-            Keyboard.Tab();
-            Keyboard.Backspace(20);
-            Keyboard.WriteLine(RunParams.Password);
+                //fill in password
+                Keyboard.Tab();
+                Keyboard.Backspace(20);
+                Keyboard.WriteLine(RunParams.Password);
 
-            //trigger the login button
-            Keyboard.Enter();
+                //trigger the login button
+                Keyboard.Enter();
+                if (SafeWait(5000)) { return false; }
+            }
 
-            //click the "CLICK HERE TO PLAY" button
-            Thread.Sleep(5000);
-            LeftClick(center, 337);
-            Thread.Sleep(5000);
+            //click the "CLICK HERE TO PLAY" button on the welcome screen
+            if (ConfirmWelcomeScreen())
+            {
+                LeftClick(center, 337);
+            }
+            else
+            {
+                return false;
+            }
+            if (SafeWait(10000)) { return false; }
 
             //verify the log in
             ReadWindow();
             return IsLoggedIn();
+        }
+
+        /// <summary>
+        /// Determines if the last screenshot was of the welcome screen
+        /// </summary>
+        /// <returns>true if we are on the welcome screen, false otherwise</returns>
+        private bool IsWelcomeScreen()
+        {
+            int centerX = CenterX;
+            int centerY = 337;
+            int offsetX = 110;
+            int offsetY = 40;
+            int totalSize = (2 * offsetX + 1) * (2 * offsetY + 1);
+            int redBlobSize;
+
+            ColorRange red = ColorFilters.WelcomeScreenClickHere();
+            bool[,] clickHere = ColorFilter(red);
+            clickHere = ColorFilterPiece(red, centerX - offsetX, centerX + offsetX, centerY - offsetY, centerY + offsetY);
+            redBlobSize = ImageProcessing.BiggestBlob(clickHere).Size;
+
+            return ((2 * redBlobSize) > totalSize);
+        }
+
+        /// <summary>
+        /// Determines if the welcome screen has been reached
+        /// </summary>
+        /// <returns>true if the welcome screen has been reached, false if not or if the StopFlag is raised</returns>
+        private bool ConfirmWelcomeScreen()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                if (StopFlag) { return false; }
+                ReadWindow();
+                if (IsWelcomeScreen())
+                {
+                    return true;
+                }
+                else
+                {
+                    if (StopFlag) { return false; }
+                    SafeWait(1000);
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -371,11 +490,29 @@ namespace RunescapeBot.BotPrograms
             Color color;
             int width = ColorArray.GetLength(0);
             int height = ColorArray.GetLength(1);
-            int center = width / 2;
-            int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);
-            for (int i = center - 10; i <= center + 10; i++)    //check 21 pixels for blackness
+            int centerX = width / 2;
+            int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);    //50 pixels below where the bottom of the login picture should be
+            int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 50;
+            for (int x = centerX - xOffset; x < centerX + xOffset; x++)  //check 21 pixels for blackness
             {
-                color = ColorArray[i, checkRow];  //50 safety pixels below where the bottom of the login picture should be
+                //check bottom of login box
+                color = ColorArray[x, checkRow];
+                if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
+                {
+                    return true;
+                }
+            }
+            for (int y = 0; y < checkRow; y++)  //check 21 pixels for blackness
+            {
+                //check left of login box
+                color = ColorArray[centerX - xOffset, y];
+                if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
+                {
+                    return true;
+                }
+
+                //check right of login box
+                color = ColorArray[centerX + xOffset, y];
                 if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
                 {
                     return true;
@@ -388,7 +525,8 @@ namespace RunescapeBot.BotPrograms
         /// Waits for the specified time while periodically checking for the stop flag
         /// </summary>
         /// <param name="waitTime"></param>
-        private void SafeWait(int waitTime)
+        /// <returns>true if the StopFlag has been raised</returns>
+        private bool SafeWait(int waitTime)
         {
             int nextWaitTime;
             int waitInterval = 1000;
@@ -401,8 +539,9 @@ namespace RunescapeBot.BotPrograms
                 nextWaitTime = Math.Min(waitInterval, (waitTime - (int)watch.ElapsedMilliseconds));
                 nextWaitTime = Math.Max(0, nextWaitTime);
                 Thread.Sleep(nextWaitTime);
-                if (StopFlag) { return; }
+                if (StopFlag) { return true; }
             }
+            return StopFlag;
         }
     }
 }

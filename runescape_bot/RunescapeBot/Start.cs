@@ -217,9 +217,10 @@ namespace RunescapeBot
                 this.Invoke((MethodInvoker)(() =>
                 {
                     this.Text = FORM_NAME;
-                    User32.RECT windowRect = new User32.RECT();
-                    User32.GetWindowRect(this.Handle, ref windowRect);
-                    MouseActions.MoveMouse(windowRect.left + 150, windowRect.top + 15);
+                    //Move mouse back to the start form
+                    //User32.RECT windowRect = new User32.RECT();
+                    //User32.GetWindowRect(this.Handle, ref windowRect);
+                    //User32.SetCursorPos(windowRect.left + 150, windowRect.top + 15);
                 }));
             }
         }

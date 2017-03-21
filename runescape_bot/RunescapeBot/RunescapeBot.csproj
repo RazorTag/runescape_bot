@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
+    <Compile Include="BotPrograms\ColorFilters.cs" />
     <Compile Include="BotPrograms\Diagnostics\Debug.cs" />
     <Compile Include="Common\PrimitiveWrapper.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
