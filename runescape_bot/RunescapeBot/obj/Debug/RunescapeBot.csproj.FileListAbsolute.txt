@@ -1,27 +1,16 @@
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\RunescapeBot.exe.config
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\RunescapeBot.exe
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\RunescapeBot.pdb
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\WindowsFormsApplication1.Start.resources
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.csproj.GenerateResource.Cache
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.exe
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\obj\Debug\RunescapeBot.pdb
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.dll
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.pdb
-C:\Projects\Runescape Bot\RunescapeBot\RunescapeBot\bin\Debug\InputSimulator.xml
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.dll
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.pdb
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.xml
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csproj.GenerateResource.Cache
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.Start.resources
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.Properties.Resources.resources
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\Roboport.exe.config
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\Roboport.exe.manifest
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\Roboport.application
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\Roboport.exe
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\Roboport.pdb
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.dll
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.pdb
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\bin\Debug\InputSimulator.xml
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.Properties.Resources.resources
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.Start.resources
+C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csproj.GenerateResource.Cache
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\Roboport.exe.manifest
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\Roboport.application
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\Roboport.exe
 C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\Roboport.pdb
-C:\Projects\RunescapeBot\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache

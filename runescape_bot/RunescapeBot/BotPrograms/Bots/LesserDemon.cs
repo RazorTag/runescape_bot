@@ -15,6 +15,7 @@ namespace RunescapeBot.BotPrograms
         private const int maxDemonSpawnTime = 28000;    //max possible lesser demon spawn time in milliseconds
         private static ColorRange LesserDemonSkin;
         private static ColorRange LesserDemonHorn;
+        private static ColorRange RuneMedHelm;
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -37,6 +38,9 @@ namespace RunescapeBot.BotPrograms
         {
             //test code to save mask pictures
             //ReadWindow();
+            //bool[,] helmPixels = ColorFilter(RuneMedHelm);
+            //EraseClientUIFromMask(ref helmPixels);
+            //TestMask(RuneMedHelm, "helm", helmPixels);
             //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             //EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
@@ -73,6 +77,18 @@ namespace RunescapeBot.BotPrograms
             else
             {
                 missedDemons++;
+            }
+
+            // during the first frame that the bot program cant find a demon, look for a rune med helm drop
+            if (missedDemons == 1)
+            {
+                bool[,] helmPixels = ColorFilter(RuneMedHelm);
+                Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
+                if (runeMedHelmBlob != null)
+                {
+                    Point runeMedHelmCenter = runeMedHelmBlob.Center;
+                    LeftClick(runeMedHelmCenter.X, runeMedHelmCenter.Y);
+                }
             }
 
             if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
@@ -251,6 +267,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            //string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
             ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg", ImageFormat.Jpeg);
@@ -285,6 +302,7 @@ namespace RunescapeBot.BotPrograms
         {
             LesserDemonSkin = ColorFilters.LesserDemonSkin();
             LesserDemonHorn = ColorFilters.LesserDemonHorn();
+            RuneMedHelm = ColorFilters.RuneMedHelm();
         }
     }
 }

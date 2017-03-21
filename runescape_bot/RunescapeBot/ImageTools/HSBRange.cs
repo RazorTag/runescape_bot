@@ -20,7 +20,11 @@ namespace RunescapeBot.ImageTools
             this.MinimumHue = minimumHue;
             if (maximumHue < minimumHue)
             {
-                MaximumHue = maximumHue + 360;
+                this.MaximumHue = maximumHue + 360;
+            }
+            else
+            {
+                this.MaximumHue = maximumHue;
             }
             this.MinimumSaturation = minimumSaturation;
             this.MaximumSaturation = maximumSaturation;
