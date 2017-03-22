@@ -19,10 +19,17 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class BotProgram
     {
+        private const long LOGIN_LOGO_COLOR_SUM = 15456063;
+
         /// <summary>
         /// Error message to show the user for a start error
         /// </summary>
         private string loadError;
+
+        /// <summary>
+        /// Specifies how the bot should be run
+        /// </summary>
+        public StartParams RunParams;
 
         /// <summary>
         /// Process to which this bot program is attached
@@ -35,11 +42,6 @@ namespace RunescapeBot.BotPrograms
         protected Thread RunThread { get; set; }
 
         /// <summary>
-        /// Specifies how the bot should be run
-        /// </summary>
-        public StartParams RunParams;
-
-        /// <summary>
         /// Stores a bitmap of the client window
         /// </summary>
         protected Bitmap Bitmap { get; set; }
@@ -48,6 +50,11 @@ namespace RunescapeBot.BotPrograms
         /// Stores a Color array of the client window
         /// </summary>
         protected Color[,] ColorArray { get; set; }
+
+        /// <summary>
+        /// The sidebar including the inventory and spellbook
+        /// </summary>
+        protected Inventory Inventory { get; set; }
 
         /// <summary>
         /// Stock random number generator
@@ -87,6 +94,7 @@ namespace RunescapeBot.BotPrograms
             RSClient = ScreenScraper.GetOSBuddy(startParams, out loadError);
             this.RunParams = startParams;
             RNG = new Random();
+            Inventory = new Inventory(RSClient);
         }
        
         /// <summary>
@@ -110,9 +118,23 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Process()
         {
-            Run();
+            Setup();
             Iterate();
             Done();
+        }
+
+        /// <summary>
+        /// Standard setup before running a bot
+        /// </summary>
+        private void Setup()
+        {
+            ReadWindow();
+            if (!IsLoggedIn())
+            {
+                LogIn();
+            }
+            if (StopFlag) { return; }
+            Run();
         }
 
         /// <summary>
@@ -316,7 +338,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                MouseActions.LeftMouseClick(x, y, RSClient);
+                Mouse.LeftClick(x, y, RSClient);
             }
         }
 
@@ -329,7 +351,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                MouseActions.RightMouseClick(x, y, RSClient);
+                Mouse.RightClick(x, y, RSClient);
             }
         }
 
@@ -340,6 +362,11 @@ namespace RunescapeBot.BotPrograms
         /// <param name="mask"></param>
         protected void EraseClientUIFromMask(ref bool[,] mask)
         {
+            if (mask == null)
+            {
+                return;
+            }
+
             int width = mask.GetLength(0);
             int height = mask.GetLength(1);
 
@@ -377,6 +404,11 @@ namespace RunescapeBot.BotPrograms
             if (IsLoggedIn())
             {
                 return true;    //already logged in
+            }
+            SafeWait(5000);
+            if (IsLoggedIn())
+            {
+                return true;
             }
 
             //see if we have login and password to log in
@@ -429,7 +461,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            if (SafeWait(10000)) { return false; }
+            if (SafeWait(5000)) { return false; }
 
             //verify the log in
             ReadWindow();
@@ -491,7 +523,7 @@ namespace RunescapeBot.BotPrograms
             int centerX = Center.X;
             int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);    //50 pixels below where the bottom of the login picture should be
             int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 50;
-            for (int x = centerX - xOffset; x < centerX + xOffset; x++)  //check 21 pixels for blackness
+            for (int x = centerX - xOffset; x < centerX + xOffset; x++)
             {
                 //check bottom of login box
                 color = ColorArray[x, checkRow];
@@ -500,7 +532,7 @@ namespace RunescapeBot.BotPrograms
                     return true;
                 }
             }
-            for (int y = 0; y < checkRow; y++)  //check 21 pixels for blackness
+            for (int y = 0; y < checkRow; y++)  //check sides
             {
                 //check left of login box
                 color = ColorArray[centerX - xOffset, y];
@@ -516,6 +548,14 @@ namespace RunescapeBot.BotPrograms
                     return true;
                 }
             }
+
+            //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
+            long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, 0, 160));
+            if ((colorSum < (LOGIN_LOGO_COLOR_SUM * 0.99)) || (colorSum > (LOGIN_LOGO_COLOR_SUM * 1.01)))
+            {
+                return true;
+            }
+
             return false;
         }
 

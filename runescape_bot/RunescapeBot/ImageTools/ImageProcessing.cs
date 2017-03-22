@@ -222,5 +222,26 @@ namespace RunescapeBot.ImageTools
         {
             return (color1.R == color2.R) && (color1.B == color2.B) && (color1.G == color2.G);
         }
+
+        /// <summary>
+        /// Sums all of the R, G, and B values in the image
+        /// </summary>
+        /// <param name="rgbImage">color array to sum</param>
+        /// <returns></returns>
+        public static long ColorSum(Color[,] rgbImage)
+        {
+            Color pixel;
+            long colorSum = 0;
+
+            for (int x = 0; x < rgbImage.GetLength(0); x++)
+            {
+                for (int y = 0; y < rgbImage.GetLength(1); y++)
+                {
+                    pixel = rgbImage[x, y];
+                    colorSum += pixel.R + pixel.G + pixel.B;
+                }
+            }
+            return colorSum;
+        }
     }
 }

@@ -42,8 +42,14 @@ namespace RunescapeBot.ImageTools
                         totalX += pixel.Value.X;
                         totalY += pixel.Value.Y;
                     }
-
-                    _center = new Point(totalX / Size, totalY / Size);
+                    if (Size == 0)
+                    {
+                        _center = new Point(0, 0);
+                    }
+                    else
+                    {
+                        _center = new Point(totalX / Size, totalY / Size);
+                    }
                     _centerSet = true;
                 }
                 
@@ -84,6 +90,7 @@ namespace RunescapeBot.ImageTools
             {
                 FoundPixels.Enqueue(newPixel);
                 Pixels.Add(newPixel, newPixel);
+                _centerSet = false;
                 return true;
             }
             return false;

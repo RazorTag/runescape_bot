@@ -6,7 +6,7 @@ using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.UITools
 {
-    public static class MouseActions
+    public static class Mouse
     {
         #region constants
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
@@ -31,9 +31,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftMouseClick(int x, int y, Process rsClient)
+        public static void LeftClick(int x, int y, Process rsClient)
         {
-            MouseClick(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP);
+            Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP);
         }
 
         /// <summary>
@@ -41,9 +41,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightMouseClick(int x, int y, Process rsClient)
+        public static void RightClick(int x, int y, Process rsClient)
         {
-            MouseClick(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP);
+            Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP);
         }
 
         /// <summary>
@@ -54,12 +54,12 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient"></param>
         /// <param name="clickTypeDown"></param>
         /// <param name="clickTypeUp"></param>
-        private static void MouseClick(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
+        private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
         {
             int hWnd = rsClient.MainWindowHandle.ToInt32();
             ScreenScraper.BringToForeGround(rsClient);
             TranslateClick(ref x, ref y, rsClient);
-            MoveMouseSmoothly(x, y);
+            NaturalMove(x, y);
             Random rng = new Random();
             Thread.Sleep(rng.Next(25, 50));  //wait for RS client to recognize the cursor hover
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
@@ -89,7 +89,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void MoveMouse(int x, int y)
+        public static void Move(int x, int y)
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY;
@@ -106,7 +106,7 @@ namespace RunescapeBot.UITools
             yMoveDistance = yDistance / discreteMovements;
             sleepTime = (int) (1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
 
-            SplineInterpolator spline = new SplineInterpolator(startingPosition, new System.Drawing.Point(x, y));
+            Spline spline = new Spline(startingPosition, new System.Drawing.Point(x, y));
 
             for (int i = 0; i < discreteMovements; i++)
             {
@@ -123,7 +123,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void MoveMouseSmoothly(int x, int y)
+        public static void NaturalMove(int x, int y)
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY, mouseMoveSpeed;
@@ -143,7 +143,7 @@ namespace RunescapeBot.UITools
             yMoveDistance = yDistance / discreteMovements;
             sleepTime = (int)(1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
 
-            SplineInterpolator spline = new SplineInterpolator(startingPosition, new System.Drawing.Point(x, y));
+            Spline spline = new Spline(startingPosition, new System.Drawing.Point(x, y));
 
             for (int i = 0; i < discreteMovements; i++)
             {
@@ -154,7 +154,7 @@ namespace RunescapeBot.UITools
                 watch.Stop();
                 Thread.Sleep(sleepTime - (int)watch.ElapsedMilliseconds);
             }
-            MoveMouse(x, y);
+            Move(x, y);
         }
         #endregion
     }

@@ -123,7 +123,7 @@ namespace RunescapeBot
         {
             if (botIsRunning)
             {
-                MessageBox.Show("There is already a bot running.");
+                StopBot();
                 return;
             }
 
@@ -274,7 +274,8 @@ namespace RunescapeBot
             runningBot = null;
             botIsRunning = false;
             Text = FORM_NAME;
-            StartButton.BackColor = ColorTranslator.FromHtml("#874C48");
+            StartButton.Text = "Start";
+            StartButton.BackColor = ColorTranslator.FromHtml("#527E3F");
         }
 
         /// <summary>
@@ -283,6 +284,7 @@ namespace RunescapeBot
         private void SetTransitionalState()
         {
             Text = GetBotName() + BOT_STOPPING;
+            StartButton.Text = "";
             StartButton.BackColor = ColorTranslator.FromHtml("#7E7E37");
         }
 
@@ -293,7 +295,8 @@ namespace RunescapeBot
         {
             botIsRunning = true;
             this.Text = GetBotName() + BOT_RUNNING;
-            StartButton.BackColor = ColorTranslator.FromHtml("#527E3F");
+            StartButton.Text = "Stop";
+            StartButton.BackColor = ColorTranslator.FromHtml("#874C48");
         }
     }
 }

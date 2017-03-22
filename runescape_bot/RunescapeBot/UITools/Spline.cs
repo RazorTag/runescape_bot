@@ -8,7 +8,7 @@ namespace RunescapeBot.UITools
     /// <summary>
     /// Spline interpolation class.
     /// </summary>
-    public class SplineInterpolator
+    public class Spline
     {
         private readonly double[] _keys;
 
@@ -23,7 +23,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="start">Start point for the spline</param>
         /// <param name="finish">End point for the spline</param>
-        public SplineInterpolator(Point start, Point end)
+        public Spline(Point start, Point end)
         {
             Random rng = new Random();
             List<double> nodesX = new List<double>();

@@ -37,10 +37,10 @@ namespace RunescapeBot.BotPrograms
         protected override void Run()
         {
             //test code to save mask pictures
-            ReadWindow();
-            bool[,] helmPixels = ColorFilter(RuneMedHelm);
-            EraseClientUIFromMask(ref helmPixels);
-            TestMask(RuneMedHelm, "helm", helmPixels);
+            //ReadWindow();
+            //bool[,] helmPixels = ColorFilter(RuneMedHelm);
+            //EraseClientUIFromMask(ref helmPixels);
+            //TestMask(RuneMedHelm, "helm", helmPixels);
             //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             //EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
@@ -82,14 +82,7 @@ namespace RunescapeBot.BotPrograms
             // during the first frame that the bot program cant find a demon, look for a rune med helm drop
             if (missedDemons == 1)
             {
-                bool[,] helmPixels = ColorFilter(RuneMedHelm);
-                Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
-                // we accept a blob as the rune med helm if the pixel count is above 70 pixels
-                if (runeMedHelmBlob.Size > 70)
-                {
-                    Point runeMedHelmCenter = runeMedHelmBlob.Center;
-                    LeftClick(runeMedHelmCenter.X, runeMedHelmCenter.Y);
-                }
+                CheckDrops();
             }
 
             if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
@@ -99,6 +92,22 @@ namespace RunescapeBot.BotPrograms
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Telegrabs a rune med helm if one is found on the ground
+        /// </summary>
+        private void CheckDrops()
+        {
+            bool[,] helmPixels = ColorFilter(RuneMedHelm);
+            Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
+
+            // we accept a blob as the rune med helm if the pixel count is above 70 pixels
+            if (runeMedHelmBlob.Size > 70)
+            {
+                Point runeMedHelmCenter = runeMedHelmBlob.Center;
+                Inventory.Telegrab(ColorArray, runeMedHelmCenter.X, runeMedHelmCenter.Y);
+            }
         }
 
         /// <summary>
@@ -147,32 +156,6 @@ namespace RunescapeBot.BotPrograms
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Colors the pixels where either the skin of the horn were found in Bitmap.
-        /// Does not modify Bitmap. Creates a copy and returns the copy with masking applied.
-        /// </summary>
-        /// <param name="skin"></param>
-        /// <param name="horn"></param>
-        private void TestSkinAndHorn(bool[,] skin, bool[,] horn)
-        {
-            Bitmap bitmap = (Bitmap) Bitmap.Clone();
-
-            for (int x = 0; x < Bitmap.Width; x++)
-            {
-                for (int y = 0; y < Bitmap.Height; y++)
-                {
-                    if (!skin[x, y] && !horn[x, y])
-                    {
-                        bitmap.SetPixel(x, y, Color.White);
-                    }
-                }
-            }
-            //string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
-
-            ScreenScraper.SaveImageToFile(bitmap, directory + "SkinAndHorn.jpg", ImageFormat.Jpeg);
         }
 
         /// <summary>
@@ -269,8 +252,8 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            //string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
+            string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            //string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
             ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg", ImageFormat.Jpeg);
