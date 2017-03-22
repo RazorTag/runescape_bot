@@ -100,6 +100,7 @@ namespace RunescapeBot.BotPrograms
         private void CheckDrops()
         {
             bool[,] helmPixels = ColorFilter(RuneMedHelm);
+            EraseClientUIFromMask(ref helmPixels);
             Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
 
             // we accept a blob as the rune med helm if the pixel count is above 70 pixels
