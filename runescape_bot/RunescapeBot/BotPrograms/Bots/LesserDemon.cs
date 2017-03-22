@@ -37,10 +37,10 @@ namespace RunescapeBot.BotPrograms
         protected override void Run()
         {
             //test code to save mask pictures
-            //ReadWindow();
-            //bool[,] helmPixels = ColorFilter(RuneMedHelm);
-            //EraseClientUIFromMask(ref helmPixels);
-            //TestMask(RuneMedHelm, "helm", helmPixels);
+            ReadWindow();
+            bool[,] helmPixels = ColorFilter(RuneMedHelm);
+            EraseClientUIFromMask(ref helmPixels);
+            TestMask(RuneMedHelm, "helm", helmPixels);
             //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             //EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
@@ -84,7 +84,8 @@ namespace RunescapeBot.BotPrograms
             {
                 bool[,] helmPixels = ColorFilter(RuneMedHelm);
                 Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
-                if (runeMedHelmBlob != null)
+                // we accept a blob as the rune med helm if the pixel count is above 70 pixels
+                if (runeMedHelmBlob.Size > 70)
                 {
                     Point runeMedHelmCenter = runeMedHelmBlob.Center;
                     LeftClick(runeMedHelmCenter.X, runeMedHelmCenter.Y);
@@ -168,7 +169,9 @@ namespace RunescapeBot.BotPrograms
                     }
                 }
             }
-            string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            //string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
+
             ScreenScraper.SaveImageToFile(bitmap, directory + "SkinAndHorn.jpg", ImageFormat.Jpeg);
         }
 
@@ -266,8 +269,8 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            //string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
+            //string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
             ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg", ImageFormat.Jpeg);
