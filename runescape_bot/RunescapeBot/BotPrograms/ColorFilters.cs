@@ -67,6 +67,10 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// ===========>something else
+        /// </summary>
+        /// <returns></returns>
         public static ColorRange MerkleArmor()
         {
             Color dark = Color.FromArgb(45, 45, 70);
