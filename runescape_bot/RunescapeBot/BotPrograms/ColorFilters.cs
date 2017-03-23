@@ -53,7 +53,6 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
-<<<<<<< HEAD
         /// <summary>
         /// Creates the color range to represent the mithril color
         /// </summary>
@@ -66,14 +65,12 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
-=======
-        public static ColorRange RuneMedHelm2()
+        public static ColorRange MerkleArmor()
         {
-            Color dark = Color.FromArgb(52, 70, 77);
-            Color light = Color.FromArgb(95, 131, 137);
-            HSBRange hsbRange = new HSBRange(190, 200, 0.18f, 0.21f, 0.245f, 0.48f);
+            Color dark = Color.FromArgb(45, 45, 70);
+            Color light = Color.FromArgb(100, 97, 125);
+            HSBRange hsbRange = new HSBRange(239, 241, 0.1f, 0.2f, 0.23f, 0.44f);
             return new ColorRange(dark, light, hsbRange);
         }
->>>>>>> 554e6e8717ea0a5c333c2415087bed02af4fe2a2
     }
 }
