@@ -27,8 +27,7 @@ namespace RunescapeBot.BotPrograms
             Color light = Color.FromArgb(140, 70, 50);
             HSBRange hsbRange = new HSBRange(355, 20, 0.4f, 1f, 0.05f, 0.5f);
             return new ColorRange(dark, light, hsbRange);
-            //Evan's conflict testing
-            //mq test
+
         }
 
         /// <summary>
@@ -67,16 +66,5 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
-        /// <summary>
-        /// ===========>something else
-        /// </summary>
-        /// <returns></returns>
-        public static ColorRange MerkleArmor()
-        {
-            Color dark = Color.FromArgb(45, 45, 70);
-            Color light = Color.FromArgb(100, 97, 125);
-            HSBRange hsbRange = new HSBRange(239, 241, 0.1f, 0.2f, 0.23f, 0.44f);
-            return new ColorRange(dark, light, hsbRange);
-        }
     }
 }
