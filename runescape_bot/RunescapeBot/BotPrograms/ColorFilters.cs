@@ -53,6 +53,17 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// Creates the color range to represent the mithril color
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange MithrilArmor()
+        {
+            Color dark = Color.FromArgb(45, 45, 70);
+            Color light = Color.FromArgb(100, 97, 125);
+            HSBRange hsbRange = new HSBRange(239, 241, 0.1f, 0.2f, 0.23f, 0.44f);
+            return new ColorRange(dark, light, hsbRange);
+        }
 
     }
 }
