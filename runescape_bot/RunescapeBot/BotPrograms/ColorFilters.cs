@@ -53,6 +53,12 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
-
+        public static ColorRange RuneMedHelm2()
+        {
+            Color dark = Color.FromArgb(52, 70, 77);
+            Color light = Color.FromArgb(95, 131, 137);
+            HSBRange hsbRange = new HSBRange(190, 200, 0.18f, 0.21f, 0.245f, 0.48f);
+            return new ColorRange(dark, light, hsbRange);
+        }
     }
 }
