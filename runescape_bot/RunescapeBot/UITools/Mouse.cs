@@ -61,7 +61,7 @@ namespace RunescapeBot.UITools
             TranslateClick(ref x, ref y, rsClient);
             NaturalMove(x, y);
             Random rng = new Random();
-            Thread.Sleep(rng.Next(25, 50));  //wait for RS client to recognize the cursor hover
+            Thread.Sleep(rng.Next(40, 60));  //wait for RS client to recognize the cursor hover
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
         }

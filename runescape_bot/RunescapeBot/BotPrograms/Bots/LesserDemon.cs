@@ -108,6 +108,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Point runeMedHelmCenter = runeMedHelmBlob.Center;
                 Inventory.Telegrab(ColorArray, runeMedHelmCenter.X, runeMedHelmCenter.Y);
+                Inventory.Alch(ColorArray, 3, 6);   //only start alching when the inventory fills up
             }
         }
 
