@@ -26,6 +26,12 @@ namespace RunescapeBot.FileIO
         public Start.BotActions BotAction { get; set; }
 
         /// <summary>
+        /// The number of times to run through a bot program's routine
+        /// </summary>
+        [DataMember]
+        public int Iterations { get; set; }
+
+        /// <summary>
         /// Serializes SettingsData
         /// </summary>
         /// <param name="info"></param>
@@ -37,6 +43,7 @@ namespace RunescapeBot.FileIO
             info.AddValue("Login", Login);
             info.AddValue("Password", Password);
             info.AddValue("BotAction", BotAction);
+            info.AddValue("Iterations", Iterations);
         }
     }
 }

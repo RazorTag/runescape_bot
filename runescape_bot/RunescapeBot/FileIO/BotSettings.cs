@@ -73,10 +73,21 @@ namespace RunescapeBot.FileIO
             }
         }
 
+        /// <summary>
+        /// The number of times to run through a bot program's routine
+        /// </summary>
+        public int Iterations
+        {
+            get
+            {
+                return SettingsData.Iterations;
+            }
+        }
+
 
         public BotSettings()
         {
-            directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\RunescapeBot";
+            directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Roboport";
             serializer = new XmlSerializer(typeof(SettingsData));
             Load();
         }
@@ -145,6 +156,7 @@ namespace RunescapeBot.FileIO
             SettingsData.Login = startParams.Login;
             SettingsData.Password = startParams.Password;
             SettingsData.BotAction = startParams.BotAction;
+            SettingsData.Iterations = startParams.Iterations;
         }
     }
 }

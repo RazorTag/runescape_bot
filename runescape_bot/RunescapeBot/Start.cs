@@ -50,7 +50,9 @@ namespace RunescapeBot
             [Description("Lesser Demon")]
             LesserDemon,
             [Description("Gold Bracelets")]
-            GoldBracelets
+            GoldBracelets,
+            [Description("Gnome Stronghold Agility")]
+            AgilityGnomeStronghold
         };
 
         /// <summary>
@@ -107,9 +109,10 @@ namespace RunescapeBot
                 names[i] = GetDescription((Enum) actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
-            BotActionSelect.SelectedIndex = (int) settings.BotAction;
             Login.Text = settings.Login;
             Password.Text = settings.Password;
+            BotActionSelect.SelectedIndex = (int)settings.BotAction;
+            Iterations.Value = settings.Iterations;
             SetIdleState();
         }
 
@@ -140,6 +143,10 @@ namespace RunescapeBot
                     runningBot = new LesserDemon(startParams);
                     break;
 
+                case BotActions.AgilityGnomeStronghold:
+                    runningBot = new AgilityGnomeStronghold(startParams);
+                    break;
+
                 default:
                     return;
             }
@@ -166,6 +173,7 @@ namespace RunescapeBot
                 startParams.RunUntil = DateTime.MaxValue;
             }
             startParams.TaskComplete = new BotResponse(BotDone);
+            startParams.BotAction = (BotActions) BotActionSelect.SelectedIndex;
 
             return startParams;
         }
