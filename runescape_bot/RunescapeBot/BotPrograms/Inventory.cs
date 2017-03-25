@@ -89,6 +89,7 @@ namespace RunescapeBot.BotPrograms
         public void Telegrab(Color[,] screen, int x, int y)
         {
             ClickSpellbook(screen, 5, 2);
+            Thread.Sleep(500); //wait for the slow computers
             Mouse.LeftClick(x, y, rsClient);
             Thread.Sleep(5000); //telegrab takes about 5 seconds
         }

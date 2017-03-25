@@ -376,6 +376,48 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Sets the pixels in all non-drop range to false
+        /// This should only be used with untrimmed images.
+        /// </summary>
+        /// <param name="mask"></param>
+        protected void EraseNonDroppablePixelsFromMask(ref bool[,] mask, int xMin, int xMax, int yMin, int yMax)
+        {
+            if (mask == null)
+            {
+                return;
+            }
+
+            int maskWidth = mask.GetLength(0);
+            int maskHeight = mask.GetLength(1);
+
+            //checking to see if the provided region is out of bounds 
+            if (xMin < 0)
+            {
+                xMin = 0;
+            }
+            
+            if (xMax > maskWidth)
+            {
+                xMax = maskWidth;
+            }
+
+            if (yMin < 0)
+            {
+                yMin = 0;
+            }
+
+            if (yMax > maskHeight)
+            {
+                yMax = maskHeight;
+            }
+
+            EraseFromMask(ref mask, 0, maskWidth, 0, yMin);                         //erase bottom
+            EraseFromMask(ref mask, 0, maskWidth, yMax, maskHeight);                //erase top
+            EraseFromMask(ref mask, 0, xMin, 0, maskHeight);                        //erase left
+            EraseFromMask(ref mask, xMax, maskWidth, 0, maskHeight);                //erase right
+        }
+
+        /// <summary>
         /// Clears a rectangle from a boolean mask
         /// </summary>
         /// <param name="mask"></param>

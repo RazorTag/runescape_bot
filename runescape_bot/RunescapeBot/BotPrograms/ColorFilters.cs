@@ -56,13 +56,14 @@ namespace RunescapeBot.BotPrograms
 
         /// <summary>
         /// Creates the color range to represent the mithril color
+        /// we have to be careful with this filter because it also picks up water and similarly colored shades
         /// </summary>
         /// <returns></returns>
         public static ColorRange MithrilArmor()
         {
             Color dark = Color.FromArgb(45, 45, 70);
-            Color light = Color.FromArgb(100, 97, 125);
-            HSBRange hsbRange = new HSBRange(239, 241, 0.1f, 0.2f, 0.23f, 0.44f);
+            Color light = Color.FromArgb(105, 105, 130);
+            HSBRange hsbRange = new HSBRange(215, 315, 0.1f, 0.2f, 0.23f, 0.46f);
             return new ColorRange(dark, light, hsbRange);
         }
 

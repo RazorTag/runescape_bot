@@ -16,6 +16,7 @@ namespace RunescapeBot.BotPrograms
         private static ColorRange LesserDemonSkin;
         private static ColorRange LesserDemonHorn;
         private static ColorRange RuneMedHelm;
+        private static ColorRange MithrilArmor;
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -37,10 +38,13 @@ namespace RunescapeBot.BotPrograms
         protected override void Run()
         {
             //test code to save mask pictures
-            //ReadWindow();
+            ReadWindow();
             //bool[,] helmPixels = ColorFilter(RuneMedHelm);
             //EraseClientUIFromMask(ref helmPixels);
             //TestMask(RuneMedHelm, "helm", helmPixels);
+            bool[,] mithPixels = ColorFilter(MithrilArmor);
+            EraseClientUIFromMask(ref mithPixels);
+            TestMask(MithrilArmor, "helm", mithPixels);
             //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             //EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
@@ -56,6 +60,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             int xOffset, yOffset, maxOffset;
+            Point lastDemonLocation = new Point(0,0);
             bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
             EraseClientUIFromMask(ref skinPixels);
@@ -71,6 +76,7 @@ namespace RunescapeBot.BotPrograms
                 xOffset = RNG.Next(-maxOffset, maxOffset + 1);
                 yOffset = RNG.Next(-maxOffset, maxOffset + 1);
                 LeftClick(demonCenter.X, demonCenter.Y);
+                lastDemonLocation = demon.Center;
                 missedDemons = 0;
                 minDemonSize = ArtifactSize(demon) / 2.0;
             }
@@ -82,7 +88,7 @@ namespace RunescapeBot.BotPrograms
             // during the first frame that the bot program cant find a demon, look for a rune med helm drop
             if (missedDemons == 1)
             {
-                CheckDrops();
+                CheckDrops(lastDemonLocation);
             }
 
             if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
@@ -97,10 +103,12 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Telegrabs a rune med helm if one is found on the ground
         /// </summary>
-        private void CheckDrops()
+        private void CheckDrops(Point lastDemonLocation)
         {
             bool[,] helmPixels = ColorFilter(RuneMedHelm);
+            int dropRange = 150;
             EraseClientUIFromMask(ref helmPixels);
+            EraseNonDroppablePixelsFromMask(ref helmPixels, lastDemonLocation.X-dropRange, lastDemonLocation.X + dropRange, lastDemonLocation.Y - dropRange, lastDemonLocation.Y + dropRange);
             Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
 
             // we accept a blob as the rune med helm if the pixel count is above 70 pixels
@@ -108,8 +116,27 @@ namespace RunescapeBot.BotPrograms
             {
                 Point runeMedHelmCenter = runeMedHelmBlob.Center;
                 Inventory.Telegrab(ColorArray, runeMedHelmCenter.X, runeMedHelmCenter.Y);
-                Inventory.Alch(ColorArray, 3, 6);   //only start alching when the inventory fills up
+                // MXQ : commenting this section out right now while we troubleshoot for defects
+                //only start alching when the inventory fills up
+                //Inventory.Alch(ColorArray, 3, 6
+                return;
             }
+
+            bool[,] mithPixels = ColorFilter(MithrilArmor);
+            EraseClientUIFromMask(ref mithPixels);
+            EraseNonDroppablePixelsFromMask(ref mithPixels, lastDemonLocation.X - dropRange, lastDemonLocation.X + dropRange, lastDemonLocation.Y - dropRange, lastDemonLocation.Y + dropRange);
+            Blob mithBlob = ImageProcessing.BiggestBlob(mithPixels);
+
+            if (mithBlob.Size > 320)
+            {
+                Point mithBlobCenter = mithBlob.Center;
+                Inventory.Telegrab(ColorArray, mithBlobCenter.X, mithBlobCenter.Y);
+                // MXQ : commenting this section out right now while we troubleshoot for defects
+                //only start alching when the inventory fills up
+                //Inventory.Alch(ColorArray, 3, 6
+                return;
+            }
+
         }
 
         /// <summary>
@@ -254,8 +281,8 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            //string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\rune_med_helm\\";
+            //string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
+            string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\mithrilarmor\\";
             ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg", ImageFormat.Jpeg);
             ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg", ImageFormat.Jpeg);
@@ -291,6 +318,7 @@ namespace RunescapeBot.BotPrograms
             LesserDemonSkin = ColorFilters.LesserDemonSkin();
             LesserDemonHorn = ColorFilters.LesserDemonHorn();
             RuneMedHelm = ColorFilters.RuneMedHelm();
+            MithrilArmor = ColorFilters.MithrilArmor();
         }
     }
 }
