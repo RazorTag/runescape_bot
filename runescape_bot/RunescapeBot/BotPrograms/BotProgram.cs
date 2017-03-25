@@ -19,12 +19,15 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class BotProgram
     {
+        /// <summary>
+        /// Checksum for the RUNE SCAPE logo on the login page
+        /// </summary>
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
 
         /// <summary>
         /// Error message to show the user for a start error
         /// </summary>
-        private string loadError;
+        private string LoadError;
 
         /// <summary>
         /// Specifies how the bot should be run
@@ -91,7 +94,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="startParams">specifies the username to search for</param>
         public BotProgram(StartParams startParams)
         {
-            RSClient = ScreenScraper.GetOSBuddy(startParams, out loadError);
+            RSClient = ScreenScraper.GetOSBuddy(startParams, out LoadError);
             this.RunParams = startParams;
             RNG = new Random();
             Inventory = new Inventory(RSClient);
@@ -104,9 +107,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="iterations"></param>
         public void Start()
         {
-            if (!String.IsNullOrEmpty(loadError))
+            if (!String.IsNullOrEmpty(LoadError))
             {
-                MessageBox.Show(loadError);
+                MessageBox.Show(LoadError);
                 return;
             }
             RunThread = new Thread(Process);
@@ -235,11 +238,40 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool[,] ColorFilter(ColorRange artifactColor)
         {
+            return ColorFilter(ColorArray, artifactColor);
+        }
+
+        /// <summary>
+        /// Creates a boolean array to represent a color filter match
+        /// </summary>
+        /// <param name="artifactColor"></param>
+        /// <returns></returns>
+        protected bool[,] ColorFilter(Color[,] image, ColorRange artifactColor)
+        {
             if (ColorArray == null)
             {
                 return null;
             }
-            return ImageProcessing.ColorFilter(ColorArray, artifactColor);
+            return ImageProcessing.ColorFilter(image, artifactColor);
+        }
+
+        /// <summary>
+        /// Creates a boolean array of a portion of the screen to represent a color filter match
+        /// </summary>
+        /// <param name="artifactColor"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
+        /// <returns></returns>
+        protected bool[,] ColorFilterPiece(ColorRange artifactColor, int left, int right, int top, int bottom, out Point trimOffset)
+        {
+            Color[,] colorArray = ScreenPiece(left, right, top, bottom, out trimOffset);
+            if (ColorArray == null)
+            {
+                return null;
+            }
+            return ImageProcessing.ColorFilter(colorArray, artifactColor);
         }
 
         /// <summary>
@@ -253,12 +285,38 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool[,] ColorFilterPiece(ColorRange artifactColor, int left, int right, int top, int bottom)
         {
-            Color[,] colorArray = ScreenPiece(left, right, top, bottom);
-            if (ColorArray == null)
+            Point empty;
+            return ColorFilterPiece(artifactColor, left, right, top, bottom, out empty);
+        }
+
+        /// <summary>
+        /// Gets a rectangle from ColorArray
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        protected Color[,] ScreenPiece(int left, int right, int top, int bottom, out Point trimOffset)
+        {
+            left = Math.Max(left, 0);
+            right = Math.Min(right, ColorArray.GetLength(0));
+            top = Math.Max(top, 0);
+            bottom = Math.Min(bottom, ColorArray.GetLength(1));
+            if ((left > right) || (top > bottom))
             {
+                trimOffset = Point.Empty;
                 return null;
             }
-            return ImageProcessing.ColorFilter(colorArray, artifactColor);
+            Color[,] screenPiece = new Color[right - left + 1, bottom - top + 1];
+            trimOffset = new Point(left, top);
+
+            for (int x = left; x <= right; x++)
+            {
+                for (int y = top; y <= bottom; y++)
+                {
+                    screenPiece[x - left, y - top] = ColorArray[x, y];
+                }
+            }
+            return screenPiece;
         }
 
         /// <summary>
@@ -269,24 +327,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected Color[,] ScreenPiece(int left, int right, int top, int bottom)
         {
-            left = Math.Max(left, 0);
-            right = Math.Min(right, ColorArray.GetLength(0));
-            top = Math.Max(top, 0);
-            bottom = Math.Min(bottom, ColorArray.GetLength(1));
-            if ((left > right) || (top > bottom))
-            {
-                return null;
-            }
-            Color[,] screenPiece = new Color[right - left + 1, bottom - top + 1];
-
-            for (int x = left; x <= right; x++)
-            {
-                for (int y = top; y <= bottom; y++)
-                {
-                    screenPiece[x - left, y - top] = ColorArray[x, y];
-                }
-            }
-            return screenPiece;
+            Point empty;
+            return ScreenPiece(left, right, top, bottom, out empty);
         }
 
         /// <summary>
@@ -300,7 +342,6 @@ namespace RunescapeBot.BotPrograms
             }
             if (StopFlag) { return false; }
 
-            //Bitmap = ScreenScraper.CaptureWindowLegacy(RSClient);
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
 
@@ -334,11 +375,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void LeftClick(int x, int y)
+        protected void LeftClick(int x, int y, int hoverDelay = 100)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                Mouse.LeftClick(x, y, RSClient);
+                Mouse.LeftClick(x, y, RSClient, hoverDelay);
             }
         }
 
@@ -347,11 +388,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y)
+        protected void RightClick(int x, int y, int hoverDelay = 100)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                Mouse.RightClick(x, y, RSClient);
+                Mouse.RightClick(x, y, RSClient, hoverDelay);
             }
         }
 
@@ -370,51 +411,9 @@ namespace RunescapeBot.BotPrograms
             int width = mask.GetLength(0);
             int height = mask.GetLength(1);
 
-            EraseFromMask(ref mask, 0, 519, height - 159, height);                  //erase chat box
-            EraseFromMask(ref mask, width - 241, width, height - 336, height);      //erase inventory
-            EraseFromMask(ref mask, width - 211, width, 0, 192);                    //erase minimap
-        }
-
-        /// <summary>
-        /// Sets the pixels in all non-drop range to false
-        /// This should only be used with untrimmed images.
-        /// </summary>
-        /// <param name="mask"></param>
-        protected void EraseNonDroppablePixelsFromMask(ref bool[,] mask, int xMin, int xMax, int yMin, int yMax)
-        {
-            if (mask == null)
-            {
-                return;
-            }
-
-            int maskWidth = mask.GetLength(0);
-            int maskHeight = mask.GetLength(1);
-
-            //checking to see if the provided region is out of bounds 
-            if (xMin < 0)
-            {
-                xMin = 0;
-            }
-            
-            if (xMax > maskWidth)
-            {
-                xMax = maskWidth;
-            }
-
-            if (yMin < 0)
-            {
-                yMin = 0;
-            }
-
-            if (yMax > maskHeight)
-            {
-                yMax = maskHeight;
-            }
-
-            EraseFromMask(ref mask, 0, maskWidth, 0, yMin);                         //erase bottom
-            EraseFromMask(ref mask, 0, maskWidth, yMax, maskHeight);                //erase top
-            EraseFromMask(ref mask, 0, xMin, 0, maskHeight);                        //erase left
-            EraseFromMask(ref mask, xMax, maskWidth, 0, maskHeight);                //erase right
+            EraseFromMask(ref mask, 0, 519, height - 159, height);              //erase chat box
+            EraseFromMask(ref mask, width - 241, width, height - 336, height);  //erase inventory
+            EraseFromMask(ref mask, width - 211, width, 0, 192);                //erase minimap
         }
 
         /// <summary>
@@ -427,9 +426,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="yMax">Exclusive</param>
         protected void EraseFromMask(ref bool[,] mask, int xMin, int xMax, int yMin, int yMax)
         {
-            for (int x = xMin; x < xMax; x++)
+            for (int x = Math.Max(0, xMin); x < Math.Min(xMax, mask.GetLength(0) - 1); x++)
             {
-                for (int y = yMin; y < yMax; y++)
+                for (int y = Math.Max(0, yMin); y < Math.Min(yMax, mask.GetLength(1) - 1); y++)
                 {
                     mask[x, y] = false;
                 }

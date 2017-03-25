@@ -62,7 +62,7 @@ namespace RunescapeBot.BotPrograms
             int xOffset = screen.GetLength(0) - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X) + rng.Next(-5, 6);
             int yOffset = screen.GetLength(1) - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y) + rng.Next(-5, 6);
             OpenInventory(screen);
-            Mouse.LeftClick(xOffset, yOffset, rsClient);
+            Mouse.LeftClick(xOffset, yOffset, rsClient, 200);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace RunescapeBot.BotPrograms
             int xOffset = screen.GetLength(0) - SPELLBOOK_OFFSET_LEFT + (x * SPELLBOOK_GAP_X) + rng.Next(-5, 6);
             int yOffset = screen.GetLength(1) - SPELLBOOK_OFFSET_TOP + (y * SPELLBOOK_GAP_Y) + rng.Next(-5, 6);
             OpenSpellbook(screen);
-            Mouse.LeftClick(xOffset, yOffset, rsClient);
+            Mouse.LeftClick(xOffset, yOffset, rsClient, 200);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace RunescapeBot.BotPrograms
         {
             ClickSpellbook(screen, 5, 2);
             Thread.Sleep(500); //wait for the slow computers
-            Mouse.LeftClick(x, y, rsClient);
+            Mouse.LeftClick(x, y, rsClient, 200);
             Thread.Sleep(5000); //telegrab takes about 5 seconds
         }
 

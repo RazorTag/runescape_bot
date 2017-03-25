@@ -21,30 +21,37 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
         /// </summary>
-        private int missedDemons;
+        private int MissedDemons;
 
         /// <summary>
         /// The minimum required proportion of screen for a lesser demon
         /// </summary>
-        private double minDemonSize;
+        private double MinDemonSize;
+
+        /// <summary>
+        /// The last location where a demon was found. Set to (0, 0) is no demon has been found yet.
+        /// </summary>
+        private Point LastDemonLocation;
 
 
         public LesserDemon(StartParams startParams) : base(startParams)
         {
             GetReferenceColors();
-            minDemonSize = 0.001;
+            MinDemonSize = 0.001;
         }
 
         protected override void Run()
         {
             //test code to save mask pictures
             ReadWindow();
+            LastDemonLocation = new Point(958, 500);
+            CheckDrops();
             //bool[,] helmPixels = ColorFilter(RuneMedHelm);
             //EraseClientUIFromMask(ref helmPixels);
             //TestMask(RuneMedHelm, "helm", helmPixels);
-            bool[,] mithPixels = ColorFilter(MithrilArmor);
-            EraseClientUIFromMask(ref mithPixels);
-            TestMask(MithrilArmor, "helm", mithPixels);
+            //bool[,] mithPixels = ColorFilter(MithrilArmor);
+            //EraseClientUIFromMask(ref mithPixels);
+            //TestMask(MithrilArmor, "helm", mithPixels);
             //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             //EraseClientUIFromMask(ref skinPixels);
             //TestMask(LesserDemonSkin, "Skin", skinPixels);
@@ -60,13 +67,11 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             int xOffset, yOffset, maxOffset;
-            Point lastDemonLocation = new Point(0,0);
             bool[,] skinPixels = ColorFilter(LesserDemonSkin);
             if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
             EraseClientUIFromMask(ref skinPixels);
             Blob demon = ImageProcessing.BiggestBlob(skinPixels);
             if (StopFlag) { return false; }   //quit immediately if the stop flag has been raised
-            if (demon == null) { return true; }
 
             Point demonCenter = demon.Center;
             double cloveRange = 2 * Math.Sqrt(demon.Size);
@@ -76,25 +81,25 @@ namespace RunescapeBot.BotPrograms
                 xOffset = RNG.Next(-maxOffset, maxOffset + 1);
                 yOffset = RNG.Next(-maxOffset, maxOffset + 1);
                 LeftClick(demonCenter.X, demonCenter.Y);
-                lastDemonLocation = demon.Center;
-                missedDemons = 0;
-                minDemonSize = ArtifactSize(demon) / 2.0;
+                MissedDemons = 0;
+                MinDemonSize = ArtifactSize(demon) / 2.0;
+                LastDemonLocation = demonCenter;
             }
             else
             {
-                missedDemons++;
+                MissedDemons++;
             }
 
             // during the first frame that the bot program cant find a demon, look for a rune med helm drop
-            if (missedDemons == 1)
+            if (MissedDemons == 1)
             {
-                CheckDrops(lastDemonLocation);
+                CheckDrops();
             }
 
-            if (missedDemons * RunParams.FrameTime > maxDemonSpawnTime)
+            if (MissedDemons * RunParams.FrameTime > maxDemonSpawnTime)
             {
-                minDemonSize /= 2.0;
-                missedDemons = 0;
+                MinDemonSize /= 2.0;
+                MissedDemons = 0;
             }
 
             return true;
@@ -103,40 +108,40 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Telegrabs a rune med helm if one is found on the ground
         /// </summary>
-        private void CheckDrops(Point lastDemonLocation)
+        private void CheckDrops()
         {
-            bool[,] helmPixels = ColorFilter(RuneMedHelm);
-            int dropRange = 150;
-            EraseClientUIFromMask(ref helmPixels);
-            EraseNonDroppablePixelsFromMask(ref helmPixels, lastDemonLocation.X-dropRange, lastDemonLocation.X + dropRange, lastDemonLocation.Y - dropRange, lastDemonLocation.Y + dropRange);
-            Blob runeMedHelmBlob = ImageProcessing.BiggestBlob(helmPixels);
+            int dropRange = 250;
+            int dropRangeLeft = LastDemonLocation.X - dropRange;
+            int dropRangeRight = LastDemonLocation.X + dropRange;
+            int dropRangeTop = LastDemonLocation.Y - dropRange;
+            int dropRangeBottom = LastDemonLocation.Y + dropRange;
+            Point trimOffset;
+            Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
-            // we accept a blob as the rune med helm if the pixel count is above 70 pixels
-            if (runeMedHelmBlob.Size > 70)
+            FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, 70);
+            FindAndAlch(screenDropArea, trimOffset, MithrilArmor, 320);
+        }
+
+        /// <summary>
+        /// Looks for, picks up, and alchs a drop that matches a ColorRange
+        /// </summary>
+        /// <param name="screenDropArea"></param>
+        /// <param name="referenceColor"></param>
+        /// <param name="minimumSize">minimum number of pixels needed to </param>
+        private void FindAndAlch(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        {
+            bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
+            EraseClientUIFromMask(ref matchedPixels);
+            Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
+
+            if (biggestBlob.Size > minimumSize)
             {
-                Point runeMedHelmCenter = runeMedHelmBlob.Center;
-                Inventory.Telegrab(ColorArray, runeMedHelmCenter.X, runeMedHelmCenter.Y);
-                // MXQ : commenting this section out right now while we troubleshoot for defects
+                Point blobCenter = biggestBlob.Center;
+                Inventory.Telegrab(ColorArray, blobCenter.X + offset.X, blobCenter.Y + offset.Y);
                 //only start alching when the inventory fills up
-                //Inventory.Alch(ColorArray, 3, 6
+                Inventory.Alch(ColorArray, 3, 6);
                 return;
             }
-
-            bool[,] mithPixels = ColorFilter(MithrilArmor);
-            EraseClientUIFromMask(ref mithPixels);
-            EraseNonDroppablePixelsFromMask(ref mithPixels, lastDemonLocation.X - dropRange, lastDemonLocation.X + dropRange, lastDemonLocation.Y - dropRange, lastDemonLocation.Y + dropRange);
-            Blob mithBlob = ImageProcessing.BiggestBlob(mithPixels);
-
-            if (mithBlob.Size > 320)
-            {
-                Point mithBlobCenter = mithBlob.Center;
-                Inventory.Telegrab(ColorArray, mithBlobCenter.X, mithBlobCenter.Y);
-                // MXQ : commenting this section out right now while we troubleshoot for defects
-                //only start alching when the inventory fills up
-                //Inventory.Alch(ColorArray, 3, 6
-                return;
-            }
-
         }
 
         /// <summary>
@@ -147,7 +152,7 @@ namespace RunescapeBot.BotPrograms
         private bool MinimumSizeMet(Blob demon)
         {
             double demonScreenSize = ArtifactSize(demon);
-            if (demonScreenSize > minDemonSize)
+            if (demonScreenSize > MinDemonSize)
             {
                 return true;
             }

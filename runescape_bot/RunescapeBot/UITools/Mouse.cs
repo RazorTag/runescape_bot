@@ -31,9 +31,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftClick(int x, int y, Process rsClient)
+        public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 100)
         {
-            Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP);
+            Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay);
         }
 
         /// <summary>
@@ -41,9 +41,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightClick(int x, int y, Process rsClient)
+        public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 100)
         {
-            Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP);
+            Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay);
         }
 
         /// <summary>
@@ -54,14 +54,14 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient"></param>
         /// <param name="clickTypeDown"></param>
         /// <param name="clickTypeUp"></param>
-        private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp)
+        private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay)
         {
             int hWnd = rsClient.MainWindowHandle.ToInt32();
             ScreenScraper.BringToForeGround(rsClient);
             TranslateClick(ref x, ref y, rsClient);
             NaturalMove(x, y);
             Random rng = new Random();
-            Thread.Sleep(rng.Next(40, 60));  //wait for RS client to recognize the cursor hover
+            Thread.Sleep(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
             User32.mouse_event(clickTypeDown, x, y, 0, 0);
             User32.mouse_event(clickTypeUp, x, y, 0, 0);
         }
