@@ -30,7 +30,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         public void OpenInventory(Color[,] screen)
         {
-            if (SelectedTab == TabSelect.Inventory) { return; }
+            //if (SelectedTab == TabSelect.Inventory) { return; }
             int x = screen.GetLength(0) - INVENTORY_TAB_OFFSET_LEFT;
             int y = screen.GetLength(1) - INVENTORY_TAB_OFFSET_TOP + rng.Next(-5, 6);
             Mouse.LeftClick(x, y, rsClient);
@@ -44,7 +44,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         public void OpenSpellbook(Color[,] screen)
         {
-            if (SelectedTab == TabSelect.Spellbook) { return; }
+            //if (SelectedTab == TabSelect.Spellbook) { return; }
             int x = screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_LEFT + rng.Next(-5, 6);
             int y = screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_TOP + rng.Next(-5, 6);
             Mouse.LeftClick(x, y, rsClient);
@@ -89,7 +89,6 @@ namespace RunescapeBot.BotPrograms
         public void Telegrab(Color[,] screen, int x, int y)
         {
             ClickSpellbook(screen, 5, 2);
-            Thread.Sleep(500); //wait for the slow computers
             Mouse.LeftClick(x, y, rsClient, 200);
             Thread.Sleep(5000); //telegrab takes about 5 seconds
         }
