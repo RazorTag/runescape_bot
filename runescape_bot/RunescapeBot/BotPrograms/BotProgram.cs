@@ -298,9 +298,9 @@ namespace RunescapeBot.BotPrograms
         protected Color[,] ScreenPiece(int left, int right, int top, int bottom, out Point trimOffset)
         {
             left = Math.Max(left, 0);
-            right = Math.Min(right, ColorArray.GetLength(0));
+            right = Math.Min(right, ColorArray.GetLength(0) - 1);
             top = Math.Max(top, 0);
-            bottom = Math.Min(bottom, ColorArray.GetLength(1));
+            bottom = Math.Min(bottom, ColorArray.GetLength(1) - 1);
             if ((left > right) || (top > bottom))
             {
                 trimOffset = Point.Empty;

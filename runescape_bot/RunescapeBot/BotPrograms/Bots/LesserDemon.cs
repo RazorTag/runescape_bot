@@ -110,7 +110,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void CheckDrops()
         {
-            int dropRange = 250;
+            int dropRange = 350;
             int dropRangeLeft = LastDemonLocation.X - dropRange;
             int dropRangeRight = LastDemonLocation.X + dropRange;
             int dropRangeTop = LastDemonLocation.Y - dropRange;
@@ -119,7 +119,7 @@ namespace RunescapeBot.BotPrograms
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
             FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, 70);
-            FindAndAlch(screenDropArea, trimOffset, MithrilArmor, 320);
+            FindAndAlch(screenDropArea, trimOffset, MithrilArmor, 100);
         }
 
         /// <summary>
@@ -138,8 +138,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Point blobCenter = biggestBlob.Center;
                 Inventory.Telegrab(ColorArray, blobCenter.X + offset.X, blobCenter.Y + offset.Y);
-                //only start alching when the inventory fills up
-                Inventory.Alch(ColorArray, 3, 6);
+                Inventory.Alch(ColorArray, 3, 6);   //only start alching when the inventory fills up
                 return;
             }
         }
