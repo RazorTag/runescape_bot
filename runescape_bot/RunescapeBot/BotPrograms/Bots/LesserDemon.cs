@@ -43,9 +43,9 @@ namespace RunescapeBot.BotPrograms
         protected override void Run()
         {
             //test code to save mask pictures
-            ReadWindow();
-            LastDemonLocation = new Point(958, 500);
-            CheckDrops();
+            //ReadWindow();
+            //LastDemonLocation = new Point(958, 500);
+            //CheckDrops();
             //bool[,] helmPixels = ColorFilter(RuneMedHelm);
             //EraseClientUIFromMask(ref helmPixels);
             //TestMask(RuneMedHelm, "helm", helmPixels);
