@@ -79,10 +79,10 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Makes an RGB 
+        /// Makes an RGB array from a Bitmap
         /// </summary>
         /// <param name="bitmap"></param>
-        public static Color[,] GetRGB(this Bitmap bitmap)
+        public static Color[,] GetRGB(Bitmap bitmap)
         {
             const int PixelWidth = 3;
             const PixelFormat PixelFormat = PixelFormat.Format24bppRgb;

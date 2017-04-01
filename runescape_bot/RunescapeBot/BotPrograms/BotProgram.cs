@@ -182,15 +182,19 @@ namespace RunescapeBot.BotPrograms
 
                 Stopwatch watch = Stopwatch.StartNew();
                 ReadWindow();   //Read the game window color values into Bitmap and ColorArray
-                if (StopFlag || !CheckLogIn()) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
+                if (StopFlag) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
-                if (Bitmap != null) //Make sure the read is successful before using the bitmap values
+                //Only do the actual botting if we are logged in
+                if (CheckLogIn())
                 {
-                    if (!Execute()) //quit by an override Execute method
+                    if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                     {
-                        return;
+                        if (!Execute()) //quit by an override Execute method
+                        {
+                            return;
+                        }
+                        if (StopFlag) { return; }
                     }
-                    if (StopFlag) { return; }
                 }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
