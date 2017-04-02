@@ -84,6 +84,17 @@ namespace RunescapeBot.FileIO
             }
         }
 
+        /// <summary>
+        /// The location of the client to run
+        /// </summary>
+        public string ClientFilePath
+        {
+            get
+            {
+                return SettingsData.ClientFilePath;
+            }
+        }
+
 
         public BotSettings()
         {
@@ -157,6 +168,7 @@ namespace RunescapeBot.FileIO
             SettingsData.Password = startParams.Password;
             SettingsData.BotAction = startParams.BotAction;
             SettingsData.Iterations = startParams.Iterations;
+            SettingsData.ClientFilePath = startParams.ClientFilePath;
         }
     }
 }

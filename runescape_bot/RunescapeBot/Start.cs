@@ -106,11 +106,12 @@ namespace RunescapeBot
             string[] names = new string[actions.Length];
             for (int i = 0; i < actions.Length; i++)
             {
-                names[i] = GetDescription((Enum) actions.GetValue(i));
+                names[i] = GetDescription((Enum)actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
             Login.Text = settings.Login;
             Password.Text = settings.Password;
+            ClientLocation.Text = settings.ClientFilePath;
             BotActionSelect.SelectedIndex = (int)settings.BotAction;
             Iterations.Value = settings.Iterations;
             SetIdleState();
@@ -174,6 +175,7 @@ namespace RunescapeBot
             }
             startParams.TaskComplete = new BotResponse(BotDone);
             startParams.BotAction = (BotActions) BotActionSelect.SelectedIndex;
+            startParams.ClientFilePath = ClientLocation.Text;
 
             return startParams;
         }
@@ -305,6 +307,20 @@ namespace RunescapeBot
             this.Text = GetBotName() + BOT_RUNNING;
             StartButton.Text = "Stop";
             StartButton.BackColor = ColorTranslator.FromHtml("#874C48");
+        }
+
+        /// <summary>
+        /// Opens a file dialog for the user to select the OSBuddy executable
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OSBuddySelect_Click(object sender, EventArgs e)
+        {
+            DialogResult result = FileSelect.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                ClientLocation.Text = FileSelect.FileName;
+            }
         }
     }
 }

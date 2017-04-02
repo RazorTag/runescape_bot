@@ -50,6 +50,11 @@ namespace RunescapeBot.BotPrograms
         /// Set to true to slightly vary the time between frames
         /// </summary>
         public bool RandomizeFrames { get; set; }
+
+        /// <summary>
+        /// File location of the client to run
+        /// </summary>
+        public string ClientFilePath { get; set; }
         #endregion
 
         #region delegates

@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.FileIO;
 using RunescapeBot.UITools;
 using System;
 using System.Diagnostics;
@@ -30,11 +31,11 @@ namespace RunescapeBot.ImageTools
         public static void BringToForeGround(Process rsClient)
         {
             int rsHandle = (int)rsClient.MainWindowHandle;
-            if (User32.IsIconic(rsHandle))
+            if (IsIconic(rsHandle))
             {
-                User32.ShowWindow(rsHandle, SW_RESTORE);
+                ShowWindow(rsHandle, SW_RESTORE);
             }
-            User32.SetForegroundWindow(rsHandle);
+            SetForegroundWindow(rsHandle);
             MaximizeWindow(rsClient);
         }
 
@@ -48,7 +49,7 @@ namespace RunescapeBot.ImageTools
             int style = GetWindowLong(rsClient.MainWindowHandle, GWL_STYLE);
             if ((style & WS_MAXIMIZE) != WS_MAXIMIZE)
             {
-                User32.ShowWindow((int)rsClient.MainWindowHandle, SW_MAXIMIZE);
+                ShowWindow((int)rsClient.MainWindowHandle, SW_MAXIMIZE);
                 Thread.Sleep(1000);  //wait for the window to maximize
             }
         }
@@ -63,7 +64,7 @@ namespace RunescapeBot.ImageTools
             BringToForeGround(rsClient);
 
             RECT windowRect = new RECT();
-            User32.GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
             if (!TrimOSBuddy(ref windowRect))
             {
                 return null;
@@ -160,10 +161,9 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Finds the OSBuddy client process to attach to
         /// </summary>
-        /// <param name="startParams">specifies the username to select from multiple OSBuddy processes</param>
         /// <param name="loadError">used to output an error in finding a process</param>
         /// <returns></returns>
-        public static Process GetOSBuddy(StartParams startParams, out string loadError)
+        public static Process GetOSBuddy(out string loadError)
         {
             loadError = "";
             string windowName = "OSBUDDY";
@@ -181,6 +181,26 @@ namespace RunescapeBot.ImageTools
             
             loadError = "No OSBuddy client found";
             return null;    //no OSBuddy client found
+        }
+
+        /// <summary>
+        /// Determines if a process is currently running
+        /// </summary>
+        /// <param name="processToFind"></param>
+        /// <returns>true if the process is found, false otherwise</returns>
+        public static bool ProcessExists(Process processToFind)
+        {
+            IntPtr mainWindowHandle = processToFind.MainWindowHandle;
+            Process[] processlist = Process.GetProcesses();
+
+            foreach (Process process in processlist)
+            {
+                if (mainWindowHandle == process.MainWindowHandle)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -205,9 +225,53 @@ namespace RunescapeBot.ImageTools
         public static Point GetOSBuddyWindowSize(Process OSBuddy)
         {
             RECT windowRect = new RECT();
-            User32.GetWindowRect(OSBuddy.MainWindowHandle, ref windowRect);
-            ScreenScraper.TrimOSBuddy(ref windowRect);
+            GetWindowRect(OSBuddy.MainWindowHandle, ref windowRect);
+            TrimOSBuddy(ref windowRect);
             return new Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+        }
+
+        /// <summary>
+        /// Closes an instance of OSBuddy ad opens a new one
+        /// </summary>
+        /// <param name="OSBuddy"></param>
+        /// <returns></returns>
+        public static bool RestartOSBuddy(string clientFilePath, ref Process OSBuddy)
+        {
+            if ((OSBuddy != null) && !OSBuddy.CloseMainWindow())
+            {
+                return false;   //unable to close the current instance of OSBuddy
+            }
+            if (!StartOSBuddy(clientFilePath, out OSBuddy))
+            {
+                return false;   //unable to start a new instance of OSBuddy
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Starts a new instance of the OSBuddy client
+        /// </summary>
+        /// <returns></returns>
+        public static bool StartOSBuddy(string clientFilePath, out Process OSBuddy)
+        {
+            string error;
+            OSBuddy = GetOSBuddy(out error);
+            if (!(OSBuddy == null))
+            {
+                return true;    //OSBuddy is already running
+            }
+            
+            //start OSBuddy
+            try
+            {
+                OSBuddy = new Process();
+                OSBuddy.StartInfo.FileName = clientFilePath;
+                return OSBuddy.Start();
+            }
+            catch
+            {
+                return false;
+            }
         }
         #endregion
     }

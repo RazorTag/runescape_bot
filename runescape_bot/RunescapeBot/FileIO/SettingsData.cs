@@ -1,6 +1,4 @@
-﻿using RunescapeBot.BotPrograms;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace RunescapeBot.FileIO
 {
@@ -32,6 +30,12 @@ namespace RunescapeBot.FileIO
         public int Iterations { get; set; }
 
         /// <summary>
+        /// The file location of the RuneScape client to run
+        /// </summary>
+        [DataMember]
+        public string ClientFilePath { get; set; }
+
+        /// <summary>
         /// Serializes SettingsData
         /// </summary>
         /// <param name="info"></param>
@@ -44,6 +48,7 @@ namespace RunescapeBot.FileIO
             info.AddValue("Password", Password);
             info.AddValue("BotAction", BotAction);
             info.AddValue("Iterations", Iterations);
+            info.AddValue("ClientFilePath", ClientFilePath);
         }
     }
 }

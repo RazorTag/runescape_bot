@@ -1,4 +1,6 @@
-﻿namespace RunescapeBot.BotPrograms
+﻿using RunescapeBot.ImageTools;
+
+namespace RunescapeBot.BotPrograms
 {
     /// <summary>
     /// Smiths gold bracelets at the furnace in Port Phasmatys
@@ -9,7 +11,7 @@
 
         protected override void Run()
         {
-            System.Windows.Forms.MessageBox.Show("GoldBracelets running");
+            DefaultCamera();
         }
     }
 }

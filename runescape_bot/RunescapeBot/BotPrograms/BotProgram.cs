@@ -1,4 +1,5 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.FileIO;
+using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
 using System.Diagnostics;
@@ -25,9 +26,19 @@ namespace RunescapeBot.BotPrograms
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
 
         /// <summary>
+        /// Milliseconds to wait after starting the client
+        /// </summary>
+        private const int CLIENT_STARTUP_WAIT_TIME = 20000;
+
+        /// <summary>
         /// Error message to show the user for a start error
         /// </summary>
         private string LoadError;
+
+        /// <summary>
+        /// The number of consecutive previously failed login attempts.
+        /// </summary>
+        private int failedLoginAttempts;
 
         /// <summary>
         /// Specifies how the bot should be run
@@ -38,6 +49,11 @@ namespace RunescapeBot.BotPrograms
         /// Process to which this bot program is attached
         /// </summary>
         protected Process RSClient { get; set; }
+
+        /// <summary>
+        /// Keyboard controller
+        /// </summary>
+        protected Keyboard Keyboard { get; set; }
 
         /// <summary>
         /// Thread in which the run method is executed
@@ -94,9 +110,10 @@ namespace RunescapeBot.BotPrograms
         /// <param name="startParams">specifies the username to search for</param>
         public BotProgram(StartParams startParams)
         {
-            RSClient = ScreenScraper.GetOSBuddy(startParams, out LoadError);
+            RSClient = ScreenScraper.GetOSBuddy(out LoadError);
             this.RunParams = startParams;
             RNG = new Random();
+            Keyboard = new Keyboard(RSClient);
             Inventory = new Inventory(RSClient);
         }
        
@@ -109,8 +126,18 @@ namespace RunescapeBot.BotPrograms
         {
             if (!String.IsNullOrEmpty(LoadError))
             {
-                MessageBox.Show(LoadError);
-                return;
+                Process client;
+
+                if (ScreenScraper.StartOSBuddy(RunParams.ClientFilePath, out client))
+                {
+                    RSClient = client;
+                    SafeWait(CLIENT_STARTUP_WAIT_TIME);
+                }
+                else
+                {
+                    MessageBox.Show(LoadError);
+                    return;
+                }
             }
             RunThread = new Thread(Process);
             RunThread.Start();
@@ -158,12 +185,14 @@ namespace RunescapeBot.BotPrograms
         {
             if (StopFlag) { return; }
             int randomFrameOffset, randomFrameTime;
-
+            
+            //don't limit by iterations unless the user has specified a positive number of iterations
             if (RunParams.Iterations == 0)
             {
                 RunParams.Iterations = int.MaxValue;
             }
-
+            
+            //randomize the time between executions
             if (RunParams.RandomizeFrames)
             {
                 randomFrameOffset = (int) (0.6 * RunParams.FrameTime);
@@ -196,6 +225,23 @@ namespace RunescapeBot.BotPrograms
                         if (StopFlag) { return; }
                     }
                 }
+                else
+                {
+                    if (failedLoginAttempts > 10)
+                    {
+                        Process client = RSClient;
+                        if (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
+                        {
+                            RSClient = client;
+                            failedLoginAttempts = 0;
+                            SafeWait(CLIENT_STARTUP_WAIT_TIME);
+                        }
+                        else
+                        {
+                            return; //The client didnt restart correctly, so we can't continue.
+                        }
+                    }
+                }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
                 randomFrameTime = Math.Max(0, randomFrameTime);
@@ -223,7 +269,10 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Done()
         {
-            Bitmap.Dispose();
+            if (Bitmap != null)
+            {
+                Bitmap.Dispose();
+            }
             RunParams.TaskComplete();
         }
 
@@ -232,7 +281,14 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public void Stop()
         {
-            StopFlag = true;
+            if (StopFlag)
+            {
+                RunParams.TaskComplete();
+            }
+            else
+            {
+                StopFlag = true;
+            }
         }
 
         /// <summary>
@@ -500,10 +556,12 @@ namespace RunescapeBot.BotPrograms
             //click the "CLICK HERE TO PLAY" button on the welcome screen
             if (ConfirmWelcomeScreen())
             {
+                failedLoginAttempts = 0;
                 LeftClick(center, 337);
             }
             else
             {
+                failedLoginAttempts++;
                 return false;
             }
             if (SafeWait(5000)) { return false; }
@@ -625,6 +683,17 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return true; }
             }
             return StopFlag;
+        }
+
+        /// <summary>
+        /// Positions the camera facing north and as high as possible
+        /// </summary>
+        protected void DefaultCamera()
+        {
+            int compassX = ColorArray.GetLength(0) - 159;
+            int compassY = 21;
+            LeftClick(compassX, compassY);
+            Keyboard.UpArrow(1000);
         }
     }
 }

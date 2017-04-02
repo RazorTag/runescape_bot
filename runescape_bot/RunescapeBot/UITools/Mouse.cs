@@ -62,8 +62,8 @@ namespace RunescapeBot.UITools
             NaturalMove(x, y);
             Random rng = new Random();
             Thread.Sleep(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
-            User32.mouse_event(clickTypeDown, x, y, 0, 0);
-            User32.mouse_event(clickTypeUp, x, y, 0, 0);
+            mouse_event(clickTypeDown, x, y, 0, 0);
+            mouse_event(clickTypeUp, x, y, 0, 0);
         }
 
         /// <summary>
@@ -75,13 +75,25 @@ namespace RunescapeBot.UITools
         {
             //adjust for the position of the OSBuddy window
             RECT windowRect = new RECT();
-            User32.GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
             x += windowRect.left;
             y += windowRect.top;
 
             //adjust for the borders and toolbar
             x += ScreenScraper.OSBUDDY_BORDER_WIDTH;
             y += ScreenScraper.OSBUDDY_TOOLBAR_WIDTH + ScreenScraper.OSBUDDY_BORDER_WIDTH;
+        }
+
+        /// <summary>
+        /// Clicks at the specified point on the monitor without translating to game screen coordinates
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public static void RawClick(int x, int y)
+        {
+            NaturalMove(x, y);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
         }
 
         /// <summary>

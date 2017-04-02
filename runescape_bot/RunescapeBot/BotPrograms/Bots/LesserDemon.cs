@@ -42,23 +42,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override void Run()
         {
-            //test code to save mask pictures
-            //ReadWindow();
-            //LastDemonLocation = new Point(958, 500);
-            //CheckDrops();
-            //bool[,] helmPixels = ColorFilter(RuneMedHelm);
-            //EraseClientUIFromMask(ref helmPixels);
-            //TestMask(RuneMedHelm, "helm", helmPixels);
-            //bool[,] mithPixels = ColorFilter(MithrilArmor);
-            //EraseClientUIFromMask(ref mithPixels);
-            //TestMask(MithrilArmor, "helm", mithPixels);
-            //bool[,] skinPixels = ColorFilter(LesserDemonSkin);
-            //EraseClientUIFromMask(ref skinPixels);
-            //TestMask(LesserDemonSkin, "Skin", skinPixels);
-            //bool[,] hornPixels = ColorFilter(LesserDemonHorn);
-            //EraseClientUIFromMask(ref hornPixels);
-            //TestMask(LesserDemonHorn, "horn", hornPixels);
-            //TestSkinAndHorn(skinPixels, hornPixels);
+            DefaultCamera();
         }
 
         /// <summary>
