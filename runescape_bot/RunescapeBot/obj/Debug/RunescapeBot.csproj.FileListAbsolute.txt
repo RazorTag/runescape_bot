@@ -27,4 +27,3 @@ C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\Roboport.exe.manifest
 C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\Roboport.application
 C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\Roboport.exe
 C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\Roboport.pdb
-C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache

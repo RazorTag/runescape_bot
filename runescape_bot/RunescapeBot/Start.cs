@@ -227,6 +227,7 @@ namespace RunescapeBot
                 this.Invoke((MethodInvoker)(() =>
                 {
                     SetIdleState();
+                    this.Enabled = true;
                 }));
             }
         }
@@ -240,6 +241,7 @@ namespace RunescapeBot
 
             if (runningBot != null)
             {
+                this.Enabled = false;
                 SetTransitionalState();
                 runningBot.Stop();
             }

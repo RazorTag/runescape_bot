@@ -116,6 +116,11 @@ namespace RunescapeBot
             // 
             this.Iterations.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Iterations.Location = new System.Drawing.Point(123, 256);
+            this.Iterations.Maximum = new decimal(new int[] {
+            1000000000,
+            0,
+            0,
+            0});
             this.Iterations.Name = "Iterations";
             this.Iterations.Size = new System.Drawing.Size(89, 26);
             this.Iterations.TabIndex = 10;
@@ -184,7 +189,7 @@ namespace RunescapeBot
             // OSBuddySelect
             // 
             this.OSBuddySelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OSBuddySelect.Image = global::RunescapeBot.Properties.Resources.OSBuddy;
+            this.OSBuddySelect.Image = ((System.Drawing.Image)(resources.GetObject("OSBuddySelect.Image")));
             this.OSBuddySelect.Location = new System.Drawing.Point(375, 112);
             this.OSBuddySelect.Name = "OSBuddySelect";
             this.OSBuddySelect.Size = new System.Drawing.Size(35, 30);
