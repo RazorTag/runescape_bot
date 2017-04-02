@@ -13,5 +13,10 @@ namespace RunescapeBot.BotPrograms
         {
             DefaultCamera();
         }
+
+        protected override bool Execute()
+        {
+            return true;
+        }
     }
 }
