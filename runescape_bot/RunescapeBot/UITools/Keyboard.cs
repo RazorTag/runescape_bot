@@ -18,6 +18,15 @@ namespace RunescapeBot.UITools
         }
 
         /// <summary>
+        /// Sets the client for he keyboard to use
+        /// </summary>
+        /// <param name="rsClient"></param>
+        public void SetClient(Process rsClient)
+        {
+            RSClient = rsClient;
+        }
+
+        /// <summary>
         /// Types a message in the active window
         /// </summary>
         /// <param name="line"></param>
@@ -63,32 +72,43 @@ namespace RunescapeBot.UITools
             for (int i = 0; i < iterations; i++)
             {
                 SendKeys.SendWait("{UP}");
-                //Thread.Sleep(100);
             }
         }
 
         /// <summary>
         /// Presses the right arrow
         /// </summary>
-        public void RightArrow()
+        public void RightArrow(int iterations)
         {
-            SendKeys.SendWait("{RIGHT}");
+            ScreenScraper.BringToForeGround(RSClient);
+            for (int i = 0; i < iterations; i++)
+            {
+                SendKeys.SendWait("{RIGHT}");
+            }
         }
 
         /// <summary>
         /// Presses the down arrow
         /// </summary>
-        public void DownArrow()
+        public void DownArrow(int iterations)
         {
-            SendKeys.SendWait("{DOWN}");
+            ScreenScraper.BringToForeGround(RSClient);
+            for (int i = 0; i < iterations; i++)
+            {
+                SendKeys.SendWait("{DOWN}");
+            }
         }
 
         /// <summary>
         /// Presses the left arrow
         /// </summary>
-        public void LeftArrow()
+        public void LeftArrow(int iterations)
         {
-            SendKeys.SendWait("{LEFT}");
+            ScreenScraper.BringToForeGround(RSClient);
+            for (int i = 0; i < iterations; i++)
+            {
+                SendKeys.SendWait("{LEFT}");
+            }
         }
     }
 }

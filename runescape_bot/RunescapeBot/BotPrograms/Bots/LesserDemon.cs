@@ -74,16 +74,22 @@ namespace RunescapeBot.BotPrograms
                 MissedDemons++;
             }
 
-            // during the first frame that the bot program cant find a demon, look for a rune med helm drop
+            //During the first frame that the bot program cant find a demon, look for a rune med helm drop
             if (MissedDemons == 1)
             {
                 CheckDrops();
             }
 
+            //Give up, log out of the game, go outside, and play
+            if ((MissedDemons * RunParams.FrameTime) > (3 * maxDemonSpawnTime))
+            {
+                Logout();
+            }
+
+            //Reduce the minimum size of the demon in a desperate attempt to find a demon
             if (MissedDemons * RunParams.FrameTime > maxDemonSpawnTime)
             {
                 MinDemonSize /= 2.0;
-                MissedDemons = 0;
             }
 
             return true;

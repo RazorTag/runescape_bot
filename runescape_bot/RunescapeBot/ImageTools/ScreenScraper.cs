@@ -241,7 +241,7 @@ namespace RunescapeBot.ImageTools
             {
                 return false;   //unable to close the current instance of OSBuddy
             }
-            if (!StartOSBuddy(clientFilePath, out OSBuddy))
+            if (!StartOSBuddy(clientFilePath))
             {
                 return false;   //unable to start a new instance of OSBuddy
             }
@@ -252,10 +252,10 @@ namespace RunescapeBot.ImageTools
         /// Starts a new instance of the OSBuddy client
         /// </summary>
         /// <returns></returns>
-        public static bool StartOSBuddy(string clientFilePath, out Process OSBuddy)
+        public static bool StartOSBuddy(string clientFilePath)
         {
             string error;
-            OSBuddy = GetOSBuddy(out error);
+            Process OSBuddy = GetOSBuddy(out error);
             if (!(OSBuddy == null))
             {
                 return true;    //OSBuddy is already running

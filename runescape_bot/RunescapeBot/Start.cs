@@ -188,9 +188,8 @@ namespace RunescapeBot
         {
             if(botProgram == null) { return; }
 
-            SetTransitionalState();
-            botProgram.Start();
             SetActiveState();
+            botProgram.Start();
             settings.SaveBot(botProgram.RunParams);
         }
 

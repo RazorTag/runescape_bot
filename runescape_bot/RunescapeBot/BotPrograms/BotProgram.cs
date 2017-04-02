@@ -26,11 +26,6 @@ namespace RunescapeBot.BotPrograms
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
 
         /// <summary>
-        /// Milliseconds to wait after starting the client
-        /// </summary>
-        private const int CLIENT_STARTUP_WAIT_TIME = 20000;
-
-        /// <summary>
         /// Error message to show the user for a start error
         /// </summary>
         private string LoadError;
@@ -48,7 +43,22 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Process to which this bot program is attached
         /// </summary>
-        protected Process RSClient { get; set; }
+        private Process client;
+        protected Process RSClient
+        {
+            get
+            {
+                return client;
+            }
+            set
+            {
+                client = value;
+                if (Keyboard != null)
+                {
+                    Keyboard.SetClient(client);
+                }
+            }
+        }
 
         /// <summary>
         /// Keyboard controller
@@ -124,18 +134,40 @@ namespace RunescapeBot.BotPrograms
         /// <param name="iterations"></param>
         public void Start()
         {
+            bool ready = false;
+
             if (!String.IsNullOrEmpty(LoadError))
             {
-                Process client;
+                if (ScreenScraper.StartOSBuddy(RunParams.ClientFilePath))
+                {
+                    for (int i = 0; i < 300; i++)
+                    {
+                        if (SafeWait(1000)) { return; }
+                        RSClient = ScreenScraper.GetOSBuddy(out LoadError);
 
-                if (ScreenScraper.StartOSBuddy(RunParams.ClientFilePath, out client))
-                {
-                    RSClient = client;
-                    SafeWait(CLIENT_STARTUP_WAIT_TIME);
+                        if(RSClient != null)
+                        {
+                            ReadWindow();
+                            if (IsLoggedOut())
+                            {
+                                ready = true;
+                                break;
+                            }
+                        }
+                    }
                 }
-                else
+                if (!ready)
                 {
-                    MessageBox.Show(LoadError);
+                    if (!String.IsNullOrEmpty(LoadError))
+                    {
+                        MessageBox.Show(LoadError);
+                    }
+                    else
+                    {
+                        MessageBox.Show("OSBuddy did not start correctly");
+                    }
+
+                    Done();
                     return;
                 }
             }
@@ -159,7 +191,8 @@ namespace RunescapeBot.BotPrograms
         private void Setup()
         {
             ReadWindow();
-            if (!IsLoggedIn())
+            bool test = IsLoggedIn();
+            if (IsLoggedOut())
             {
                 LogIn();
             }
@@ -234,7 +267,7 @@ namespace RunescapeBot.BotPrograms
                         {
                             RSClient = client;
                             failedLoginAttempts = 0;
-                            SafeWait(CLIENT_STARTUP_WAIT_TIME);
+                            if(SafeWait(1000)) { return; }
                         }
                         else
                         {
@@ -409,6 +442,23 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Calls ReadWindow if the current screen image is unsatisfactory
+        /// </summary>
+        /// <returns>true unless the window needs to be read but can't</returns>
+        private bool MakeSureWindowHasBeenRead()
+        {
+            if ((Bitmap == null) || (ColorArray == null))
+            {
+                return ReadWindow();
+            }
+            if ((ColorArray.GetLength(0) == 0) || (ColorArray.GetLength(1) == 0))
+            {
+                return ReadWindow();
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Retrieve the color of a single pixel
         /// </summary>
         /// <param name="x"></param>
@@ -502,12 +552,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
         private bool CheckLogIn()
         { 
-            if (IsLoggedIn())
+            if (!IsLoggedOut())
             {
                 return true;    //already logged in
             }
-            SafeWait(5000);
-            if (IsLoggedIn())
+            if (SafeWait(5000)) { return false; }
+            if (!IsLoggedOut())
             {
                 return true;
             }
@@ -556,7 +606,6 @@ namespace RunescapeBot.BotPrograms
             //click the "CLICK HERE TO PLAY" button on the welcome screen
             if (ConfirmWelcomeScreen())
             {
-                failedLoginAttempts = 0;
                 LeftClick(center, 337);
             }
             else
@@ -564,11 +613,18 @@ namespace RunescapeBot.BotPrograms
                 failedLoginAttempts++;
                 return false;
             }
-            if (SafeWait(5000)) { return false; }
 
             //verify the log in
-            ReadWindow();
-            return IsLoggedIn();
+            if (ConfirmLogin())
+            {
+                failedLoginAttempts = 0;
+                return true;
+            }
+            else
+            {
+                failedLoginAttempts++;
+                return false;
+            }
         }
 
         /// <summary>
@@ -585,8 +641,7 @@ namespace RunescapeBot.BotPrograms
             int redBlobSize;
 
             ColorRange red = ColorFilters.WelcomeScreenClickHere();
-            bool[,] clickHere = ColorFilter(red);
-            clickHere = ColorFilterPiece(red, centerX - offsetX, centerX + offsetX, centerY - offsetY, centerY + offsetY);
+            bool[,] clickHere = ColorFilterPiece(red, centerX - offsetX, centerX + offsetX, centerY - offsetY, centerY + offsetY);
             redBlobSize = ImageProcessing.BiggestBlob(clickHere).Size;
 
             return ((2 * redBlobSize) > totalSize);
@@ -598,7 +653,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the welcome screen has been reached, false if not or if the StopFlag is raised</returns>
         private bool ConfirmWelcomeScreen()
         {
-            for (int i = 0; i < 10; i++)
+            //Wait up to 60 seconds
+            for (int i = 0; i < 60; i++)
             {
                 if (StopFlag) { return false; }
                 ReadWindow();
@@ -612,15 +668,68 @@ namespace RunescapeBot.BotPrograms
                     SafeWait(1000);
                 }
             }
-            return false;
+            return false;   //We timed out waiting.
         }
 
         /// <summary>
-        /// Determines if the client is logged in
+        /// Determines if  the client is logged in
         /// </summary>
-        /// <returns>true if we are logged in, false if we are logged out</returns>
+        /// <returns>true if we are verifiably logged in</returns>
         private bool IsLoggedIn()
         {
+            MakeSureWindowHasBeenRead();
+
+            //Get a piece of the column from the right of the inventory
+            int right = ColorArray.GetLength(0) - 10;
+            int left = right - 12;
+            int bottom = ColorArray.GetLength(1) - 105;
+            int top = bottom - 45;
+            Color[,] inventoryColumn = ScreenPiece(left, right, top, bottom);
+
+            //Compare the column against the expected value
+            long columnSum = ImageProcessing.ColorSum(inventoryColumn);
+            long expectedColumnSum = 133405;
+            if (columnSum > (1.01 * expectedColumnSum) || columnSum < (0.99 * expectedColumnSum))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Waits on the client to log in after clicking through the welcome screen
+        /// </summary>
+        /// <returns>true if the log in is verified, false if we time out waiting</returns>
+        private bool ConfirmLogin()
+        {
+            //Wait for up to 60 seconds
+            for (int i = 0; i < 60; i++)
+            {
+                if (StopFlag) { return false; }
+                ReadWindow();
+                if (IsLoggedIn())
+                {
+                    return true;
+                }
+                else
+                {
+                    if (StopFlag) { return false; }
+                    SafeWait(1000);
+                }
+            }
+
+            return false;   //We timed out waiting.
+        }
+
+        /// <summary>
+        /// Determines if the client is logged out
+        /// </summary>
+        /// <returns>true if we are verifiably logged out</returns>
+        private bool IsLoggedOut()
+        {
+            MakeSureWindowHasBeenRead();
+
             Color color;
             int height = ColorArray.GetLength(1);
             int centerX = Center.X;
@@ -632,7 +741,7 @@ namespace RunescapeBot.BotPrograms
                 color = ColorArray[x, checkRow];
                 if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
                 {
-                    return true;
+                    return false;
                 }
             }
             for (int y = 0; y < checkRow; y++)  //check sides
@@ -641,14 +750,14 @@ namespace RunescapeBot.BotPrograms
                 color = ColorArray[centerX - xOffset, y];
                 if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
                 {
-                    return true;
+                    return false;
                 }
 
                 //check right of login box
                 color = ColorArray[centerX + xOffset, y];
                 if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
                 {
-                    return true;
+                    return false;
                 }
             }
 
@@ -656,10 +765,10 @@ namespace RunescapeBot.BotPrograms
             long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, 0, 160));
             if ((colorSum < (LOGIN_LOGO_COLOR_SUM * 0.99)) || (colorSum > (LOGIN_LOGO_COLOR_SUM * 1.01)))
             {
-                return true;
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -694,6 +803,15 @@ namespace RunescapeBot.BotPrograms
             int compassY = 21;
             LeftClick(compassX, compassY);
             Keyboard.UpArrow(1000);
+        }
+
+        /// <summary>
+        /// Logs out of the game
+        /// </summary>
+        protected void Logout()
+        {
+            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 18);
+            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 86);
         }
     }
 }
