@@ -67,5 +67,37 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// The orange part of a furnace minimap icon
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange FurnaceIconOrange()
+        {
+            Color dark = Color.FromArgb(200, 70, 20);
+            Color light = Color.FromArgb(255, 220, 200);
+            HSBRange hsbRange = new HSBRange(20, 40, 0.52f, 1.0f, 0.50f, 0.75f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The yellow part of a bank minimap icon
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange BankIconDollar()
+        {
+            Color dark = Color.FromArgb(120, 100, 40);
+            Color light = Color.FromArgb(250, 220, 140);
+            HSBRange hsbRange = new HSBRange(40, 52, 0.35f, 0.9f, 0.30f, 0.76f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+
+        public static ColorRange Furnace()
+        {
+            Color dark = Color.FromArgb(46, 43, 43);
+            Color light = Color.FromArgb(85, 80, 78);
+            HSBRange hsbRange = new HSBRange(0, 0, 0.02f, 0.07f, 0.18f, 0.32f);
+            return new ColorRange(dark, light, hsbRange);
+        }
     }
 }

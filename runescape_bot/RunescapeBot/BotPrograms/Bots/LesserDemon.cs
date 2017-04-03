@@ -13,10 +13,10 @@ namespace RunescapeBot.BotPrograms
     public class LesserDemon : BotProgram
     {
         private const int maxDemonSpawnTime = 28000;    //max possible lesser demon spawn time in milliseconds
-        private static ColorRange LesserDemonSkin;
-        private static ColorRange LesserDemonHorn;
-        private static ColorRange RuneMedHelm;
-        private static ColorRange MithrilArmor;
+        private ColorRange LesserDemonSkin;
+        private ColorRange LesserDemonHorn;
+        private ColorRange RuneMedHelm;
+        private ColorRange MithrilArmor;
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -127,8 +127,8 @@ namespace RunescapeBot.BotPrograms
             if (biggestBlob.Size > minimumSize)
             {
                 Point blobCenter = biggestBlob.Center;
-                Inventory.Telegrab(ColorArray, blobCenter.X + offset.X, blobCenter.Y + offset.Y);
-                Inventory.Alch(ColorArray, 3, 6);   //only start alching when the inventory fills up
+                Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                Inventory.Alch(3, 6);   //only start alching when the inventory fills up
                 return;
             }
         }
@@ -181,113 +181,7 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
-        /// <summary>
-        /// Colors the pixels where the given feature was found in Bitmap.
-        /// Does not modify Bitmap. Creates a copy and returns the copy with masking applied.
-        /// </summary>
-        /// <param name="mask"></param>
-        /// <param name="testColor"></param>
-        /// <returns></returns>
-        private void TestMask(ColorRange bodyPart, string saveName, bool[,] mask)
-        {
-            Bitmap redBitmap = (Bitmap) Bitmap.Clone();
-            Bitmap greenBitmap = (Bitmap) Bitmap.Clone();
-            Bitmap blueBitmap = (Bitmap) Bitmap.Clone();
-            Bitmap hueBitmap = (Bitmap) Bitmap.Clone();
-            Bitmap saturationBitmap = (Bitmap)Bitmap.Clone();
-            Bitmap brightnessBitmap = (Bitmap)Bitmap.Clone();
-            Bitmap bitmap = (Bitmap) Bitmap.Clone();
-            Color pixel;
-
-            for (int x = 0; x < Bitmap.Width; x++)
-            {
-                for (int y = 0; y < Bitmap.Height; y++)
-                {
-                    pixel = ColorArray[x, y];
-
-                    if ((bodyPart.DarkestColor != null) && (bodyPart.LightestColor != null))
-                    {
-                        //make red bitmap
-                        if (pixel.R < bodyPart.DarkestColor.R)
-                        {
-                            redBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.R > bodyPart.LightestColor.R)
-                        {
-                            redBitmap.SetPixel(x, y, Color.White);
-                        }
-
-                        //make green bitmap
-                        if (pixel.G < bodyPart.DarkestColor.G)
-                        {
-                            greenBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.G > bodyPart.LightestColor.G)
-                        {
-                            greenBitmap.SetPixel(x, y, Color.White);
-                        }
-
-                        //make blue bitmap
-                        if (pixel.B < bodyPart.DarkestColor.B)
-                        {
-                            blueBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.B > bodyPart.LightestColor.B)
-                        {
-                            blueBitmap.SetPixel(x, y, Color.White);
-                        }
-                    }
-
-                    if (bodyPart.HSBRange != null)
-                    {
-                        //make hue bitmap
-                        if (!bodyPart.HSBRange.HueInRange(pixel))
-                        {
-                            hueBitmap.SetPixel(x, y, Color.White);
-                        }
-
-                        //make saturation bitmap
-                        if (pixel.GetSaturation() < bodyPart.HSBRange.MinimumSaturation)
-                        {
-                            saturationBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.GetSaturation() > bodyPart.HSBRange.MaximumSaturation)
-                        {
-                            saturationBitmap.SetPixel(x, y, Color.White);
-                        }
-
-                        //make brightness bitmap
-                        if (pixel.GetBrightness() < bodyPart.HSBRange.MinimumBrightness)
-                        {
-                            brightnessBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.GetBrightness() > bodyPart.HSBRange.MaximumBrightness)
-                        {
-                            brightnessBitmap.SetPixel(x, y, Color.White);
-                        }
-                    }
-
-                    //make combined bitmap
-                    if (!mask[x, y])
-                    {
-                        bitmap.SetPixel(x, y, Color.White);
-                    }
-                }
-            }
-
-            //string directory = "C:\\Projects\\RunescapeBot\\test_pictures\\mask_tests\\";
-            string directory = "D:\\SourceTree\\runescape_bot\\test_pictures\\mithrilarmor\\";
-            ScreenScraper.SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(hueBitmap, directory + saveName + "_HSBHueMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(saturationBitmap, directory + saveName + "_HSBSaturationMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(brightnessBitmap, directory + saveName + "_HSBBrightnessMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(bitmap, directory + saveName + "_TotalMaskTest.jpg", ImageFormat.Jpeg);
-            ScreenScraper.SaveImageToFile(Bitmap, directory + "Original.jpg", ImageFormat.Jpeg);
-        }
-
-        public static int SizeOfMatch(bool[,] mask)
+        public int SizeOfMatch(bool[,] mask)
         {
             int matches = 0;
 
@@ -307,7 +201,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Sets the reference colors for the lesser demon's parts if they haven't been set already
         /// </summary>
-        private static void GetReferenceColors()
+        private void GetReferenceColors()
         {
             LesserDemonSkin = ColorFilters.LesserDemonSkin();
             LesserDemonHorn = ColorFilters.LesserDemonHorn();

@@ -86,7 +86,8 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
-    <Compile Include="BotPrograms\ColorFilters.cs" />
+    <Compile Include="ImageTools\ColorFilters.cs" />
+    <Compile Include="BotPrograms\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Diagnostics\Debug.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />
     <Compile Include="Common\PrimitiveWrapper.cs" />

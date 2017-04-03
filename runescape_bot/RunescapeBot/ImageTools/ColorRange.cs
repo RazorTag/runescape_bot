@@ -59,7 +59,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Determines if the given color falls within this color range
+        /// Determines if the given color's RGB and HSB falls within this color range
         /// </summary>
         /// <param name="color">the color to check</param>
         /// <returns>true if the given color falls within this color range</returns>

@@ -8,28 +8,48 @@ namespace RunescapeBot.BotPrograms
 {
     public class Inventory
     {
+        private Color[,] screen;
         private bool[,] inventory;
         private Random rng;
-        private Process rsClient;
+        private Process RSClient;
 
-        public Inventory(Process rsClient)
+        public Inventory(Process rsClient, Color[,] screen)
         {
             inventory = new bool[4, 7];
             rng = new Random();
-            this.rsClient = rsClient;
+            this.RSClient = rsClient;
             SelectedTab = TabSelect.Unknown;
+            this.screen = screen;
+        }
+
+        /// <summary>
+        /// Sets the client to use
+        /// </summary>
+        /// <param name="rsClient"></param>
+        public void SetClient(Process rsClient)
+        {
+            RSClient = rsClient;
+        }
+
+        /// <summary>
+        /// Sets the latest screenshot
+        /// </summary>
+        /// <param name="screen"></param>
+        public void SetScreen(Color[,] screen)
+        {
+            this.screen = screen;
         }
 
         /// <summary>
         /// Opens the inventory if it isn't open already
         /// </summary>
         /// <param name="screen"></param>
-        public void OpenInventory(Color[,] screen, bool safeTab = true)
+        public void OpenInventory(bool safeTab = true)
         {
             if (!safeTab && SelectedTab == TabSelect.Inventory) { return; }
             int x = screen.GetLength(0) - INVENTORY_TAB_OFFSET_LEFT;
             int y = screen.GetLength(1) - INVENTORY_TAB_OFFSET_TOP + rng.Next(-5, 6);
-            Mouse.LeftClick(x, y, rsClient);
+            Mouse.LeftClick(x, y, RSClient);
             Thread.Sleep(TAB_SWITCH_WAIT);
             SelectedTab = TabSelect.Inventory;
         }
@@ -38,12 +58,12 @@ namespace RunescapeBot.BotPrograms
         /// Opens the spellbook if it isn't open already
         /// </summary>
         /// <param name="screen"></param>
-        public void OpenSpellbook(Color[,] screen, bool safeTab = true)
+        public void OpenSpellbook(bool safeTab = true)
         {
             if (!safeTab && SelectedTab == TabSelect.Spellbook) { return; }
             int x = screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_LEFT + rng.Next(-5, 6);
             int y = screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_TOP + rng.Next(-5, 6);
-            Mouse.LeftClick(x, y, rsClient);
+            Mouse.LeftClick(x, y, RSClient);
             Thread.Sleep(TAB_SWITCH_WAIT);
             SelectedTab = TabSelect.Spellbook;
         }
@@ -53,24 +73,24 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">slots away from the leftmost column (0-3)</param>
         /// <param name="y">slots away from the topmost column (0-6)</param>
-        public void ClickInventory(Color[,] screen, int x, int y, bool safeTab = true)
+        public void ClickInventory(int x, int y, bool safeTab = true)
         {
             int xOffset = screen.GetLength(0) - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X) + rng.Next(-5, 6);
             int yOffset = screen.GetLength(1) - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y) + rng.Next(-5, 6);
-            OpenInventory(screen, safeTab);
-            Mouse.LeftClick(xOffset, yOffset, rsClient, 200);
+            OpenInventory(safeTab);
+            Mouse.LeftClick(xOffset, yOffset, RSClient, 200);
         }
 
         /// <summary>
         /// Opens the inventory and clicks on an inventory slot
         /// </summary>
         /// <param name="index">sequential slot in the inventory (1-28)</param>
-        public void ClickInventory(Color[,] screen, int index, bool safeTab = true)
+        public void ClickInventory(int index, bool safeTab = true)
         {
             index--;
             int x = index % 4;
             int y = index / 4;
-            ClickInventory(screen, x, y, safeTab);
+            ClickInventory(x, y, safeTab);
         }
 
         /// <summary>
@@ -80,12 +100,12 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         /// <param name="x">slots away from the leftmost column (0-3)</param>
         /// <param name="y">slots away from the topmost column (0-6)</param>
-        private void ClickSpellbook(Color[,] screen, int x, int y, bool safeTab = true)
+        private void ClickSpellbook(int x, int y, bool safeTab = true)
         {
             int xOffset = screen.GetLength(0) - SPELLBOOK_OFFSET_LEFT + (x * SPELLBOOK_GAP_X) + rng.Next(-5, 6);
             int yOffset = screen.GetLength(1) - SPELLBOOK_OFFSET_TOP + (y * SPELLBOOK_GAP_Y) + rng.Next(-5, 6);
-            OpenSpellbook(screen, safeTab);
-            Mouse.LeftClick(xOffset, yOffset, rsClient, 200);
+            OpenSpellbook(safeTab);
+            Mouse.LeftClick(xOffset, yOffset, RSClient, 200);
         }
 
         /// <summary>
@@ -94,10 +114,10 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         /// <param name="x">x pixel location on the screen</param>
         /// <param name="y">y pixel location on the screen</param>
-        public void Telegrab(Color[,] screen, int x, int y)
+        public void Telegrab(int x, int y)
         {
-            ClickSpellbook(screen, 5, 2);
-            Mouse.LeftClick(x, y, rsClient, 200);
+            ClickSpellbook(5, 2);
+            Mouse.LeftClick(x, y, RSClient, 200);
             Thread.Sleep(5000); //telegrab takes about 5 seconds
         }
 
@@ -108,14 +128,14 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
         /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
         /// <returns>true if the alch succeeds</returns>
-        public bool Alch(Color[,] screen, int x, int y)
+        public bool Alch(int x, int y)
         {
-            if (ScreenToInventory(screen, ref x, ref y))
+            if (ScreenToInventory(ref x, ref y))
             {
-                OpenSpellbook(screen);
-                ClickSpellbook(screen, 6, 4);
+                OpenSpellbook();
+                ClickSpellbook(6, 4);
                 SelectedTab = TabSelect.Inventory;
-                ClickInventory(screen, x, y, false);
+                ClickInventory(x, y, false);
                 SelectedTab = TabSelect.Spellbook;
                 return true;
             }
@@ -130,7 +150,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>true if translation succeeds</returns>
-        private bool ScreenToInventory(Color[,] screen, ref int x, ref int y)
+        private bool ScreenToInventory(ref int x, ref int y)
         {
             if (x > 3 && y > 6)
             {

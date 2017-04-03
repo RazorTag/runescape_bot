@@ -57,6 +57,10 @@ namespace RunescapeBot.BotPrograms
                 {
                     Keyboard.SetClient(client);
                 }
+                if (Inventory != null)
+                {
+                    Inventory.SetClient(client);
+                }
             }
         }
 
@@ -78,7 +82,22 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Stores a Color array of the client window
         /// </summary>
-        protected Color[,] ColorArray { get; set; }
+        private Color[,] colorArray;
+        protected Color[,] ColorArray
+        {
+            get
+            {
+                return colorArray;
+            }
+            set
+            {
+                colorArray = value;
+                if (Inventory != null)
+                {
+                    Inventory.SetScreen(colorArray);
+                }
+            }
+        }
 
         /// <summary>
         /// The sidebar including the inventory and spellbook
@@ -124,7 +143,7 @@ namespace RunescapeBot.BotPrograms
             this.RunParams = startParams;
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);
-            Inventory = new Inventory(RSClient);
+            Inventory = new Inventory(RSClient, ColorArray);
         }
        
         /// <summary>
@@ -324,6 +343,63 @@ namespace RunescapeBot.BotPrograms
             }
         }
 
+        #region user actions
+        /// <summary>
+        /// Wrapper for MouseActions.LeftMouseClick
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        protected void LeftClick(int x, int y, int hoverDelay = 100, bool randomize = true)
+        {
+            if (!StopFlag)  //don't click if the stop flag has been raised
+            {
+                Mouse.LeftClick(x, y, RSClient, hoverDelay);
+            }
+        }
+
+        /// <summary>
+        /// Wrapper for MouseActions.RightMouseClick
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        protected void RightClick(int x, int y, int hoverDelay = 100, bool randomize = true)
+        {
+            if (!StopFlag)  //don't click if the stop flag has been raised
+            {
+                Mouse.RightClick(x, y, RSClient, hoverDelay);
+            }
+        }
+        #endregion
+
+        #region vision utilities
+        /// <summary>
+        /// Wrapper for ScreenScraper.CaptureWindow
+        /// </summary>
+        protected bool ReadWindow()
+        {
+            if (Bitmap != null)
+            {
+                Bitmap.Dispose();
+            }
+            if (StopFlag) { return false; }
+
+            Bitmap = ScreenScraper.CaptureWindow(RSClient);
+            ColorArray = ScreenScraper.GetRGB(Bitmap);
+
+            return Bitmap != null;
+        }
+
+        /// <summary>
+        /// Retrieve the color of a single pixel
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        protected Color GetPixel(int x, int y)
+        {
+            return ColorArray[x, y];
+        }
+
         /// <summary>
         /// Creates a boolean array to represent a color filter match
         /// </summary>
@@ -425,48 +501,36 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Wrapper for ScreenScraper.CaptureWindow
+        /// Gets a rectangle containing the minimap with the non-minimap corners set to false
         /// </summary>
-        protected bool ReadWindow()
+        /// <param name="filter">the filter to use on the minimap</param>
+        /// <param name="offset">gets set to the offset from the game screen to the minimap piece</param>
+        /// <returns>true for the pixels on the minimap that match the filter</returns>
+        protected bool[,] MinimapFilter(ColorRange filter, out Point offset)
         {
-            if (Bitmap != null)
+            int left = ColorArray.GetLength(0) - 157;
+            int right = ColorArray.GetLength(0) - 8;
+            int top = 8;
+            int bottom = 159;
+            Point center = new Point((left + right) / 2, (top + bottom) / 2);
+            double radius = 70.0;
+            double distance;
+            offset = new Point(left, top);
+            bool[,] minimapFilter = new bool[right - left + 1, bottom - top + 1];
+
+            for (int x = left; x <= right; x++)
             {
-                Bitmap.Dispose();
+                for (int y = top; y <= bottom; y++)
+                {
+                    distance = Math.Sqrt(Math.Pow(x - center.X, 2) + Math.Pow(y - center.Y, 2));
+                    if (distance < radius)
+                    {
+                        minimapFilter[x - left, y - top] = filter.ColorInRange(ColorArray[x, y]);
+                    }
+                }
             }
-            if (StopFlag) { return false; }
 
-            Bitmap = ScreenScraper.CaptureWindow(RSClient);
-            ColorArray = ScreenScraper.GetRGB(Bitmap);
-
-            return Bitmap != null;
-        }
-
-        /// <summary>
-        /// Calls ReadWindow if the current screen image is unsatisfactory
-        /// </summary>
-        /// <returns>true unless the window needs to be read but can't</returns>
-        private bool MakeSureWindowHasBeenRead()
-        {
-            if ((Bitmap == null) || (ColorArray == null))
-            {
-                return ReadWindow();
-            }
-            if ((ColorArray.GetLength(0) == 0) || (ColorArray.GetLength(1) == 0))
-            {
-                return ReadWindow();
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Retrieve the color of a single pixel
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        protected Color GetPixel(int x, int y)
-        {
-            return ColorArray[x, y];
+            return minimapFilter;
         }
 
         /// <summary>
@@ -478,32 +542,6 @@ namespace RunescapeBot.BotPrograms
         {
             double screenSize = Bitmap.Size.Width * Bitmap.Size.Height;
             return artifact.Size / screenSize;
-        }
-
-        /// <summary>
-        /// Wrapper for MouseActions.LeftMouseClick
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        protected void LeftClick(int x, int y, int hoverDelay = 100)
-        {
-            if (!StopFlag)  //don't click if the stop flag has been raised
-            {
-                Mouse.LeftClick(x, y, RSClient, hoverDelay);
-            }
-        }
-
-        /// <summary>
-        /// Wrapper for MouseActions.RightMouseClick
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        protected void RightClick(int x, int y, int hoverDelay = 100)
-        {
-            if (!StopFlag)  //don't click if the stop flag has been raised
-            {
-                Mouse.RightClick(x, y, RSClient, hoverDelay);
-            }
         }
 
         /// <summary>
@@ -544,7 +582,9 @@ namespace RunescapeBot.BotPrograms
                 }
             }
         }
+        #endregion
 
+        #region login/restart
         /// <summary>
         /// Determines if the user is logged out and logs him back in if he is.
         /// If the bot does not have valid login information, then it will quit.
@@ -772,11 +812,22 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Logs out of the game
+        /// </summary>
+        protected void Logout()
+        {
+            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 18);
+            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 86);
+        }
+        #endregion
+
+        #region miscellaneous
+        /// <summary>
         /// Waits for the specified time while periodically checking for the stop flag
         /// </summary>
         /// <param name="waitTime"></param>
         /// <returns>true if the StopFlag has been raised</returns>
-        private bool SafeWait(int waitTime)
+        public bool SafeWait(int waitTime)
         {
             int nextWaitTime;
             int waitInterval = 1000;
@@ -806,12 +857,21 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Logs out of the game
+        /// Calls ReadWindow if the current screen image is unsatisfactory
         /// </summary>
-        protected void Logout()
+        /// <returns>true unless the window needs to be read but can't</returns>
+        private bool MakeSureWindowHasBeenRead()
         {
-            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 18);
-            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 86);
+            if ((Bitmap == null) || (ColorArray == null))
+            {
+                return ReadWindow();
+            }
+            if ((ColorArray.GetLength(0) == 0) || (ColorArray.GetLength(1) == 0))
+            {
+                return ReadWindow();
+            }
+            return true;
         }
+        #endregion
     }
 }

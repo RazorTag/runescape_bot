@@ -123,38 +123,6 @@ namespace RunescapeBot.ImageTools
             }
             return rgbArray;
         }
-
-        /// <summary>
-        /// Saves a Bitmap object to file as an image
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <param name="fileName"></param>
-        /// <param name="format"></param>
-        public static void SaveImageToFile(Bitmap bitmap, string fileName, ImageFormat format)
-        {
-            IntPtr hBitmap = bitmap.GetHbitmap();
-            Image img = Image.FromHbitmap(hBitmap);
-            img.Save(fileName, format);
-        }
-
-        /// <summary>
-        /// Saves an RGB array to file as an image
-        /// </summary>
-        /// <param name="rgbArray"></param>
-        /// <param name="fileName"></param>
-        /// <param name="format"></param>
-        public static void SaveImageToFile(Color[,] rgbArray, string fileName, ImageFormat format)
-        {
-            Bitmap bitmap = new Bitmap(rgbArray.GetLength(0), rgbArray.GetLength(1));
-            for(int x = 0; x < rgbArray.GetLength(0); x++)
-            {
-                for(int y = 0; y < rgbArray.GetLength(1); y++)
-                {
-                    bitmap.SetPixel(x, y, rgbArray[x, y]);
-                }
-            }
-            SaveImageToFile(bitmap, fileName, format);
-        }
         #endregion
 
         #region OSBuddy
