@@ -42,7 +42,11 @@ namespace RunescapeBot.BotPrograms
 
         protected override void Run()
         {
-            DefaultCamera();
+            //ColorRange empty = ColorFilters.EmptyInventorySlot();
+            //bool[,] mask = ColorFilter(empty);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, empty, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "emptySlot");
+            //Inventory.GrabAndAlch(1500, 800);
+            //Inventory.FirstEmptySlot();
         }
 
         /// <summary>
@@ -75,9 +79,16 @@ namespace RunescapeBot.BotPrograms
             }
 
             //During the first frame that the bot program cant find a demon, look for a rune med helm drop
-            if (MissedDemons == 1)
+            if (MissedDemons == 1 && CheckDrops())
             {
-                CheckDrops();
+                MissedDemons = 0;
+            }
+
+            //Reduce the minimum size of the demon in a desperate attempt to find a demon
+            if (MissedDemons * RunParams.FrameTime > maxDemonSpawnTime)
+            {
+                MinDemonSize /= 2.0;
+                DefaultCamera();
             }
 
             //Give up, log out of the game, go outside, and play
@@ -86,19 +97,14 @@ namespace RunescapeBot.BotPrograms
                 Logout();
             }
 
-            //Reduce the minimum size of the demon in a desperate attempt to find a demon
-            if (MissedDemons * RunParams.FrameTime > maxDemonSpawnTime)
-            {
-                MinDemonSize /= 2.0;
-            }
-
             return true;
         }
 
         /// <summary>
         /// Telegrabs a rune med helm if one is found on the ground
         /// </summary>
-        private void CheckDrops()
+        /// <returns>True if a drop is found</returns>
+        private bool CheckDrops()
         {
             int dropRange = 350;
             int dropRangeLeft = LastDemonLocation.X - dropRange;
@@ -108,8 +114,16 @@ namespace RunescapeBot.BotPrograms
             Point trimOffset;
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
-            FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, 70);
-            FindAndAlch(screenDropArea, trimOffset, MithrilArmor, 100);
+            if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, 70))
+            {
+                return true;
+            }
+            if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, 100))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -118,7 +132,8 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screenDropArea"></param>
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
-        private void FindAndAlch(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        /// <returns>True if an item is found, picked up, and alched. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
+        private bool FindAndAlch(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             EraseClientUIFromMask(ref matchedPixels);
@@ -127,10 +142,9 @@ namespace RunescapeBot.BotPrograms
             if (biggestBlob.Size > minimumSize)
             {
                 Point blobCenter = biggestBlob.Center;
-                Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
-                Inventory.Alch(3, 6);   //only start alching when the inventory fills up
-                return;
+                return Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
             }
+            return false;
         }
 
         /// <summary>

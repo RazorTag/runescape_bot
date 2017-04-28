@@ -349,7 +349,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void LeftClick(int x, int y, int hoverDelay = 100, bool randomize = true)
+        protected void LeftClick(int x, int y, int hoverDelay = 100, bool randomize = false)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
@@ -466,26 +466,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected Color[,] ScreenPiece(int left, int right, int top, int bottom, out Point trimOffset)
         {
-            left = Math.Max(left, 0);
-            right = Math.Min(right, ColorArray.GetLength(0) - 1);
-            top = Math.Max(top, 0);
-            bottom = Math.Min(bottom, ColorArray.GetLength(1) - 1);
-            if ((left > right) || (top > bottom))
-            {
-                trimOffset = Point.Empty;
-                return null;
-            }
-            Color[,] screenPiece = new Color[right - left + 1, bottom - top + 1];
-            trimOffset = new Point(left, top);
-
-            for (int x = left; x <= right; x++)
-            {
-                for (int y = top; y <= bottom; y++)
-                {
-                    screenPiece[x - left, y - top] = ColorArray[x, y];
-                }
-            }
-            return screenPiece;
+            return ImageProcessing.ScreenPiece(ColorArray, left, right, top, bottom, out trimOffset);
         }
 
         /// <summary>

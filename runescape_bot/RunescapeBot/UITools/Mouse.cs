@@ -164,7 +164,7 @@ namespace RunescapeBot.UITools
                 currentY = spline.GetValue(currentX);
                 User32.SetCursorPos((int)currentX, (int)currentY);
                 watch.Stop();
-                Thread.Sleep(sleepTime - (int)watch.ElapsedMilliseconds);
+                Thread.Sleep(Math.Max(0, sleepTime - (int)watch.ElapsedMilliseconds));
             }
             Move(x, y);
         }

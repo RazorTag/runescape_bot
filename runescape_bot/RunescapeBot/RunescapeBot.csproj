@@ -70,6 +70,9 @@
     <Reference Include="InputSimulator">
       <HintPath>..\InputSimulator.0.1.0.0-bin\Release\InputSimulator.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -86,11 +89,14 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
+    <Compile Include="BotPrograms\Bots\NightmareZoneD.cs" />
+    <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
+    <Compile Include="BotPrograms\Popups\MakeX.cs" />
+    <Compile Include="Common\Geometry.cs" />
+    <Compile Include="Common\Numerical.cs" />
     <Compile Include="ImageTools\ColorFilters.cs" />
-    <Compile Include="BotPrograms\DebugUtilities.cs" />
-    <Compile Include="BotPrograms\Diagnostics\Debug.cs" />
+    <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />
-    <Compile Include="Common\PrimitiveWrapper.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
     <Compile Include="FileIO\SettingsData.cs" />
     <Compile Include="GMA\GlobalEventProvider.cs">
@@ -167,8 +173,6 @@
   <ItemGroup>
     <Content Include="project.ico" />
     <None Include="Resources\OSBuddy2.png" />
-    <None Include="Resources\OSBuddy1.png" />
-    <None Include="Resources\OSBuddy.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

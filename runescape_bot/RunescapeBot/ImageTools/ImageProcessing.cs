@@ -1,12 +1,7 @@
-﻿using RunescapeBot.BotPrograms;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.ImageTools
 {
@@ -23,12 +18,16 @@ namespace RunescapeBot.ImageTools
             int height = rgbImage.GetLength(1);
             bool[,] filterPixels = new bool[width, height];
             int numThreads = Math.Max(1, Environment.ProcessorCount - 1);
+            if (numThreads > rgbImage.GetLength(0))
+            {
+                numThreads = 1; //not enough stuff to do to justify multithreading
+            }
             int heavyThreads = width % numThreads;
             int lightWidth = (width - heavyThreads) / numThreads;
             Thread[] threadPool = new Thread[numThreads];
             int assignedColumns = 0;
 
-            //Create the n+1 width threads
+            //Create the n+1 width threads (heavy)
             for (int i = 0; i < heavyThreads; i++)
             {
                 int start = assignedColumns;
@@ -36,7 +35,8 @@ namespace RunescapeBot.ImageTools
                 threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, start, end));
                 assignedColumns += lightWidth + 1;
             }
-            //Create the n width threads
+
+            //Create the n width threads (light)
             for (int i = heavyThreads; i < numThreads; i++)
             {
                 int start = assignedColumns;
@@ -242,6 +242,79 @@ namespace RunescapeBot.ImageTools
                 }
             }
             return colorSum;
+        }
+
+        /// <summary>
+        /// Determines the fraction of an RGB image that matches a color filter
+        /// </summary>
+        /// <param name="rgbImage">image to match on</param>
+        /// <param name="filter">filter to use for matching</param>
+        /// <returns>The fraction (0-1) of the image that matches the filter</returns>
+        public static double FractionalMatch(Color[,] rgbImage, ColorRange filter)
+        {
+            bool[,] binaryImage = ColorFilter(rgbImage, filter);
+            return FractionalMatch(binaryImage);
+        }
+
+        /// <summary>
+        /// Determines the fraction of a binary image that is true
+        /// </summary>
+        /// <param name="image">binary image to check</param>
+        /// <returns>The fraction (0-1) of the image that is true</returns>
+        public static double FractionalMatch(bool[,] image)
+        {
+            int matches = 0;
+            int width = image.GetLength(0);
+            int height = image.GetLength(1);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (image[x, y])
+                    {
+                        matches++;
+                    }
+                }
+            }
+
+            return matches / ((double) (width * height));
+        }
+
+        /// <summary>
+        /// Gets a rectangle from ColorArray
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom, out Point trimOffset)
+        {
+            left = Math.Max(left, 0);
+            right = Math.Min(right, image.GetLength(0) - 1);
+            top = Math.Max(top, 0);
+            bottom = Math.Min(bottom, image.GetLength(1) - 1);
+            if ((left > right) || (top > bottom))
+            {
+                trimOffset = Point.Empty;
+                return null;
+            }
+            Color[,] screenPiece = new Color[right - left + 1, bottom - top + 1];
+            trimOffset = new Point(left, top);
+
+            for (int x = left; x <= right; x++)
+            {
+                for (int y = top; y <= bottom; y++)
+                {
+                    screenPiece[x - left, y - top] = image[x, y];
+                }
+            }
+            return screenPiece;
+        }
+
+        public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom)
+        {
+            Point empty = new Point();
+            return ScreenPiece(image, left, right, top, bottom, out empty);
         }
     }
 }

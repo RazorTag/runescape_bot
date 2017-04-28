@@ -1,4 +1,6 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
+using System;
 using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
@@ -8,6 +10,7 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class GoldBracelets : BotProgram
     {
+        private const double furnaceLocationTolerance = 50.0;
         private ColorRange FurnaceIconOrange;
         private ColorRange BankIconDollar;
         private ColorRange Furnace;
@@ -95,20 +98,49 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         private bool ClickFurnace()
         {
-            for (int i = 0; i < 15; i++)
+            Point? furnaceLocation;
+
+            if (LocateStationaryFurnace(out furnaceLocation))
+            {
+                LeftClick(furnaceLocation.Value.X, furnaceLocation.Value.Y);
+                SafeWait(1000);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Looks for a furnace that isn't moving (meaning the player isn't moving)
+        /// </summary>
+        /// <returns>True if a furnace is found</returns>
+        private bool LocateStationaryFurnace(out Point? furnaceLocation)
+        {
+            furnaceLocation = null;
+            Point? lastPosition = null;
+
+            for (int i = 0; i < 40; i++)
             {
                 ReadWindow();
                 bool[,] furnace = ColorFilter(Furnace);
                 Blob furnaceBlob = ImageProcessing.BiggestBlob(furnace);
                 if (furnaceBlob != null && furnaceBlob.Size > 100)
                 {
-                    LeftClick(furnaceBlob.Center.X, furnaceBlob.Center.Y);
-                    return true;
+                    if (Geometry.DistanceBetweenPoints(furnaceBlob.Center, lastPosition) <= furnaceLocationTolerance)
+                    {
+                        furnaceLocation = furnaceBlob.Center;
+                        return true;
+                    }
+                    else
+                    {
+                        lastPosition = furnaceBlob.Center;
+                    }
                 }
                 else
                 {
-                    SafeWait(1000);
+                    lastPosition = null;
                 }
+                SafeWait(500);
             }
 
             return false;

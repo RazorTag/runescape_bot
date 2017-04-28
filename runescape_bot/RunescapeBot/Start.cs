@@ -25,7 +25,7 @@ namespace RunescapeBot
         /// <summary>
         /// List of running bot programs
         /// </summary>
-        private BotProgram runningBot;
+        private BotProgram RunningBot;
 
         /// <summary>
         /// Saved startup settings for each bot program
@@ -52,7 +52,9 @@ namespace RunescapeBot
             [Description("Gold Bracelets")]
             GoldBracelets,
             [Description("Gnome Stronghold Agility")]
-            AgilityGnomeStronghold
+            AgilityGnomeStronghold,
+            [Description("Nightmare Zone Dharoks")]
+            NightmareZoneD
         };
 
         /// <summary>
@@ -87,12 +89,12 @@ namespace RunescapeBot
         /// <returns>The bot's display name and current status</returns>
         private string GetBotName()
         {
-            if (runningBot == null)
+            if (RunningBot == null)
             {
                 return string.Empty;
             }
 
-            return GetDescription(runningBot.RunParams.BotAction);
+            return GetDescription(RunningBot.RunParams.BotAction);
         }
 
         /// <summary>
@@ -136,23 +138,28 @@ namespace RunescapeBot
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
                 case BotActions.GoldBracelets:
-                    runningBot = new GoldBracelets(startParams);
+                    RunningBot = new GoldBracelets(startParams);
                     break;
 
                 case BotActions.LesserDemon:
                     startParams.FrameTime = 5000;
-                    runningBot = new LesserDemon(startParams);
+                    RunningBot = new LesserDemon(startParams);
                     break;
 
                 case BotActions.AgilityGnomeStronghold:
-                    runningBot = new AgilityGnomeStronghold(startParams);
+                    RunningBot = new AgilityGnomeStronghold(startParams);
+                    break;
+
+                case BotActions.NightmareZoneD:
+                    startParams.FrameTime = 30000;
+                    RunningBot = new NightmareZoneD(startParams);
                     break;
 
                 default:
                     return;
             }
 
-            RunBotProgram(runningBot);
+            RunBotProgram(RunningBot);
         }
 
         /// <summary>
@@ -210,9 +217,9 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void Start_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (runningBot != null)
+            if (RunningBot != null)
             {
-                runningBot.Stop();
+                RunningBot.Stop();
             }
         }
 
@@ -238,11 +245,11 @@ namespace RunescapeBot
         {
             User32.SetForegroundWindow(Handle.ToInt32());
 
-            if (runningBot != null)
+            if (RunningBot != null)
             {
                 this.Enabled = false;
                 SetTransitionalState();
-                runningBot.Stop();
+                RunningBot.Stop();
             }
             else
             {
@@ -282,7 +289,7 @@ namespace RunescapeBot
         /// </summary>
         private void SetIdleState()
         {
-            runningBot = null;
+            RunningBot = null;
             botIsRunning = false;
             Text = FORM_NAME;
             StartButton.Text = "Start";

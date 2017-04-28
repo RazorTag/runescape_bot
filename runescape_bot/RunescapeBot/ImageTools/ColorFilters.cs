@@ -5,6 +5,7 @@ namespace RunescapeBot.BotPrograms
 {
     public static class ColorFilters
     {
+        #region login
         /// <summary>
         /// Creates the color range to represent a lesser demon's red skin
         /// </summary>
@@ -16,7 +17,9 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(355, 20, 0.4f, 1f, 0.05f, 0.5f);
             return new ColorRange(dark, light, hsbRange);
         }
+        #endregion
 
+        #region monsters
         /// <summary>
         /// Creates the color range to represent a lesser demon's red skin
         /// </summary>
@@ -41,7 +44,23 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(0, 0, 0.05f, 0.3f, 0.02f, 0.12f);
             return new ColorRange(dark, light, hsbRange);
         }
+        #endregion
 
+        #region stationary objcts
+        /// <summary>
+        /// The gray top of a furnace
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange Furnace()
+        {
+            Color dark = Color.FromArgb(46, 43, 43);
+            Color light = Color.FromArgb(85, 80, 78);
+            HSBRange hsbRange = new HSBRange(0, 0, 0.02f, 0.07f, 0.18f, 0.32f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+        #endregion
+
+        #region items (ground)
         /// <summary>
         /// Creates the color range to represent the rune color
         /// </summary>
@@ -50,7 +69,7 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(52, 70, 77);
             Color light = Color.FromArgb(95, 131, 137);
-            HSBRange hsbRange = new HSBRange(190, 200,  0.18f, 0.21f, 0.245f, 0.48f);
+            HSBRange hsbRange = new HSBRange(190, 200, 0.18f, 0.21f, 0.245f, 0.48f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -66,7 +85,9 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(215, 315, 0.1f, 0.2f, 0.23f, 0.46f);
             return new ColorRange(dark, light, hsbRange);
         }
+        #endregion
 
+        #region minimap icons
         /// <summary>
         /// The orange part of a furnace minimap icon
         /// </summary>
@@ -90,14 +111,20 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(40, 52, 0.35f, 0.9f, 0.30f, 0.76f);
             return new ColorRange(dark, light, hsbRange);
         }
+        #endregion
 
-
-        public static ColorRange Furnace()
+        #region Inventory
+        /// <summary>
+        /// Catches most of the colors found in the opaque background of the inventory
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange EmptyInventorySlot()
         {
-            Color dark = Color.FromArgb(46, 43, 43);
-            Color light = Color.FromArgb(85, 80, 78);
-            HSBRange hsbRange = new HSBRange(0, 0, 0.02f, 0.07f, 0.18f, 0.32f);
+            Color dark = Color.FromArgb(56, 48, 35);
+            Color light = Color.FromArgb(66, 58, 45);
+            HSBRange hsbRange = new HSBRange(28, 40, 0.15f, 0.25f, 0.15f, 0.25f);
             return new ColorRange(dark, light, hsbRange);
         }
+        #endregion
     }
 }
