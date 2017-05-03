@@ -26,13 +26,12 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Caches the center point of the blob
         /// </summary>
-        private bool _centerSet;
-        private Point _center;
+        private Point? center;
         public Point Center
         {
             get
             {
-                if (!_centerSet)
+                if (center == null)
                 {
                     int totalX = 0;
                     int totalY = 0;
@@ -44,16 +43,106 @@ namespace RunescapeBot.ImageTools
                     }
                     if (Size == 0)
                     {
-                        _center = new Point(0, 0);
+                        center = new Point(0, 0);
                     }
                     else
                     {
-                        _center = new Point(totalX / Size, totalY / Size);
+                        center = new Point(totalX / Size, totalY / Size);
                     }
-                    _centerSet = true;
                 }
                 
-                return _center;
+                return (Point)center;
+            }
+        }
+
+        /// <summary>
+        /// Returns the horizontal distance between left and right bounds
+        /// </summary>
+        public int Width
+        {
+            get
+            {
+                return RightBound - LeftBound;
+            }
+        }
+
+        /// <summary>
+        /// Returns the vertical distance between top and bottom bounds
+        /// </summary>
+        public int Height
+        {
+            get
+            {
+                return BottomBound - TopBound;
+            }
+        }
+
+        /// <summary>
+        /// True if the current value of the bounds are correct
+        /// </summary>
+        private bool boundsCalculated;
+
+        /// <summary>
+        /// The left most x-value of any pixel in the blob
+        /// </summary>
+        private int leftBound;
+        public int LeftBound
+        {
+            get
+            {
+                if (!boundsCalculated)
+                {
+                    FindBounds();
+                }
+                return leftBound;
+            }
+        }
+
+        /// <summary>
+        /// The left most x-value of any pixel in the blob
+        /// </summary>
+        private int rightBound;
+        public int RightBound
+        {
+            get
+            {
+                if (!boundsCalculated)
+                {
+                    FindBounds();
+                }
+                return rightBound;
+            }
+        }
+
+        /// <summary>
+        /// The left most x-value of any pixel in the blob
+        /// </summary>
+        private int topBound;
+        public int TopBound
+        {
+            get
+            {
+                if (!boundsCalculated)
+                {
+                    FindBounds();
+                }
+                return topBound;
+            }
+        }
+
+        /// <summary>
+        /// The left most x-value of any pixel in the blob
+        /// </summary>
+        private int bottomBound;
+        public int BottomBound
+        {
+            get
+            {
+                if (!boundsCalculated)
+                {
+                    FindBounds();
+                }
+                return bottomBound;
             }
         }
 
@@ -65,6 +154,35 @@ namespace RunescapeBot.ImageTools
             get
             {
                 return Pixels.Count;
+            }
+        }
+
+        /// <summary>
+        /// Determines the left, right, top, and bottom most pixels in the blob
+        /// </summary>
+        private void FindBounds()
+        {
+            if (Size == 0)
+            {
+                leftBound = 0;
+                rightBound = 0;
+                topBound = 0;
+                bottomBound = 0;
+            }
+            else
+            {
+                leftBound = Int32.MaxValue;
+                rightBound = Int32.MinValue;
+                topBound = Int32.MaxValue;
+                bottomBound = Int32.MinValue;
+
+                foreach (KeyValuePair<Point, Point> pixel in Pixels)
+                {
+                    leftBound = Math.Min(leftBound, pixel.Value.X);
+                    rightBound = Math.Max(rightBound, pixel.Value.X);
+                    topBound = Math.Min(topBound, pixel.Value.Y);
+                    bottomBound = Math.Max(bottomBound, pixel.Value.Y);
+                }
             }
         }
 
@@ -90,7 +208,8 @@ namespace RunescapeBot.ImageTools
             {
                 FoundPixels.Enqueue(newPixel);
                 Pixels.Add(newPixel, newPixel);
-                _centerSet = false;
+                center = null;
+                boundsCalculated = false;
                 return true;
             }
             return false;

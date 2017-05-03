@@ -1,6 +1,7 @@
 ﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
@@ -10,10 +11,12 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class GoldBracelets : BotProgram
     {
-        private const double furnaceLocationTolerance = 50.0;
+        private const double stationaryObjectTolerance = 50.0;
+        private const int bankBoothMinSize = 400;
         private ColorRange FurnaceIconOrange;
         private ColorRange BankIconDollar;
         private ColorRange Furnace;
+        private ColorRange BankBooth;
 
         public GoldBracelets(StartParams startParams) : base(startParams)
         {
@@ -32,15 +35,25 @@ namespace RunescapeBot.BotPrograms
             //ReadWindow();
             //bool[,] furnace = ColorFilter(Furnace);
             //DebugUtilities.TestMask(Bitmap, ColorArray, Furnace, furnace, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnace");
+            //ReadWindow();
+            //bool[,] bankBooth = ColorFilter(BankBooth);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, BankBooth, bankBooth, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankBooth");
         }
 
         protected override bool Execute()
         {
             MoveToBank();
+            if (StopFlag) { return false; }
+            ClickBankBooth();
+            if (StopFlag) { return false; }
+            //deposit all inventory, withdraw 1 bracelet mould, withdraw 27 gold bars
 
             MoveToFurnace();
+            if (StopFlag) { return false; }
             Inventory.ClickInventory(0, 1);
-            ClickFurnace();
+            ClickStationaryObject(Furnace, stationaryObjectTolerance, 1000);
+            if (StopFlag) { return false; }
+            //make 27 bars and wait
 
             return false;
         }
@@ -69,6 +82,89 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Finds the Port Phasmatys bank booths and clicks on them to open the bank.
+        /// Assumes that the player has a ghostspeak amulet equipped.
+        /// Fails if the Port Phasmatys bank booths are not visible on the screen.
+        /// </summary>
+        /// <returns>True if the bank is opened</returns>
+        private bool ClickBankBooth()
+        {
+            Point? bankBoothLocation = null;
+            Point? lastPosition = null;
+
+            for (int i = 0; i < 40; i++)
+            {
+                if (StopFlag) { return false; }
+
+                ReadWindow();
+                if (LocateBankBooth(out bankBoothLocation))
+                {
+                    if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= stationaryObjectTolerance)
+                    {
+                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y);
+                        SafeWait(1000);
+                        return true;
+                    }
+                    else
+                    {
+                        lastPosition = bankBoothLocation;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Finds the midpoint of the two east most bank booths in the Port Phasmatys bank
+        /// </summary>
+        /// <returns>True if the bank booths are found</returns>
+        private bool LocateBankBooth(out Point? bankBooth)
+        {
+            bankBooth = null;
+            const int numberOfBankBooths = 6;
+            bool[,] bankBooths = ColorFilter(BankBooth);
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true);    //list of blobs from biggest to smallest
+            Blob blob;
+            int blobIndex = 0;
+
+            //Remove blobs that aren't bank booths
+            while (blobIndex < numberOfBankBooths)
+            {
+                if (blobIndex > boothBlobs.Count - 1)
+                {
+                    return false;   //We did not find the expected number of bank booths
+                }
+
+                blob = boothBlobs[blobIndex];
+
+                if (blob.Size < bankBoothMinSize)
+                {
+                    return false;   //We did not find the expected number of bank booths
+                }
+
+                if (blob.Width > (4 * blob.Height))
+                {
+                    boothBlobs.RemoveAt(blobIndex); //This blob is too wide to be a bank booth counter.
+                }
+                else
+                {
+                    blobIndex++;
+                }
+            }
+
+            //Reduce the blob list to the bank booths
+            boothBlobs = boothBlobs.GetRange(0, numberOfBankBooths);
+            boothBlobs.Sort(new BlobHorizontalComparer());
+
+            Blob rightBooth = boothBlobs[numberOfBankBooths - 1];
+            Blob secondRightBooth = boothBlobs[numberOfBankBooths - 2];
+
+            bankBooth = Numerical.Average(rightBooth.Center, secondRightBooth.Center);
+            return true;
+        }
+
+        /// <summary>
         /// Moves the character to the Port Phasmatys furnace
         /// </summary>
         /// <returns>true if the furnace icon is found</returns>
@@ -92,60 +188,6 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Clicks on the furnace
-        /// </summary>
-        /// <returns></returns>
-        private bool ClickFurnace()
-        {
-            Point? furnaceLocation;
-
-            if (LocateStationaryFurnace(out furnaceLocation))
-            {
-                LeftClick(furnaceLocation.Value.X, furnaceLocation.Value.Y);
-                SafeWait(1000);
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Looks for a furnace that isn't moving (meaning the player isn't moving)
-        /// </summary>
-        /// <returns>True if a furnace is found</returns>
-        private bool LocateStationaryFurnace(out Point? furnaceLocation)
-        {
-            furnaceLocation = null;
-            Point? lastPosition = null;
-
-            for (int i = 0; i < 40; i++)
-            {
-                ReadWindow();
-                bool[,] furnace = ColorFilter(Furnace);
-                Blob furnaceBlob = ImageProcessing.BiggestBlob(furnace);
-                if (furnaceBlob != null && furnaceBlob.Size > 100)
-                {
-                    if (Geometry.DistanceBetweenPoints(furnaceBlob.Center, lastPosition) <= furnaceLocationTolerance)
-                    {
-                        furnaceLocation = furnaceBlob.Center;
-                        return true;
-                    }
-                    else
-                    {
-                        lastPosition = furnaceBlob.Center;
-                    }
-                }
-                else
-                {
-                    lastPosition = null;
-                }
-                SafeWait(500);
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         private void GetReferenceColors()
@@ -153,6 +195,7 @@ namespace RunescapeBot.BotPrograms
             FurnaceIconOrange = ColorFilters.FurnaceIconOrange();
             BankIconDollar = ColorFilters.BankIconDollar();
             Furnace = ColorFilters.Furnace();
+            BankBooth = ColorFilters.BankBoothPhasmatys();
         }
     }
 }

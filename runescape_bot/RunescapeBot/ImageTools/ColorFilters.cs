@@ -58,6 +58,18 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(0, 0, 0.02f, 0.07f, 0.18f, 0.32f);
             return new ColorRange(dark, light, hsbRange);
         }
+
+        /// <summary>
+        /// The teller side counter of a Port Phasmatys bank booth
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange BankBoothPhasmatys()
+        {
+            Color dark = Color.FromArgb(64, 70, 30);
+            Color light = Color.FromArgb(71, 76, 36);
+            HSBRange hsbRange = new HSBRange(64, 72, 0.365f, 0.395f, 0.199f, 0.217f);
+            return new ColorRange(dark, light, hsbRange);
+        }
         #endregion
 
         #region items (ground)

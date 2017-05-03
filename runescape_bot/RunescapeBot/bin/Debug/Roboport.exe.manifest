@@ -67,14 +67,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Roboport.exe" size="218536">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Roboport.exe" size="221096">
       <assemblyIdentity name="Roboport" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>iuQCEpImSvSBSSeM2RHPS6BB+aCSdV1HtjUsUX2wBtg=</dsig:DigestValue>
+        <dsig:DigestValue>X3SuMuKGbcotvnZPGeyhuq7q0cDinxHGw3ruyi45f0k=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

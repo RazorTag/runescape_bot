@@ -94,6 +94,8 @@
     <Compile Include="BotPrograms\Popups\MakeX.cs" />
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Numerical.cs" />
+    <Compile Include="ImageTools\BlobHorizontalComparer.cs" />
+    <Compile Include="ImageTools\BlobSizeComparer.cs" />
     <Compile Include="ImageTools\ColorFilters.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />

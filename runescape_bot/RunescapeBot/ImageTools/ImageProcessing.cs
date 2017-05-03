@@ -85,14 +85,12 @@ namespace RunescapeBot.ImageTools
             }
         }
 
-        //public delegate void 
-
         /// <summary>
         /// Finds 
         /// </summary>
         /// <param name="artifactImage"></param>
         /// <returns></returns>
-        public static List<Blob> FindBlobs(bool[,] artifactImage)
+        public static List<Blob> FindBlobs(bool[,] artifactImage, bool sort = false)
         {
             Blob blob;
             Point pixel;
@@ -118,6 +116,12 @@ namespace RunescapeBot.ImageTools
                         allBlobs.Add(blob);
                     }
                 }
+            }
+
+            if (sort)
+            {
+                allBlobs.Sort(new BlobSizeComparer());
+                allBlobs.Reverse();
             }
 
             return allBlobs;

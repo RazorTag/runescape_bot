@@ -1,4 +1,5 @@
-﻿using RunescapeBot.FileIO;
+﻿using RunescapeBot.Common;
+using RunescapeBot.FileIO;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -368,6 +369,62 @@ namespace RunescapeBot.BotPrograms
             {
                 Mouse.RightClick(x, y, RSClient, hoverDelay);
             }
+        }
+
+        /// <summary>
+        /// Clicks on a stationary object
+        /// </summary>
+        /// <returns></returns>
+        protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int waitTime)
+        {
+            Point? objectLocation;
+
+            if (LocateStationaryObject(stationaryObject, out objectLocation, tolerance))
+            {
+                LeftClick(objectLocation.Value.X, objectLocation.Value.Y);
+                SafeWait(waitTime);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Looks for an object that isn't moving (meaning the player isn't moving)
+        /// </summary>
+        /// <returns>True if the object is found</returns>
+        protected bool LocateStationaryObject(ColorRange stationaryObject, out Point? objectLocation, double tolerance)
+        {
+            objectLocation = null;
+            Point? lastPosition = null;
+
+            for (int i = 0; i < 40; i++)
+            {
+                if (StopFlag) { return false; }
+
+                ReadWindow();
+                bool[,] objectPixels = ColorFilter(stationaryObject);
+                Blob objectBlob = ImageProcessing.BiggestBlob(objectPixels);
+                if (objectBlob != null && objectBlob.Size > 100)
+                {
+                    if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
+                    {
+                        objectLocation = objectBlob.Center;
+                        return true;
+                    }
+                    else
+                    {
+                        lastPosition = objectBlob.Center;
+                    }
+                }
+                else
+                {
+                    lastPosition = null;
+                }
+                SafeWait(500);
+            }
+
+            return false;
         }
         #endregion
 
