@@ -106,9 +106,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange BankIconDollar()
         {
-            Color dark = Color.FromArgb(120, 100, 40);
-            Color light = Color.FromArgb(250, 220, 140);
-            HSBRange hsbRange = new HSBRange(40, 52, 0.35f, 0.9f, 0.30f, 0.76f);
+            Color dark = Color.FromArgb(94, 92, 0);
+            Color light = Color.FromArgb(233, 231, 136);
+            HSBRange hsbRange = new HSBRange(49, 69, 0.433f, 1.0f, 0.164f, 0.709f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion

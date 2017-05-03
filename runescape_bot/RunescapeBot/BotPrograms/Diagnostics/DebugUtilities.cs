@@ -15,6 +15,11 @@ namespace RunescapeBot.BotPrograms
         /// <param name="format"></param>
         public static void SaveImageToFile(Bitmap bitmap, string filePath)
         {
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
             IntPtr hBitmap = bitmap.GetHbitmap();
             Image img = Image.FromHbitmap(hBitmap);
             img.Save(filePath, ImageFormat.Jpeg);

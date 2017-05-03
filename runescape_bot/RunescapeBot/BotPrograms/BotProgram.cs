@@ -639,6 +639,7 @@ namespace RunescapeBot.BotPrograms
             if (ConfirmLogin())
             {
                 failedLoginAttempts = 0;
+                DefaultCamera();
                 return true;
             }
             else

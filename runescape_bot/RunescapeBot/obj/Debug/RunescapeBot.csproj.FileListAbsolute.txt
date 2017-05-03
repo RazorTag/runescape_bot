@@ -29,3 +29,4 @@ C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\Roboport.exe
 C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\Roboport.pdb
 C:\Projects\Roboport\runescape_bot\RunescapeBot\bin\Debug\MathNet.Numerics.dll
 C:\Projects\Roboport\runescape_bot\RunescapeBot\bin\Debug\MathNet.Numerics.xml
+C:\Projects\Roboport\runescape_bot\RunescapeBot\obj\Debug\RunescapeBot.csprojResolveAssemblyReference.cache

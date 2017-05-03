@@ -32,13 +32,12 @@ namespace RunescapeBot.BotPrograms
             //ReadWindow();
             //bool[,] furnace = ColorFilter(Furnace);
             //DebugUtilities.TestMask(Bitmap, ColorArray, Furnace, furnace, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnace");
-
-
-            DefaultCamera();
         }
 
         protected override bool Execute()
         {
+            MoveToBank();
+
             MoveToFurnace();
             Inventory.ClickInventory(0, 1);
             ClickFurnace();
