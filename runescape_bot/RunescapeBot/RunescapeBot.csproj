@@ -90,6 +90,7 @@
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
     <Compile Include="BotPrograms\Bots\NightmareZoneD.cs" />
+    <Compile Include="BotPrograms\Popups\Bank.cs" />
     <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
     <Compile Include="BotPrograms\Popups\MakeX.cs" />
     <Compile Include="Common\Geometry.cs" />
