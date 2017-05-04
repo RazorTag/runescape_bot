@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.ImageTools
@@ -182,7 +183,13 @@ namespace RunescapeBot.ImageTools
             windowRect.bottom -= OSBUDDY_BORDER_WIDTH;
             windowRect.left += OSBUDDY_BORDER_WIDTH;
 
-            return (windowRect.top > 0) || (windowRect.right > 0) || (windowRect.bottom > 0) || (windowRect.left > 0);
+            //Ignore any portion of the game screen that is not visible
+            windowRect.top = Math.Max(0, windowRect.top);
+            windowRect.right = Math.Max(0, windowRect.right);
+            windowRect.bottom = Math.Max(0, windowRect.bottom);
+            windowRect.left = Math.Max(0, windowRect.left);
+
+            return ((windowRect.right > windowRect.left) && (windowRect.bottom > windowRect.top));
         }
 
         /// <summary>
