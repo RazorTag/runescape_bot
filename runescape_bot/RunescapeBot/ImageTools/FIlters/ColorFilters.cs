@@ -65,9 +65,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange BankBoothPhasmatys()
         {
-            Color dark = Color.FromArgb(64, 70, 30);
+            Color dark = Color.FromArgb(62, 67, 27);
             Color light = Color.FromArgb(71, 76, 36);
-            HSBRange hsbRange = new HSBRange(64, 72, 0.365f, 0.395f, 0.199f, 0.217f);
+            HSBRange hsbRange = new HSBRange(64, 72, 0.360f, 0.418f, 0.182f, 0.222f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion
@@ -99,7 +99,7 @@ namespace RunescapeBot.BotPrograms
         }
         #endregion
 
-        #region minimap icons
+        #region minimap
         /// <summary>
         /// The orange part of a furnace minimap icon
         /// </summary>
@@ -108,7 +108,7 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(200, 70, 20);
             Color light = Color.FromArgb(255, 220, 200);
-            HSBRange hsbRange = new HSBRange(20, 40, 0.52f, 1.0f, 0.50f, 0.75f);
+            HSBRange hsbRange = new HSBRange(20, 40, 0.52f, 1.0000f, 0.50f, 0.75f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -120,7 +120,32 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(94, 92, 0);
             Color light = Color.FromArgb(233, 231, 136);
-            HSBRange hsbRange = new HSBRange(49, 69, 0.433f, 1.0f, 0.164f, 0.709f);
+            HSBRange hsbRange = new HSBRange(49, 69, 0.433f, 1.0000f, 0.164f, 0.709f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The yellow version of the run energy foot icon
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange RunEnergyFoot()
+        {
+            Color dark = Color.FromArgb(215, 192, 77);
+            Color light = Color.FromArgb(255, 236, 130);
+            HSBRange hsbRange = new HSBRange(39, 60, 0.668f, 0.948f, 0.557f, 0.778f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Middle yellow to green range for the gauges aroound the minimap. Roughly 50% - 100%
+        /// (hitpoints, prayer points, run energy, special attack energy)
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange MinimapGaugeYellowGreen()
+        {
+            Color dark = Color.FromArgb(0, 163, 0);
+            Color light = Color.FromArgb(194, 255, 121);
+            HSBRange hsbRange = new HSBRange(67, 130, 0.174f, 1.000f, 0.400f, 0.663f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion

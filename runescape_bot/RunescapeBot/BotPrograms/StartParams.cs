@@ -55,6 +55,11 @@ namespace RunescapeBot.BotPrograms
         /// File location of the client to run
         /// </summary>
         public string ClientFilePath { get; set; }
+
+        /// <summary>
+        /// Toggles run on when the player has run energy
+        /// </summary>
+        public bool Run { get; set; }
         #endregion
 
         #region delegates

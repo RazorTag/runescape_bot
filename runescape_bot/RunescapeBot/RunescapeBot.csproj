@@ -95,9 +95,9 @@
     <Compile Include="BotPrograms\Popups\MakeX.cs" />
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Numerical.cs" />
-    <Compile Include="ImageTools\BlobHorizontalComparer.cs" />
-    <Compile Include="ImageTools\BlobSizeComparer.cs" />
-    <Compile Include="ImageTools\ColorFilters.cs" />
+    <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
+    <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
+    <Compile Include="ImageTools\FIlters\ColorFilters.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
@@ -111,11 +111,11 @@
     <Compile Include="GMA\HookManager.Windows.cs" />
     <Compile Include="GMA\Kernel32.cs" />
     <Compile Include="GMA\MouseEventExtArgs.cs" />
-    <Compile Include="ImageTools\Blob.cs" />
+    <Compile Include="ImageTools\Blob\Blob.cs" />
     <Compile Include="BotPrograms\Bots\GoldBracelets.cs" />
     <Compile Include="BotPrograms\Bots\LesserDemon.cs" />
-    <Compile Include="ImageTools\ColorRange.cs" />
-    <Compile Include="ImageTools\HSBRange.cs" />
+    <Compile Include="ImageTools\FIlters\ColorRange.cs" />
+    <Compile Include="ImageTools\FIlters\HSBRange.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />
     <Compile Include="Start.cs">

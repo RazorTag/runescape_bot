@@ -21,6 +21,7 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class BotProgram
     {
+        #region properties
         /// <summary>
         /// Checksum for the RUNE SCAPE logo on the login page
         /// </summary>
@@ -128,11 +129,33 @@ namespace RunescapeBot.BotPrograms
                 }
                 else
                 {
-                    return new Point(ColorArray.GetLength(0) / 2, ColorArray.GetLength(1) / 2);
+                    return new Point(ScreenWidth / 2, ScreenHeight / 2);
                 }
             }
         }
 
+        /// <summary>
+        /// The width in pixels of the most recent image o the game screen
+        /// </summary>
+        protected int ScreenWidth
+        {
+            get
+            {
+                return ColorArray.GetLength(0);
+            }
+        }
+
+        /// <summary>
+        /// The width in pixels of the most recent image o the game screen
+        /// </summary>
+        protected int ScreenHeight
+        {
+            get
+            {
+                return ColorArray.GetLength(1);
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Initializes a bot program with a client matching startParams
@@ -266,6 +289,9 @@ namespace RunescapeBot.BotPrograms
                 ReadWindow();   //Read the game window color values into Bitmap and ColorArray
                 if (StopFlag) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
+                //Turn on run if the player has run energy
+                RunCharacter();
+
                 //Only do the actual botting if we are logged in
                 if (CheckLogIn())
                 {
@@ -350,7 +376,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void LeftClick(int x, int y, int hoverDelay = 100, bool randomize = false)
+        protected void LeftClick(int x, int y, int hoverDelay = 200, bool randomize = false)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
@@ -363,7 +389,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y, int hoverDelay = 100, bool randomize = true)
+        protected void RightClick(int x, int y, int hoverDelay = 200, bool randomize = true)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
@@ -374,15 +400,19 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Clicks on a stationary object
         /// </summary>
+        /// <param name="stationaryObject">color filter for the stationary object</param>
+        /// <param name="tolerance">maximum allowable distance between two subsequent checks to consider both objects the same object</param>
+        /// <param name="afterClickWait">time to wait affter clicking on the stationary object</param>
+        /// <param name="maxWaitTime">maximum time to wait before giving up</param>
         /// <returns></returns>
-        protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int waitTime)
+        protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime)
         {
             Point? objectLocation;
 
-            if (LocateStationaryObject(stationaryObject, out objectLocation, tolerance))
+            if (LocateStationaryObject(stationaryObject, out objectLocation, tolerance, maxWaitTime))
             {
                 LeftClick(objectLocation.Value.X, objectLocation.Value.Y);
-                SafeWait(waitTime);
+                SafeWait(afterClickWait);
                 return true;
             }
 
@@ -393,18 +423,22 @@ namespace RunescapeBot.BotPrograms
         /// Looks for an object that isn't moving (meaning the player isn't moving)
         /// </summary>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(ColorRange stationaryObject, out Point? objectLocation, double tolerance)
+        protected bool LocateStationaryObject(ColorRange stationaryObject, out Point? objectLocation, double tolerance, int maxWaitTime)
         {
             objectLocation = null;
             Point? lastPosition = null;
+            const int scanInterval = 200; //time between checks in milliseconds
+            Stopwatch watch = new Stopwatch();
 
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i < (maxWaitTime / ((double)scanInterval)); i++)
             {
                 if (StopFlag) { return false; }
 
+                watch.Restart();
                 ReadWindow();
                 bool[,] objectPixels = ColorFilter(stationaryObject);
                 Blob objectBlob = ImageProcessing.BiggestBlob(objectPixels);
+
                 if (objectBlob != null && objectBlob.Size > 100)
                 {
                     if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
@@ -421,6 +455,8 @@ namespace RunescapeBot.BotPrograms
                 {
                     lastPosition = null;
                 }
+
+                watch.Stop();
                 SafeWait(500);
             }
 
@@ -546,8 +582,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true for the pixels on the minimap that match the filter</returns>
         protected bool[,] MinimapFilter(ColorRange filter, out Point offset)
         {
-            int left = ColorArray.GetLength(0) - 157;
-            int right = ColorArray.GetLength(0) - 8;
+            int left = ScreenWidth - 157;
+            int right = ScreenWidth - 8;
             int top = 8;
             int bottom = 159;
             Point center = new Point((left + right) / 2, (top + bottom) / 2);
@@ -658,7 +694,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if login is successful, false if login fails</returns>
         private bool LogIn()
         {
-            int center = ColorArray.GetLength(0) / 2;
+            int center = ScreenWidth / 2;
 
             //log in at the login screen
             if (!IsWelcomeScreen())
@@ -759,9 +795,9 @@ namespace RunescapeBot.BotPrograms
             MakeSureWindowHasBeenRead();
 
             //Get a piece of the column from the right of the inventory
-            int right = ColorArray.GetLength(0) - 10;
+            int right = ScreenWidth - 10;
             int left = right - 12;
-            int bottom = ColorArray.GetLength(1) - 105;
+            int bottom = ScreenHeight - 105;
             int top = bottom - 45;
             Color[,] inventoryColumn = ScreenPiece(left, right, top, bottom);
 
@@ -810,7 +846,7 @@ namespace RunescapeBot.BotPrograms
             MakeSureWindowHasBeenRead();
 
             Color color;
-            int height = ColorArray.GetLength(1);
+            int height = ScreenHeight;
             int centerX = Center.X;
             int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);    //50 pixels below where the bottom of the login picture should be
             int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 50;
@@ -855,8 +891,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void Logout()
         {
-            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 18);
-            LeftClick(ColorArray.GetLength(0) - 120, ColorArray.GetLength(1) - 86);
+            LeftClick(ScreenWidth - 120, ScreenHeight - 18);
+            LeftClick(ScreenWidth - 120, ScreenHeight - 86);
         }
         #endregion
 
@@ -866,7 +902,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="waitTime"></param>
         /// <returns>true if the StopFlag has been raised</returns>
-        public bool SafeWait(int waitTime)
+        protected bool SafeWait(int waitTime)
         {
             int nextWaitTime;
             int waitInterval = 1000;
@@ -889,7 +925,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void DefaultCamera()
         {
-            int compassX = ColorArray.GetLength(0) - 159;
+            int compassX = ScreenWidth - 159;
             int compassY = 21;
             LeftClick(compassX, compassY);
             Keyboard.UpArrow(1000);
@@ -905,11 +941,75 @@ namespace RunescapeBot.BotPrograms
             {
                 return ReadWindow();
             }
-            if ((ColorArray.GetLength(0) == 0) || (ColorArray.GetLength(1) == 0))
+            if ((ScreenWidth == 0) || (ScreenHeight == 0))
             {
                 return ReadWindow();
             }
             return true;
+        }
+
+        /// <summary>
+        /// Sets the player to run (as opposed to walk) if Run is enabled and run energy is fairly high (~50%)
+        /// </summary>
+        protected void RunCharacter()
+        {
+            if (!RunParams.Run)
+            {
+                return;
+            }
+
+            if (!CharacterIsRunning() && RunEnergyIsHigh())
+            {
+                ToggleRun();
+            }
+        }
+
+        /// <summary>
+        /// Toggle the run/walk status using the run enery meter next to the minimap
+        /// </summary>
+        protected void ToggleRun()
+        {
+            int x = ScreenWidth - 145;
+            int y = 144;
+            LeftClick(x, y, 200, true);
+        }
+
+        /// <summary>
+        /// Determines if the character is currently running
+        /// </summary>
+        /// <returns>true for running, false for walking</returns>
+        protected bool CharacterIsRunning()
+        {
+            Color runColor = GetPixel(ScreenWidth - 145, 147);
+            ColorRange runEnergyFoot = ColorFilters.RunEnergyFoot();
+            return runEnergyFoot.ColorInRange(runColor);
+        }
+
+        /// <summary>
+        /// Determines if the character's run energy is above roughly 50%
+        /// </summary>
+        /// <returns></returns>
+        protected bool RunEnergyIsHigh()
+        {
+            int left = ScreenWidth - 181;
+            int right = ScreenWidth - 162;
+            int top = 141;
+            int bottom = 155;
+            Color[,] runEnergyPercentage = ScreenPiece(left, right, top, bottom);
+            return MinimapGaugeIsHigh(runEnergyPercentage, 0.05);
+        }
+
+        /// <summary>
+        /// Determines if a minimap gauge is above roughly 50%
+        /// </summary>
+        /// <param name="gaugePercentage">array of Color pixels containing the gauge percentage number</param>
+        /// <param name="threshold">minimum match needed to be considered high</param>
+        /// <returns>true if the gauge is low, false otherwise</returns>
+        protected bool MinimapGaugeIsHigh(Color[,] gaugePercentage, double threshold)
+        {
+            ColorRange highGauge = ColorFilters.MinimapGaugeYellowGreen();
+            double highMatch = ImageProcessing.FractionalMatch(gaugePercentage, highGauge);
+            return highMatch >= threshold;
         }
         #endregion
     }

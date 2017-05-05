@@ -1,7 +1,9 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
@@ -11,51 +13,91 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class GoldBracelets : BotProgram
     {
-        private const double stationaryObjectTolerance = 50.0;
-        private const int bankBoothMinSize = 400;
+        private const int CRAFTING_TIME = 50000;
+        private const double STATIONARY_OBJECT_TOLERANCE = 15.0;
+        private const int BANK_BOOTH_MIN_SIZE = 100;
+        private const int WAIT_FOR_TIMEOUT = 5000;
         private ColorRange FurnaceIconOrange;
         private ColorRange BankIconDollar;
         private ColorRange Furnace;
         private ColorRange BankBooth;
+        private Bank BankPopup;
+        private FurnaceCrafting CraftPopup;
+        private int failedRuns;
 
         public GoldBracelets(StartParams startParams) : base(startParams)
         {
             GetReferenceColors();
+            RunParams.Run = true;
+            failedRuns = 0;
         }
 
         protected override void Run()
         {
             //Debug
+
             //ReadWindow();
             //bool[,] furnaceIcon = ColorFilter(FurnaceIconOrange);
             //DebugUtilities.TestMask(Bitmap, ColorArray, FurnaceIconOrange, furnaceIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnaceIcon");
+
             //ReadWindow();
             //bool[,] bankIcon = ColorFilter(BankIconDollar);
             //DebugUtilities.TestMask(Bitmap, ColorArray, BankIconDollar, bankIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankIcon");
+
             //ReadWindow();
             //bool[,] furnace = ColorFilter(Furnace);
             //DebugUtilities.TestMask(Bitmap, ColorArray, Furnace, furnace, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnace");
+
             //ReadWindow();
             //bool[,] bankBooth = ColorFilter(BankBooth);
             //DebugUtilities.TestMask(Bitmap, ColorArray, BankBooth, bankBooth, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankBooth");
+
+            //ReadWindow();
+            //bankPopup = new Bank(ScreenWidth, ScreenHeight);
+
+            //ReadWindow();
+            //MakeX makeX = new MakeX(0, 0, RSClient);
+            //bool test = makeX.WaitForEnterAmount(60000);
         }
 
         protected override bool Execute()
         {
+            //Move to the bank ad open it
             MoveToBank();
-            if (StopFlag) { return false; }
             ClickBankBooth();
-            if (StopFlag) { return false; }
-            //deposit all inventory, withdraw 1 bracelet mould, withdraw 27 gold bars
 
+            //Refresh inventory to a bracelet mould and 27 gold bars
+            if (StopFlag) { return false; }
+            BankPopup = new Bank(RSClient);
+            if (!BankPopup.WaitForPopup(WAIT_FOR_TIMEOUT))
+            {
+                failedRuns++;
+                return true;
+            }
+            BankPopup.DepositInventory();
+            BankPopup.WithdrawOne(7, 0);
+            BankPopup.WithdrawAll(6, 0);
+
+            //Move to the furnace and use a gold bar on it
+            if (StopFlag) { return false; }
             MoveToFurnace();
-            if (StopFlag) { return false; }
             Inventory.ClickInventory(0, 1);
-            ClickStationaryObject(Furnace, stationaryObjectTolerance, 1000);
-            if (StopFlag) { return false; }
-            //make 27 bars and wait
+            ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000);
 
-            return false;
+            //make 27 bars and wait
+            if (StopFlag) { return false; }
+            CraftPopup = new FurnaceCrafting(RSClient);
+            if (!CraftPopup.WaitForPopup(WAIT_FOR_TIMEOUT))
+            {   
+                failedRuns++;
+                return true;
+            }
+            CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27);
+            SafeWait(CRAFTING_TIME);
+            //TODO verify that all gold bars have been crafted
+
+            failedRuns = 0;
+            return true;
         }
 
         /// <summary>
@@ -64,6 +106,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the bank icon is found</returns>
         private bool MoveToBank()
         {
+            const int runTimeFromFurnaceToBank = 5000;  //approximate milliseconds needed to run from the furnace to the bank
+
             ReadWindow();
             Point offset;
             bool[,] bankIcon = MinimapFilter(BankIconDollar, out offset);
@@ -76,7 +120,7 @@ namespace RunescapeBot.BotPrograms
             int x = bankBlob.Center.X + offset.X;
             int y = bankBlob.Center.Y + offset.Y;
             LeftClick(x, y);
-            SafeWait(5000);
+            SafeWait(runTimeFromFurnaceToBank);
 
             return true;
         }
@@ -91,23 +135,30 @@ namespace RunescapeBot.BotPrograms
         {
             Point? bankBoothLocation = null;
             Point? lastPosition = null;
+            const int scanInterval = 200; //time between checks in milliseconds
+            const int maxWaitTime = 12000;
+            Stopwatch watch = new Stopwatch();
 
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i < (maxWaitTime / ((double)scanInterval)); i++)
             {
                 if (StopFlag) { return false; }
+                watch.Restart();
 
                 ReadWindow();
                 if (LocateBankBooth(out bankBoothLocation))
                 {
-                    if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= stationaryObjectTolerance)
+                    if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
                     {
                         LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y);
                         SafeWait(1000);
+                        //TODO verify that the bank opened
                         return true;
                     }
                     else
                     {
                         lastPosition = bankBoothLocation;
+                        watch.Stop();
+                        SafeWait(scanInterval - ((int)watch.ElapsedMilliseconds));
                     }
                 }
             }
@@ -123,6 +174,7 @@ namespace RunescapeBot.BotPrograms
         {
             bankBooth = null;
             const int numberOfBankBooths = 6;
+            const double maxBoothHeightToWidthRatio = 3.2;
             bool[,] bankBooths = ColorFilter(BankBooth);
             List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true);    //list of blobs from biggest to smallest
             Blob blob;
@@ -138,12 +190,12 @@ namespace RunescapeBot.BotPrograms
 
                 blob = boothBlobs[blobIndex];
 
-                if (blob.Size < bankBoothMinSize)
+                if (blob.Size < BANK_BOOTH_MIN_SIZE)
                 {
                     return false;   //We did not find the expected number of bank booths
                 }
 
-                if (blob.Width > (4 * blob.Height))
+                if ((blob.Width / blob.Height) > maxBoothHeightToWidthRatio)
                 {
                     boothBlobs.RemoveAt(blobIndex); //This blob is too wide to be a bank booth counter.
                 }
@@ -170,6 +222,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the furnace icon is found</returns>
         private bool MoveToFurnace()
         {
+            const int runTimeFromBankToFurnace = 4000;  //appproximate milliseconds needed to run from the bank to the furnace
+
             ReadWindow();
             Point offset;
             bool[,] furnaceIcon = MinimapFilter(FurnaceIconOrange, out offset);
@@ -182,7 +236,7 @@ namespace RunescapeBot.BotPrograms
             int x = furnaceBlob.Center.X - 4 + offset.X;
             int y = furnaceBlob.Center.Y + offset.Y;
             LeftClick(x, y);
-            SafeWait(4000);
+            SafeWait(runTimeFromBankToFurnace);
 
             return true;
         }

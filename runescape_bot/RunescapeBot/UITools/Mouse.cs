@@ -31,7 +31,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 100)
+        public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 200)
         {
             Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay);
         }
@@ -41,7 +41,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 100)
+        public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 200)
         {
             Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay);
         }

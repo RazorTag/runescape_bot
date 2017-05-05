@@ -32,6 +32,18 @@ namespace RunescapeBot.UITools
         /// <param name="line"></param>
         public void WriteLine(string line)
         {
+            ScreenScraper.BringToForeGround(RSClient);
+            SendKeys.SendWait(line);
+        }
+
+        /// <summary>
+        /// Types a number in the active window
+        /// </summary>
+        /// <param name="number">The number to type</param>
+        public void WriteNumber(int number)
+        {
+            ScreenScraper.BringToForeGround(RSClient);
+            string line = number.ToString();
             SendKeys.SendWait(line);
         }
 
@@ -41,6 +53,7 @@ namespace RunescapeBot.UITools
         /// <param name="maxCharsToDelete">the number of times to spam the backspace key</param>
         public void Backspace(int maxCharsToDelete)
         {
+            ScreenScraper.BringToForeGround(RSClient);
             for (int i = 0; i < maxCharsToDelete; i++)
             {
                 SendKeys.SendWait("{BACKSPACE}");
@@ -52,6 +65,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void Tab()
         {
+            ScreenScraper.BringToForeGround(RSClient);
             SendKeys.SendWait("{TAB}");
         }
 
@@ -60,6 +74,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void Enter()
         {
+            ScreenScraper.BringToForeGround(RSClient);
             SendKeys.SendWait("{ENTER}");
         }
 
