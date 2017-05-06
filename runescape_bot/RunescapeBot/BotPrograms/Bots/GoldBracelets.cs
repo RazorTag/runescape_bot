@@ -18,6 +18,7 @@ namespace RunescapeBot.BotPrograms
         private const double STATIONARY_OBJECT_TOLERANCE = 15.0;
         private const int BANK_BOOTH_MIN_SIZE = 100;
         private const int WAIT_FOR_TIMEOUT = 5000;
+        private const int CONSECUTIVE_FAILURES_ALLOWED = 10;
         private ColorRange FurnaceIconOrange;
         private ColorRange BankIconDollar;
         private ColorRange Furnace;
@@ -41,9 +42,9 @@ namespace RunescapeBot.BotPrograms
             //bool[,] furnaceIcon = ColorFilter(FurnaceIconOrange);
             //DebugUtilities.TestMask(Bitmap, ColorArray, FurnaceIconOrange, furnaceIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnaceIcon");
 
-            //ReadWindow();
-            //bool[,] bankIcon = ColorFilter(BankIconDollar);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, BankIconDollar, bankIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankIcon");
+            ReadWindow();
+            bool[,] bankIcon = ColorFilter(BankIconDollar);
+            DebugUtilities.TestMask(Bitmap, ColorArray, BankIconDollar, bankIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankIcon");
 
             //ReadWindow();
             //bool[,] furnace = ColorFilter(Furnace);
@@ -63,8 +64,17 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            //Move to the bank ad open it
-            MoveToBank();
+            if (failedRuns > CONSECUTIVE_FAILURES_ALLOWED)
+            {
+                return false;
+            }
+
+            //Move to the bank and open it
+            if (!MoveToBank())
+            {
+                failedRuns++;
+                return true;
+            }
             ClickBankBooth();
 
             //Refresh inventory to a bracelet mould and 27 gold bars
@@ -81,7 +91,11 @@ namespace RunescapeBot.BotPrograms
 
             //Move to the furnace and use a gold bar on it
             if (StopFlag) { return false; }
-            MoveToFurnace();
+            if (!MoveToFurnace())
+            {
+                failedRuns++;
+                return true;
+            }
             Inventory.ClickInventory(0, 1);
             ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000);
 
