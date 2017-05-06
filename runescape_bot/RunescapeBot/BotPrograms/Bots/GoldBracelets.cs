@@ -1,6 +1,7 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
 using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -106,7 +107,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the bank icon is found</returns>
         private bool MoveToBank()
         {
-            const int runTimeFromFurnaceToBank = 5000;  //approximate milliseconds needed to run from the furnace to the bank
+            const int runTimeFromFurnaceToBank = 3000;  //approximate milliseconds needed to run from the furnace to the bank
 
             ReadWindow();
             Point offset;
@@ -135,9 +136,13 @@ namespace RunescapeBot.BotPrograms
         {
             Point? bankBoothLocation = null;
             Point? lastPosition = null;
+            Point guessLocation = new Point(Center.X + 100, Center.Y);
             const int scanInterval = 200; //time between checks in milliseconds
             const int maxWaitTime = 12000;
             Stopwatch watch = new Stopwatch();
+
+            //Move the mouse to the neighborhood of where we expect the bank booth to be
+            Mouse.MoveMouse(guessLocation.X + RNG.Next(-20, 26), guessLocation.Y + RNG.Next(-30, 41), RSClient);
 
             for (int i = 0; i < (maxWaitTime / ((double)scanInterval)); i++)
             {
@@ -222,7 +227,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the furnace icon is found</returns>
         private bool MoveToFurnace()
         {
-            const int runTimeFromBankToFurnace = 4000;  //appproximate milliseconds needed to run from the bank to the furnace
+            const int runTimeFromBankToFurnace = 3000;  //appproximate milliseconds needed to run from the bank to the furnace
 
             ReadWindow();
             Point offset;

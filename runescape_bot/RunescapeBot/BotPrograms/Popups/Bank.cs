@@ -109,7 +109,7 @@ namespace RunescapeBot.BotPrograms.Popups
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 titleHash = ImageProcessing.ColorSum(screen);
-                if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.05))
+                if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.01))
                 {
                     return true;
                 }

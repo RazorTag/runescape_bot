@@ -56,7 +56,6 @@ namespace RunescapeBot.UITools
         /// <param name="clickTypeUp"></param>
         private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay)
         {
-            int hWnd = rsClient.MainWindowHandle.ToInt32();
             ScreenScraper.BringToForeGround(rsClient);
             TranslateClick(ref x, ref y, rsClient);
             NaturalMove(x, y);
@@ -101,7 +100,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void Move(int x, int y)
+        private static void Move(int x, int y)
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY;
@@ -135,7 +134,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void NaturalMove(int x, int y)
+        private static void NaturalMove(int x, int y)
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY, mouseMoveSpeed;
@@ -167,6 +166,17 @@ namespace RunescapeBot.UITools
                 Thread.Sleep(Math.Max(0, sleepTime - (int)watch.ElapsedMilliseconds));
             }
             Move(x, y);
+        }
+
+        /// <summary>
+        /// Moves a mouse across a screen like a human would
+        /// </summary>
+        /// <param name="x">x-coordinate within the game screen</param>
+        /// <param name="y">y-coordinate within the game screen</param>
+        public static void MoveMouse(int x, int y, Process rsClient)
+        {
+            TranslateClick(ref x, ref y, rsClient);
+            NaturalMove(x, y);
         }
         #endregion
     }
