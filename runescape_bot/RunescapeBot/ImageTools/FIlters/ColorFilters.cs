@@ -106,9 +106,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange FurnaceIconOrange()
         {
-            Color dark = Color.FromArgb(200, 70, 20);
-            Color light = Color.FromArgb(255, 220, 200);
-            HSBRange hsbRange = new HSBRange(20, 40, 0.52f, 1.0000f, 0.50f, 0.75f);
+            Color dark = Color.FromArgb(146, 83, 0);
+            Color light = Color.FromArgb(255, 255, 136);
+            HSBRange hsbRange = new HSBRange(15, 45, 0.330f, 1.000f, 0.380f, 0.770f);
             return new ColorRange(dark, light, hsbRange);
         }
 

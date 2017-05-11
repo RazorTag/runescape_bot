@@ -109,7 +109,14 @@ namespace RunescapeBot.BotPrograms
                         //make hue bitmap
                         if (!bodyPart.HSBRange.HueInRange(pixel))
                         {
-                            hueBitmap.SetPixel(x, y, Color.White);
+                            if (pixel.GetHue() < bodyPart.HSBRange.MinimumHue)
+                            {
+                                hueBitmap.SetPixel(x, y, Color.Black);
+                            }
+                            else if (pixel.GetHue() > bodyPart.HSBRange.MaximumHue)
+                            {
+                                hueBitmap.SetPixel(x, y, Color.White);
+                            }
                         }
 
                         //make saturation bitmap

@@ -87,7 +87,7 @@ namespace RunescapeBot.BotPrograms.Popups
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 titleHash = ImageProcessing.ColorSum(screen);
-                if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.01))
+                if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.001))
                 {
                     return true;
                 }
@@ -101,12 +101,13 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         /// <param name="jewel">The type of jewel to use (sapphire, emerald, ruby, etc.)</param>
         /// <param name="numberToMake">Number of bracelets to craft</param>
-        public void MakeBracelets(Jewel jewel, int numberToMake)
+        public void MakeBracelets(Jewel jewel, int numberToMake, int timeout)
         {
             int xClick = Left + NO_JEWEL_X_OFFSET + (((int)jewel) * ITEM_ICON_WIDTH) + RNG.Next(-4, 5);
             int yClick = Top + BRACELET_Y_OFFSET + RNG.Next(-4, 5);
             Mouse.RightClick(xClick, yClick, RSClient);
             MakeX makeX = new MakeX(xClick, yClick, RSClient);
+            makeX.WaitForPopup(timeout);
             makeX.MakeXItems(numberToMake);
         }
 

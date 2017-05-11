@@ -17,8 +17,12 @@ namespace RunescapeBot.BotPrograms
         private const int CRAFTING_TIME = 50000;
         private const double STATIONARY_OBJECT_TOLERANCE = 15.0;
         private const int BANK_BOOTH_MIN_SIZE = 100;
-        private const int WAIT_FOR_TIMEOUT = 5000;
+        private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 15000;
+        private const int WAIT_FOR_CRAFTING_WINDOW_TIMEOUT = 15000;
+        private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 10;
+        private const int FURNACE_TO_BANK_ICON_OFFSET_HORIZONTAL = 15;
+        private const int FURNACE_TO_BANK_ICON_OFFSET_VERICAL = 50;
         private ColorRange FurnaceIconOrange;
         private ColorRange BankIconDollar;
         private ColorRange Furnace;
@@ -42,9 +46,9 @@ namespace RunescapeBot.BotPrograms
             //bool[,] furnaceIcon = ColorFilter(FurnaceIconOrange);
             //DebugUtilities.TestMask(Bitmap, ColorArray, FurnaceIconOrange, furnaceIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnaceIcon");
 
-            ReadWindow();
-            bool[,] bankIcon = ColorFilter(BankIconDollar);
-            DebugUtilities.TestMask(Bitmap, ColorArray, BankIconDollar, bankIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankIcon");
+            //ReadWindow();
+            //bool[,] bankIcon = ColorFilter(BankIconDollar);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, BankIconDollar, bankIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankIcon");
 
             //ReadWindow();
             //bool[,] furnace = ColorFilter(Furnace);
@@ -60,6 +64,10 @@ namespace RunescapeBot.BotPrograms
             //ReadWindow();
             //MakeX makeX = new MakeX(0, 0, RSClient);
             //bool test = makeX.WaitForEnterAmount(60000);
+
+            //ReadWindow();
+            //FurnaceCrafting crafting = new FurnaceCrafting(RSClient);
+            //crafting.MakeBracelets(FurnaceCrafting.Jewel.None, 27, 60000);
         }
 
         protected override bool Execute()
@@ -80,7 +88,7 @@ namespace RunescapeBot.BotPrograms
             //Refresh inventory to a bracelet mould and 27 gold bars
             if (StopFlag) { return false; }
             BankPopup = new Bank(RSClient);
-            if (!BankPopup.WaitForPopup(WAIT_FOR_TIMEOUT))
+            if (!BankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
                 failedRuns++;
                 return true;
@@ -102,12 +110,12 @@ namespace RunescapeBot.BotPrograms
             //make 27 bars and wait
             if (StopFlag) { return false; }
             CraftPopup = new FurnaceCrafting(RSClient);
-            if (!CraftPopup.WaitForPopup(WAIT_FOR_TIMEOUT))
+            if (!CraftPopup.WaitForPopup(WAIT_FOR_CRAFTING_WINDOW_TIMEOUT))
             {   
                 failedRuns++;
                 return true;
             }
-            CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27);
+            CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
             SafeWait(CRAFTING_TIME);
             //TODO verify that all gold bars have been crafted
 
@@ -123,21 +131,67 @@ namespace RunescapeBot.BotPrograms
         {
             const int runTimeFromFurnaceToBank = 3000;  //approximate milliseconds needed to run from the furnace to the bank
 
+            Point? bankIcon = BankIconLocation();
+            Point clickLocation;
+
+            if (bankIcon == null)
+            {
+                bankIcon = FurnaceIconLocation();
+                if (bankIcon == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    clickLocation = new Point(bankIcon.Value.X + FURNACE_TO_BANK_ICON_OFFSET_HORIZONTAL, bankIcon.Value.Y + FURNACE_TO_BANK_ICON_OFFSET_VERICAL);
+                }
+            }
+            else
+            {
+                clickLocation = (Point) bankIcon;
+            }
+            LeftClick(clickLocation.X, clickLocation.Y);
+            SafeWait(runTimeFromFurnaceToBank);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Finds the bank icon on the minimap
+        /// </summary>
+        /// <returns>true if the icon is probably found correctly, false otherwise</returns>
+        private Point? BankIconLocation()
+        {
             ReadWindow();
             Point offset;
             bool[,] bankIcon = MinimapFilter(BankIconDollar, out offset);
             Blob bankBlob = ImageProcessing.BiggestBlob(bankIcon);
             if (bankBlob == null || bankBlob.Size < 10)
             {
-                //TODO guess the bank location based on the furnace location
-                return false;
+                return null;
             }
             int x = bankBlob.Center.X + offset.X;
             int y = bankBlob.Center.Y + offset.Y;
-            LeftClick(x, y);
-            SafeWait(runTimeFromFurnaceToBank);
+            return new Point(x, y);
+        }
 
-            return true;
+        /// <summary>
+        /// Finds the furnace icon on the minimap
+        /// </summary>
+        /// <returns>true if the icon is probably found correctly, false otherwise</returns>
+        private Point? FurnaceIconLocation()
+        {
+            ReadWindow();
+            Point offset;
+            bool[,] furnaceIcon = MinimapFilter(FurnaceIconOrange, out offset);
+            Blob furnaceBlob = ImageProcessing.BiggestBlob(furnaceIcon);
+            if (furnaceBlob == null || furnaceBlob.Size < 3)
+            {
+                return null;
+            }
+            int x = furnaceBlob.Center.X - 4 + offset.X;
+            int y = furnaceBlob.Center.Y + offset.Y;
+            return new Point(x, y);
         }
 
         /// <summary>
@@ -243,18 +297,26 @@ namespace RunescapeBot.BotPrograms
         {
             const int runTimeFromBankToFurnace = 3000;  //appproximate milliseconds needed to run from the bank to the furnace
 
-            ReadWindow();
-            Point offset;
-            bool[,] furnaceIcon = MinimapFilter(FurnaceIconOrange, out offset);
-            Blob furnaceBlob = ImageProcessing.BiggestBlob(furnaceIcon);
-            if (furnaceBlob == null || furnaceBlob.Size < 3)
+            Point? furnaceIcon = FurnaceIconLocation();
+            Point clickLocation;
+
+            if (furnaceIcon == null)
             {
-                //TODO guess the furnace location based on the bank location
-                return false;
+                furnaceIcon = BankIconLocation();
+                if (furnaceIcon == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    clickLocation = new Point(furnaceIcon.Value.X - FURNACE_TO_BANK_ICON_OFFSET_HORIZONTAL, furnaceIcon.Value.Y - FURNACE_TO_BANK_ICON_OFFSET_VERICAL);
+                }
             }
-            int x = furnaceBlob.Center.X - 4 + offset.X;
-            int y = furnaceBlob.Center.Y + offset.Y;
-            LeftClick(x, y);
+            else
+            {
+                clickLocation = (Point) furnaceIcon;
+            }
+            LeftClick(clickLocation.X, clickLocation.Y);
             SafeWait(runTimeFromBankToFurnace);
 
             return true;

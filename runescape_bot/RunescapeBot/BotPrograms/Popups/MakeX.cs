@@ -10,6 +10,9 @@ namespace RunescapeBot.BotPrograms.Popups
 {
     public class MakeX
     {
+        private const int POPUP_WIDTH = 154;
+        private const int POPUP_HEIGHT = 94;
+        private const int POPUP_TITLE_HEIGHT = 15;
         private Process RSClient;
         private int XClick;
         private int YClick;
@@ -87,6 +90,41 @@ namespace RunescapeBot.BotPrograms.Popups
                 Thread.Sleep(200);
                 keyboard.Enter();
             }
+        }
+
+        /// <summary>
+        /// Waits for the Make-X popup to appear
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public bool WaitForPopup(int timeout)
+        {
+            const int popupTitleHash = 50840;
+            const int padding = 2;
+            const int mouseOffset = 10;
+
+            Color[,] screen;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            long titleHash;
+
+            int left = XClick - (POPUP_WIDTH / 2) + padding;
+            int right = XClick - mouseOffset;
+            int top = YClick + padding;
+            int bottom = YClick + POPUP_TITLE_HEIGHT - padding;
+
+            while (watch.ElapsedMilliseconds < timeout)
+            {
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
+                titleHash = ImageProcessing.ColorSum(screen);
+                if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.001))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
