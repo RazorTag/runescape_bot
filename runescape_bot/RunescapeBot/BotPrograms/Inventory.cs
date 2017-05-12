@@ -193,6 +193,19 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Uses an item in the inventory on another item in the inventory
+        /// </summary>
+        /// <param name="subjectItem">the item to use on another item</param>
+        /// <param name="objectItem">the item to be used on</param>
+        /// <returns>true if the operation seems to succeed</returns>
+        public void UseItemOnItem(Point subjectItem, Point objectItem, bool safeTab = true)
+        {
+            ClickInventory(subjectItem.X, subjectItem.Y, safeTab);
+            Thread.Sleep(200);
+            ClickInventory(objectItem.X, objectItem.Y, safeTab);
+        }
+
+        /// <summary>
         /// Finds the next slot that a new picked up item would go into.
         /// </summary>
         /// <returns>The first empty inventory slot scanning left to right then top to bottom. Returns null if inventory is full.</returns>

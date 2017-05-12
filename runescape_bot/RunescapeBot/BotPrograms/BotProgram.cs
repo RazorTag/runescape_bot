@@ -161,7 +161,7 @@ namespace RunescapeBot.BotPrograms
         /// Initializes a bot program with a client matching startParams
         /// </summary>
         /// <param name="startParams">specifies the username to search for</param>
-        public BotProgram(StartParams startParams)
+        protected BotProgram(StartParams startParams)
         {
             RSClient = ScreenScraper.GetOSBuddy(out LoadError);
             this.RunParams = startParams;

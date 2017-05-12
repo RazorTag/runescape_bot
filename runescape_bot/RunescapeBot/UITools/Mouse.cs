@@ -1,7 +1,10 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunecapeBot.UITools.Spline;
+using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Drawing;
 using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.UITools
@@ -117,8 +120,6 @@ namespace RunescapeBot.UITools
             yMoveDistance = yDistance / discreteMovements;
             sleepTime = (int) (1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
 
-            Spline spline = new Spline(startingPosition, new System.Drawing.Point(x, y));
-
             for (int i = 0; i < discreteMovements; i++)
             {
                 currentX += xMoveDistance;
@@ -137,13 +138,15 @@ namespace RunescapeBot.UITools
         private static void NaturalMove(int x, int y)
         {
             int discreteMovements, sleepTime;
-            double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY, mouseMoveSpeed;
+            double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, completion, currentX, currentY, mouseMoveSpeed;
             POINT startingPosition;
             Stopwatch watch = new Stopwatch();
             Random rng = new Random();
             GetCursorPos(out startingPosition);
             currentX = startingPosition.X;
             currentY = startingPosition.Y;
+            float slope = (float)((y - currentY) / (x - currentX));
+
             xDistance = x - currentX;
             yDistance = y - currentY;
             totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
@@ -154,18 +157,41 @@ namespace RunescapeBot.UITools
             yMoveDistance = yDistance / discreteMovements;
             sleepTime = (int)(1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
 
-            Spline spline = new Spline(startingPosition, new System.Drawing.Point(x, y));
+            CubicSpline xSpline, ySpline;
+            CreateParameterizedSplines(startingPosition, new Point(x, y), out xSpline, out ySpline);
 
-            for (int i = 0; i < discreteMovements; i++)
+            for (int i = 1; i <= discreteMovements; i++)
             {
                 watch.Restart();
-                currentX += xMoveDistance;
-                currentY = spline.GetValue(currentX);
+                completion = (i * moveDistance) / totalDistance;
+                currentX = xSpline.Eval((float) completion);
+                currentY = ySpline.Eval((float) completion);
                 User32.SetCursorPos((int)currentX, (int)currentY);
                 watch.Stop();
                 Thread.Sleep(Math.Max(0, sleepTime - (int)watch.ElapsedMilliseconds));
             }
             Move(x, y);
+        }
+
+        /// <summary>
+        /// Creates a spline for each of x and y parameterized with the fraction of progress toward the end point
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="xSpline"></param>
+        /// <param name="ySpline"></param>
+        public static void CreateParameterizedSplines(Point start, Point end, out CubicSpline xSpline, out CubicSpline ySpline)
+        {
+            const double randomization = 0.02;
+            const int maxRandomAllowed = 25;
+            const double newMidPointDistance = 500.0;
+            int xRandomization = Math.Min(maxRandomAllowed, Math.Abs((int)(randomization * (end.Y - start.Y))));
+            int yRandomization = Math.Min(maxRandomAllowed, Math.Abs((int)(randomization * (end.X - start.X))));
+            double moveDistance = Geometry.DistanceBetweenPoints(start, end);
+            int midPoints = 1 + (int)(moveDistance / newMidPointDistance);
+
+            xSpline = new CubicSpline(new Point(0, start.X), new Point(1, end.X), 0, xRandomization, midPoints);
+            ySpline = new CubicSpline(new Point(0, start.Y), new Point(1, end.Y), 0, yRandomization, midPoints);
         }
 
         /// <summary>

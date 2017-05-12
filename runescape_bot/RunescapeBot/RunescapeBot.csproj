@@ -76,6 +76,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -89,10 +90,19 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
+    <Compile Include="BotPrograms\Bots\BankPhasmatys.cs" />
+    <Compile Include="BotPrograms\Bots\FletchShortbows.cs" />
+    <Compile Include="BotPrograms\Bots\Cannonballs.cs" />
     <Compile Include="BotPrograms\Bots\NightmareZoneD.cs" />
+    <Compile Include="BotPrograms\Bots\StringBows.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />
     <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
+    <Compile Include="BotPrograms\Popups\MakeAll.cs" />
+    <Compile Include="BotPrograms\Popups\MakeAllSlim.cs" />
     <Compile Include="BotPrograms\Popups\MakeX.cs" />
+    <Compile Include="BotPrograms\Popups\MakeXSlim.cs" />
+    <Compile Include="BotPrograms\Popups\RightClick.cs" />
+    <Compile Include="BotPrograms\Utilities.cs" />
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Numerical.cs" />
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
@@ -118,6 +128,9 @@
     <Compile Include="ImageTools\FIlters\HSBRange.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />
+    <Compile Include="UITools\Spline\ArrayUtil.cs" />
+    <Compile Include="UITools\Spline\CubicSpline.cs" />
+    <Compile Include="UITools\Spline\TriDiagonalMatrix.cs" />
     <Compile Include="Start.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -131,7 +144,6 @@
     <Compile Include="UITools\Kernel32.cs" />
     <Compile Include="UITools\Keyboard.cs" />
     <Compile Include="UITools\Mouse.cs" />
-    <Compile Include="UITools\Spline.cs" />
     <Compile Include="UITools\User32.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

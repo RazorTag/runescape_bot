@@ -56,6 +56,25 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Gets the game screen size of the client
+        /// </summary>
+        /// <param name="rsClient"></param>
+        /// <returns></returns>
+        public static Point? GetScreenSize(Process rsClient)
+        {
+            RECT windowRect = new RECT();
+            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            if (!TrimOSBuddy(ref windowRect))
+            {
+                return null;
+            }
+            else
+            {
+                return new Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+            }
+        }
+
+        /// <summary>
         /// Creates an Image object containing a screen shot of a specific window
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>

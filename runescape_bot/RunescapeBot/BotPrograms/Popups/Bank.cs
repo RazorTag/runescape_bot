@@ -87,29 +87,39 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
+        /// Determines if the bank screen is currently visible
+        /// </summary>
+        /// <returns>true if the bank is open</returns>
+        public bool BankIsOpen()
+        {
+            const int popupTitleHash = 625098;
+            long titleHash;
+            int left = Left + 162;
+            int right = Left + 325;
+            int top = Top + 8;
+            int bottom = Top + 25;
+
+            Color[,] screen;
+            screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
+            titleHash = ImageProcessing.ColorSum(screen);
+
+            return Numerical.CloseEnough(popupTitleHash, titleHash, 0.001);
+        }
+
+        /// <summary>
         /// Wait for the bank pop-up to open
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns>true if the bank pop-up opens</returns>
         public bool WaitForPopup(int timeout)
         {
-            const int popupTitleHash = 625098;
-            Color[,] screen;
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            long titleHash;
-
-            int left = Left + 162;
-            int right = Left + 325;
-            int top = Top + 8;
-            int bottom = Top + 25;
 
             while (watch.ElapsedMilliseconds < timeout)
             {
-                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
-                screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
-                titleHash = ImageProcessing.ColorSum(screen);
-                if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.001))
+                if (BankIsOpen())
                 {
                     return true;
                 }
@@ -177,6 +187,34 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
+        /// Use the Withdraw N option to withdraw the specified number of items
+        /// </summary>
+        /// <param name="column">slots from the left</param>
+        /// <param name="row">slots from the top</param>
+        /// <param name="quantity">number of items to withdraw</param>
+        public void WithdrawN(int column, int row)
+        {
+            const int yOffset = 70;
+            WithdrawMenuClick(column, row, yOffset);
+        }
+
+        /// <summary>
+        /// Use the Withdraw X option to withdraw the specified number of items
+        /// </summary>
+        /// <param name="column">slots from the left</param>
+        /// <param name="row">slots from the top</param>
+        /// <param name="quantity">number of items to withdraw</param>
+        public void WithdrawX(int column, int row, int quantity)
+        {
+            const int yOffset = 85;
+            WithdrawMenuClick(column, row, yOffset);
+            if (WaitForEnterAmount(5000))
+            {
+                Utilities.EnterAmount(RSClient, quantity);
+            }
+        }
+
+        /// <summary>
         /// Withdraw X items using Withdraw-X
         /// </summary>
         /// <param name="column">bank item slots from left slot (0-7)</param>
@@ -184,13 +222,23 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="numberToWithdraw"></param>
         public void WithdrawAll(int column, int row)
         {
+            const int yOffset = 100;
+            WithdrawMenuClick(column, row, yOffset);
+        }
+
+        /// <summary>
+        /// Opens the Withdraw-X menu for a specified bank slot and clicks on the specified withdraw option
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        /// <param name="yOffset"></param>
+        public void WithdrawMenuClick(int column, int row, int yOffset)
+        {
             Point? itemSlot = ItemSlotLocation(column, row);
             if (itemSlot == null)
             {
                 return;
             }
-
-            const int withdrawAllOffset = 101;
 
             //open the withdraw right-click menu
             int xClick = itemSlot.Value.X + RNG.Next(-10, 11);
@@ -200,7 +248,7 @@ namespace RunescapeBot.BotPrograms.Popups
 
             //click on Withdraw-All
             xClick += RNG.Next(-90, 91);
-            yClick += withdrawAllOffset + RNG.Next(-2, 3);
+            yClick += yOffset + RNG.Next(-2, 3);
             Mouse.LeftClick(xClick, yClick, RSClient);
             Thread.Sleep(200);
         }
@@ -215,6 +263,16 @@ namespace RunescapeBot.BotPrograms.Popups
             int xClick = Left + xOffset + RNG.Next(-6, 7);
             int yClick = Top + yOffset + RNG.Next(-5, 6);
             Mouse.LeftClick(xClick, yClick, RSClient);
+        }
+
+        /// <summary>
+        /// Waits for the "Enter amount:" prompt to appear over the chat box
+        /// </summary>
+        /// <param name="timeout">Gives up after the max wait time has elapsed</param>
+        /// <returns>true if the prompt appears</returns>
+        public bool WaitForEnterAmount(int timeout)
+        {
+            return Utilities.WaitForEnterAmount(RSClient, timeout);
         }
     }
 }

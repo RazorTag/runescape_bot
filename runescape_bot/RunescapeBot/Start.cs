@@ -47,14 +47,20 @@ namespace RunescapeBot
         /// </summary>
         public enum BotActions : int
         {
-            [Description("Lesser Demon")]
-            LesserDemon,
-            [Description("Gold Bracelets")]
-            GoldBracelets,
-            [Description("Gnome Stronghold Agility")]
+            [Description("Agility - Gnome Stronghold")]
             AgilityGnomeStronghold,
-            [Description("Nightmare Zone Dharoks")]
-            NightmareZoneD
+            [Description("Combat - Lesser Demon")]
+            LesserDemon,
+            [Description("Combat - Nightmare Zone Dharoks")]
+            NightmareZoneD,
+            [Description("Crafting - Gold Bracelets")]
+            GoldBracelets,
+            [Description("Fletching - Short Bows")]
+            FletchShortBows,
+            [Description("Fletching - String Bows")]
+            StringBows,
+            [Description("Smithing - Cannonballs")]
+            Cannonballs
         };
 
         /// <summary>
@@ -137,13 +143,17 @@ namespace RunescapeBot
 
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
+                case BotActions.LesserDemon:
+                    startParams.FrameTime = 5000;
+                    RunningBot = new LesserDemon(startParams);
+                    break;
+
                 case BotActions.GoldBracelets:
                     RunningBot = new GoldBracelets(startParams);
                     break;
 
-                case BotActions.LesserDemon:
-                    startParams.FrameTime = 5000;
-                    RunningBot = new LesserDemon(startParams);
+                case BotActions.Cannonballs:
+                    RunningBot = new GoldBracelets(startParams);
                     break;
 
                 case BotActions.AgilityGnomeStronghold:
@@ -153,6 +163,14 @@ namespace RunescapeBot
                 case BotActions.NightmareZoneD:
                     startParams.FrameTime = 30000;
                     RunningBot = new NightmareZoneD(startParams);
+                    break;
+
+                case BotActions.FletchShortBows:
+                    RunningBot = new FletchShortbows(startParams);
+                    break;
+
+                case BotActions.StringBows:
+                    RunningBot = new StringBows(startParams);
                     break;
 
                 default:
