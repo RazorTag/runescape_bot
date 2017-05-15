@@ -376,11 +376,13 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void LeftClick(int x, int y, int hoverDelay = 200, bool randomize = false)
+        /// <param name="hoverDelay"></param>
+        /// <param name="randomize">maximum number of pixels in each direction by which to randomize the click location</param>
+        protected void LeftClick(int x, int y, int hoverDelay = 200, int randomize = 0)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                Mouse.LeftClick(x, y, RSClient, hoverDelay);
+                Mouse.LeftClick(x, y, RSClient, hoverDelay, randomize);
             }
         }
 
@@ -389,11 +391,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y, int hoverDelay = 200, bool randomize = true)
+        protected void RightClick(int x, int y, int hoverDelay = 200, int randomize = 0)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                Mouse.RightClick(x, y, RSClient, hoverDelay);
+                Mouse.RightClick(x, y, RSClient, hoverDelay, randomize);
             }
         }
 
@@ -971,7 +973,7 @@ namespace RunescapeBot.BotPrograms
         {
             int x = ScreenWidth - 145;
             int y = 144;
-            LeftClick(x, y, 200, true);
+            LeftClick(x, y, 200, 3);
         }
 
         /// <summary>

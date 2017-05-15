@@ -34,9 +34,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 200)
+        public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 200, int randomize = 0)
         {
-            Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay);
+            Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
         }
 
         /// <summary>
@@ -44,9 +44,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 200)
+        public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 200, int randomize = 0)
         {
-            Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay);
+            Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
         }
 
         /// <summary>
@@ -57,12 +57,17 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient"></param>
         /// <param name="clickTypeDown"></param>
         /// <param name="clickTypeUp"></param>
-        private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay)
+        private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay, int randomize)
         {
+            Random rng = new Random();
+            if (randomize > 0)
+            {
+                x += rng.Next(-randomize, randomize + 1);
+                y += rng.Next(-randomize, randomize + 1);
+            }
             ScreenScraper.BringToForeGround(rsClient);
             TranslateClick(ref x, ref y, rsClient);
             NaturalMove(x, y);
-            Random rng = new Random();
             Thread.Sleep(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
             mouse_event(clickTypeDown, x, y, 0, 0);
             mouse_event(clickTypeUp, x, y, 0, 0);
@@ -124,10 +129,26 @@ namespace RunescapeBot.UITools
             {
                 currentX += xMoveDistance;
                 currentY += yMoveDistance;
-                User32.SetCursorPos((int) currentX, (int) currentY);
+                SetCursorPos((int) currentX, (int) currentY);
                 Thread.Sleep(sleepTime);
             }
-            User32.SetCursorPos(x, y);
+            SetCursorPos(x, y);
+        }
+
+        /// <summary>
+        /// Move the mouse relative to its current position
+        /// </summary>
+        /// <param name="x">x distance to move</param>
+        /// <param name="y">y distance to move</param>
+        /// <param name="randomize">maximum distance by which to randomize the mouse offset</param>
+        public static void Offset(int x, int y, int randomize = 100)
+        {
+            Random rng = new Random();
+            POINT startingPosition;
+            GetCursorPos(out startingPosition);
+            x += startingPosition.X + rng.Next(-randomize, randomize + 1);
+            y += startingPosition.Y + rng.Next(-randomize, randomize + 1);
+            NaturalMove(x, y);
         }
 
         /// <summary>

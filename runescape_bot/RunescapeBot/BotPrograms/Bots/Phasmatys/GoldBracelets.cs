@@ -7,23 +7,13 @@ namespace RunescapeBot.BotPrograms
     /// <summary>
     /// Smiths gold bracelets at the furnace in Port Phasmatys
     /// </summary>
-    public class GoldBracelets : BankPhasmatys
+    public class GoldBracelets : FurnacePhasmatys
     {
         private const int CRAFTING_TIME = 50000;
-        private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 15000;
         private const int WAIT_FOR_CRAFTING_WINDOW_TIMEOUT = 15000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
-        private const int CONSECUTIVE_FAILURES_ALLOWED = 5;
-        private int failedRuns;
-        private Point guessBankLocation;
 
-        public GoldBracelets(StartParams startParams) : base(startParams)
-        {
-            RunParams.Run = true;
-            failedRuns = 0;
-            ReadWindow();
-            guessBankLocation = new Point(Center.X + 100, Center.Y);
-        }
+        public GoldBracelets(StartParams startParams) : base(startParams) { }
 
         protected override void Run()
         {
@@ -57,57 +47,21 @@ namespace RunescapeBot.BotPrograms
             //crafting.MakeBracelets(FurnaceCrafting.Jewel.None, 27, 60000);
         }
 
-        protected override bool Execute()
+        protected override bool FurnaceActions()
         {
-            if (failedRuns > CONSECUTIVE_FAILURES_ALLOWED)
-            {
-                return false;
-            }
-
-            //Move to the bank and open it
-            if (!MoveToBank())
-            {
-                failedRuns++;
-                return true;
-            }
-            Mouse.MoveMouse(guessBankLocation.X + RNG.Next(-20, 26), guessBankLocation.Y + RNG.Next(-30, 41), RSClient);    //Move the mouse to the neighborhood of where we expect the bank booth to be
-            ClickBankBooth();
-
-            //Refresh inventory to a bracelet mould and 27 gold bars
-            if (StopFlag) { return false; }
-            BankPopup = new Bank(RSClient);
-            if (!BankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
-            {
-                failedRuns++;
-                return true;
-            }
-            BankPopup.DepositInventory();
-            BankPopup.WithdrawOne(7, 0);
-            BankPopup.WithdrawAll(6, 0);
-
-            //Move to the furnace and use a gold bar on it
-            if (StopFlag) { return false; }
-            if (!MoveToFurnace())
-            {
-                failedRuns++;
-                return true;
-            }
-            Inventory.ClickInventory(0, 1);
-            ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000);
-
             //make 27 bars and wait
             if (StopFlag) { return false; }
             CraftPopup = new FurnaceCrafting(RSClient);
             if (!CraftPopup.WaitForPopup(WAIT_FOR_CRAFTING_WINDOW_TIMEOUT))
-            {   
-                failedRuns++;
-                return true;
+            {
+                return false;
             }
             CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
-            SafeWait(CRAFTING_TIME);
-            //TODO verify that all gold bars have been crafted
 
-            failedRuns = 0;
+            //TODO verify that gold bars are being crafted
+
+            SafeWait(CRAFTING_TIME);
+
             return true;
         }
     }

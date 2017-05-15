@@ -1,10 +1,5 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -12,13 +7,10 @@ namespace RunescapeBot.BotPrograms
     {
         private const int FLETCHING_TIME = 16800;
         private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
-        private const int WAIT_FOR_FLETCHING_WINDOW_TIMEOUT = 5000;
-        private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
         private int FailedRuns;
         private Point BowSlot;
         private Point StringSlot;
-        private MakeAllSlim MakeAllSlim;
 
         public StringBows(StartParams startParams) : base(startParams)
         {
@@ -77,19 +69,7 @@ namespace RunescapeBot.BotPrograms
 
             //String the bows
             Inventory.UseItemOnItem(StringSlot, BowSlot, false);
-            int left = 230;
-            int right = 282;
-            int top = ScreenHeight - 110;
-            int bottom = ScreenHeight - 70;
-            Point rightClick = new Point(RNG.Next(left, right), RNG.Next(top, bottom));
-            RightClick(rightClick.X, rightClick.Y, 500);
-            MakeAllSlim = new MakeAllSlim(rightClick.X, rightClick.Y, RSClient);
-            if (!MakeAllSlim.WaitForPopup(WAIT_FOR_MAKEX_POPUP_TIMEOUT))
-            {
-                FailedRuns++;
-                return true;
-            }
-            MakeAllSlim.MakeAllItems();
+            Utilities.ChatBoxSingleOptionMakeAll(RSClient);
 
             //Wait for the inventory to be fletched
             SafeWait(FLETCHING_TIME);

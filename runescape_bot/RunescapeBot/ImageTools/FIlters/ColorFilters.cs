@@ -163,5 +163,19 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion
+
+        #region textBoxes
+        /// <summary>
+        /// The gray background color of a right-click menu
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange RightClickPopup()
+        {
+            Color dark = Color.FromArgb(88, 79, 66);
+            Color light = Color.FromArgb(98, 89, 76);
+            HSBRange hsbRange = new HSBRange(30, 40, 0.080f, 0.180f, 0.270f, 0.370f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+        #endregion
     }
 }

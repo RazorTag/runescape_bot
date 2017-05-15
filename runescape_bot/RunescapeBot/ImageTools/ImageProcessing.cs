@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.Common;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
@@ -246,6 +247,24 @@ namespace RunescapeBot.ImageTools
                 }
             }
             return colorSum;
+        }
+
+        /// <summary>
+        /// Checks a piece of the screen against an expected value for approximate equivalence
+        /// </summary>
+        /// <param name="image">full image of the game screen</param>
+        /// <param name="left">left bound of the piece of the screen to check</param>
+        /// <param name="right">right bound of the piece of the screen to check</param>
+        /// <param name="top">top bound of the piece of the screen to check</param>
+        /// <param name="bottom">bottom bound of the piece of the screen to check</param>
+        /// <param name="expectedColorSum">the expected color sum of the piece of the screen</param>
+        /// <param name="tolerance">allowed deviation of the actual value from the expected value</param>
+        /// <returns></returns>
+        public static bool ScreenPieceCheck(Color[,] image, int left, int right, int top, int bottom, long expectedColorSum, double tolerance)
+        {
+            Color[,] screenPiece = ScreenPiece(image, left, right, top, bottom);
+            long colorSum = ColorSum(screenPiece);
+            return Numerical.CloseEnough(expectedColorSum, colorSum, tolerance);
         }
 
         /// <summary>

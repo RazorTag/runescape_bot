@@ -62,7 +62,7 @@ namespace RunescapeBot.ImageTools
         {
             get
             {
-                return RightBound - LeftBound;
+                return RightBound - LeftBound + 1;
             }
         }
 
@@ -73,7 +73,7 @@ namespace RunescapeBot.ImageTools
         {
             get
             {
-                return BottomBound - TopBound;
+                return BottomBound - TopBound + 1;
             }
         }
 

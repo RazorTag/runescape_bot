@@ -235,10 +235,14 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
         /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
         /// <returns>Item enum value</returns>
-        public bool SlotIsEmpty(int x, int y, bool safeTab = false)
+        public bool SlotIsEmpty(int x, int y, bool readScreen = false, bool safeTab = false)
         {
             OpenInventory(safeTab);
             InventoryToScreen(ref x, ref y);
+            if (readScreen)
+            {
+                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            }
 
             int xOffset = (INVENTORY_GAP_X / 2) - 1;
             int yOffset = (INVENTORY_GAP_Y / 2) - 1;
@@ -304,7 +308,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>true if translation succeeds</returns>
-        private bool InventoryToScreen(ref int x, ref int y)
+        public bool InventoryToScreen(ref int x, ref int y)
         {
             if (x < 0 || x > 3 || y < 0 || y > 6)
             {

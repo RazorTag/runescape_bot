@@ -153,7 +153,7 @@ namespace RunescapeBot
                     break;
 
                 case BotActions.Cannonballs:
-                    RunningBot = new GoldBracelets(startParams);
+                    RunningBot = new Cannonballs(startParams);
                     break;
 
                 case BotActions.AgilityGnomeStronghold:

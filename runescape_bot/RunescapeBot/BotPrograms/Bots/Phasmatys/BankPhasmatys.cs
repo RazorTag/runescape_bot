@@ -33,7 +33,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the bank icon is found</returns>
         protected bool MoveToBank()
         {
-            const int runTimeFromFurnaceToBank = 3000;  //approximate milliseconds needed to run from the furnace to the bank
+            const int runTimeFromFurnaceToBank = 3000;  //approximate minimum milliseconds needed to run from the furnace to the bank
 
             Point? bankIcon = BankIconLocation();
             Point clickLocation;
@@ -54,7 +54,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)bankIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y);
+            LeftClick(clickLocation.X, clickLocation.Y + 5);
             SafeWait(runTimeFromFurnaceToBank);
 
             return true;
@@ -122,7 +122,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
                     {
-                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y);
+                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 200, 5);
                         SafeWait(1000);
                         //TODO verify that the bank opened
                         return true;

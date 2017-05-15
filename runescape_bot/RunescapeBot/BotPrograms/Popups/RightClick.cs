@@ -76,7 +76,8 @@ namespace RunescapeBot.BotPrograms.Popups
             const int padding = 2;
             const int mouseOffset = 10;
 
-            Color[,] screen = null;
+            Color[,] screen;
+            Color[,] title;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             long titleHash;
@@ -89,16 +90,29 @@ namespace RunescapeBot.BotPrograms.Popups
             while (watch.ElapsedMilliseconds < timeout)
             {
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
-                screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
-                titleHash = ImageProcessing.ColorSum(screen);
+                title = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
+                titleHash = ImageProcessing.ColorSum(title);
 
-                if (Numerical.CloseEnough(TitleHash, titleHash, 0.001))
+                if (PopupIsCorrectSize(screen) && Numerical.CloseEnough(TitleHash, titleHash, 0.001))
                 {
                     return true;
                 }
             }
-            DebugUtilities.SaveImageToFile(screen, "C:\\Projects\\Roboport\\test_pictures\\right-click.jpg");
             return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private bool PopupIsCorrectSize(Color[,] screen)
+        {
+            const int padding = 5;
+            int x = XClick + Width / 2 - padding;
+            int y = YClick + Height - padding;
+            Color bottomRight = screen[x, y];
+            ColorRange rightClickColor = ColorFilters.RightClickPopup();
+            return rightClickColor.ColorInRange(bottomRight);
         }
 
         /// <summary>
