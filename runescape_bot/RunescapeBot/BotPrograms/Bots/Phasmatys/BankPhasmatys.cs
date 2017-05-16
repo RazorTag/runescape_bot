@@ -54,7 +54,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)bankIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y + 5, 200, 2);
+            LeftClick(clickLocation.X, clickLocation.Y + 5, 200, 3);
             SafeWait(runTimeFromFurnaceToBank);
 
             return true;
@@ -225,7 +225,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)furnaceIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y, 200, 2);
+            LeftClick(clickLocation.X, clickLocation.Y, 200, 3);
             SafeWait(runTimeFromBankToFurnace);
 
             return true;
