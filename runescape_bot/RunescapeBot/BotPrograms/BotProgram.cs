@@ -164,6 +164,8 @@ namespace RunescapeBot.BotPrograms
         protected BotProgram(StartParams startParams)
         {
             RSClient = ScreenScraper.GetOSBuddy(out LoadError);
+            if (RSClient == null) { throw new Exception(); }    //cannot proceed without a RuneScape client
+
             this.RunParams = startParams;
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);

@@ -54,7 +54,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)bankIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y + 5);
+            LeftClick(clickLocation.X, clickLocation.Y + 5, 200, 2);
             SafeWait(runTimeFromFurnaceToBank);
 
             return true;
@@ -118,11 +118,11 @@ namespace RunescapeBot.BotPrograms
                 watch.Restart();
 
                 ReadWindow();
-                if (LocateBankBooth(out bankBoothLocation))
+                if (LocateBankBooth(out bankBoothLocation, true))
                 {
                     if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
                     {
-                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 200, 5);
+                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 200, 10);
                         SafeWait(1000);
                         //TODO verify that the bank opened
                         return true;
@@ -143,7 +143,7 @@ namespace RunescapeBot.BotPrograms
         /// Finds the midpoint of the two east most bank booths in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if the bank booths are found</returns>
-        protected bool LocateBankBooth(out Point? bankBooth)
+        protected bool LocateBankBooth(out Point? bankBooth, bool randomize = false)
         {
             bankBooth = null;
             const int numberOfBankBooths = 6;
@@ -184,8 +184,17 @@ namespace RunescapeBot.BotPrograms
 
             Blob rightBooth = boothBlobs[numberOfBankBooths - 1];
             Blob secondRightBooth = boothBlobs[numberOfBankBooths - 2];
+            double leftness = RNG.NextDouble();
 
-            bankBooth = Numerical.Average(rightBooth.Center, secondRightBooth.Center);
+            if(randomize)
+            {
+                bankBooth = Numerical.RandomMidpoint(rightBooth.Center, secondRightBooth.Center);
+            }
+            else
+            {
+                bankBooth = Numerical.Average(rightBooth.Center, secondRightBooth.Center);
+            }
+            
             return true;
         }
 
@@ -216,7 +225,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)furnaceIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y);
+            LeftClick(clickLocation.X, clickLocation.Y, 200, 2);
             SafeWait(runTimeFromBankToFurnace);
 
             return true;

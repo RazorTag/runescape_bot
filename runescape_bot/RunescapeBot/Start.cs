@@ -123,6 +123,7 @@ namespace RunescapeBot
             BotActionSelect.SelectedIndex = (int)settings.BotAction;
             Iterations.Value = settings.Iterations;
             SetIdleState();
+            settings.Save();
         }
 
         /// <summary>
