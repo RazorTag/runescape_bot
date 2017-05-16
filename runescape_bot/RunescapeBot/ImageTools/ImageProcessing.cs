@@ -15,6 +15,8 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static bool[,] ColorFilter(Color[,] rgbImage, ColorRange artifactColor)
         {
+            if (rgbImage == null || artifactColor == null) { return new bool[0, 0]; }
+
             int width = rgbImage.GetLength(0);
             int height = rgbImage.GetLength(1);
             bool[,] filterPixels = new bool[width, height];
@@ -71,7 +73,7 @@ namespace RunescapeBot.ImageTools
         /// <param name="xMax">exclusive</param>
         /// <param name="yMin">inclusive</param>
         /// <param name="yMax">exclusive</param>
-        public static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filterPixels, int xMin, int xMax)
+        private static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filterPixels, int xMin, int xMax)
         {
             Color pixelColor;
             int height = rgbImage.GetLength(1);
@@ -87,12 +89,14 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Finds 
+        /// Finds  all of the blobs in a binary image. Only considers right, left, up, down adjacency (not diagonal)
         /// </summary>
         /// <param name="artifactImage"></param>
-        /// <returns></returns>
+        /// <returns>a list of blobs found from biggest to smallest</returns>
         public static List<Blob> FindBlobs(bool[,] artifactImage, bool sort = false)
         {
+            if (artifactImage == null) { return new List<Blob>(); }
+
             Blob blob;
             Point pixel;
             List<Blob> allBlobs = new List<Blob>();
@@ -181,6 +185,8 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static Blob BiggestBlob(bool[,] artifactImage)
         {
+            if (artifactImage == null) { return null; }
+
             Blob biggestBlob;
             List<Blob> blobs = FindBlobs(artifactImage);
 
@@ -225,6 +231,7 @@ namespace RunescapeBot.ImageTools
         /// <returns>true if the colors match on RGB values</returns>
         public static bool ColorsAreEqual(Color color1, Color color2)
         {
+            if (color1 == null || color2 == null) { return false; }
             return (color1.R == color2.R) && (color1.B == color2.B) && (color1.G == color2.G);
         }
 
@@ -235,6 +242,8 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static long ColorSum(Color[,] rgbImage)
         {
+            if (rgbImage == null) { return 0; }
+
             Color pixel;
             long colorSum = 0;
 
@@ -286,6 +295,8 @@ namespace RunescapeBot.ImageTools
         /// <returns>The fraction (0-1) of the image that is true</returns>
         public static double FractionalMatch(bool[,] image)
         {
+            if (image == null) { return 0.0; }
+
             int matches = 0;
             int width = image.GetLength(0);
             int height = image.GetLength(1);
@@ -307,11 +318,20 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Gets a rectangle from ColorArray
         /// </summary>
-        /// <param name="topLeft"></param>
-        /// <param name="bottomRight"></param>
+        /// <param name="image"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
         /// <returns></returns>
         public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom, out Point trimOffset)
         {
+            if (image == null)
+            {
+                trimOffset = new Point();
+                return new Color[0, 0];
+            }
+
             left = Math.Max(left, 0);
             right = Math.Min(right, image.GetLength(0) - 1);
             top = Math.Max(top, 0);
@@ -334,9 +354,18 @@ namespace RunescapeBot.ImageTools
             return screenPiece;
         }
 
+        /// <summary>
+        /// Gets a rectangle from ColorArray
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
+        /// <returns></returns>
         public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom)
         {
-            Point empty = new Point();
+            Point empty;
             return ScreenPiece(image, left, right, top, bottom, out empty);
         }
     }

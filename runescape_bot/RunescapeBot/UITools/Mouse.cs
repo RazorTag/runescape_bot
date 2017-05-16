@@ -36,7 +36,10 @@ namespace RunescapeBot.UITools
         /// <param name="y">pixels from top of client</param>
         public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 200, int randomize = 0)
         {
-            Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
+            if (ScreenScraper.ProcessExists(rsClient))
+            {
+                Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
+            }
         }
 
         /// <summary>
@@ -46,7 +49,10 @@ namespace RunescapeBot.UITools
         /// <param name="y">pixels from top of client</param>
         public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 200, int randomize = 0)
         {
-            Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
+            if (ScreenScraper.ProcessExists(rsClient))
+            {
+                Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
+            }
         }
 
         /// <summary>
@@ -222,8 +228,11 @@ namespace RunescapeBot.UITools
         /// <param name="y">y-coordinate within the game screen</param>
         public static void MoveMouse(int x, int y, Process rsClient)
         {
-            TranslateClick(ref x, ref y, rsClient);
-            NaturalMove(x, y);
+            if (ScreenScraper.ProcessExists(rsClient))
+            {
+                TranslateClick(ref x, ref y, rsClient);
+                NaturalMove(x, y);
+            }
         }
         #endregion
     }

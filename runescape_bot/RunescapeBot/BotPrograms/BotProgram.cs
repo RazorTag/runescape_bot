@@ -28,6 +28,11 @@ namespace RunescapeBot.BotPrograms
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
 
         /// <summary>
+        /// Approximate time in milliseconds needed for OSBuddy to start
+        /// </summary>
+        private const int OSBUDDY_LOAD_TIME = 10000;
+
+        /// <summary>
         /// Error message to show the user for a start error
         /// </summary>
         private string LoadError;
@@ -35,7 +40,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// The number of consecutive previously failed login attempts.
         /// </summary>
-        private int failedLoginAttempts;
+        private int FailedLoginAttempts;
 
         /// <summary>
         /// Specifies how the bot should be run
@@ -157,6 +162,7 @@ namespace RunescapeBot.BotPrograms
         }
         #endregion
 
+        #region core bot process
         /// <summary>
         /// Initializes a bot program with a client matching startParams
         /// </summary>
@@ -164,9 +170,7 @@ namespace RunescapeBot.BotPrograms
         protected BotProgram(StartParams startParams)
         {
             RSClient = ScreenScraper.GetOSBuddy(out LoadError);
-            if (RSClient == null) { throw new Exception(); }    //cannot proceed without a RuneScape client
-
-            this.RunParams = startParams;
+            RunParams = startParams;
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);
             Inventory = new Inventory(RSClient, ColorArray);
@@ -179,45 +183,54 @@ namespace RunescapeBot.BotPrograms
         /// <param name="iterations"></param>
         public void Start()
         {
-            bool ready = false;
-
-            if (!String.IsNullOrEmpty(LoadError))
+            if (PrepareClient())
             {
-                if (ScreenScraper.StartOSBuddy(RunParams.ClientFilePath))
-                {
-                    for (int i = 0; i < 300; i++)
-                    {
-                        if (SafeWait(1000)) { return; }
-                        RSClient = ScreenScraper.GetOSBuddy(out LoadError);
+                RunThread = new Thread(Process);
+                RunThread.Start();
+            }
+            else
+            {
+                Done();
+            }
+        }
 
-                        if(RSClient != null)
+        /// <summary>
+        /// Makes sure that OSBuddy is running and starts it if it isn't
+        /// </summary>
+        /// <returns></returns>
+        private bool PrepareClient()
+        {
+            if (ScreenScraper.ProcessExists(RSClient)) { return true; }
+
+            if (ScreenScraper.StartOSBuddy(RunParams.ClientFilePath, ref client))
+            {
+                for (int i = 0; i < 180; i++)
+                {
+                    if (SafeWait(OSBUDDY_LOAD_TIME)) { return false; }
+                    RSClient = ScreenScraper.GetOSBuddy(out LoadError);
+
+                    if (RSClient != null)
+                    {
+                        ReadWindow();
+                        if (IsLoggedOut())
                         {
-                            ReadWindow();
-                            if (IsLoggedOut())
-                            {
-                                ready = true;
-                                break;
-                            }
+                            return true;
                         }
                     }
                 }
-                if (!ready)
-                {
-                    if (!String.IsNullOrEmpty(LoadError))
-                    {
-                        MessageBox.Show(LoadError);
-                    }
-                    else
-                    {
-                        MessageBox.Show("OSBuddy did not start correctly");
-                    }
-
-                    Done();
-                    return;
-                }
             }
-            RunThread = new Thread(Process);
-            RunThread.Start();
+
+            //The client did not start correctly
+            if (String.IsNullOrEmpty(LoadError))
+            {
+                MessageBox.Show("OSBuddy did not start correctly");
+            }
+            else
+            {
+                MessageBox.Show(LoadError);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -288,7 +301,7 @@ namespace RunescapeBot.BotPrograms
                 }
 
                 Stopwatch watch = Stopwatch.StartNew();
-                ReadWindow();   //Read the game window color values into Bitmap and ColorArray
+                if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
                 if (StopFlag) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
                 //Turn on run if the player has run energy
@@ -308,20 +321,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 else
                 {
-                    if (failedLoginAttempts > 10)
-                    {
-                        Process client = RSClient;
-                        if (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
-                        {
-                            RSClient = client;
-                            failedLoginAttempts = 0;
-                            if(SafeWait(1000)) { return; }
-                        }
-                        else
-                        {
-                            return; //The client didnt restart correctly, so we can't continue.
-                        }
-                    }
+                    HandleFailedLogIn();
                 }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
@@ -371,6 +371,7 @@ namespace RunescapeBot.BotPrograms
                 StopFlag = true;
             }
         }
+        #endregion
 
         #region user actions
         /// <summary>
@@ -479,7 +480,12 @@ namespace RunescapeBot.BotPrograms
                 Bitmap.Dispose();
             }
             if (StopFlag) { return false; }
-
+            
+            if(!ScreenScraper.ProcessExists(RSClient))
+            {
+                PrepareClient();
+                return false;
+            }
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
 
@@ -664,6 +670,31 @@ namespace RunescapeBot.BotPrograms
 
         #region login/restart
         /// <summary>
+        /// Respond to a failed attempt to log in
+        /// </summary>
+        /// <returns>true if the failed login is handled satisfactorily. false if the bot should stop</returns>
+        private bool HandleFailedLogIn()
+        {
+            if (FailedLoginAttempts > 2)
+            {
+                if (PrepareClient())
+                {
+                    FailedLoginAttempts = 0;
+                    SafeWait(OSBUDDY_LOAD_TIME);
+                    return true;
+                }
+                else
+                {
+                    return false; //The client didnt restart correctly, so we can't continue.
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Determines if the user is logged out and logs him back in if he is.
         /// If the bot does not have valid login information, then it will quit.
         /// </summary>
@@ -698,10 +729,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if login is successful, false if login fails</returns>
         private bool LogIn()
         {
+            Point? clickLocation;
             int center = ScreenWidth / 2;
 
             //log in at the login screen
-            if (!IsWelcomeScreen())
+            if (!IsWelcomeScreen(out clickLocation))
             {
                 //Click existing account. Clicks in a dead space if we are already on the login screen.
                 LeftClick(center + 16, 288);
@@ -722,26 +754,26 @@ namespace RunescapeBot.BotPrograms
             }
 
             //click the "CLICK HERE TO PLAY" button on the welcome screen
-            if (ConfirmWelcomeScreen())
+            if (ConfirmWelcomeScreen(out clickLocation))
             {
-                LeftClick(center, 337);
+                LeftClick(clickLocation.Value.X, clickLocation.Value.Y);
             }
             else
             {
-                failedLoginAttempts++;
+                FailedLoginAttempts++;
                 return false;
             }
 
             //verify the log in
             if (ConfirmLogin())
             {
-                failedLoginAttempts = 0;
+                FailedLoginAttempts = 0;
                 DefaultCamera();
                 return true;
             }
             else
             {
-                failedLoginAttempts++;
+                FailedLoginAttempts++;
                 return false;
             }
         }
@@ -750,34 +782,52 @@ namespace RunescapeBot.BotPrograms
         /// Determines if the last screenshot was of the welcome screen
         /// </summary>
         /// <returns>true if we are on the welcome screen, false otherwise</returns>
-        private bool IsWelcomeScreen()
+        private bool IsWelcomeScreen(out Point? clickLocation)
         {
             int centerX = Center.X;
-            int centerY = 337;
-            int offsetX = 110;
-            int offsetY = 40;
-            int totalSize = (2 * offsetX + 1) * (2 * offsetY + 1);
+            const int centerY = 337;
+            const int width = 220;
+            const int height = 80;
+            int left = centerX - (width / 2);
+            int right = centerX + (width / 2);
+            int top = centerY - (height / 2);
+            int bottom = centerY + (height / 2);
+            int totalSize = width * height;
             int redBlobSize;
 
             ColorRange red = ColorFilters.WelcomeScreenClickHere();
-            bool[,] clickHere = ColorFilterPiece(red, centerX - offsetX, centerX + offsetX, centerY - offsetY, centerY + offsetY);
-            redBlobSize = ImageProcessing.BiggestBlob(clickHere).Size;
+            bool[,] clickHere = ColorFilterPiece(red, left, right, top, bottom);
+            Blob enterGame = ImageProcessing.BiggestBlob(clickHere);
+            redBlobSize = enterGame.Size;
 
-            return ((2 * redBlobSize) > totalSize);
+            if (redBlobSize > (totalSize / 2))
+            {
+                clickLocation = enterGame.RandomBlobPixel();
+                clickLocation = new Point(clickLocation.Value.X + left, clickLocation.Value.Y + top);
+                return true;
+            }
+            else
+            {
+                clickLocation = null;
+                return false;
+            }
         }
 
         /// <summary>
         /// Determines if the welcome screen has been reached
         /// </summary>
         /// <returns>true if the welcome screen has been reached, false if not or if the StopFlag is raised</returns>
-        private bool ConfirmWelcomeScreen()
+        private bool ConfirmWelcomeScreen(out Point? clickLocation)
         {
+            clickLocation = null;
+
             //Wait up to 60 seconds
             for (int i = 0; i < 60; i++)
             {
                 if (StopFlag) { return false; }
                 ReadWindow();
-                if (IsWelcomeScreen())
+                
+                if (IsWelcomeScreen(out clickLocation))
                 {
                     return true;
                 }

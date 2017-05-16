@@ -31,6 +31,8 @@ namespace RunescapeBot.ImageTools
         /// <param name="rsHandle"></param>
         public static void BringToForeGround(Process rsClient)
         {
+            if (!ProcessExists(rsClient)) { return; }
+            
             int rsHandle = (int)rsClient.MainWindowHandle;
             if (IsIconic(rsHandle))
             {
@@ -62,6 +64,8 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static Point? GetScreenSize(Process rsClient)
         {
+            if (!ProcessExists(rsClient)) { return null; }
+
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
             if (!TrimOSBuddy(ref windowRect))
@@ -81,8 +85,9 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static Bitmap CaptureWindow(Process rsClient)
         {
-            BringToForeGround(rsClient);
+            if (!ProcessExists(rsClient)) { return null; }
 
+            BringToForeGround(rsClient);
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
             if (!TrimOSBuddy(ref windowRect))
@@ -105,12 +110,12 @@ namespace RunescapeBot.ImageTools
         /// <param name="bitmap"></param>
         public static Color[,] GetRGB(Bitmap bitmap)
         {
+            if (bitmap == null) { return new Color[0, 0]; }
+
             const int PixelWidth = 3;
             const PixelFormat PixelFormat = PixelFormat.Format24bppRgb;
             int width, height, pixelOffset;
             Color[,] rgbArray;
-            
-            if (bitmap == null) throw new ArgumentNullException("image");
 
             width = bitmap.Width;
             height = bitmap.Height;
@@ -178,17 +183,17 @@ namespace RunescapeBot.ImageTools
         /// <returns>true if the process is found, false otherwise</returns>
         public static bool ProcessExists(Process processToFind)
         {
-            IntPtr mainWindowHandle = processToFind.MainWindowHandle;
-            Process[] processlist = Process.GetProcesses();
+            if (processToFind == null) { return false; }
 
-            foreach (Process process in processlist)
+            try
             {
-                if (mainWindowHandle == process.MainWindowHandle)
-                {
-                    return true;
-                }
+                Process process = Process.GetProcessById(processToFind.Id);
+                return process != null;
             }
-            return false;
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -218,6 +223,8 @@ namespace RunescapeBot.ImageTools
         /// <returns>Point(width, height)</returns>
         public static Point GetOSBuddyWindowSize(Process OSBuddy)
         {
+            if (!ProcessExists(OSBuddy)) { return new Point(); }
+
             RECT windowRect = new RECT();
             GetWindowRect(OSBuddy.MainWindowHandle, ref windowRect);
             TrimOSBuddy(ref windowRect);
@@ -235,7 +242,7 @@ namespace RunescapeBot.ImageTools
             {
                 return false;   //unable to close the current instance of OSBuddy
             }
-            if (!StartOSBuddy(clientFilePath))
+            if (!StartOSBuddy(clientFilePath, ref OSBuddy))
             {
                 return false;   //unable to start a new instance of OSBuddy
             }
@@ -246,10 +253,10 @@ namespace RunescapeBot.ImageTools
         /// Starts a new instance of the OSBuddy client
         /// </summary>
         /// <returns></returns>
-        public static bool StartOSBuddy(string clientFilePath)
+        public static bool StartOSBuddy(string clientFilePath, ref Process OSBuddy)
         {
             string error;
-            Process OSBuddy = GetOSBuddy(out error);
+            OSBuddy = GetOSBuddy(out error);
             if (!(OSBuddy == null))
             {
                 return true;    //OSBuddy is already running

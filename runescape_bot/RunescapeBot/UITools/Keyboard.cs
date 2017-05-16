@@ -27,13 +27,32 @@ namespace RunescapeBot.UITools
         }
 
         /// <summary>
+        /// Verifies that the client exists and that it is visible and maximized
+        /// </summary>
+        /// <returns></returns>
+        private bool PrepareClientForInput()
+        {
+            if (ScreenScraper.ProcessExists(RSClient))
+            {
+                ScreenScraper.BringToForeGround(RSClient);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Types a message in the active window
         /// </summary>
         /// <param name="line"></param>
         public void WriteLine(string line)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            SendKeys.SendWait(line);
+            if (PrepareClientForInput())
+            {
+                SendKeys.SendWait(line);
+            }
         }
 
         /// <summary>
@@ -42,9 +61,11 @@ namespace RunescapeBot.UITools
         /// <param name="number">The number to type</param>
         public void WriteNumber(int number)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            string line = number.ToString();
-            SendKeys.SendWait(line);
+            if (PrepareClientForInput())
+            {
+                string line = number.ToString();
+                SendKeys.SendWait(line);
+            }
         }
 
         /// <summary>
@@ -53,10 +74,12 @@ namespace RunescapeBot.UITools
         /// <param name="maxCharsToDelete">the number of times to spam the backspace key</param>
         public void Backspace(int maxCharsToDelete)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            for (int i = 0; i < maxCharsToDelete; i++)
+            if (PrepareClientForInput())
             {
-                SendKeys.SendWait("{BACKSPACE}");
+                for (int i = 0; i < maxCharsToDelete; i++)
+                {
+                    SendKeys.SendWait("{BACKSPACE}");
+                }
             }
         }
 
@@ -65,8 +88,10 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void Tab()
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            SendKeys.SendWait("{TAB}");
+            if (PrepareClientForInput())
+            {
+                SendKeys.SendWait("{TAB}");
+            }
         }
 
         /// <summary>
@@ -74,8 +99,10 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void Enter()
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            SendKeys.SendWait("{ENTER}");
+            if (PrepareClientForInput())
+            {
+                SendKeys.SendWait("{ENTER}");
+            }
         }
 
         /// <summary>
@@ -83,10 +110,12 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void UpArrow(int iterations)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            for (int i = 0; i < iterations; i++)
+            if (PrepareClientForInput())
             {
-                SendKeys.SendWait("{UP}");
+                for (int i = 0; i < iterations; i++)
+                {
+                    SendKeys.SendWait("{UP}");
+                }
             }
         }
 
@@ -95,10 +124,12 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void RightArrow(int iterations)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            for (int i = 0; i < iterations; i++)
+            if (PrepareClientForInput())
             {
-                SendKeys.SendWait("{RIGHT}");
+                for (int i = 0; i < iterations; i++)
+                {
+                    SendKeys.SendWait("{RIGHT}");
+                }
             }
         }
 
@@ -107,10 +138,12 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void DownArrow(int iterations)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            for (int i = 0; i < iterations; i++)
+            if (PrepareClientForInput())
             {
-                SendKeys.SendWait("{DOWN}");
+                for (int i = 0; i < iterations; i++)
+                {
+                    SendKeys.SendWait("{DOWN}");
+                }
             }
         }
 
@@ -119,10 +152,12 @@ namespace RunescapeBot.UITools
         /// </summary>
         public void LeftArrow(int iterations)
         {
-            ScreenScraper.BringToForeGround(RSClient);
-            for (int i = 0; i < iterations; i++)
+            if (PrepareClientForInput())
             {
-                SendKeys.SendWait("{LEFT}");
+                for (int i = 0; i < iterations; i++)
+                {
+                    SendKeys.SendWait("{LEFT}");
+                }
             }
         }
     }

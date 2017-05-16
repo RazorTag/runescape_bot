@@ -294,5 +294,17 @@ namespace RunescapeBot.ImageTools
         {
             return blobs.OrderByDescending(o => o.Size).ToList();
         }
+
+        /// <summary>
+        /// Picks a random pixel within the blob
+        /// </summary>
+        /// <returns>a random blob pixel's coordinates in terms of the game screen</returns>
+        public Point? RandomBlobPixel()
+        {
+            if (Pixels.Count == 0) { return null; }
+
+            Random rng = new Random();
+            return Pixels.ElementAt(rng.Next(0, Pixels.Count)).Value;
+        }
     }
 }
