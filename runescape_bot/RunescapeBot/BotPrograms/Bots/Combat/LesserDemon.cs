@@ -13,6 +13,8 @@ namespace RunescapeBot.BotPrograms
     {
         private const int MAX_DEMON_SPAWN_TIME = 25000;    //max possible lesser demon spawn time in milliseconds
         private const int DEMON_ENGAGE_TIME = 3000;
+        private const int RUNE_MED_HELM_MIN_SIZE = 70;
+        private const int MITHRIL_ARMOR_MIN_SIZE = 100;
         private ColorRange LesserDemonSkin;
         private ColorRange LesserDemonHorn;
         private ColorRange RuneMedHelm;
@@ -64,7 +66,7 @@ namespace RunescapeBot.BotPrograms
                 MinDemonSize = demon.Size / 2;
                 int maxOffset = (int)(0.05 * cloveRange);
                 LeftClick(demon.Center.X, demon.Center.Y, 200, maxOffset);
-                Mouse.RadialOffset(100, 800, 6, 223);
+                Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
                 MissedDemons = 0;
                 LastDemonLocation = demon.Center;
                 SafeWait(DEMON_ENGAGE_TIME);
@@ -72,6 +74,7 @@ namespace RunescapeBot.BotPrograms
             else
             {
                 MissedDemons++;
+                HandleMissedDemon();
             }
 
             return true;
@@ -116,11 +119,11 @@ namespace RunescapeBot.BotPrograms
             Point trimOffset;
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
-            if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, 70))
+            if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE))
             {
                 return true;
             }
-            if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, 100))
+            if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE))
             {
                 return true;
             }
