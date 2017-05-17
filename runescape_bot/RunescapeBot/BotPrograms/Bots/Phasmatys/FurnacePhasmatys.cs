@@ -61,7 +61,7 @@ namespace RunescapeBot.BotPrograms
                 return true;
             }
             Inventory.ClickInventory(1, 0);
-            ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000);
+            ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000, 1000);
 
             //Do the bot-specific actions at the furnace
             if (StopFlag) { return false; }

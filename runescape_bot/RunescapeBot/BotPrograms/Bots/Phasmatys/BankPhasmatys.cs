@@ -108,7 +108,7 @@ namespace RunescapeBot.BotPrograms
         {
             Point? bankBoothLocation = null;
             Point? lastPosition = null;
-            const int scanInterval = 200; //time between checks in milliseconds
+            const int scanInterval = 20; //time between checks in milliseconds
             const int maxWaitTime = 12000;
             Stopwatch watch = new Stopwatch();
 
@@ -123,8 +123,7 @@ namespace RunescapeBot.BotPrograms
                     if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
                     {
                         LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 200, 10);
-                        SafeWait(1000);
-                        //TODO verify that the bank opened
+                        SafeWait(1000); //TODO verify that the bank opened
                         return true;
                     }
                     else

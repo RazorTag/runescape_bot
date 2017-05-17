@@ -145,7 +145,6 @@ namespace RunescapeBot
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
                 case BotActions.LesserDemon:
-                    startParams.FrameTime = 5000;
                     RunningBot = new LesserDemon(startParams);
                     break;
 

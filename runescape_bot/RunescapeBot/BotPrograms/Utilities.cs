@@ -16,7 +16,7 @@ namespace RunescapeBot.BotPrograms
     public static class Utilities
     {
         private const int WAIT_FOR_MAKEALL_POPUP_TIMEOUT = 1000;
-        private const int CHATBOX_OPTION_RIGHT_CLICK_MAX_TRIES = 3;
+        private const int CHATBOX_OPTION_RIGHT_CLICK_MAX_TRIES = 5;
         private const int CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY = 500;
 
         /// <summary>

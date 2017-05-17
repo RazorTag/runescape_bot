@@ -11,11 +11,11 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Creates a boolean array to represent that match 
         /// </summary>
-        /// <param name="artifactColor"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        public static bool[,] ColorFilter(Color[,] rgbImage, ColorRange artifactColor)
+        public static bool[,] ColorFilter(Color[,] rgbImage, ColorRange filter)
         {
-            if (rgbImage == null || artifactColor == null) { return new bool[0, 0]; }
+            if (rgbImage == null || filter == null) { return new bool[0, 0]; }
 
             int width = rgbImage.GetLength(0);
             int height = rgbImage.GetLength(1);
@@ -35,7 +35,7 @@ namespace RunescapeBot.ImageTools
             {
                 int start = assignedColumns;
                 int end = assignedColumns + lightWidth + 1;
-                threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, start, end));
+                threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, filter, ref filterPixels, start, end));
                 assignedColumns += lightWidth + 1;
             }
 
@@ -44,7 +44,7 @@ namespace RunescapeBot.ImageTools
             {
                 int start = assignedColumns;
                 int end = assignedColumns + lightWidth;
-                threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, artifactColor, ref filterPixels, start, end));
+                threadPool[i] = new Thread(() => ColorFilterPiece(rgbImage, filter, ref filterPixels, start, end));
                 assignedColumns += lightWidth;
             }
 
@@ -67,13 +67,13 @@ namespace RunescapeBot.ImageTools
         /// Filters a portion of the rgbImage into a binary image
         /// </summary>
         /// <param name="rgbImage">unfiltered image</param>
-        /// <param name="artifactColor">color range to use for filtering</param>
+        /// <param name="filter">color range to use for filtering</param>
         /// <param name="filterPixels">filtered binary image</param>
         /// <param name="xMin">inclusive</param>
         /// <param name="xMax">exclusive</param>
         /// <param name="yMin">inclusive</param>
         /// <param name="yMax">exclusive</param>
-        private static void ColorFilterPiece(Color[,] rgbImage, ColorRange artifactColor, ref bool[,] filterPixels, int xMin, int xMax)
+        private static void ColorFilterPiece(Color[,] rgbImage, ColorRange filter, ref bool[,] filterPixels, int xMin, int xMax)
         {
             Color pixelColor;
             int height = rgbImage.GetLength(1);
@@ -83,7 +83,7 @@ namespace RunescapeBot.ImageTools
                 for (int y = 0; y < height; y++)
                 {
                     pixelColor = rgbImage[x, y];
-                    filterPixels[x, y] = artifactColor.ColorInRange(pixelColor);
+                    filterPixels[x, y] = filter.ColorInRange(pixelColor);
                 }
             }
         }
@@ -91,31 +91,31 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Finds  all of the blobs in a binary image. Only considers right, left, up, down adjacency (not diagonal)
         /// </summary>
-        /// <param name="artifactImage"></param>
+        /// <param name="image"></param>
         /// <returns>a list of blobs found from biggest to smallest</returns>
-        public static List<Blob> FindBlobs(bool[,] artifactImage, bool sort = false)
+        public static List<Blob> FindBlobs(bool[,] image, bool sort = false)
         {
-            if (artifactImage == null) { return new List<Blob>(); }
+            if (image == null) { return new List<Blob>(); }
 
             Blob blob;
             Point pixel;
             List<Blob> allBlobs = new List<Blob>();
-            int width = artifactImage.GetLength(0);
-            int height = artifactImage.GetLength(1);
+            int width = image.GetLength(0);
+            int height = image.GetLength(1);
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (artifactImage[x, y])
+                    if (image[x, y])
                     {
                         blob = new Blob();
-                        AddPixelToBlob(x, y, artifactImage, blob);
+                        AddPixelToBlob(x, y, image, blob);
 
                         while (blob.HasPixelsToProcess())
                         {
                             pixel = blob.NextPixel();
-                            CheckNeighbors(blob, artifactImage, pixel.X, pixel.Y, width, height);
+                            CheckNeighbors(blob, image, pixel.X, pixel.Y, width, height);
                         }
                         
                         allBlobs.Add(blob);
@@ -138,42 +138,42 @@ namespace RunescapeBot.ImageTools
         /// <param name="blob"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <param name="artifactImage"></param>
-        private static void CheckNeighbors(Blob blob, bool[,] artifactImage, int x, int y, int width, int height)
+        /// <param name="image"></param>
+        private static void CheckNeighbors(Blob blob, bool[,] image, int x, int y, int width, int height)
         {
             //top
             if (y > 0)
             {
-                if (artifactImage[x, y - 1])
+                if (image[x, y - 1])
                 {
-                    AddPixelToBlob(x, y - 1, artifactImage, blob);
+                    AddPixelToBlob(x, y - 1, image, blob);
                 }
             }
 
             //left
             if (x > 0)
             {
-                if (artifactImage[x - 1, y])
+                if (image[x - 1, y])
                 {
-                    AddPixelToBlob(x - 1, y, artifactImage, blob);
+                    AddPixelToBlob(x - 1, y, image, blob);
                 }
             }
 
             //right
             if (x < (width - 1))
             {
-                if (artifactImage[x + 1, y])
+                if (image[x + 1, y])
                 {
-                    AddPixelToBlob(x + 1, y, artifactImage, blob);
+                    AddPixelToBlob(x + 1, y, image, blob);
                 }
             }
 
             //bottom
             if (y < (height - 1))
             {
-                if (artifactImage[x, y + 1])
+                if (image[x, y + 1])
                 {
-                    AddPixelToBlob(x, y + 1, artifactImage, blob);
+                    AddPixelToBlob(x, y + 1, image, blob);
                 }
             }
         }
@@ -181,14 +181,14 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Finds the biggest blob in the image
         /// </summary>
-        /// <param name="artifactImage"></param>
+        /// <param name="image"></param>
         /// <returns></returns>
-        public static Blob BiggestBlob(bool[,] artifactImage)
+        public static Blob BiggestBlob(bool[,] image)
         {
-            if (artifactImage == null) { return null; }
+            if (image == null) { return null; }
 
             Blob biggestBlob;
-            List<Blob> blobs = FindBlobs(artifactImage);
+            List<Blob> blobs = FindBlobs(image);
 
             if (blobs.Count > 0)
             {
@@ -216,11 +216,11 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <param name="artifactImage"></param>
-        private static void AddPixelToBlob(int x, int y, bool[,] artifactImage, Blob blob)
+        /// <param name="image"></param>
+        private static void AddPixelToBlob(int x, int y, bool[,] image, Blob blob)
         {
             blob.AddPixel(new Point(x, y));
-            artifactImage[x, y] = false;
+            image[x, y] = false;
         }
 
         /// <summary>

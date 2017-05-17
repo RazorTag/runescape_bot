@@ -158,6 +158,35 @@ namespace RunescapeBot.UITools
         }
 
         /// <summary>
+        /// Moves the mouse to a random position within the specified arc and distance from the current mouse position.
+        /// The arc angle starts at a heading of (1, 0)/right and goes counterclockwise.
+        /// </summary>
+        /// <param name="minRadius"></param>
+        /// <param name="maxRadius"></param>
+        /// <param name="arcStart">Degrees (NOT radians). The possible arc goes counterclockwise from arcStart to arcEnd.</param>
+        /// <param name="arcEnd">Degrees (NOT radians). The possible arc goes counterclockwise from arcStart to arcEnd.</param>
+        public static void RadialOffset(int minRadius, int maxRadius, int arcStart, int arcEnd)
+        {
+            Random rng = new Random();
+            int radius = rng.Next(minRadius, maxRadius + 1);
+
+            arcStart = arcStart % 360;
+            arcEnd = arcEnd % 360;
+            if (arcStart > arcEnd)
+            {
+                arcEnd += 360;
+            }
+            double angle = rng.Next(arcStart, arcEnd + 1);
+            angle = (angle % 360) * ((2 * Math.PI) / 360.0);
+
+            POINT startingPosition;
+            GetCursorPos(out startingPosition);
+            int x = startingPosition.X + ((int) Math.Round(Math.Cos(angle) * radius));
+            int y = startingPosition.Y - ((int) Math.Round(Math.Sin(angle) * radius));
+            NaturalMove(x, y);
+        }
+
+        /// <summary>
         /// Moves a mouse across a screen like a human would
         /// </summary>
         /// <param name="x"></param>

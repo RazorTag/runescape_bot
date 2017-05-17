@@ -1,9 +1,15 @@
 ~General~
--run OSBuddy
+-use OSBuddy
 -turn brightness all the way up in the game settings
--turn off public chat
+-set private chat to friends only
 -use the 'Old School Box' instead of 'Bottom Line'
--use the opaque chatbox instead of the transparent chatbox
+-set the inventory background to opaque
+-set the zoom to roughly the max zoom out setting for the default client
+	*To verify, go to Settings -> General -> Camera Zoom -> OFF
+
+
+~Combat~
+-enable the OSbuddy monster hitpoints bar (Settings -> General -> All Opponent Info -> ON)
 
 
 ~Lesser Demon~

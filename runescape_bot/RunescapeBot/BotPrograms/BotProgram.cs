@@ -107,6 +107,11 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// The time that the last screenshot was taken
+        /// </summary>
+        protected DateTime LastScreenShot { get; set; }
+
+        /// <summary>
         /// The sidebar including the inventory and spellbook
         /// </summary>
         protected Inventory Inventory { get; set; }
@@ -410,13 +415,13 @@ namespace RunescapeBot.BotPrograms
         /// <param name="afterClickWait">time to wait affter clicking on the stationary object</param>
         /// <param name="maxWaitTime">maximum time to wait before giving up</param>
         /// <returns></returns>
-        protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime)
+        protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
         {
-            Point? objectLocation;
+            Blob foundObject;
 
-            if (LocateStationaryObject(stationaryObject, out objectLocation, tolerance, maxWaitTime))
+            if (LocateStationaryObject(stationaryObject, out foundObject, tolerance, maxWaitTime, minimumSize))
             {
-                LeftClick(objectLocation.Value.X, objectLocation.Value.Y);
+                LeftClick(foundObject.Center.X, foundObject.Center.Y);
                 SafeWait(afterClickWait);
                 return true;
             }
@@ -428,11 +433,11 @@ namespace RunescapeBot.BotPrograms
         /// Looks for an object that isn't moving (meaning the player isn't moving)
         /// </summary>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(ColorRange stationaryObject, out Point? objectLocation, double tolerance, int maxWaitTime)
+        protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize)
         {
-            objectLocation = null;
+            foundObject = null;
             Point? lastPosition = null;
-            const int scanInterval = 200; //time between checks in milliseconds
+            const int scanInterval = 20; //minimum time between checks in milliseconds
             Stopwatch watch = new Stopwatch();
 
             for (int i = 0; i < (maxWaitTime / ((double)scanInterval)); i++)
@@ -440,15 +445,14 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return false; }
 
                 watch.Restart();
-                ReadWindow();
-                bool[,] objectPixels = ColorFilter(stationaryObject);
-                Blob objectBlob = ImageProcessing.BiggestBlob(objectPixels);
+                Blob objectBlob;
+                LocateObject(stationaryObject, out objectBlob, minimumSize);
 
-                if (objectBlob != null && objectBlob.Size > 100)
+                if (objectBlob != null && objectBlob.Size >= minimumSize)
                 {
                     if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
                     {
-                        objectLocation = objectBlob.Center;
+                        foundObject = objectBlob;
                         return true;
                     }
                     else
@@ -461,11 +465,39 @@ namespace RunescapeBot.BotPrograms
                     lastPosition = null;
                 }
 
+                if (StopFlag) { return false; }
                 watch.Stop();
-                SafeWait(500);
+                SafeWait(Math.Max(0, scanInterval - (int)watch.ElapsedMilliseconds));
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Looks for an object that matches a filter
+        /// </summary>
+        /// <param name="stationaryObject"></param>
+        /// <param name="foundObject"></param>
+        /// <param name="maxWaitTime"></param>
+        /// <param name="minimumSize"></param>
+        /// <returns></returns>
+        protected bool LocateObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize)
+        {
+            ReadWindow();
+            bool[,] objectPixels = ColorFilter(stationaryObject);
+            EraseClientUIFromMask(ref objectPixels);
+            Blob objectBlob = ImageProcessing.BiggestBlob(objectPixels);
+
+            if (objectBlob != null && objectBlob.Size >= minimumSize)
+            {
+                foundObject = objectBlob;
+                return true;
+            }
+            else
+            {
+                foundObject = null;
+                return false;
+            }
         }
         #endregion
 
@@ -486,10 +518,22 @@ namespace RunescapeBot.BotPrograms
                 PrepareClient();
                 return false;
             }
+
+            LastScreenShot = DateTime.Now;
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
 
             return Bitmap != null;
+        }
+
+        /// <summary>
+        /// Gets the time since the last screenshot
+        /// </summary>
+        /// <returns>time elapsed since the most recent screenshot</returns>
+        protected int TimeSinceLastScreenShot()
+        {
+            TimeSpan elapsedTime = DateTime.Now - LastScreenShot;
+            return (int)elapsedTime.TotalMilliseconds;
         }
 
         /// <summary>
@@ -530,35 +574,66 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Creates a boolean array of a portion of the screen to represent a color filter match
         /// </summary>
-        /// <param name="artifactColor"></param>
+        /// <param name="filter"></param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="top"></param>
         /// <param name="bottom"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilterPiece(ColorRange artifactColor, int left, int right, int top, int bottom, out Point trimOffset)
+        protected bool[,] ColorFilterPiece(ColorRange filter, int left, int right, int top, int bottom, out Point trimOffset)
         {
             Color[,] colorArray = ScreenPiece(left, right, top, bottom, out trimOffset);
             if (ColorArray == null)
             {
                 return null;
             }
-            return ImageProcessing.ColorFilter(colorArray, artifactColor);
+            return ImageProcessing.ColorFilter(colorArray, filter);
         }
 
         /// <summary>
         /// Creates a boolean array of a portion of the screen to represent a color filter match
         /// </summary>
-        /// <param name="artifactColor"></param>
+        /// <param name="filter"></param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="top"></param>
         /// <param name="bottom"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilterPiece(ColorRange artifactColor, int left, int right, int top, int bottom)
+        protected bool[,] ColorFilterPiece(ColorRange filter, int left, int right, int top, int bottom)
         {
             Point empty;
-            return ColorFilterPiece(artifactColor, left, right, top, bottom, out empty);
+            return ColorFilterPiece(filter, left, right, top, bottom, out empty);
+        }
+
+        /// <summary>
+        /// Filters in a circle within the screen shot
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
+        protected bool[,] ColorFilterPiece(ColorRange filter, Point center, int radius)
+        {
+            int left = center.X - radius;
+            int right = center.X + radius;
+            int top = center.Y - radius;
+            int bottom = center.Y + radius;
+            double distance;
+
+            bool[,] circleImage = new bool[right - left + 1, bottom - top + 1];
+
+            for (int x = left; x <= right; x++)
+            {
+                for (int y = top; y <= bottom; y++)
+                {
+                    distance = Math.Sqrt(Math.Pow(x - center.X, 2) + Math.Pow(y - center.Y, 2));
+                    if (distance <= radius)
+                    {
+                        circleImage[x - left, y - top] = filter.ColorInRange(ColorArray[x, y]);
+                    }
+                }
+            }
+            return circleImage;
         }
 
         /// <summary>

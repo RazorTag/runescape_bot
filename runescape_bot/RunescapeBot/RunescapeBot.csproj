@@ -67,9 +67,6 @@
     <ApplicationIcon>project.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InputSimulator">
-      <HintPath>..\InputSimulator.0.1.0.0-bin\Release\InputSimulator.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -90,10 +87,11 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
+    <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\FletchShortbows.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\Cannonballs.cs" />
-    <Compile Include="BotPrograms\Bots\NightmareZoneD.cs" />
+    <Compile Include="BotPrograms\Bots\Combat\NightmareZoneD.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\FurnacePhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\StringBows.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />
@@ -124,7 +122,7 @@
     <Compile Include="GMA\MouseEventExtArgs.cs" />
     <Compile Include="ImageTools\Blob\Blob.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\GoldBracelets.cs" />
-    <Compile Include="BotPrograms\Bots\LesserDemon.cs" />
+    <Compile Include="BotPrograms\Bots\Combat\LesserDemon.cs" />
     <Compile Include="ImageTools\FIlters\ColorRange.cs" />
     <Compile Include="ImageTools\FIlters\HSBRange.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />

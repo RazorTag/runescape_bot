@@ -195,7 +195,7 @@ namespace RunescapeBot.ImageTools
         {
             int rise = Center.Y - point.Y;
             int run = Center.X - point.X;
-            return Math.Sqrt(rise * rise + run * run);
+            return Math.Sqrt((rise * rise) + (run * run));
         }
 
         /// <summary>

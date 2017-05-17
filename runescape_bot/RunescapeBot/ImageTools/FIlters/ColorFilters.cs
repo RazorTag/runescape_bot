@@ -41,7 +41,7 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(30, 30, 30);
-            HSBRange hsbRange = new HSBRange(0, 0, 0.05f, 0.3f, 0.02f, 0.12f);
+            HSBRange hsbRange = new HSBRange(0, 0, 0.030f, 0.400f, 0.020f, 0.120f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion
@@ -174,6 +174,44 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(88, 79, 66);
             Color light = Color.FromArgb(98, 89, 76);
             HSBRange hsbRange = new HSBRange(30, 40, 0.080f, 0.180f, 0.270f, 0.370f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+        #endregion
+
+        #region OSBuddy
+        /// <summary>
+        /// The gray background on the OSBuddy popup in the top-left of the screen that shows the current target's hitpoints
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange OSBuddyEnemyHitpointsBackground()
+        {
+            Color dark = Color.FromArgb(66, 60, 52);
+            Color light = Color.FromArgb(68, 62, 54);
+            HSBRange hsbRange = new HSBRange(33, 35, 0.116f, 0.118f, 0.234f, 0.236f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The green portion of the health bar on the OSBuddy popup in the top-left of the screen that shows the current target's hitpoints
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange OSBuddyEnemyHitpointsGreen()
+        {
+            Color dark = Color.FromArgb(45, 121, 35);
+            Color light = Color.FromArgb(47, 123, 37);
+            HSBRange hsbRange = new HSBRange(112, 114, 0.543f, 0.545f, 0.309f, 0.311f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The red portion of the health bar on the OSBuddy popup in the top-left of the screen that shows the current target's hitpoints
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange OSBuddyEnemyHitpointsRed()
+        {
+            Color dark = Color.FromArgb(125, 41, 35);
+            Color light = Color.FromArgb(127, 43, 37);
+            HSBRange hsbRange = new HSBRange(3, 5, 0.555f, 0.557f, 0.317f, 0.319f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion
