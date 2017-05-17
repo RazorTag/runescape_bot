@@ -298,14 +298,14 @@ namespace RunescapeBot.BotPrograms
                 randomFrameOffset = 0;
             }
 
+            Stopwatch watch = new Stopwatch();
             for (int i = 0; i < RunParams.Iterations; i++)
             {
+                watch.Restart();
                 if (DateTime.Now > RunParams.RunUntil)
                 {
                     return; //quit if we have gone over our time limit
                 }
-
-                Stopwatch watch = Stopwatch.StartNew();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
                 if (StopFlag) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
@@ -331,7 +331,6 @@ namespace RunescapeBot.BotPrograms
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
                 randomFrameTime = Math.Max(0, randomFrameTime);
-                watch.Stop();
                 if (watch.ElapsedMilliseconds < randomFrameTime)
                 {
                     SafeWait(randomFrameTime - (int)watch.ElapsedMilliseconds);
@@ -432,19 +431,26 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Looks for an object that isn't moving (meaning the player isn't moving)
         /// </summary>
+        /// <param name="stationaryObject">color filter used to locate the stationary object</param>
+        /// <param name="foundObject">returns the Blob if it is found</param>
+        /// <param name="tolerance">maximum allowed distance in pixels between subsequent object locations</param>
+        /// <param name="maxWaitTime">time to wait before gving up</param>
+        /// <param name="minimumSize">minimum required size of the object in pixels</param>
         /// <returns>True if the object is found</returns>
         protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize)
         {
             foundObject = null;
             Point? lastPosition = null;
-            const int scanInterval = 20; //minimum time between checks in milliseconds
-            Stopwatch watch = new Stopwatch();
+            const int scanInterval = 100; //minimum time between checks in milliseconds
+            Stopwatch intervalWatch = new Stopwatch();
+            Stopwatch giveUpWatch = new Stopwatch();
+            giveUpWatch.Start();
 
-            for (int i = 0; i < (maxWaitTime / ((double)scanInterval)); i++)
+            while (giveUpWatch.ElapsedMilliseconds < maxWaitTime)
             {
                 if (StopFlag) { return false; }
 
-                watch.Restart();
+                intervalWatch.Restart();
                 Blob objectBlob;
                 LocateObject(stationaryObject, out objectBlob, minimumSize);
 
@@ -466,8 +472,7 @@ namespace RunescapeBot.BotPrograms
                 }
 
                 if (StopFlag) { return false; }
-                watch.Stop();
-                SafeWait(Math.Max(0, scanInterval - (int)watch.ElapsedMilliseconds));
+                SafeWait(Math.Max(0, scanInterval - (int)intervalWatch.ElapsedMilliseconds));
             }
 
             return false;
@@ -606,7 +611,24 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Filters in a circle within the screen shot
+        /// Filters in a square within the screen shot
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <param name="offset"></param>
+        /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
+        protected bool[,] ColorFilterPiece(ColorRange filter, Point center, int radius, out Point offset)
+        {
+            int left = center.X - radius;
+            int right = center.X + radius;
+            int top = center.Y - radius;
+            int bottom = center.Y + radius;
+            return ColorFilterPiece(filter, left, right, top, bottom, out offset);
+        }
+
+        /// <summary>
+        /// Filters in a square within the screen shot
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="center"></param>
@@ -614,26 +636,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
         protected bool[,] ColorFilterPiece(ColorRange filter, Point center, int radius)
         {
-            int left = center.X - radius;
-            int right = center.X + radius;
-            int top = center.Y - radius;
-            int bottom = center.Y + radius;
-            double distance;
-
-            bool[,] circleImage = new bool[right - left + 1, bottom - top + 1];
-
-            for (int x = left; x <= right; x++)
-            {
-                for (int y = top; y <= bottom; y++)
-                {
-                    distance = Math.Sqrt(Math.Pow(x - center.X, 2) + Math.Pow(y - center.Y, 2));
-                    if (distance <= radius)
-                    {
-                        circleImage[x - left, y - top] = filter.ColorInRange(ColorArray[x, y]);
-                    }
-                }
-            }
-            return circleImage;
+            Point offset;
+            return ColorFilterPiece(filter, center, radius, out offset);
         }
 
         /// <summary>
@@ -1034,15 +1038,13 @@ namespace RunescapeBot.BotPrograms
         protected bool SafeWait(int waitTime)
         {
             int nextWaitTime;
-            int waitInterval = 1000;
-            int numIntervals = (int) Math.Ceiling((double)waitTime / (double)waitInterval);
+            int waitInterval = 100;
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            for (int i = 0; i < numIntervals; i++)
+            while (watch.ElapsedMilliseconds < waitTime)
             {
-                nextWaitTime = Math.Min(waitInterval, (waitTime - (int)watch.ElapsedMilliseconds));
-                nextWaitTime = Math.Max(0, nextWaitTime);
+                nextWaitTime = Math.Min(waitInterval, (int)(waitTime - watch.ElapsedMilliseconds));
                 Thread.Sleep(nextWaitTime);
                 if (StopFlag) { return true; }
             }

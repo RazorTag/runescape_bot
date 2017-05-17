@@ -94,7 +94,31 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(45, 45, 70);
             Color light = Color.FromArgb(105, 105, 130);
-            HSBRange hsbRange = new HSBRange(215, 315, 0.1f, 0.2f, 0.23f, 0.46f);
+            HSBRange hsbRange = new HSBRange(215, 315, 0.100f, 0.200f, 0.203f, 0.460f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The orange outline on a chaos rune
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange ChaosRuneOrange()
+        {
+            Color dark = Color.FromArgb(218, 161, 20);
+            Color light = Color.FromArgb(229, 174, 33);
+            HSBRange hsbRange = new HSBRange(40, 46, 0.728f, 0.848f, 0.436f, 0.544f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The white skull and crossbones on a death rune
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange DeathRuneWhite()
+        {
+            Color dark = Color.FromArgb(223, 219, 219);
+            Color light = Color.FromArgb(234, 230, 230);
+            HSBRange hsbRange = new HSBRange(357, 3, 0.021f, 0.121f, 0.840f, 0.940f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion

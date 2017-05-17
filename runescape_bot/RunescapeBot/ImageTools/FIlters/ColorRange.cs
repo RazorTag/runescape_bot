@@ -86,7 +86,7 @@ namespace RunescapeBot.ImageTools
 
         public bool RGBInRange(Color color)
         {
-            if ((DarkestColor == null) && (LightestColor == null))
+            if ((DarkestColor == null) || (LightestColor == null))
             {
                 return true;
             }

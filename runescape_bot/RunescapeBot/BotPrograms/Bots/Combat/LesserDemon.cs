@@ -15,10 +15,14 @@ namespace RunescapeBot.BotPrograms
         private const int DEMON_ENGAGE_TIME = 3000;
         private const int RUNE_MED_HELM_MIN_SIZE = 70;
         private const int MITHRIL_ARMOR_MIN_SIZE = 100;
+        private const int CHAOS_RUNE_MIN_SIZE = 3;
+        private const int DEATH_RUNE_MIN_SIZE = 5;
         private ColorRange LesserDemonSkin;
         private ColorRange LesserDemonHorn;
         private ColorRange RuneMedHelm;
         private ColorRange MithrilArmor;
+        private ColorRange ChaosRune;
+        private ColorRange DeathRune;
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -35,6 +39,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private Point LastDemonLocation;
 
+        /// <summary>
+        /// The last time when a demon was found.
+        /// </summary>
+        private DateTime LastDemonTime;
+
 
         public LesserDemon(StartParams startParams) : base(startParams)
         {
@@ -44,9 +53,26 @@ namespace RunescapeBot.BotPrograms
 
         protected override void Run()
         {
-            //ColorRange empty = ColorFilters.LesserDemonHorn();
+            //ColorRange empty = ColorFilters.ChaosRuneOrange();
             //bool[,] mask = ColorFilter(empty);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, empty, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "cloves");
+            //DebugUtilities.TestMask(Bitmap, ColorArray, empty, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "chaosRune");
+
+            //ReadWindow();
+            //ColorRange filter = ColorFilters.ChaosRuneOrange();
+            //bool[,] binary = ColorFilter(filter);
+            //double test = ImageProcessing.FractionalMatch(binary);
+
+            //ColorRange filter = ColorFilters.DeathRuneWhite();
+            //bool[,] mask = ColorFilter(filter);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, filter, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "deathRune");
+            //double test = ImageProcessing.FractionalMatch(mask);
+
+            //ColorRange filterM = ColorFilters.MithrilArmor();
+            //bool[,] binaryM = ColorFilter(filterM);
+            //double testM = ImageProcessing.FractionalMatch(binaryM);
+
+            LastDemonLocation = Center;
+            CheckDrops();
         }
 
         /// <summary>
@@ -54,27 +80,26 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected override bool Execute()
         {
-            if (InCombat()) //we are already fighting the demon
-            {
-                return true;
-            }
-
             Blob demon;
             double cloveRange = 2 * Math.Sqrt(MinDemonSize);
+
             if (LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
             {
+                LastDemonTime = DateTime.Now;
                 MinDemonSize = demon.Size / 2;
                 int maxOffset = (int)(0.05 * cloveRange);
-                LeftClick(demon.Center.X, demon.Center.Y, 200, maxOffset);
-                Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
+                if (!InCombat())    //engage the demon
+                {
+                    LeftClick(demon.Center.X, demon.Center.Y, 200, maxOffset);
+                    Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
+                }
                 MissedDemons = 0;
                 LastDemonLocation = demon.Center;
                 SafeWait(DEMON_ENGAGE_TIME);
             }
             else
             {
-                MissedDemons++;
-                HandleMissedDemon();
+                MissedDemon();
             }
 
             return true;
@@ -83,25 +108,28 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Called when a demon is not found
         /// </summary>
-        private void HandleMissedDemon()
+        private void MissedDemon()
         {
-            //During the first frame that the bot program cant find a demon, look for a rune med helm drop
-            if (MissedDemons == 1 && CheckDrops())
+            MissedDemons++;
+
+            //During the first frame that the bot program can't find a demon, look for drops
+            if (MissedDemons == 1)
             {
-                MissedDemons = 0;
+                CheckDrops();
             }
 
-            //Reduce the minimum size of the demon in a desperate attempt to find a demon
-            if (MissedDemons * RunParams.FrameTime > MAX_DEMON_SPAWN_TIME)
+            //Reduce the minimum required size of the demon in a desperate attempt to find a demon
+            if ((DateTime.Now - LastDemonTime).TotalMilliseconds > MAX_DEMON_SPAWN_TIME)
             {
                 MinDemonSize /= 2;
                 DefaultCamera();
             }
 
-            //Give up, log out of the game, go outside, and play
+            //Give up, log out of the game, go outside and play
             if ((MissedDemons * RunParams.FrameTime) > (3 * MAX_DEMON_SPAWN_TIME))
             {
                 Logout();
+                StopFlag = true;
             }
         }
 
@@ -111,7 +139,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if a drop is found</returns>
         private bool CheckDrops()
         {
-            int dropRange = 350;
+            int dropRange = (int) (3 * Math.Sqrt(MinDemonSize));
             int dropRangeLeft = LastDemonLocation.X - dropRange;
             int dropRangeRight = LastDemonLocation.X + dropRange;
             int dropRangeTop = LastDemonLocation.Y - dropRange;
@@ -119,14 +147,10 @@ namespace RunescapeBot.BotPrograms
             Point trimOffset;
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
-            if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE))
-            {
-                return true;
-            }
-            if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE))
-            {
-                return true;
-            }
+            if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE)){ return true; }
+            if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE)) { return true; }
+            if (FindAndGrab(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE)) { return true; }
+            if (FindAndGrab(screenDropArea, trimOffset, DeathRune, DEATH_RUNE_MIN_SIZE)) { return true; }
 
             return false;
         }
@@ -141,13 +165,33 @@ namespace RunescapeBot.BotPrograms
         private bool FindAndAlch(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
-            EraseClientUIFromMask(ref matchedPixels);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
 
             if (biggestBlob.Size > minimumSize)
             {
                 Point blobCenter = biggestBlob.Center;
                 return Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Looks for, picks up, and alchs a drop that matches a ColorRange
+        /// </summary>
+        /// <param name="screenDropArea"></param>
+        /// <param name="referenceColor"></param>
+        /// <param name="minimumSize">minimum number of pixels needed to </param>
+        /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
+        private bool FindAndGrab(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        {
+            bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
+            Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
+
+            if (biggestBlob.Size > minimumSize)
+            {
+                Point blobCenter = biggestBlob.Center;
+                Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                return true;
             }
             return false;
         }
@@ -213,6 +257,8 @@ namespace RunescapeBot.BotPrograms
             LesserDemonHorn = ColorFilters.LesserDemonHorn();
             RuneMedHelm = ColorFilters.RuneMedHelm();
             MithrilArmor = ColorFilters.MithrilArmor();
+            ChaosRune = ColorFilters.ChaosRuneOrange();
+            DeathRune = ColorFilters.DeathRuneWhite();
         }
     }
 }
