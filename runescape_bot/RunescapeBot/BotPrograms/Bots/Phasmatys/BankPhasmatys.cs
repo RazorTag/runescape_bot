@@ -139,7 +139,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Finds the midpoint of the two east most bank booths in the Port Phasmatys bank
+        /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if the bank booths are found</returns>
         protected bool LocateBankBooth(out Point? bankBooth, bool randomize = false)

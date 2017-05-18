@@ -56,15 +56,9 @@ namespace RunescapeBot.Common
         {
             Random rng = new Random();
             int midX, midY;
-
-            if (a.X == b.X)
-            {
-                midY = (int)Math.Round((a.Y * (b.Y - a.Y)) + rng.NextDouble());
-            }
-            double slope = (b.Y - a.Y) / (b.X - a.X);
             double bNess = rng.NextDouble();
             midX = (int) Math.Round((bNess * (b.X - a.X)) + a.X);
-            midY = (int) Math.Round((slope * (midX - a.X)) + a.Y);
+            midY = (int) Math.Round((bNess * (b.Y - a.Y)) + a.Y);
             return new Point(midX, midY);
         }
     }
