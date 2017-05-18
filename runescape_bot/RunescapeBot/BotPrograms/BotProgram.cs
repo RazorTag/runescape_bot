@@ -202,10 +202,11 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Makes sure that OSBuddy is running and starts it if it isn't
         /// </summary>
+        /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
         /// <returns></returns>
-        private bool PrepareClient()
+        private bool PrepareClient(bool forceRestart = false)
         {
-            if (ScreenScraper.ProcessExists(RSClient)) { return true; }
+            if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
 
             if (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
             {
@@ -510,13 +511,8 @@ namespace RunescapeBot.BotPrograms
                 Bitmap.Dispose();
             }
             if (StopFlag) { return false; }
-            
-            if(!ScreenScraper.ProcessExists(RSClient))
-            {
-                PrepareClient();
-                return false;
-            }
 
+            if (!PrepareClient()) { return false; }
             LastScreenShot = DateTime.Now;
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
@@ -747,7 +743,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the failed login is handled satisfactorily. false if the bot should stop</returns>
         private bool HandleFailedLogIn()
         {
-            return PrepareClient();
+            return PrepareClient(true);
         }
 
         /// <summary>
