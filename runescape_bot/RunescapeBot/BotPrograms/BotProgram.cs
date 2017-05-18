@@ -40,7 +40,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// The number of consecutive previously failed login attempts.
         /// </summary>
-        private int FailedLoginAttempts;
+        private int FailedRestartAttempts;
 
         /// <summary>
         /// Specifies how the bot should be run
@@ -207,7 +207,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (ScreenScraper.ProcessExists(RSClient)) { return true; }
 
-            if (ScreenScraper.StartOSBuddy(RunParams.ClientFilePath, ref client))
+            if (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
             {
                 for (int i = 0; i < 180; i++)
                 {
@@ -326,7 +326,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 else
                 {
-                    HandleFailedLogIn();
+                    if (!HandleFailedLogIn()) { return; }   //stop if we are unable to recover
                 }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
@@ -366,14 +366,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public void Stop()
         {
-            if (StopFlag)
-            {
-                RunParams.TaskComplete();
-            }
-            else
-            {
-                StopFlag = true;
-            }
+            StopFlag = true;
         }
         #endregion
 
@@ -754,23 +747,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the failed login is handled satisfactorily. false if the bot should stop</returns>
         private bool HandleFailedLogIn()
         {
-            if (FailedLoginAttempts > 2)
-            {
-                if (PrepareClient())
-                {
-                    FailedLoginAttempts = 0;
-                    SafeWait(OSBUDDY_LOAD_TIME);
-                    return true;
-                }
-                else
-                {
-                    return false; //The client didnt restart correctly, so we can't continue.
-                }
-            }
-            else
-            {
-                return true;
-            }
+            return PrepareClient();
         }
 
         /// <summary>
@@ -803,7 +780,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Tries to log in. Make sure the client window has focus before calling this method.
+        /// Tries to log in.
         /// </summary>
         /// <returns>true if login is successful, false if login fails</returns>
         private bool LogIn()
@@ -839,20 +816,17 @@ namespace RunescapeBot.BotPrograms
             }
             else
             {
-                FailedLoginAttempts++;
                 return false;
             }
 
             //verify the log in
             if (ConfirmLogin())
             {
-                FailedLoginAttempts = 0;
                 DefaultCamera();
                 return true;
             }
             else
             {
-                FailedLoginAttempts++;
                 return false;
             }
         }

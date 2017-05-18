@@ -232,7 +232,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Closes an instance of OSBuddy ad opens a new one
+        /// Closes an instance of OSBuddy and opens a new one
         /// </summary>
         /// <param name="OSBuddy"></param>
         /// <returns></returns>
