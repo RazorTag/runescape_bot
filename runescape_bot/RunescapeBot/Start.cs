@@ -49,9 +49,11 @@ namespace RunescapeBot
         {
             [Description("Agility - Gnome Stronghold")]
             AgilityGnomeStronghold,
+            [Description("Agility - Seers' Village")]
+            AgilitySeersVillage,
             [Description("Combat - Lesser Demon")]
             LesserDemon,
-            [Description("Combat - Nightmare Zone Dharoks")]
+            [Description("Combat - Nightmare Zone")]
             NightmareZoneD,
             [Description("Crafting - Gold Bracelets")]
             GoldBracelets,
@@ -156,10 +158,6 @@ namespace RunescapeBot
                     RunningBot = new Cannonballs(startParams);
                     break;
 
-                case BotActions.AgilityGnomeStronghold:
-                    RunningBot = new AgilityGnomeStronghold(startParams);
-                    break;
-
                 case BotActions.NightmareZoneD:
                     startParams.FrameTime = 30000;
                     RunningBot = new NightmareZoneD(startParams);
@@ -171,6 +169,14 @@ namespace RunescapeBot
 
                 case BotActions.StringBows:
                     RunningBot = new StringBows(startParams);
+                    break;
+
+                case BotActions.AgilityGnomeStronghold:
+                    RunningBot = new AgilityGnomeStronghold(startParams);
+                    break;
+
+                case BotActions.AgilitySeersVillage:
+                    RunningBot = new AgilitySeersVillage(startParams);
                     break;
 
                 default:

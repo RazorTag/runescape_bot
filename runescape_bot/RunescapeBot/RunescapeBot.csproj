@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
+    <Compile Include="BotPrograms\Bots\AgilitySeersVillage.cs" />
     <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\FletchShortbows.cs" />

@@ -47,6 +47,7 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region stationary objcts
+
         /// <summary>
         /// The gray top of a furnace
         /// </summary>
@@ -70,6 +71,23 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(64, 72, 0.360f, 0.418f, 0.182f, 0.222f);
             return new ColorRange(dark, light, hsbRange);
         }
+
+        #region gnome stronghold agility obstacles
+
+        /// <summary>
+        /// The teller side counter of a Port Phasmatys bank booth
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange LogBalance()
+        {
+            Color dark = Color.FromArgb(68, 39, 3);
+            Color light = Color.FromArgb(107, 64, 17);
+            HSBRange hsbRange = new HSBRange(30, 35, 0.735f, 0.875f, 0.143f, 0.236f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        #endregion
+
         #endregion
 
         #region items (ground)

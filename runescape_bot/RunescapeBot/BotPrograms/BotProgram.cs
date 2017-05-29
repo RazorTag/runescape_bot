@@ -1,5 +1,4 @@
 ﻿using RunescapeBot.Common;
-using RunescapeBot.FileIO;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -36,11 +35,6 @@ namespace RunescapeBot.BotPrograms
         /// Error message to show the user for a start error
         /// </summary>
         private string LoadError;
-
-        /// <summary>
-        /// The number of consecutive previously failed login attempts.
-        /// </summary>
-        private int FailedRestartAttempts;
 
         /// <summary>
         /// Specifies how the bot should be run
@@ -127,6 +121,11 @@ namespace RunescapeBot.BotPrograms
         protected bool StopFlag { get; set; }
 
         /// <summary>
+        /// Set to true after the bot stops naturally
+        /// </summary>
+        protected bool BotIsDone { get; set; }
+
+        /// <summary>
         /// Center of the screen
         /// </summary>
         protected Point Center
@@ -188,6 +187,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="iterations"></param>
         public void Start()
         {
+            BotIsDone = false;
             if (PrepareClient())
             {
                 RunThread = new Thread(Process);
@@ -355,6 +355,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Done()
         {
+            BotIsDone = true;
             if (Bitmap != null)
             {
                 Bitmap.Dispose();
@@ -368,6 +369,21 @@ namespace RunescapeBot.BotPrograms
         public void Stop()
         {
             StopFlag = true;
+            Thread abortThread = new Thread(WaitForBotToStop);
+            abortThread.Start();
+        }
+
+        /// <summary>
+        /// Aborts the currently running thread if it takes to long to stop
+        /// </summary>
+        private void WaitForBotToStop()
+        {
+            Thread.Sleep(3000);
+            if (!BotIsDone)
+            {
+                RunThread.Abort();
+            }
+            Done();
         }
         #endregion
 

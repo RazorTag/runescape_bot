@@ -29,5 +29,25 @@ namespace RunescapeBot.Common
             int yDiff = a.Value.Y - b.Value.Y;
             return Math.Sqrt(Math.Pow(xDiff, 2.0) + Math.Pow(yDiff, 2.0));
         }
+
+        /// <summary>
+        /// Calculates the area of a circle from its radius
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <returns>the area of the circle</returns>
+        public static double CircleArea(double radius)
+        {
+            return Math.PI * radius * radius;
+        }
+
+        /// <summary>
+        /// Calculates the radius of a circle from its area
+        /// </summary>
+        /// <param name="area"></param>
+        /// <returns></returns>
+        public static double CircleRadius(double area)
+        {
+            return Math.Sqrt(area / Math.PI);
+        }
     }
 }

@@ -52,6 +52,7 @@ namespace RunescapeBot.BotPrograms
             BankPopup = new Bank(RSClient);
             if (!BankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
+                MoveToBank();
                 FailedRuns++;
                 return true;
             }

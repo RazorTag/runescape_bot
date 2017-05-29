@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.Common;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -306,5 +307,91 @@ namespace RunescapeBot.ImageTools
             Random rng = new Random();
             return Pixels.ElementAt(rng.Next(0, Pixels.Count)).Value;
         }
+
+        #region feature matching
+        /// <summary>
+        /// Determines if the blob is apprximately fits a disk.
+        /// i.e. hollow center surrounded by a ring of finite thickness or a solid disk
+        /// </summary>
+        /// <param name="minimumHollow">minimum required inner radius as a fraction of what the outer radius would be with an inner radius of 0</param>
+        /// <returns></returns>
+        public bool IsCircle(double minimumHollow = 0.0)
+        {
+            const double allowedRadiusFactor = 1.3;
+            const double requiredInsidePortion = 0.9;
+
+            //determine the expected outer radius of the circle
+            Point closestPixel = ClosestPixel(Center);
+            Point farthestPixel = FarthestPixel(Center);
+            double innerRadius = Geometry.DistanceBetweenPoints(Center, closestPixel);
+            double minInnerRadius = minimumHollow * Geometry.CircleRadius(Size);
+            if (innerRadius < minInnerRadius)
+            {
+                return false;   //the blob is not hollow enough
+            }
+            double diskArea = Size + Geometry.CircleArea(innerRadius);
+            double outerRadius = Geometry.CircleRadius(diskArea);
+
+            //determine the portion of the blob that fits inside of the expected outer radius
+            double allowedRadius = allowedRadiusFactor * outerRadius;
+            int insidePixels = 0;
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                if (Geometry.DistanceBetweenPoints(Center, pixel.Value) <= allowedRadius)
+                {
+                    insidePixels++;
+                }
+            }
+            double insidePortion = insidePixels / ((double)Size);
+
+            return insidePortion >= requiredInsidePortion;
+        }
+
+        /// <summary>
+        /// Finds the pixel in the blob that is closest to the start point
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns>the closest pixel in the blob</returns>
+        private Point ClosestPixel(Point start)
+        {
+            double closestDistance = Double.MaxValue;
+            double distance;
+            Point closestPoint = new Point();
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                distance = Geometry.DistanceBetweenPoints(start, pixel.Value);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestPoint = pixel.Value;
+                }
+            }
+            return closestPoint;
+        }
+
+        /// <summary>
+        /// Finds the pixel in the blob that is farthest from the start point
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns>the closest pixel in the blob</returns>
+        private Point FarthestPixel(Point start)
+        {
+            double farthestDistance = Double.MinValue;
+            double distance;
+            Point farthestPoint = new Point();
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                distance = Geometry.DistanceBetweenPoints(start, pixel.Value);
+                if (distance > farthestDistance)
+                {
+                    farthestDistance = distance;
+                    farthestPoint = pixel.Value;
+                }
+            }
+            return farthestPoint;
+        }
+        #endregion
     }
 }

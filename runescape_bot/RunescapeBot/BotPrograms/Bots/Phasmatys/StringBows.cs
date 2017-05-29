@@ -72,8 +72,9 @@ namespace RunescapeBot.BotPrograms
             Utilities.ChatBoxSingleOptionMakeAll(RSClient);
 
             //Wait for the inventory to be fletched
-            SafeWait(FLETCHING_TIME);
+            SafeWait(FLETCHING_TIME + RNG.Next(-200, 201));
 
+            FailedRuns = 0;
             return true;
         }
     }

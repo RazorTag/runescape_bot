@@ -25,7 +25,7 @@ namespace RunescapeBot.UITools
         /// <summary>
         /// Mouse movements per second to execute when moving the mouse smoothly
         /// </summary>
-        private const double MOUSE_MOVE_RATE = 60.0;
+        private const double MOUSE_MOVE_RATE = 125.0;
         #endregion
 
         #region click handlers

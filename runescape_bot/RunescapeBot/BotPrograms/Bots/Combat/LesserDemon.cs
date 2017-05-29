@@ -53,6 +53,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override void Run()
         {
+            //ReadWindow();
             //ColorRange empty = ColorFilters.ChaosRuneOrange();
             //bool[,] mask = ColorFilter(empty);
             //DebugUtilities.TestMask(Bitmap, ColorArray, empty, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "chaosRune");
@@ -71,8 +72,12 @@ namespace RunescapeBot.BotPrograms
             //bool[,] binaryM = ColorFilter(filterM);
             //double testM = ImageProcessing.FractionalMatch(binaryM);
 
-            LastDemonLocation = Center;
-            CheckDrops();
+            //LastDemonLocation = Center;
+            //CheckDrops();
+
+            //Point trimOffset;
+            //Color[,] screenDropArea = ScreenPiece(0, 1800, 0, 900, out trimOffset);
+            //FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE);
         }
 
         /// <summary>
@@ -149,7 +154,7 @@ namespace RunescapeBot.BotPrograms
 
             if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE)){ return true; }
             if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE)) { return true; }
-            if (FindAndGrab(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE)) { return true; }
+            if (FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE)) { return true; }
             if (FindAndGrab(screenDropArea, trimOffset, DeathRune, DEATH_RUNE_MIN_SIZE)) { return true; }
 
             return false;
@@ -193,6 +198,31 @@ namespace RunescapeBot.BotPrograms
                 Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
                 return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Looks for, picks up, and alchs a drop that matches a ColorRange
+        /// </summary>
+        /// <param name="screenDropArea"></param>
+        /// <param name="referenceColor"></param>
+        /// <param name="minimumSize">minimum number of pixels needed to </param>
+        /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
+        private bool FindAndGrabChaosRune(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        {
+            bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
+            List<Blob> chaosRunes = ImageProcessing.FindBlobs(matchedPixels, true);
+
+            for (int i = 0; i < Math.Min(10, chaosRunes.Count); i++)
+            {
+                if ((chaosRunes[i].Size > minimumSize) && chaosRunes[i].IsCircle(0.4))
+                {
+                    Point blobCenter = chaosRunes[i].Center;
+                    Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                    return true;
+                }
+            }
+                
             return false;
         }
 
