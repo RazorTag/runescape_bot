@@ -1,13 +1,9 @@
 ﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms.Popups
 {
@@ -19,7 +15,6 @@ namespace RunescapeBot.BotPrograms.Popups
         protected int Height;
         protected int TitleHeight;
         protected int Width;
-        protected int TitleHash;
 
         /// <summary>
         /// Create a record of a basic popup
@@ -41,10 +36,9 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         protected virtual void SetSize()
         {
-            Height = 95;
-            TitleHeight = 15;
+            Height = 96;
+            TitleHeight = 16;
             Width = 154;
-            TitleHash = 50840;
         }
 
         /// <summary>
@@ -67,7 +61,7 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Waits for the Make-X popup to appear
+        /// Waits for the right-click popup to appear
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
@@ -77,23 +71,18 @@ namespace RunescapeBot.BotPrograms.Popups
             const int mouseOffset = 10;
 
             Color[,] screen;
-            Color[,] title;
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            long titleHash;
-
             int left = XClick - (Width / 2) + padding;
             int right = XClick - mouseOffset;
             int top = YClick + padding;
             int bottom = YClick + TitleHeight - padding;
 
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             while (watch.ElapsedMilliseconds < timeout)
             {
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
-                title = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
-                titleHash = ImageProcessing.ColorSum(title);
 
-                if (PopupIsCorrectSize(screen) && Numerical.CloseEnough(TitleHash, titleHash, 0.001))
+                if (PopupIsCorrectSize(screen))
                 {
                     return true;
                 }

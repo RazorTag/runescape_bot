@@ -2,13 +2,9 @@
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms.Popups
 {
@@ -92,19 +88,19 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <returns>true if the bank is open</returns>
         public bool BankIsOpen()
         {
-            const int popupTitleHash = 625098;
-            long titleHash;
+            const double minTitleMatch = 0.05;
+            double titleMatch;
             int left = Left + 162;
             int right = Left + 325;
             int top = Top + 8;
             int bottom = Top + 25;
-
+            
             Color[,] screen;
             screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
-            titleHash = ImageProcessing.ColorSum(screen);
-
-            return Numerical.CloseEnough(popupTitleHash, titleHash, 0.001);
+            titleMatch = ImageProcessing.FractionalMatch(screen, ColorFilters.BankTitle());
+            
+            return titleMatch > minTitleMatch;
         }
 
         /// <summary>

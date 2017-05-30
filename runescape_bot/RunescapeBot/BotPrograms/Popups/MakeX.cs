@@ -30,7 +30,6 @@ namespace RunescapeBot.BotPrograms.Popups
             Height = 95;
             TitleHeight = 15;
             Width = 154;
-            TitleHash = 50840;
         }
 
         /// <summary>

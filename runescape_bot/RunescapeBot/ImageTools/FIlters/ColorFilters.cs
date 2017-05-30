@@ -207,17 +207,31 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region textBoxes
+
         /// <summary>
         /// The gray background color of a right-click menu
         /// </summary>
         /// <returns></returns>
         public static ColorRange RightClickPopup()
         {
-            Color dark = Color.FromArgb(88, 79, 66);
-            Color light = Color.FromArgb(98, 89, 76);
-            HSBRange hsbRange = new HSBRange(30, 40, 0.080f, 0.180f, 0.270f, 0.370f);
+            Color dark = Color.FromArgb(91, 82, 69);
+            Color light = Color.FromArgb(95, 86, 73);
+            HSBRange hsbRange = new HSBRange(33, 37, 0.126f, 0.143f, 0.309f, 0.334f);
             return new ColorRange(dark, light, hsbRange);
         }
+
+        /// <summary>
+        /// The orange title text in the bank screen
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange BankTitle()
+        {
+            Color dark = Color.FromArgb(253, 150, 29);
+            Color light = Color.FromArgb(255, 154, 33);
+            HSBRange hsbRange = new HSBRange(31, 33, 0.995f, 1.000f, 0.556f, 0.566f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region OSBuddy

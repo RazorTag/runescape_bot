@@ -378,7 +378,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void WaitForBotToStop()
         {
-            Thread.Sleep(3000);
+            Thread.Sleep(8000);
             if (!BotIsDone)
             {
                 RunThread.Abort();
@@ -967,8 +967,8 @@ namespace RunescapeBot.BotPrograms
             Color color;
             int height = ScreenHeight;
             int centerX = Center.X;
-            int checkRow = Math.Min(height, ScreenScraper.LOGIN_WINDOW_HEIGHT + 50);    //50 pixels below where the bottom of the login picture should be
-            int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 50;
+            int checkRow = Math.Min(height - 1, ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
+            int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 2;
             for (int x = centerX - xOffset; x < centerX + xOffset; x++)
             {
                 //check bottom of login box
