@@ -66,6 +66,7 @@ namespace RunescapeBot.ImageTools
         {
             if (!ProcessExists(rsClient)) { return null; }
 
+            BringToForeGround(rsClient);
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
             if (!TrimOSBuddy(ref windowRect))

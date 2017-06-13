@@ -1,19 +1,22 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
     public class Combat : BotProgram
     {
+        //the bounds of the entire target monster hitpoints popup
         const int TARGET_HP_LEFT = 6;
         const int TARGET_HP_RIGHT = 130;
         const int TARGET_HP_TOP = 24;
         const int TARGET_HP_BOTTOM = 55;
+
+        //the hitpoint measurement from the last time that hitpoints were checked for a decrease
+        //set to double.MaxValue when no hitpoint bar is found
+        private KeyValuePair<DateTime, double> oldHitpoints;
 
         public Combat(StartParams startParams) : base(startParams) { }
 
@@ -23,19 +26,22 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool InCombat()
         {
-            const int maxScreenshotAge = 500;
             const double minBackground = 0.1;
 
             ColorRange background = ColorFilters.OSBuddyEnemyHitpointsBackground();
-
-            if (TimeSinceLastScreenShot() <= maxScreenshotAge)
-            {
-                ReadWindow();
-            }
+            UpdateScreenshot();
 
             bool[,] targetBackground = ColorFilterPiece(background, TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
             double backgroundMatch = ImageProcessing.FractionalMatch(targetBackground);
-            return backgroundMatch >= minBackground;
+            if (backgroundMatch >= minBackground)
+            {
+                return true;
+            }
+            else
+            {
+                oldHitpoints = new KeyValuePair<DateTime, double>(DateTime.Now, double.MaxValue);
+                return false;
+            }
         }
 
         /// <summary>
@@ -44,13 +50,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected double TargetHitpointFraction()
         {
-            const int maxScreenshotAge = 500;
+            if (!InCombat()) { return double.MaxValue; }
 
-            if (TimeSinceLastScreenShot() <= maxScreenshotAge)
-            {
-                ReadWindow();
-            }
-
+            UpdateScreenshot();
             Color[,] targetHitpoints = ScreenPiece(TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
             ColorRange greenHPBar = ColorFilters.OSBuddyEnemyHitpointsGreen();
             bool[,] greenHP = ColorFilter(targetHitpoints, greenHPBar);
@@ -59,7 +61,28 @@ namespace RunescapeBot.BotPrograms
             bool[,] redHP = ColorFilter(targetHitpoints, redHPBar);
             double redWidth = ImageProcessing.BiggestBlob(redHP).Width;
 
-            return greenWidth / (greenWidth + redWidth);
+            return greenWidth / Numerical.NonZero(greenWidth + redWidth);
+        }
+
+        /// <summary>
+        /// Determines if a monsters hitpoint bar is lower than the last recorded instance
+        /// </summary>
+        /// <param name="checkInterval">minimum time between hitpoint checks in milliseconds</param>
+        /// <returns>
+        /// Always returns true if a full check interval hasn't elapsed since the last check. 
+        /// Otherwise, returns true if the hitpoints are measured as less than the last check.
+        /// </returns>
+        protected bool HitpointsHaveDecreased(int checkInterval = 5000)
+        {
+            if ((DateTime.Now - oldHitpoints.Key).TotalMilliseconds > checkInterval)
+            {
+                double currentHitpoints = TargetHitpointFraction();
+                double previousHitpoints = oldHitpoints.Value;
+                oldHitpoints = new KeyValuePair<DateTime, double>(DateTime.Now, currentHitpoints);
+                return currentHitpoints < previousHitpoints;
+            }
+
+            return true;
         }
     }
 }

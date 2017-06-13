@@ -48,7 +48,8 @@ namespace RunescapeBot.BotPrograms
         public LesserDemon(StartParams startParams) : base(startParams)
         {
             GetReferenceColors();
-            MinDemonSize = 2000;
+            ReadWindow();
+            MinDemonSize = (int) (0.001 * ScreenWidth * ScreenHeight);
         }
 
         protected override void Run()
@@ -86,14 +87,14 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             Blob demon;
-            double cloveRange = 2 * Math.Sqrt(MinDemonSize);
+            double cloveRange = 2.0 * Math.Sqrt(MinDemonSize);
 
             if (LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
             {
                 LastDemonTime = DateTime.Now;
                 MinDemonSize = demon.Size / 2;
                 int maxOffset = (int)(0.05 * cloveRange);
-                if (!InCombat())    //engage the demon
+                if (!InCombat() || !HitpointsHaveDecreased())    //engage the demon
                 {
                     LeftClick(demon.Center.X, demon.Center.Y, 200, maxOffset);
                     Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
@@ -139,7 +140,8 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Telegrabs a rune med helm if one is found on the ground
+        /// Telegrabs a drop if one is found on the ground
+        /// Alchs the drop if applicable
         /// </summary>
         /// <returns>True if a drop is found</returns>
         private bool CheckDrops()
@@ -223,22 +225,6 @@ namespace RunescapeBot.BotPrograms
                 }
             }
                 
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if a demon blob meets the minimum size requirement
-        /// </summary>
-        /// <param name="demon"></param>
-        /// <returns></returns>
-        private bool MinimumSizeMet(Blob demon)
-        {
-            double demonScreenSize = ArtifactSize(demon);
-            if (demonScreenSize > MinDemonSize)
-            {
-                return true;
-            }
-
             return false;
         }
 

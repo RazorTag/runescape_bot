@@ -43,6 +43,11 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
+            if (FailedRuns > 1)
+            {
+                return false;
+            }
+
             //Open the bank
             if (!ClickBankBooth())
             {
@@ -69,7 +74,11 @@ namespace RunescapeBot.BotPrograms
 
             //String the bows
             Inventory.UseItemOnItem(StringSlot, BowSlot, false);
-            Utilities.ChatBoxSingleOptionMakeAll(RSClient);
+            if (!Utilities.ChatBoxSingleOptionMakeAll(RSClient))
+            {
+                FailedRuns++;
+                return true;
+            }
 
             //Wait for the inventory to be fletched
             SafeWait(FLETCHING_TIME + RNG.Next(-200, 201));

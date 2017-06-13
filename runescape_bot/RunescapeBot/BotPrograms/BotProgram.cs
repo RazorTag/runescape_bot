@@ -25,6 +25,7 @@ namespace RunescapeBot.BotPrograms
         /// Checksum for the RUNE SCAPE logo on the login page
         /// </summary>
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
+        private const long LOGIN_LOGO_SUM_INFERNAL = 10145709;
 
         /// <summary>
         /// Approximate time in milliseconds needed for OSBuddy to start
@@ -369,21 +370,6 @@ namespace RunescapeBot.BotPrograms
         public void Stop()
         {
             StopFlag = true;
-            Thread abortThread = new Thread(WaitForBotToStop);
-            abortThread.Start();
-        }
-
-        /// <summary>
-        /// Aborts the currently running thread if it takes to long to stop
-        /// </summary>
-        private void WaitForBotToStop()
-        {
-            Thread.Sleep(8000);
-            if (!BotIsDone)
-            {
-                RunThread.Abort();
-            }
-            Done();
         }
         #endregion
 
@@ -544,6 +530,18 @@ namespace RunescapeBot.BotPrograms
         {
             TimeSpan elapsedTime = DateTime.Now - LastScreenShot;
             return (int)elapsedTime.TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// Takes a new screenshot if the current one is too old
+        /// </summary>
+        /// <param name="maxScreenShotAge">the maximum usable age of an old screenshot in milliseconds</param>
+        protected void UpdateScreenshot(int maxScreenshotAge = 500)
+        {
+            if (TimeSinceLastScreenShot() <= maxScreenshotAge)
+            {
+                ReadWindow();
+            }
         }
 
         /// <summary>
@@ -922,7 +920,7 @@ namespace RunescapeBot.BotPrograms
 
             //Compare the column against the expected value
             long columnSum = ImageProcessing.ColorSum(inventoryColumn);
-            long expectedColumnSum = 133405;
+            long expectedColumnSum = 122689;
             if (columnSum > (1.01 * expectedColumnSum) || columnSum < (0.99 * expectedColumnSum))
             {
                 return false;
@@ -997,7 +995,7 @@ namespace RunescapeBot.BotPrograms
 
             //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
             long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, 0, 160));
-            if ((colorSum < (LOGIN_LOGO_COLOR_SUM * 0.99)) || (colorSum > (LOGIN_LOGO_COLOR_SUM * 1.01)))
+            if (!Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01) && !Numerical.CloseEnough(LOGIN_LOGO_SUM_INFERNAL, colorSum, 0.01))
             {
                 return false;
             }

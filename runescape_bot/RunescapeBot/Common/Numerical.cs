@@ -61,5 +61,22 @@ namespace RunescapeBot.Common
             midY = (int) Math.Round((bNess * (b.Y - a.Y)) + a.Y);
             return new Point(midX, midY);
         }
+
+        /// <summary>
+        /// Adds a small positive value if the input value is exactly zero
+        /// </summary>
+        /// <param name="possibleZero"></param>
+        /// <returns>something other than 0.0</returns>
+        public static double NonZero(double possibleZero)
+        {
+            if (possibleZero == 0.0)
+            {
+                return 0.000000001;
+            }
+            else
+            {
+                return possibleZero;
+            }
+        }
     }
 }
