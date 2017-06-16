@@ -12,6 +12,8 @@ namespace RunescapeBot.BotPrograms
             {
                 FrameTime = 3000;
                 RandomizeFrames = true;
+                WorkInterval = 2 * 60 * 60 * 1000;  // 2 hours = 7,200,000 ms
+                BreakLength = 15 * 60 * 1000;       // 15 minutes = 900,000 ms
             }
         }
 
@@ -60,6 +62,18 @@ namespace RunescapeBot.BotPrograms
         /// Toggles run on when the player has run energy
         /// </summary>
         public bool Run { get; set; }
+
+        /// <summary>
+        /// Average time to run the bot for before logging out for a simulated break
+        /// Measured in milliseconds
+        /// </summary>
+        public int WorkInterval { get; set; }
+
+        /// <summary>
+        /// Average time to wait while logged out between work intervals
+        /// Measured in milliseconds
+        /// </summary>
+        public int BreakLength { get; set; }
         #endregion
 
         #region delegates

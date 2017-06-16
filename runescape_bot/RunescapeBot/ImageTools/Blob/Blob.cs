@@ -227,6 +227,18 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Add all of the pixels from another blob to this blob
+        /// </summary>
+        /// <param name="blob"></param>
+        public void AddBlob(Blob blob)
+        {
+            foreach (KeyValuePair<Point, Point> pixel in blob.Pixels)
+            {
+                AddPixel(pixel.Value);
+            }
+        }
+
+        /// <summary>
         /// The next pixel to be checked for neighbors
         /// </summary>
         /// <returns></returns>
@@ -308,7 +320,21 @@ namespace RunescapeBot.ImageTools
             return Pixels.ElementAt(rng.Next(0, Pixels.Count)).Value;
         }
 
+
+        public static Blob Combine(List<Blob> blobs)
+        {
+            if (blobs == null || blobs.Count == 0) { return null; }
+
+            Blob megaBlob = blobs[0];
+            for (int i = 1; i < blobs.Count; i++)
+            {
+                megaBlob.AddBlob(blobs[i]);
+            }
+            return megaBlob;
+        }
+
         #region feature matching
+
         /// <summary>
         /// Determines if the blob is apprximately fits a disk.
         /// i.e. hollow center surrounded by a ring of finite thickness or a solid disk
@@ -392,6 +418,7 @@ namespace RunescapeBot.ImageTools
             }
             return farthestPoint;
         }
+
         #endregion
     }
 }

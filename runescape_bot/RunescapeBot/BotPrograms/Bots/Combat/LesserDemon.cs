@@ -55,6 +55,11 @@ namespace RunescapeBot.BotPrograms
         protected override void Run()
         {
             //ReadWindow();
+            //ColorRange floor = ColorFilters.PhasmatysBuildingFloor();
+            //bool[,] mask = ColorFilter(floor);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
+
+            //ReadWindow();
             //ColorRange empty = ColorFilters.ChaosRuneOrange();
             //bool[,] mask = ColorFilter(empty);
             //DebugUtilities.TestMask(Bitmap, ColorArray, empty, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "chaosRune");

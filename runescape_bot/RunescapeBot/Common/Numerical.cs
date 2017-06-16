@@ -23,6 +23,30 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
+        /// Determines if a value is within range of a target value
+        /// </summary>
+        /// <param name="test">the value to check if it is within a given range</param>
+        /// <param name="target">center of the target range</param>
+        /// <param name="offsetRange">positive and negative offset for the target range</param>
+        /// <returns>true if the test value is within the target range</returns>
+        public static bool WithinRange(double test, double target, double offsetRange)
+        {
+            return Math.Abs(test - target) <= offsetRange;
+        }
+
+        /// <summary>
+        /// Determines if a value is within specified bounds
+        /// </summary>
+        /// <param name="test">the value to check if it is within the upper and lower bounds</param>
+        /// <param name="lowerBound">minimum allowed value</param>
+        /// <param name="upperBound">maximum allowed value</param>
+        /// <returns>true if the test value is within bounds</returns>
+        public static bool WithinBounds(double test, double lowerBound, double upperBound)
+        {
+            return (test >= lowerBound) && (test <= upperBound);
+        }
+
+        /// <summary>
         /// Takes the average of two numbers
         /// </summary>
         /// <param name="a"></param>
@@ -47,22 +71,6 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
-        /// Randomly chooses a point on the line segment connecting the two points
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns>a random point between the two given points</returns>
-        public static Point RandomMidpoint(Point a, Point b)
-        {
-            Random rng = new Random();
-            int midX, midY;
-            double bNess = rng.NextDouble();
-            midX = (int) Math.Round((bNess * (b.X - a.X)) + a.X);
-            midY = (int) Math.Round((bNess * (b.Y - a.Y)) + a.Y);
-            return new Point(midX, midY);
-        }
-
-        /// <summary>
         /// Adds a small positive value if the input value is exactly zero
         /// </summary>
         /// <param name="possibleZero"></param>
@@ -77,6 +85,40 @@ namespace RunescapeBot.Common
             {
                 return possibleZero;
             }
+        }
+
+        /// <summary>
+        /// Generates a random value from a Gaussian distribution
+        /// </summary>
+        /// <param name="mean">the average value for the distribution</param>
+        /// <param name="standardDeviation">standard deviation. equal to the square root of variance.</param>
+        /// <returns>a random number from a Gaussian distribution</returns>
+        public static double RandomGaussian(double mean, double standardDeviation)
+        {
+            Random rng = new Random();
+            double u1 = 1.0 - rng.NextDouble();
+            double u2 = 1.0 - rng.NextDouble();
+            double stdDevOffsets = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randomValue = mean + standardDeviation * stdDevOffsets; //random normal(mean,stdDev^2)
+            return randomValue;
+        }
+
+        /// <summary>
+        /// Modifies a gaussian distribution to re-roll values that deviate by more than the maximum 
+        /// </summary>
+        /// <param name="mean">the average value for the distribution</param>
+        /// <param name="standardDeviation">standard deviation. equal to the square root of variance.</param>
+        /// <param name="maxDeviation">random values are not allowed to deviate from the mean by more than the max deviation</param>
+        /// <returns>a value from a Gaussian distribution within a maximum deviation</returns>
+        public static double BoundedGaussian(double mean, double standardDeviation, double minValue, double maxValue)
+        {
+            double randomValue;
+            do
+            {
+                randomValue = RandomGaussian(mean, standardDeviation);
+            } while ((randomValue < minValue) || (randomValue > maxValue));
+
+            return randomValue;
         }
     }
 }

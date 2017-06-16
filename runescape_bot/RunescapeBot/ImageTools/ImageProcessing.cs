@@ -182,7 +182,7 @@ namespace RunescapeBot.ImageTools
         /// Finds the biggest blob in the image
         /// </summary>
         /// <param name="image"></param>
-        /// <returns></returns>
+        /// <returns>the blob with the greatest number of pixels</returns>
         public static Blob BiggestBlob(bool[,] image)
         {
             if (image == null) { return null; }
@@ -209,6 +209,89 @@ namespace RunescapeBot.ImageTools
                 biggestBlob = null;
             }
             return biggestBlob;
+        }
+
+        /// <summary>
+        /// FInds blobs that have a center within range of a search point
+        /// </summary>
+        /// <param name="image">image to search in</param>
+        /// <param name="searchPoint">point to search from</param>
+        /// <param name="range">range from the search point to consider</param>
+        /// <returns>list of blobs within the specified search area</returns>
+        public static List<Blob> BlobsWithinRange(bool[,] image, Point searchPoint, int range, bool sort = false)
+        {
+            List<Blob> blobs = FindBlobs(image);
+            List<Blob> blobsWithinRange = new List<Blob>();
+            double distance;
+
+            for (int i = 0; i < blobs.Count; i++)
+            {
+                distance = Geometry.DistanceBetweenPoints(blobs[i].Center, searchPoint);
+                if (distance <= range)
+                {
+                    blobsWithinRange.Add(blobs[i]);
+                }
+            }
+
+            if (sort)
+            {
+                blobsWithinRange.Sort(new BlobSizeComparer());
+                blobsWithinRange.Reverse();
+            }
+
+            return blobsWithinRange;
+        }
+
+        /// <summary>
+        /// Finds the blobs that are within the specified distance of the search point
+        /// </summary>
+        /// <param name="image">image to search in</param>
+        /// <param name="searchPoint">point to search from</param>
+        /// <param name="range">range from the search point to consider</param>
+        /// <returns></returns>
+        public static Blob BiggestBlobWithinRange(bool[,] image, Point searchPoint, int range)
+        {
+            List<Blob> blobs = FindBlobs(image);
+            Blob biggestBlob = null;
+            double distance;
+
+            for (int i = 0; i < blobs.Count; i++)
+            {
+                distance = Geometry.DistanceBetweenPoints(blobs[i].Center, searchPoint);
+                if ((blobs[i].Size > biggestBlob.Size) && (distance < range))
+                {
+                    biggestBlob = blobs[i];
+                }
+            }
+
+            return biggestBlob;
+        }
+
+        /// <summary>
+        /// Finds the blob that is closest to the search point
+        /// </summary>
+        /// <param name="image">binary image to search</param>
+        /// <param name="searchPoint">point to search from</param>
+        /// <param name="minSize">the minimum number of pixels that must be in a blob for it to be considered a match</param>
+        /// <returns>The blob meeting the minimum size that is closest to the search point. Returns null if no blobs meet the minimum size.</returns>
+        public static Blob ClosestBlob(bool[,] image, Point searchPoint, int minSize = 1)
+        {
+            List<Blob> blobs = FindBlobs(image);
+            Blob closestBlob = null;
+            double closestDistance = double.MaxValue;
+            double distance;
+
+            for (int i = 0; i < blobs.Count; i++)
+            {
+                distance = Geometry.DistanceBetweenPoints(blobs[i].Center, searchPoint);
+                if ((blobs[i].Size >= minSize) && (distance < closestDistance))
+                {
+                    closestDistance = distance;
+                    closestBlob = blobs[i];
+                }
+            }
+
+            return closestBlob;
         }
 
         /// <summary>

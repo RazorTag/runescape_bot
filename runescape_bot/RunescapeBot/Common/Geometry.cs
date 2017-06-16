@@ -49,5 +49,21 @@ namespace RunescapeBot.Common
         {
             return Math.Sqrt(area / Math.PI);
         }
+
+        /// <summary>
+        /// Randomly chooses a point on the line segment connecting the two points
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>a random point between the two given points</returns>
+        public static Point RandomMidpoint(Point a, Point b)
+        {
+            Random rng = new Random();
+            int midX, midY;
+            double bNess = rng.NextDouble();
+            midX = (int)Math.Round((bNess * (b.X - a.X)) + a.X);
+            midY = (int)Math.Round((bNess * (b.Y - a.Y)) + a.Y);
+            return new Point(midX, midY);
+        }
     }
 }

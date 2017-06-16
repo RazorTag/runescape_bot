@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
+﻿using RunescapeBot.ImageTools;
+using System.Diagnostics;
 
 namespace RunescapeBot.BotPrograms
 {
     /// <summary>
     /// Smiths cannonballs at the furnace in Port Phasmatys
     /// </summary>
-    class Cannonballs : FurnacePhasmatys
+    public class Cannonballs : FurnacePhasmatys
     {
         private const int SINGLE_SMITH_TIME = 6000;
         private const int TOTAL_SMITH_TIME = 162000;

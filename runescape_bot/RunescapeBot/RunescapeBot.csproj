@@ -89,6 +89,7 @@
     <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
     <Compile Include="BotPrograms\Bots\AgilitySeersVillage.cs" />
     <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
+    <Compile Include="BotPrograms\Bots\DartTips.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\FletchShortbows.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\Cannonballs.cs" />

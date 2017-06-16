@@ -289,6 +289,12 @@ namespace RunescapeBot.BotPrograms
             {
                 RunParams.Iterations = int.MaxValue;
             }
+
+            //don't limit by run until time unless the user has specified a future date/time
+            if ((RunParams.RunUntil - DateTime.Now).TotalMilliseconds <= 0)
+            {
+                RunParams.RunUntil = DateTime.MaxValue;
+            }
             
             //randomize the time between executions
             if (RunParams.RandomizeFrames)
@@ -300,14 +306,14 @@ namespace RunescapeBot.BotPrograms
                 randomFrameOffset = 0;
             }
 
-            Stopwatch watch = new Stopwatch();
-            for (int i = 0; i < RunParams.Iterations; i++)
+            Stopwatch iterationWatch = new Stopwatch();
+            Stopwatch workIntervalWatch = new Stopwatch();
+            workIntervalWatch.Start();
+            int workInterval = RandomWorkTime();
+
+            while ((RunParams.Iterations-- > 0) && (DateTime.Now < RunParams.RunUntil) && (workIntervalWatch.ElapsedMilliseconds < workInterval))
             {
-                watch.Restart();
-                if (DateTime.Now > RunParams.RunUntil)
-                {
-                    return; //quit if we have gone over our time limit
-                }
+                iterationWatch.Restart();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
                 if (StopFlag) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
 
@@ -333,9 +339,9 @@ namespace RunescapeBot.BotPrograms
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
                 randomFrameTime = Math.Max(0, randomFrameTime);
-                if (watch.ElapsedMilliseconds < randomFrameTime)
+                if (iterationWatch.ElapsedMilliseconds < randomFrameTime)
                 {
-                    SafeWait(randomFrameTime - (int)watch.ElapsedMilliseconds);
+                    SafeWait(randomFrameTime - (int)iterationWatch.ElapsedMilliseconds);
                 }
                 if (StopFlag) { return; }
             }
@@ -371,6 +377,39 @@ namespace RunescapeBot.BotPrograms
         {
             StopFlag = true;
         }
+
+        /// <summary>
+        /// Generates a number of milliseconds for the bot to run before logging out and resting
+        /// </summary>
+        /// <returns>the next work time in milliseconds</returns>
+        private int RandomWorkTime()
+        {
+            int workType = RNG.Next(1, 4);
+            int mean, stdDev;   //measured in minutes
+            switch (workType)
+            {
+                case 1:
+                    mean = 45;
+                    stdDev = 8;
+                    break;
+                case 2:
+                    mean = 115;
+                    stdDev = 30;
+                    break;
+                case 3:
+                    mean = 255;
+                    stdDev = 56;
+                    break;
+                default:
+                    mean = 60;
+                    stdDev = 5;
+                    break;
+            }
+
+            double workTime = Numerical.BoundedGaussian(mean, stdDev, 20, 358);
+            return (int) (workTime * 60 * 1000);
+        }
+
         #endregion
 
         #region user actions
@@ -407,7 +446,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="stationaryObject">color filter for the stationary object</param>
         /// <param name="tolerance">maximum allowable distance between two subsequent checks to consider both objects the same object</param>
-        /// <param name="afterClickWait">time to wait affter clicking on the stationary object</param>
+        /// <param name="afterClickWait">time to wait after clicking on the stationary object</param>
         /// <param name="maxWaitTime">maximum time to wait before giving up</param>
         /// <returns></returns>
         protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
@@ -697,6 +736,17 @@ namespace RunescapeBot.BotPrograms
             }
 
             return minimapFilter;
+        }
+
+        /// <summary>
+        /// Gets a rectangle containing the minimap with the non-minimap corners set to false
+        /// </summary>
+        /// <param name="filter">the filter to use on the minimap</param>
+        /// <returns>true for the pixels on the minimap that match the filter</returns>
+        protected bool[,] MinimapFilter(ColorRange filter)
+        {
+            Point offset;
+            return MinimapFilter(filter, out offset);
         }
 
         /// <summary>
@@ -1033,6 +1083,25 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return true; }
             }
             return StopFlag;
+        }
+
+        /// <summary>
+        /// Waits for a random time frm a Gaussian distribution
+        /// </summary>
+        /// <param name="meanWaitTime">average wait time</param>
+        /// <param name="standardDeviation">standard deviation froom the mean</param>
+        /// <returns></returns>
+        protected bool SafeWait(int meanWaitTime, double standardDeviation)
+        {
+            if (meanWaitTime <= 0)
+            {
+                return StopFlag;
+            }
+            else
+            {
+                int waitTime = (int) Numerical.BoundedGaussian(meanWaitTime, standardDeviation, 0.0, double.MaxValue);
+                return SafeWait(waitTime);
+            }
         }
 
         /// <summary>

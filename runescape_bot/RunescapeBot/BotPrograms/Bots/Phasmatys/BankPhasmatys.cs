@@ -16,6 +16,7 @@ namespace RunescapeBot.BotPrograms
         protected const double STATIONARY_OBJECT_TOLERANCE = 15.0;
         protected ColorRange FurnaceIconOrange;
         protected ColorRange BankIconDollar;
+        protected ColorRange BuildingFloor;
         protected ColorRange Furnace;
         protected ColorRange BankBooth;
         protected FurnaceCrafting CraftPopup;
@@ -62,20 +63,40 @@ namespace RunescapeBot.BotPrograms
 
         /// <summary>
         /// Finds the bank icon on the minimap
+        /// Adjusts for the icon's tendency to float around
         /// </summary>
         /// <returns>true if the icon is probably found correctly, false otherwise</returns>
         protected Point? BankIconLocation()
         {
             ReadWindow();
             Point offset;
-            bool[,] bankIcon = MinimapFilter(BankIconDollar, out offset);
-            Blob bankBlob = ImageProcessing.BiggestBlob(bankIcon);
-            if (bankBlob == null || bankBlob.Size < 10)
+            bool[,] minimapBankIcon = MinimapFilter(BankIconDollar, out offset);
+            Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
+            if (bankBlob == null || bankBlob.Size < 10) { return null; }
+
+            int bankX, bankY;
+            bool[,] minimapBankFloor = MinimapFilter(BuildingFloor, out offset);
+            Blob bankFloor = ImageProcessing.ClosestBlob(minimapBankFloor, bankBlob.Center, 100);
+            if (bankFloor == null)
             {
-                return null;
+                bankX = bankBlob.Center.X;
+                bankY = bankBlob.Center.Y;
             }
-            int x = bankBlob.Center.X + offset.X;
-            int y = bankBlob.Center.Y + offset.Y;
+            else
+            {
+                if (bankFloor.Width > 50)
+                {
+                    bankX = ((bankFloor.Center.X + bankFloor.LeftBound) / 2) + 6;
+                }
+                else
+                {
+                    bankX = bankFloor.Center.X + 6;
+                }
+                bankY = bankFloor.Center.Y + 3;
+            }
+
+            int x = bankX + offset.X + RNG.Next(-2, 3);
+            int y = bankY + offset.Y + RNG.Next(-2, 3);
             return new Point(x, y);
         }
 
@@ -87,14 +108,28 @@ namespace RunescapeBot.BotPrograms
         {
             ReadWindow();
             Point offset;
-            bool[,] furnaceIcon = MinimapFilter(FurnaceIconOrange, out offset);
-            Blob furnaceBlob = ImageProcessing.BiggestBlob(furnaceIcon);
-            if (furnaceBlob == null || furnaceBlob.Size < 3)
+            bool[,] minimapFurnace = MinimapFilter(FurnaceIconOrange, out offset);
+            Blob furnaceBlob = ImageProcessing.BiggestBlob(minimapFurnace);
+            if (furnaceBlob == null || furnaceBlob.Size < 3) { return null; }
+
+            bool[,] minimapFurnaceFloor = MinimapFilter(BuildingFloor);
+            List<Blob> floors = ImageProcessing.BlobsWithinRange(minimapFurnaceFloor, furnaceBlob.Center, 20, true);
+            Blob furnaceFloor = Blob.Combine(floors);
+
+            int furnaceX, furnaceY;
+            if (furnaceFloor == null)
             {
-                return null;
+                furnaceX = furnaceBlob.Center.X;
+                furnaceY = furnaceBlob.Center.Y;
             }
-            int x = furnaceBlob.Center.X - 4 + offset.X;
-            int y = furnaceBlob.Center.Y + offset.Y;
+            else
+            {
+                furnaceX = furnaceFloor.Center.X;
+                furnaceY = furnaceFloor.Center.Y;
+            }
+
+            int x = furnaceX + offset.X + RNG.Next(-2, 3);
+            int y = furnaceY + offset.Y + RNG.Next(-2, 3);
             return new Point(x, y);
         }
 
@@ -123,7 +158,7 @@ namespace RunescapeBot.BotPrograms
                     if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
                     {
                         LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 200, 10);
-                        SafeWait(1000); //TODO verify that the bank opened
+                        SafeWait(1000, 120); //TODO verify that the bank opened
                         return true;
                     }
                     else
@@ -187,7 +222,9 @@ namespace RunescapeBot.BotPrograms
 
             if(randomize)
             {
-                bankBooth = Numerical.RandomMidpoint(rightBooth.Center, secondRightBooth.Center);
+                bankBooth = Geometry.RandomMidpoint(rightBooth.Center, secondRightBooth.Center);
+                int y = (int) Numerical.BoundedGaussian(bankBooth.Value.Y, 3.0, bankBooth.Value.Y - 8.0, bankBooth.Value.Y + 8.0);  //randomize the height of the click
+                bankBooth = new Point(bankBooth.Value.X, y);
             }
             else
             {
@@ -237,6 +274,7 @@ namespace RunescapeBot.BotPrograms
         {
             FurnaceIconOrange = ColorFilters.FurnaceIconOrange();
             BankIconDollar = ColorFilters.BankIconDollar();
+            BuildingFloor = ColorFilters.PhasmatysBuildingFloor();
             Furnace = ColorFilters.Furnace();
             BankBooth = ColorFilters.BankBoothPhasmatys();
         }

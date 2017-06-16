@@ -142,29 +142,6 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region minimap
-        /// <summary>
-        /// The orange part of a furnace minimap icon
-        /// </summary>
-        /// <returns></returns>
-        public static ColorRange FurnaceIconOrange()
-        {
-            Color dark = Color.FromArgb(146, 83, 0);
-            Color light = Color.FromArgb(255, 255, 136);
-            HSBRange hsbRange = new HSBRange(15, 40, 0.330f, 1.000f, 0.380f, 0.770f);
-            return new ColorRange(dark, light, hsbRange);
-        }
-
-        /// <summary>
-        /// The yellow part of a bank minimap icon
-        /// </summary>
-        /// <returns></returns>
-        public static ColorRange BankIconDollar()
-        {
-            Color dark = Color.FromArgb(94, 80, 0);
-            Color light = Color.FromArgb(233, 231, 136);
-            HSBRange hsbRange = new HSBRange(43, 69, 0.433f, 1.0000f, 0.164f, 0.709f);
-            return new ColorRange(dark, light, hsbRange);
-        }
 
         /// <summary>
         /// The yellow version of the run energy foot icon
@@ -190,6 +167,43 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(67, 130, 0.174f, 1.000f, 0.400f, 0.663f);
             return new ColorRange(dark, light, hsbRange);
         }
+
+        /// <summary>
+        /// The orange part of a furnace minimap icon
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange FurnaceIconOrange()
+        {
+            Color dark = Color.FromArgb(146, 83, 0);
+            Color light = Color.FromArgb(255, 255, 136);
+            HSBRange hsbRange = new HSBRange(15, 40, 0.330f, 1.000f, 0.380f, 0.770f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The yellow part of a bank minimap icon
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange BankIconDollar()
+        {
+            Color dark = Color.FromArgb(94, 80, 0);
+            Color light = Color.FromArgb(233, 231, 136);
+            HSBRange hsbRange = new HSBRange(43, 69, 0.433f, 1.000f, 0.164f, 0.709f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The brown 
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange PhasmatysBuildingFloor()
+        {
+            Color dark = Color.FromArgb(44, 50, 34);
+            Color light = Color.FromArgb(92, 96, 79);
+            HSBRange hsbRange = new HSBRange(334, 100, 0.003f, 0.254f, 0.104f, 0.404f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region Inventory
