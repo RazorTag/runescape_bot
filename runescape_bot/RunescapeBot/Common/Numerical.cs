@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.Common
 {
@@ -85,40 +81,6 @@ namespace RunescapeBot.Common
             {
                 return possibleZero;
             }
-        }
-
-        /// <summary>
-        /// Generates a random value from a Gaussian distribution
-        /// </summary>
-        /// <param name="mean">the average value for the distribution</param>
-        /// <param name="standardDeviation">standard deviation. equal to the square root of variance.</param>
-        /// <returns>a random number from a Gaussian distribution</returns>
-        public static double RandomGaussian(double mean, double standardDeviation)
-        {
-            Random rng = new Random();
-            double u1 = 1.0 - rng.NextDouble();
-            double u2 = 1.0 - rng.NextDouble();
-            double stdDevOffsets = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-            double randomValue = mean + standardDeviation * stdDevOffsets; //random normal(mean,stdDev^2)
-            return randomValue;
-        }
-
-        /// <summary>
-        /// Modifies a gaussian distribution to re-roll values that deviate by more than the maximum 
-        /// </summary>
-        /// <param name="mean">the average value for the distribution</param>
-        /// <param name="standardDeviation">standard deviation. equal to the square root of variance.</param>
-        /// <param name="maxDeviation">random values are not allowed to deviate from the mean by more than the max deviation</param>
-        /// <returns>a value from a Gaussian distribution within a maximum deviation</returns>
-        public static double BoundedGaussian(double mean, double standardDeviation, double minValue, double maxValue)
-        {
-            double randomValue;
-            do
-            {
-                randomValue = RandomGaussian(mean, standardDeviation);
-            } while ((randomValue < minValue) || (randomValue > maxValue));
-
-            return randomValue;
         }
     }
 }

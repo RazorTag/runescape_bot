@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.Common;
 using RunescapeBot.UITools;
 using System.Drawing;
 
@@ -60,7 +61,7 @@ namespace RunescapeBot.BotPrograms
 
             //TODO verify that gold bars are being crafted
 
-            SafeWait(CRAFTING_TIME);
+            SafeWaitPlus(CRAFTING_TIME, 2000);
 
             return true;
         }

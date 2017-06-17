@@ -41,9 +41,9 @@ namespace RunescapeBot.BotPrograms
             }
             if (StopFlag) { return false; }
             BankPopup.DepositInventory();
-            SafeWait(500, 200);
+            SafeWaitPlus(500, 200);
             BankPopup.WithdrawOne(7, 0);
-            SafeWait(500, 150);
+            SafeWaitPlus(500, 150);
             BankPopup.WithdrawAll(6, 0);
 
             //Move to the furnace and use a gold bar on it
@@ -63,7 +63,7 @@ namespace RunescapeBot.BotPrograms
                 failedRuns++;
                 return true;
             }
-            SafeWait(0, 1500);
+            SafeWaitPlus(0, 1500);
 
             failedRuns = 0;
             return true;

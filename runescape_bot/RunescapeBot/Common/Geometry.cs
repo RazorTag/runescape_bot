@@ -20,10 +20,7 @@ namespace RunescapeBot.Common
         /// <returns>The distance between the two points. Returns the max double value if at least one point is null.</returns>
         public static double DistanceBetweenPoints(Point? a, Point? b)
         {
-            if (a == null || b == null)
-            {
-                return double.MaxValue;
-            }
+            if (a == null || b == null) { return double.MaxValue; }
 
             int xDiff = a.Value.X - b.Value.X;
             int yDiff = a.Value.Y - b.Value.Y;
@@ -64,6 +61,28 @@ namespace RunescapeBot.Common
             midX = (int)Math.Round((bNess * (b.X - a.X)) + a.X);
             midY = (int)Math.Round((bNess * (b.Y - a.Y)) + a.Y);
             return new Point(midX, midY);
+        }
+
+        /// <summary>
+        /// Calculates the center of mass of a collection of points
+        /// </summary>
+        /// <param name="cluster"></param>
+        /// <returns>the averae of the list of points</returns>
+        public static Point CenterPoint(List<Point> cluster)
+        {
+            if (cluster == null) { return new Point(); }
+
+            int xTotal = 0;
+            int yTotal = 0;
+            for (int i = 0; i < cluster.Count; i++)
+            {
+                xTotal += cluster[i].X;
+                yTotal += cluster[i].Y;
+            }
+            int x = (int) Math.Round(xTotal / ((double)cluster.Count));
+            int y = (int) Math.Round(yTotal / ((double)cluster.Count));
+
+            return new Point(x, y);
         }
     }
 }

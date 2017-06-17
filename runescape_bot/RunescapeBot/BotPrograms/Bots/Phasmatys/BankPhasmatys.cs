@@ -55,7 +55,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)bankIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y + 5, 200, 3);
+            LeftClick(clickLocation.X, clickLocation.Y + 5, 3);
             SafeWait(runTimeFromFurnaceToBank);
 
             return true;
@@ -92,11 +92,11 @@ namespace RunescapeBot.BotPrograms
                 {
                     bankX = bankFloor.Center.X + 6;
                 }
-                bankY = bankFloor.Center.Y + 3;
+                bankY = bankFloor.Center.Y + 5;
             }
 
-            int x = bankX + offset.X + RNG.Next(-2, 3);
-            int y = bankY + offset.Y + RNG.Next(-2, 3);
+            int x = bankX + offset.X + RNG.Next(-1, 2);
+            int y = bankY + offset.Y + RNG.Next(-1, 2);
             return new Point(x, y);
         }
 
@@ -157,7 +157,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
                     {
-                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 200, 10);
+                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 10);
                         SafeWait(1000, 120); //TODO verify that the bank opened
                         return true;
                     }
@@ -223,7 +223,7 @@ namespace RunescapeBot.BotPrograms
             if(randomize)
             {
                 bankBooth = Geometry.RandomMidpoint(rightBooth.Center, secondRightBooth.Center);
-                int y = (int) Numerical.BoundedGaussian(bankBooth.Value.Y, 3.0, bankBooth.Value.Y - 8.0, bankBooth.Value.Y + 8.0);  //randomize the height of the click
+                int y = (int) Probability.BoundedGaussian(bankBooth.Value.Y, 3.0, bankBooth.Value.Y - 8.0, bankBooth.Value.Y + 8.0);  //randomize the height of the click
                 bankBooth = new Point(bankBooth.Value.X, y);
             }
             else
@@ -261,7 +261,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)furnaceIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y, 200, 3);
+            LeftClick(clickLocation.X, clickLocation.Y, 3);
             SafeWait(runTimeFromBankToFurnace);
 
             return true;

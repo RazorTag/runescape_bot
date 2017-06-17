@@ -1,6 +1,8 @@
-﻿using RunescapeBot.UITools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.UITools;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 
 namespace RunescapeBot.BotPrograms.Popups
@@ -60,7 +62,7 @@ namespace RunescapeBot.BotPrograms.Popups
             //Wait for the "Enter amount:" prompt to appear
             if (WaitForEnterAmount(5000))
             {
-                Utilities.EnterAmount(RSClient, itemsToMake);
+                BotUtilities.EnterAmount(RSClient, itemsToMake);
             }
         }
 
@@ -80,11 +82,9 @@ namespace RunescapeBot.BotPrograms.Popups
         private void RandomClick(int yOffset)
         {
             const int padding = 2;
-            Random rng = new Random();
-            
-            XClick += rng.Next(-(Width / 2) + padding, (Width / 2) - padding + 1);
-            YClick += yOffset + rng.Next(-2, 3);
-            Mouse.LeftClick(XClick, YClick, RSClient);
+            Point clickOffset = Probability.GaussianRectangle(-(Width / 2) + padding, (Width / 2) - padding, yOffset - 2, yOffset + 2);
+            Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
     }
 }

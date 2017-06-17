@@ -101,7 +101,7 @@ namespace RunescapeBot.BotPrograms
                 int maxOffset = (int)(0.05 * cloveRange);
                 if (!InCombat() || !HitpointsHaveDecreased())    //engage the demon
                 {
-                    LeftClick(demon.Center.X, demon.Center.Y, 200, maxOffset);
+                    LeftClick(demon.Center.X, demon.Center.Y, maxOffset, 200);
                     Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
                 }
                 MissedDemons = 0;

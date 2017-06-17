@@ -34,7 +34,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftClick(int x, int y, Process rsClient, int hoverDelay = 200, int randomize = 0)
+        public static void LeftClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
@@ -47,7 +47,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightClick(int x, int y, Process rsClient, int hoverDelay = 200, int randomize = 0)
+        public static void RightClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
@@ -68,9 +68,11 @@ namespace RunescapeBot.UITools
             Random rng = new Random();
             if (randomize > 0)
             {
-                x += rng.Next(-randomize, randomize + 1);
-                y += rng.Next(-randomize, randomize + 1);
+                Point clickPoint = Probability.GaussianCircle(new Point(x, y), 0.35 * randomize, 0, 360, randomize);
+                x = clickPoint.X;
+                y = clickPoint.Y;
             }
+
             ScreenScraper.BringToForeGround(rsClient);
             TranslateClick(ref x, ref y, rsClient);
             NaturalMove(x, y);

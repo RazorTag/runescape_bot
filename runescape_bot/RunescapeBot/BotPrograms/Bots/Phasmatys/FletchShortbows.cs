@@ -1,12 +1,6 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
-using RunescapeBot.UITools;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using RunescapeBot.Common;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -67,8 +61,8 @@ namespace RunescapeBot.BotPrograms
             int right = 222;
             int top = ScreenHeight - 110;
             int bottom = ScreenHeight - 70;
-            Point rightClick = new Point(RNG.Next(left, right), RNG.Next(top, bottom));
-            RightClick(rightClick.X, rightClick.Y, 500);
+            Point rightClick = Probability.GaussianRectangle(left, right, top, bottom);
+            RightClick(rightClick.X, rightClick.Y);
             MakeXSlim = new MakeXSlim(rightClick.X, rightClick.Y, RSClient);
             if (!MakeXSlim.WaitForPopup(WAIT_FOR_MAKEX_POPUP_TIMEOUT))
             {
@@ -78,7 +72,7 @@ namespace RunescapeBot.BotPrograms
             MakeXSlim.MakeXItems(27);
 
             //Wait for the inventory to be fletched
-            SafeWait(FLETCHING_TIME);
+            SafeWaitPlus(FLETCHING_TIME, 1200);
 
             return true;
         }

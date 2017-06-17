@@ -30,7 +30,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Approximate time in milliseconds needed for OSBuddy to start
         /// </summary>
-        private const int OSBUDDY_LOAD_TIME = 10000;
+        private const int OSBUDDY_LOAD_TIME = 20000;
 
         /// <summary>
         /// Error message to show the user for a start error
@@ -245,8 +245,35 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Process()
         {
+            int awakeTime = UnitConversions.HoursToMilliseconds(12);
+            Stopwatch sleepWatch = new Stopwatch();
+            bool done = false;
+
             Setup();
-            Iterate();
+            sleepWatch.Start();
+
+            //alternate between work periods (Iterate) and break periods
+            do
+            {
+                done = Iterate();
+                if (!done)
+                {
+                    if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
+                    {
+                        if (RNG.NextDouble() > 0.2) //20% chance to stay logged in until automatically loggin out after 5 minutes of inactivity
+                        {
+                            Logout();    //80% chance to log out normally
+                        }
+                        done = SafeWait(RandomBreakTime());
+                    }
+                    else  //get a good night's sleep before resuming
+                    {
+                        done = SafeWait(RandomSleepTime());
+                        sleepWatch.Restart();
+                    }
+                }
+            } while (!done);
+            
             Done();
         }
 
@@ -279,9 +306,10 @@ namespace RunescapeBot.BotPrograms
         /// Begins iterating after Run is called. Called for the number of iterations specified by the user.
         /// Is only called if both Iterations and FrameRate are specified.
         /// </summary>
-        private void Iterate()
+        /// <returns>true if execution is finished and the bot should stop. returns false if the bot should continue after a break.</returns>
+        private bool Iterate()
         {
-            if (StopFlag) { return; }
+            if (StopFlag) { return true; }
             int randomFrameOffset, randomFrameTime;
             
             //don't limit by iterations unless the user has specified a positive number of iterations
@@ -311,11 +339,11 @@ namespace RunescapeBot.BotPrograms
             workIntervalWatch.Start();
             int workInterval = RandomWorkTime();
 
-            while ((RunParams.Iterations-- > 0) && (DateTime.Now < RunParams.RunUntil) && (workIntervalWatch.ElapsedMilliseconds < workInterval))
+            while ((DateTime.Now < RunParams.RunUntil) && (RunParams.Iterations-- > 0))
             {
                 iterationWatch.Restart();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
-                if (StopFlag) { return; }   //quit immediately if the stop flag has been raised or we can't log back in
+                if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
 
                 //Turn on run if the player has run energy
                 RunCharacter();
@@ -327,14 +355,14 @@ namespace RunescapeBot.BotPrograms
                     {
                         if (!Execute()) //quit by an override Execute method
                         {
-                            return;
+                            return true;
                         }
-                        if (StopFlag) { return; }
+                        if (StopFlag) { return true; }
                     }
                 }
                 else
                 {
-                    if (!HandleFailedLogIn()) { return; }   //stop if we are unable to recover
+                    if (!HandleFailedLogIn()) { return true; }   //stop if we are unable to recover
                 }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);
@@ -343,10 +371,11 @@ namespace RunescapeBot.BotPrograms
                 {
                     SafeWait(randomFrameTime - (int)iterationWatch.ElapsedMilliseconds);
                 }
-                if (StopFlag) { return; }
+                if (StopFlag) { return true; }
+                if (workIntervalWatch.ElapsedMilliseconds > workInterval) { return false; } //stop execution so that the bot can take a break and resume later
             }
 
-            return;
+            return true;
         }
 
         /// <summary>
@@ -384,30 +413,57 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the next work time in milliseconds</returns>
         private int RandomWorkTime()
         {
-            int workType = RNG.Next(1, 4);
-            int mean, stdDev;   //measured in minutes
-            switch (workType)
+            int workType = RNG.Next(0, 7);
+            double mean, stdDev;   //measured in minutes
+
+
+            if (workType < 1)   // 0
             {
-                case 1:
-                    mean = 45;
-                    stdDev = 8;
-                    break;
-                case 2:
-                    mean = 115;
-                    stdDev = 30;
-                    break;
-                case 3:
-                    mean = 255;
-                    stdDev = 56;
-                    break;
-                default:
-                    mean = 60;
-                    stdDev = 5;
-                    break;
+                mean = 45;
+                stdDev = 8;
+            }
+            else if (workType < 2) // 1
+            {
+                mean = 90; 
+                stdDev = 5;
+            }
+            else if (workType < 5) // 2-4
+            {
+                mean = 115;
+                stdDev = 30;
+            }
+            else  // 5-6
+            {
+                mean = 255;
+                stdDev = 56;
             }
 
-            double workTime = Numerical.BoundedGaussian(mean, stdDev, 20, 358);
+            double workTime = Probability.BoundedGaussian(mean, stdDev, 1.0, double.MaxValue);
             return (int) (workTime * 60 * 1000);
+        }
+
+        /// <summary>
+        /// Generates a random number of milliseconds for the bot to take a break
+        /// </summary>
+        /// <returns>the number of milliseconds for the bot to rest</returns>
+        private int RandomBreakTime()
+        {
+            const int avgBreakLength = 15 * 60 * 1000;  // 15 minutes = 900,000 ms
+            const int minBreakTime = 2 * 60 * 1000;     // 2 minutes = 120,000 ms
+            int breakLength = (int)Probability.BoundedGaussian(avgBreakLength, 0.35 * avgBreakLength, minBreakTime, double.MaxValue);
+            return breakLength;
+        }
+
+        /// <summary>
+        /// Generates a random number of milliseconds for the bot to sleep at night
+        /// </summary>
+        /// <returns>the number of milliseconds for the bot to sleep</returns>
+        private int RandomSleepTime()
+        {
+            const double avgSleepLength = 7.8 * 60 * 60 * 1000;  //7.8 hours = 28,080,000 ms
+            const double standardDeviation = 20 * 60 * 1000;   //20 minutes = 1,200,000 ms
+            int breakLength = (int)Probability.RandomGaussian(avgSleepLength, standardDeviation);
+            return breakLength;
         }
 
         #endregion
@@ -420,11 +476,11 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y"></param>
         /// <param name="hoverDelay"></param>
         /// <param name="randomize">maximum number of pixels in each direction by which to randomize the click location</param>
-        protected void LeftClick(int x, int y, int hoverDelay = 200, int randomize = 0)
+        protected void LeftClick(int x, int y, int randomize = 0, int hoverDelay = 200)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                Mouse.LeftClick(x, y, RSClient, hoverDelay, randomize);
+                Mouse.LeftClick(x, y, RSClient, randomize, hoverDelay);
             }
         }
 
@@ -433,11 +489,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y, int hoverDelay = 200, int randomize = 0)
+        protected void RightClick(int x, int y, int randomize = 0, int hoverDelay = 200)
         {
             if (!StopFlag)  //don't click if the stop flag has been raised
             {
-                Mouse.RightClick(x, y, RSClient, hoverDelay, randomize);
+                Mouse.RightClick(x, y, RSClient, randomize, hoverDelay);
             }
         }
 
@@ -456,7 +512,7 @@ namespace RunescapeBot.BotPrograms
             if (LocateStationaryObject(stationaryObject, out foundObject, tolerance, maxWaitTime, minimumSize))
             {
                 LeftClick(foundObject.Center.X, foundObject.Center.Y);
-                SafeWait(afterClickWait);
+                SafeWaitPlus(afterClickWait, 0.2 * afterClickWait);
                 return true;
             }
 
@@ -1086,11 +1142,11 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Waits for a random time frm a Gaussian distribution
+        /// Waits for a random time from a Gaussian distribution
         /// </summary>
         /// <param name="meanWaitTime">average wait time</param>
         /// <param name="standardDeviation">standard deviation froom the mean</param>
-        /// <returns></returns>
+        /// <returns>true if the StopFlag has been raised</returns>
         protected bool SafeWait(int meanWaitTime, double standardDeviation)
         {
             if (meanWaitTime <= 0)
@@ -1099,7 +1155,26 @@ namespace RunescapeBot.BotPrograms
             }
             else
             {
-                int waitTime = (int) Numerical.BoundedGaussian(meanWaitTime, standardDeviation, 0.0, double.MaxValue);
+                int waitTime = (int)Probability.BoundedGaussian(meanWaitTime, standardDeviation, 0.0, double.MaxValue);
+                return SafeWait(waitTime);
+            }
+        }
+
+        /// <summary>
+        /// Waits for at least the specified wait time
+        /// </summary>
+        /// <param name="minWaitTime"></param>
+        /// <param name="stdDev"></param>
+        /// <returns></returns>
+        protected bool SafeWaitPlus(int minWaitTime, double stdDev)
+        {
+            if (minWaitTime <= 0)
+            {
+                return StopFlag;
+            }
+            else
+            {
+                int waitTime = (int)Probability.HalfGaussian(minWaitTime, stdDev, true);
                 return SafeWait(waitTime);
             }
         }
@@ -1155,7 +1230,7 @@ namespace RunescapeBot.BotPrograms
         {
             int x = ScreenWidth - 145;
             int y = 144;
-            LeftClick(x, y, 200, 3);
+            LeftClick(x, y, 3, 200);
         }
 
         /// <summary>

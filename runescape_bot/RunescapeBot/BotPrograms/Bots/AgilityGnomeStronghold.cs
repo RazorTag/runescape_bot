@@ -1,9 +1,6 @@
-﻿using RunescapeBot.ImageTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
+using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -15,6 +12,7 @@ namespace RunescapeBot.BotPrograms
 
         public AgilityGnomeStronghold(StartParams startParams) : base(startParams)
         {
+            RunParams.Run = true;
             GetReferenceColors();
         }
 
@@ -44,12 +42,20 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         private bool PassLogBalance()
         {
+            const int logBalanceTime = 8000; //approximate milliseconds needed to go from the end of the pipe obstacle to the end of the log balance
+
             Blob log;
             if (!LocateStationaryObject(LogBalance, out log, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 5000))
             {
-                return false;   //unable to locate the og balance
+                return false;   //unable to locate the log balance
             }
+            Point logStart = log.GetTop();
+            Point logEnd = log.GetBottom();
+            Line logAxis = new Line(logStart, logEnd);
+            Point click = logAxis.OffsetFromStart(30);
+            LeftClick(click.X, click.Y, 2);
 
+            SafeWait(logBalanceTime);   //wait for the player to cross the log
             return true;
         }
 

@@ -188,6 +188,82 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Finds the pixel at the top of the blob
+        /// </summary>
+        /// <returns>the average of the pixel(s) at the upper bound of the blob</returns>
+        public Point GetTop()
+        {
+            int topBound = TopBound;
+            List<Point> topPixels = new List<Point>();
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                if (pixel.Value.Y == topBound)
+                {
+                    topPixels.Add(pixel.Value);
+                }
+            }
+            return Geometry.CenterPoint(topPixels);
+        }
+
+        /// <summary>
+        /// Finds the pixel at the bottom of the blob
+        /// </summary>
+        /// <returns>the average of the pixel(s) at the bottom bound of the blob</returns>
+        public Point GetBottom()
+        {
+            int bottomBound = BottomBound;
+            List<Point> bottomPixels = new List<Point>();
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                if (pixel.Value.Y == bottomBound)
+                {
+                    bottomPixels.Add(pixel.Value);
+                }
+            }
+            return Geometry.CenterPoint(bottomPixels);
+        }
+
+        /// <summary>
+        /// Finds the pixel at the left of the blob
+        /// </summary>
+        /// <returns>the average of the pixel(s) at the left bound of the blob</returns>
+        public Point GetLeft()
+        {
+            int leftBound = LeftBound;
+            List<Point> leftPixels = new List<Point>();
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                if (pixel.Value.X == leftBound)
+                {
+                    leftPixels.Add(pixel.Value);
+                }
+            }
+            return Geometry.CenterPoint(leftPixels);
+        }
+
+        /// <summary>
+        /// Finds the pixel at the right of the blob
+        /// </summary>
+        /// <returns>the average of the pixel(s) at the right bound of the blob</returns>
+        public Point GetRight()
+        {
+            int rightBound = RightBound;
+            List<Point> rightPixels = new List<Point>();
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                if (pixel.Value.X == rightBound)
+                {
+                    rightPixels.Add(pixel.Value);
+                }
+            }
+            return Geometry.CenterPoint(rightPixels);
+        }
+
+        /// <summary>
         /// Calculates the distance to another point
         /// </summary>
         /// <param name="point"></param>

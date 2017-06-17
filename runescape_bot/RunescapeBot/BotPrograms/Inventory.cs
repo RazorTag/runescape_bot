@@ -58,7 +58,7 @@ namespace RunescapeBot.BotPrograms
             int x = Screen.GetLength(0) - INVENTORY_TAB_OFFSET_LEFT + RNG.Next(-5, 6);
             int y = Screen.GetLength(1) - INVENTORY_TAB_OFFSET_TOP + RNG.Next(-5, 6);
             Mouse.LeftClick(x, y, RSClient);
-            Thread.Sleep(TAB_SWITCH_WAIT);
+            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Inventory;
             return true;
         }
@@ -77,7 +77,7 @@ namespace RunescapeBot.BotPrograms
             int x = Screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_LEFT + RNG.Next(-5, 6);
             int y = Screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_TOP + RNG.Next(-5, 6);
             Mouse.LeftClick(x, y, RSClient);
-            Thread.Sleep(TAB_SWITCH_WAIT);
+            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Spellbook;
             return true;
         }
@@ -90,10 +90,8 @@ namespace RunescapeBot.BotPrograms
         public void ClickInventory(int x, int y, bool safeTab = true)
         {
             InventoryToScreen(ref x, ref y);
-            x += RNG.Next(-5, 6);
-            y += RNG.Next(-5, 6);
             OpenInventory(safeTab);
-            Mouse.LeftClick(x, y, RSClient, 200);
+            Mouse.LeftClick(x, y, RSClient, 5);
         }
 
         /// <summary>
@@ -128,10 +126,8 @@ namespace RunescapeBot.BotPrograms
         private void ClickSpellbook(int x, int y, bool safeTab = true)
         {
             SpellbookToScreen(ref x, ref y);
-            x += RNG.Next(-5, 6);   //randomize the click location so we don't repeat the same pixel
-            y += RNG.Next(-5, 6);
             OpenSpellbook(safeTab);
-            Mouse.LeftClick(x, y, RSClient, 200);
+            Mouse.LeftClick(x, y, RSClient, 5);
         }
 
         /// <summary>
@@ -143,8 +139,8 @@ namespace RunescapeBot.BotPrograms
         public void Telegrab(int x, int y, bool safeTab = true)
         {
             ClickSpellbook(5, 2, safeTab);
-            Mouse.LeftClick(x, y, RSClient, 200);
-            Thread.Sleep(5000); //telegrab takes about 5 seconds
+            Mouse.LeftClick(x, y, RSClient, 1);
+            Thread.Sleep((int)Probability.HalfGaussian(5000, 300, true)); //telegrab takes about 5 seconds
         }
 
         /// <summary>
@@ -163,7 +159,7 @@ namespace RunescapeBot.BotPrograms
                 SelectedTab = TabSelect.Inventory;
                 ClickInventory(x, y, false);
                 SelectedTab = TabSelect.Spellbook;
-                Thread.Sleep(2000);
+                Thread.Sleep((int)Probability.HalfGaussian(2000, 200, true));
                 return true;
             }
 
@@ -201,7 +197,7 @@ namespace RunescapeBot.BotPrograms
         public void UseItemOnItem(Point subjectItem, Point objectItem, bool safeTab = true)
         {
             ClickInventory(subjectItem.X, subjectItem.Y, safeTab);
-            Thread.Sleep(200);
+            Thread.Sleep((int)Probability.HalfGaussian(200, 30, true));
             ClickInventory(objectItem.X, objectItem.Y, safeTab);
         }
 

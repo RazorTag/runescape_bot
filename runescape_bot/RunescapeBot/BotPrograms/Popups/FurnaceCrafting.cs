@@ -19,7 +19,6 @@ namespace RunescapeBot.BotPrograms.Popups
         private const int BRACELET_Y_OFFSET = 264;
 
         private Process RSClient;
-        private Random RNG;
         private int Left;
         private int Top;
 
@@ -39,7 +38,6 @@ namespace RunescapeBot.BotPrograms.Popups
         public FurnaceCrafting(Process rsClient)
         {
             this.RSClient = rsClient;
-            RNG = new Random();
             Point screenSize = ScreenScraper.GetOSBuddyWindowSize(RSClient);
             SetLeft(screenSize.X);
             SetTop(screenSize.Y);
@@ -103,10 +101,13 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="numberToMake">Number of bracelets to craft</param>
         public void MakeBracelets(Jewel jewel, int numberToMake, int timeout)
         {
-            int xClick = Left + NO_JEWEL_X_OFFSET + (((int)jewel) * ITEM_ICON_WIDTH) + RNG.Next(-4, 5);
-            int yClick = Top + BRACELET_Y_OFFSET + RNG.Next(-4, 5);
-            Mouse.RightClick(xClick, yClick, RSClient);
-            MakeX makeX = new MakeX(xClick, yClick, RSClient);
+            int left = Left + NO_JEWEL_X_OFFSET + (((int)jewel) * ITEM_ICON_WIDTH) - 4;
+            int right = Left + NO_JEWEL_X_OFFSET + (((int)jewel) * ITEM_ICON_WIDTH) + 4;
+            int top = Top + BRACELET_Y_OFFSET - 4;
+            int bottom = Top + BRACELET_Y_OFFSET + 4;
+            Point click = Probability.GaussianRectangle(left, right, top, bottom);
+            Mouse.RightClick(click.X, click.Y, RSClient);
+            MakeX makeX = new MakeX(click.X, click.Y, RSClient);
             makeX.WaitForPopup(timeout);
             makeX.MakeXItems(numberToMake);
         }
@@ -118,8 +119,8 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             const int xOffset = 474;
             const int yOffset = 17;
-            int xClick = Left + xOffset + RNG.Next(-6, 7);
-            int yClick = Top + yOffset + RNG.Next(-5, 6);
+            Point click = Probability.GaussianRectangle(Left + xOffset - 6, Left + xOffset + 6, Top + yOffset - 5, Top + yOffset + 5);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
     }
 }

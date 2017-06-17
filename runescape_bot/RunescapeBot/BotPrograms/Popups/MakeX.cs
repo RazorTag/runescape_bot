@@ -1,6 +1,8 @@
-﻿using RunescapeBot.UITools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.UITools;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 
 namespace RunescapeBot.BotPrograms.Popups
@@ -38,11 +40,8 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeOne()
         {
             const int yOffset = 25;
-
-            Random rng = new Random();
-            XClick += rng.Next(-50, 51);
-            YClick += yOffset + rng.Next(-2, 3);
-            Mouse.LeftClick(XClick, YClick, RSClient);
+            Point click = Probability.GaussianRectangle(-50, 50, yOffset - 2, yOffset + 2);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
 
         /// <summary>
@@ -51,11 +50,8 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeFive()
         {
             const int yOffset = 40;
-
-            Random rng = new Random();
-            XClick += rng.Next(-50, 51);
-            YClick += yOffset + rng.Next(-2, 3);
-            Mouse.LeftClick(XClick, YClick, RSClient);
+            Point click = Probability.GaussianRectangle(-50, 50, yOffset - 2, yOffset + 2);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
 
         /// <summary>
@@ -64,11 +60,8 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeTen()
         {
             const int yOffset = 55;
-
-            Random rng = new Random();
-            XClick += rng.Next(-50, 51);
-            YClick += yOffset + rng.Next(-2, 3);
-            Mouse.LeftClick(XClick, YClick, RSClient);
+            Point click = Probability.GaussianRectangle(-50, 50, yOffset - 2, yOffset + 2);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
 
         /// <summary>
@@ -77,16 +70,14 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeXItems(int itemsToMake)
         {
             const int yOffset = 70;
-
-            Random rng = new Random();
-            XClick += rng.Next(-50, 51);
-            YClick += yOffset + rng.Next(-2, 3);
-            Mouse.LeftClick(XClick, YClick, RSClient);
+            Point clickOffset = Probability.GaussianRectangle(-50, 50, yOffset - 2, yOffset + 2);
+            Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
 
             //Wait for the "Enter amount:" prompt to appear
             if (WaitForEnterAmount(5000))
             {
-                Utilities.EnterAmount(RSClient, itemsToMake);
+                BotUtilities.EnterAmount(RSClient, itemsToMake);
             }
         }
     }

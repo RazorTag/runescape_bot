@@ -80,9 +80,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange LogBalance()
         {
-            Color dark = Color.FromArgb(68, 39, 3);
-            Color light = Color.FromArgb(107, 64, 17);
-            HSBRange hsbRange = new HSBRange(30, 35, 0.735f, 0.875f, 0.143f, 0.236f);
+            Color dark = Color.FromArgb(61, 33, 0);
+            Color light = Color.FromArgb(110, 68, 14);
+            HSBRange hsbRange = new HSBRange(26, 40, 0.728f, 1.000f, 0.079f, 0.274f);
             return new ColorRange(dark, light, hsbRange);
         }
 

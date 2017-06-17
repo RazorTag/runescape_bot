@@ -74,14 +74,14 @@ namespace RunescapeBot.BotPrograms
 
             //String the bows
             Inventory.UseItemOnItem(StringSlot, BowSlot, false);
-            if (!Utilities.ChatBoxSingleOptionMakeAll(RSClient))
+            if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
             {
                 FailedRuns++;
                 return true;
             }
 
             //Wait for the inventory to be fletched
-            SafeWait(FLETCHING_TIME + RNG.Next(-200, 201));
+            SafeWait(FLETCHING_TIME, 200.0);
 
             FailedRuns = 0;
             return true;

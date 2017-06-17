@@ -3,17 +3,13 @@ using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
-    public static class Utilities
+    public static class BotUtilities
     {
         private const int WAIT_FOR_MAKEALL_POPUP_TIMEOUT = 1000;
         private const int CHATBOX_OPTION_RIGHT_CLICK_MAX_TRIES = 5;
@@ -82,7 +78,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
                 rightClick = new Point(rng.Next(left, right), rng.Next(top, bottom));
-                Mouse.RightClick(rightClick.X, rightClick.Y, rsClient, CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
+                Mouse.RightClick(rightClick.X, rightClick.Y, rsClient);
                 makeAllSlim = new MakeAllSlim(rightClick.X, rightClick.Y, rsClient);
 
                 if (makeAllSlim.WaitForPopup(WAIT_FOR_MAKEALL_POPUP_TIMEOUT))

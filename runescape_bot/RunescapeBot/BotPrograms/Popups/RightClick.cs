@@ -1,9 +1,7 @@
-﻿using RunescapeBot.Common;
-using RunescapeBot.ImageTools;
+﻿using RunescapeBot.ImageTools;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading;
 
 namespace RunescapeBot.BotPrograms.Popups
 {
@@ -111,7 +109,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <returns>true if the prompt appears</returns>
         public bool WaitForEnterAmount(int timeout)
         {
-            return Utilities.WaitForEnterAmount(RSClient, timeout);
+            return BotUtilities.WaitForEnterAmount(RSClient, timeout);
         }
     }
 }

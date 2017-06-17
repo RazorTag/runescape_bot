@@ -24,7 +24,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the actions succeed, false if they fail</returns>
         protected override bool FurnaceActions()
         {
-            Utilities.ChatBoxSingleOptionMakeAll(RSClient);
+            BotUtilities.ChatBoxSingleOptionMakeAll(RSClient);
 
             //verify that cannonballs are being smithed
             watch.Restart();
@@ -35,7 +35,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            SafeWait(TOTAL_SMITH_TIME - (int)watch.ElapsedMilliseconds);
+            SafeWaitPlus(TOTAL_SMITH_TIME - (int)watch.ElapsedMilliseconds, 3500);
 
             return true;
         }

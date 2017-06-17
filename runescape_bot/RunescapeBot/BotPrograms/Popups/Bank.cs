@@ -11,7 +11,6 @@ namespace RunescapeBot.BotPrograms.Popups
     public class Bank
     {
         Process RSClient;
-        Random RNG;
         public int Left { get; set; }
         public int Right { get; set; }
         public int Top { get; set; }
@@ -20,7 +19,6 @@ namespace RunescapeBot.BotPrograms.Popups
         public Bank(Process RSClient)
         {
             this.RSClient = RSClient;
-            RNG = new Random();
             Point screenSize = ScreenScraper.GetOSBuddyWindowSize(RSClient);
             SetLeft(screenSize.X);
             SetRight(screenSize.X);
@@ -127,16 +125,15 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <summary>
         /// Clicks on the "Deposit Inventory" button in the bank pop-up
         /// </summary>
-        /// <param name="screenWidth">width of the game scree in pixels</param>
+        /// <param name="screenWidth">width of the game screen in pixels</param>
         /// <param name="screenHeight">height of the game screen in pixels</param>
         public void DepositInventory()
         {
             const int xOffset = 427;
             const int yOffset = 22; //offset from bottom
-            int x = Left + xOffset + RNG.Next(-5, 6);
-            int y = Bottom - yOffset + RNG.Next(-5, 6);
-            Mouse.LeftClick(x, y, RSClient);
-            Thread.Sleep(200);
+            Point click = Probability.GaussianCircle(new Point(Left + xOffset, Bottom - yOffset), 2, 0, 360, 5);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
+            Thread.Sleep(200 + (int)Probability.HalfGaussian(0, 10, true));
         }
 
         /// <summary>
@@ -177,9 +174,8 @@ namespace RunescapeBot.BotPrograms.Popups
                 return;
             }
 
-            int xClick = itemSlot.Value.X + RNG.Next(-10, 11);
-            int yClick = itemSlot.Value.Y + RNG.Next(-10, 11);
-            Mouse.LeftClick(xClick, yClick, RSClient);
+            Point click = Probability.GaussianCircle(new Point(itemSlot.Value.X, itemSlot.Value.Y), 4, 0, 360, 11);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
 
         /// <summary>
@@ -206,7 +202,7 @@ namespace RunescapeBot.BotPrograms.Popups
             WithdrawMenuClick(column, row, yOffset);
             if (WaitForEnterAmount(5000))
             {
-                Utilities.EnterAmount(RSClient, quantity);
+                BotUtilities.EnterAmount(RSClient, quantity);
             }
         }
 
@@ -237,16 +233,14 @@ namespace RunescapeBot.BotPrograms.Popups
             }
 
             //open the withdraw right-click menu
-            int xClick = itemSlot.Value.X + RNG.Next(-10, 11);
-            int yClick = itemSlot.Value.Y + RNG.Next(-10, 11);
-            Mouse.RightClick(xClick, yClick, RSClient);
-            Thread.Sleep(200);
+            Point click = Probability.GaussianCircle(new Point(itemSlot.Value.X, itemSlot.Value.Y), 4, 0, 360, 11);
+            Mouse.RightClick(click.X, click.Y, RSClient);
+            Thread.Sleep(200 + (int)Probability.HalfGaussian(0, 10, true));
 
             //click on Withdraw-All
-            xClick += RNG.Next(-90, 91);
-            yClick += yOffset + RNG.Next(-2, 3);
-            Mouse.LeftClick(xClick, yClick, RSClient);
-            Thread.Sleep(200);
+            click = Probability.GaussianRectangle(click.X - 90, click.X + 90, click.Y + yOffset - 2, click.Y + yOffset + 2);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
+            Thread.Sleep(200 + (int)Probability.HalfGaussian(0, 10, true));
         }
 
         /// <summary>
@@ -256,9 +250,8 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             const int xOffset = 469;
             const int yOffset = 17;
-            int xClick = Left + xOffset + RNG.Next(-6, 7);
-            int yClick = Top + yOffset + RNG.Next(-5, 6);
-            Mouse.LeftClick(xClick, yClick, RSClient);
+            Point click = Probability.GaussianCircle(new Point(Left + xOffset, Top + yOffset), 3, 0, 360, 7);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
 
         /// <summary>
@@ -268,7 +261,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <returns>true if the prompt appears</returns>
         public bool WaitForEnterAmount(int timeout)
         {
-            return Utilities.WaitForEnterAmount(RSClient, timeout);
+            return BotUtilities.WaitForEnterAmount(RSClient, timeout);
         }
     }
 }
