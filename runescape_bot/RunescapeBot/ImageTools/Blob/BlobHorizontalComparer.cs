@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RunescapeBot.ImageTools
 {
@@ -19,8 +15,7 @@ namespace RunescapeBot.ImageTools
                 return -1;
             }
 
-            //y = x
-            return 0;
+            return 0;   //y = x
         }
     }
 }

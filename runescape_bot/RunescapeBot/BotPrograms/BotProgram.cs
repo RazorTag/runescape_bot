@@ -528,8 +528,10 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWaitTime">time to wait before gving up</param>
         /// <param name="minimumSize">minimum required size of the object in pixels</param>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize)
+        protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize, FindObject findObject = null)
         {
+            findObject = findObject ?? LocateObject;
+
             foundObject = null;
             Point? lastPosition = null;
             const int scanInterval = 100; //minimum time between checks in milliseconds
@@ -542,8 +544,8 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return false; }
 
                 intervalWatch.Restart();
-                Blob objectBlob;
-                LocateObject(stationaryObject, out objectBlob, minimumSize);
+                Blob objectBlob = null;
+                findObject(stationaryObject, out objectBlob, minimumSize);
 
                 if (objectBlob != null && objectBlob.Size >= minimumSize)
                 {
@@ -577,7 +579,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWaitTime"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize)
+        protected bool LocateObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize = 1)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilter(stationaryObject);
@@ -595,6 +597,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
         }
+
+        protected delegate bool FindObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize = 1);
         #endregion
 
         #region vision utilities
@@ -806,14 +810,25 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines the portion of the screen taken up by a blob
+        /// Determines the portion of the screen taken up by an artifact of a known number of pixels
         /// </summary>
-        /// <param name="artifact"></param>
-        /// <returns></returns>
-        protected double ArtifactSize(Blob artifact)
+        /// <param name="artifactSize">the size of an artifact in pixels</param>
+        /// <returns>the fraction of  the screen taken up by an artifact of known size</returns>
+        protected double ArtifactSize(int artifactSize)
         {
             double screenSize = Bitmap.Size.Width * Bitmap.Size.Height;
-            return artifact.Size / screenSize;
+            return artifactSize / screenSize;
+        }
+
+        /// <summary>
+        /// Determines the pixels on the screen taken up by an artifact of a known fraction of the screen
+        /// </summary>
+        /// <param name="artifactSize">the size of an artifact in terms of fraction of the screen</param>
+        /// <returns>the number of pixels taken up by an artifact</returns>
+        protected int ArtifactSize(double artifactSize)
+        {
+            double pixels = artifactSize * Bitmap.Size.Width * Bitmap.Size.Height;
+            return (int) Math.Round(pixels);
         }
 
         /// <summary>

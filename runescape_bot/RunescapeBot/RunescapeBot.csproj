@@ -111,6 +111,7 @@
     <Compile Include="Common\Probability.cs" />
     <Compile Include="Common\UnitConversions.cs" />
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
+    <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
     <Compile Include="ImageTools\FIlters\ColorFilters.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />

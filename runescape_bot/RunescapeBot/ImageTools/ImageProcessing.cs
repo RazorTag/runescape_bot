@@ -93,7 +93,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="image"></param>
         /// <returns>a list of blobs found from biggest to smallest</returns>
-        public static List<Blob> FindBlobs(bool[,] image, bool sort = false)
+        public static List<Blob> FindBlobs(bool[,] image, bool sort = false, int minSize = 1, int maxSize = int.MaxValue)
         {
             if (image == null) { return new List<Blob>(); }
 
@@ -117,8 +117,11 @@ namespace RunescapeBot.ImageTools
                             pixel = blob.NextPixel();
                             CheckNeighbors(blob, image, pixel.X, pixel.Y, width, height);
                         }
-                        
-                        allBlobs.Add(blob);
+
+                        if (blob.Size >= minSize && blob.Size <= maxSize)
+                        {
+                            allBlobs.Add(blob);
+                        }
                     }
                 }
             }
