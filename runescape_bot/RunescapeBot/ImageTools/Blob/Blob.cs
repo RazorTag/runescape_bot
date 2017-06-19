@@ -100,7 +100,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// The left most x-value of any pixel in the blob
+        /// The right most x-value of any pixel in the blob
         /// </summary>
         private int rightBound;
         public int RightBound
@@ -116,7 +116,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// The left most x-value of any pixel in the blob
+        /// The top most x-value of any pixel in the blob
         /// </summary>
         private int topBound;
         public int TopBound
@@ -132,7 +132,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// The left most x-value of any pixel in the blob
+        /// The bottom most x-value of any pixel in the blob
         /// </summary>
         private int bottomBound;
         public int BottomBound

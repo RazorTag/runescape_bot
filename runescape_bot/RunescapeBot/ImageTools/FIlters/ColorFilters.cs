@@ -253,14 +253,14 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// The brown 
+        /// The brown floor of a builidng on the minimap
         /// </summary>
         /// <returns></returns>
         public static ColorRange PhasmatysBuildingFloor()
         {
             Color dark = Color.FromArgb(44, 50, 34);
             Color light = Color.FromArgb(92, 96, 79);
-            HSBRange hsbRange = new HSBRange(334, 100, 0.003f, 0.254f, 0.104f, 0.404f);
+            HSBRange hsbRange = new HSBRange(334, 84, 0.053f, 0.204f, 0.154f, 0.354f);
             return new ColorRange(dark, light, hsbRange);
         }
 

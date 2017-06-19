@@ -1,9 +1,6 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
-using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
-using RunescapeBot.UITools;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
@@ -141,49 +138,31 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if the bank is opened</returns>
         protected bool ClickBankBooth()
         {
-            Point? bankBoothLocation = null;
-            Point? lastPosition = null;
-            const int scanInterval = 20; //time between checks in milliseconds
+            Blob bankBooth;
             const int maxWaitTime = 12000;
-            Stopwatch watch = new Stopwatch();
-
-            for (int i = 0; i < (maxWaitTime / ((double)scanInterval)); i++)
+            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, BANK_BOOTH_MIN_SIZE, LocateBankBooth))
             {
-                if (StopFlag) { return false; }
-                watch.Restart();
-
-                ReadWindow();
-                if (LocateBankBooth(out bankBoothLocation, true))
-                {
-                    if (Geometry.DistanceBetweenPoints(bankBoothLocation, lastPosition) <= STATIONARY_OBJECT_TOLERANCE)
-                    {
-                        LeftClick(bankBoothLocation.Value.X, bankBoothLocation.Value.Y, 10);
-                        SafeWait(1000, 120); //TODO verify that the bank opened
-                        return true;
-                    }
-                    else
-                    {
-                        lastPosition = bankBoothLocation;
-                        watch.Stop();
-                        SafeWait(scanInterval - ((int)watch.ElapsedMilliseconds));
-                    }
-                }
+                return false;
             }
-
-            return false;
+            LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
+            SafeWait(1000, 120); //TODO verify that the bank opened
+            return true;
         }
 
         /// <summary>
         /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if the bank booths are found</returns>
-        protected bool LocateBankBooth(out Point? bankBooth, bool randomize = false)
+        protected bool LocateBankBooth(ColorRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
         {
             bankBooth = null;
             const int numberOfBankBooths = 6;
             const double maxBoothHeightToWidthRatio = 3.2;
-            bool[,] bankBooths = ColorFilter(BankBooth);
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true);    //list of blobs from biggest to smallest
+            int minBankBoothSize = ArtifactSize(0.0001);
+
+            ReadWindow();
+            bool[,] bankBooths = ColorFilter(bankBoothColor);
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, minBankBoothSize);    //list of blobs from biggest to smallest
             Blob blob;
             int blobIndex = 0;
 
@@ -215,22 +194,8 @@ namespace RunescapeBot.BotPrograms
             //Reduce the blob list to the bank booths
             boothBlobs = boothBlobs.GetRange(0, numberOfBankBooths);
             boothBlobs.Sort(new BlobHorizontalComparer());
-
-            Blob rightBooth = boothBlobs[numberOfBankBooths - 1];
             Blob secondRightBooth = boothBlobs[numberOfBankBooths - 2];
-            double leftness = RNG.NextDouble();
-
-            if(randomize)
-            {
-                bankBooth = Geometry.RandomMidpoint(rightBooth.Center, secondRightBooth.Center);
-                int y = (int) Probability.BoundedGaussian(bankBooth.Value.Y, 3.0, bankBooth.Value.Y - 8.0, bankBooth.Value.Y + 8.0);  //randomize the height of the click
-                bankBooth = new Point(bankBooth.Value.X, y);
-            }
-            else
-            {
-                bankBooth = Numerical.Average(rightBooth.Center, secondRightBooth.Center);
-            }
-            
+            bankBooth = secondRightBooth;
             return true;
         }
 
