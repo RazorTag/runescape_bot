@@ -802,9 +802,6 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            Color[,] testImage = ScreenPiece(left, right, top, bottom);
-            DebugUtilities.SaveImageToFile(testImage);
-
             return minimapFilter;
         }
 
