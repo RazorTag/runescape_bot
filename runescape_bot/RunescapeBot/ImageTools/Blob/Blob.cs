@@ -264,6 +264,36 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Gets the top-left most pixel
+        /// </summary>
+        /// <returns>the point from the blob with the greatest combination of leftness and topness</returns>
+        public Point GetTopLeft()
+        {
+            if (Pixels.Count == 0) {  return new Point();}
+
+            int left = -1;
+            int top = -1;
+
+            foreach (KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                if (left == -1)
+                {
+                    left = pixel.Value.X;
+                    top = pixel.Value.Y;
+                }
+                else
+                {
+                    if ((left - pixel.Value.X) + (top - pixel.Value.Y) > 0)
+                    {
+                        left = pixel.Value.X;
+                        top = pixel.Value.Y;
+                    }
+                }
+            }
+            return new Point(left, top);
+        }
+
+        /// <summary>
         /// Calculates the distance to another point
         /// </summary>
         /// <param name="point"></param>

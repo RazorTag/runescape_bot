@@ -119,7 +119,7 @@ namespace RunescapeBot.Common
 
             arcStart = arcStart % 360;
             arcEnd = arcEnd % 360;
-            if (arcStart > arcEnd)
+            if (arcStart >= arcEnd)
             {
                 arcEnd += 360;
             }

@@ -86,8 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
-    <Compile Include="BotPrograms\Bots\AgilityGnomeStronghold.cs" />
-    <Compile Include="BotPrograms\Bots\AgilitySeersVillage.cs" />
+    <Compile Include="BotPrograms\Bots\Agility\Agility.cs" />
+    <Compile Include="BotPrograms\Bots\Agility\AgilityGnomeStronghold.cs" />
+    <Compile Include="BotPrograms\Bots\Agility\AgilitySeersVillage.cs" />
     <Compile Include="BotPrograms\Bots\CleanHerbs.cs" />
     <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
     <Compile Include="BotPrograms\Bots\DartTips.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
+    <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
     <Compile Include="ImageTools\FIlters\ColorFilters.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />

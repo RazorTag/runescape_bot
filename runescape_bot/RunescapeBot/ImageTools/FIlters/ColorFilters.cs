@@ -106,9 +106,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange GnomeTreeBranch()
         {
-            Color dark = Color.FromArgb(73, 55, 12);
+            Color dark = Color.FromArgb(52, 39, 8);
             Color light = Color.FromArgb(147, 121, 71);
-            HSBRange hsbRange = new HSBRange(37, 44, 0.355f, 0.652f, 0.176f, 0.418f);
+            HSBRange hsbRange = new HSBRange(37, 44, 0.355f, 0.668f, 0.127f, 0.418f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -118,9 +118,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange GnomeTreeTrunk()
         {
-            Color dark = Color.FromArgb(86, 68, 47);
+            Color dark = Color.FromArgb(75, 59, 39);
             Color light = Color.FromArgb(148, 120, 86);
-            HSBRange hsbRange = new HSBRange(30, 37, 0.263f, 0.291f, 0.270f, 0.449f);
+            HSBRange hsbRange = new HSBRange(30, 37, 0.263f, 0.302f, 0.233f, 0.449f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -130,21 +130,21 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange Tightrope()
         {
-            Color dark = Color.FromArgb(0, 0, 0);
-            Color light = Color.FromArgb(0, 0, 0);
-            HSBRange hsbRange = new HSBRange(0, 0, 0.000f, 0.000f, 0.000f, 0.000f);
+            Color dark = Color.FromArgb(119, 95, 65);
+            Color light = Color.FromArgb(174, 142, 101);
+            HSBRange hsbRange = new HSBRange(31, 36, 0.264f, 0.308f, 0.370f, 0.530f);
             return new ColorRange(dark, light, hsbRange);
         }
 
         /// <summary>
-        /// Opening of a drain pipe
+        /// THe rim of the opening of a drain pipe
         /// </summary>
         /// <returns></returns>
         public static ColorRange DrainPipe()
         {
-            Color dark = Color.FromArgb(0, 0, 0);
-            Color light = Color.FromArgb(0, 0, 0);
-            HSBRange hsbRange = new HSBRange(0, 0, 0.000f, 0.000f, 0.000f, 0.000f);
+            Color dark = Color.FromArgb(86, 80, 80);
+            Color light = Color.FromArgb(129, 121, 121);
+            HSBRange hsbRange = new HSBRange(355, 12, 0.027f, 0.044f, 0.335f, 0.483f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -344,6 +344,22 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(3, 5, 0.555f, 0.557f, 0.317f, 0.319f);
             return new ColorRange(dark, light, hsbRange);
         }
+        #endregion
+
+        #region generic colors
+
+        /// <summary>
+        /// perfect black
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange Black()
+        {
+            Color dark = Color.FromArgb(0, 0, 0);
+            Color light = Color.FromArgb(0, 0, 0);
+            HSBRange hsbRange = null;
+            return new ColorRange(dark, light, hsbRange);
+        }
+
         #endregion
     }
 }

@@ -2,7 +2,6 @@
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -322,17 +321,17 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private const int TAB_SWITCH_WAIT = 200;
 
-        private const int INVENTORY_TAB_OFFSET_LEFT = 119;
+        private const int INVENTORY_TAB_OFFSET_LEFT = 118;
         private const int INVENTORY_TAB_OFFSET_TOP = 320;
-        private const int INVENTORY_OFFSET_LEFT = 186;
+        private const int INVENTORY_OFFSET_LEFT = 185;
         private const int INVENTORY_OFFSET_TOP = 275;
         private const int INVENTORY_GAP_X = 42;
         private const int INVENTORY_GAP_Y = 36;
         private const int INVENTORY_CAPACITY = 28;
 
-        private const int SPELLBOOK_TAB_OFFSET_LEFT = 20;
+        private const int SPELLBOOK_TAB_OFFSET_LEFT = 19;
         private const int SPELLBOOK_TAB_OFFSET_TOP = 320;
-        private const int SPELLBOOK_OFFSET_LEFT = 192;
+        private const int SPELLBOOK_OFFSET_LEFT = 191;
         private const int SPELLBOOK_OFFSET_TOP = 272;
         private const int SPELLBOOK_GAP_X = 24;
         private const int SPELLBOOK_GAP_Y = 24;        

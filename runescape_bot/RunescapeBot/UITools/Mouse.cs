@@ -167,18 +167,18 @@ namespace RunescapeBot.UITools
         /// <param name="maxRadius"></param>
         /// <param name="arcStart">Degrees (NOT radians). The possible arc goes counterclockwise from arcStart to arcEnd.</param>
         /// <param name="arcEnd">Degrees (NOT radians). The possible arc goes counterclockwise from arcStart to arcEnd.</param>
-        public static void RadialOffset(int minRadius, int maxRadius, int arcStart, int arcEnd)
+        public static void RadialOffset(double minRadius, double maxRadius, double arcStart, double arcEnd)
         {
             Random rng = new Random();
-            int radius = rng.Next(minRadius, maxRadius + 1);
+            double radius = minRadius + (rng.NextDouble() * (maxRadius - minRadius));
 
             arcStart = arcStart % 360;
             arcEnd = arcEnd % 360;
-            if (arcStart > arcEnd)
+            if (arcStart >= arcEnd)
             {
                 arcEnd += 360;
             }
-            double angle = rng.Next(arcStart, arcEnd + 1);
+            double angle = arcStart + (rng.NextDouble() * (arcEnd - arcStart));
             angle = (angle % 360) * ((2 * Math.PI) / 360.0);
 
             POINT startingPosition;

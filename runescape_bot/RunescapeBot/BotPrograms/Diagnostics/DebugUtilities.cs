@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bitmap"></param>
         /// <param name="filePath"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(Bitmap bitmap, string filePath)
+        public static void SaveImageToFile(Bitmap bitmap, string filePath = "C:\\Projects\\Roboport\\test_pictures\\test.png")
         {
             if (System.IO.File.Exists(filePath))
             {
@@ -22,7 +22,7 @@ namespace RunescapeBot.BotPrograms
 
             IntPtr hBitmap = bitmap.GetHbitmap();
             Image img = Image.FromHbitmap(hBitmap);
-            img.Save(filePath, ImageFormat.Jpeg);
+            img.Save(filePath, ImageFormat.Png);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="rgbArray"></param>
         /// <param name="filePath"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(Color[,] rgbArray, string filePath)
+        public static void SaveImageToFile(Color[,] rgbArray, string filePath = "C:\\Projects\\Roboport\\test_pictures\\test.png")
         {
             Bitmap bitmap = new Bitmap(rgbArray.GetLength(0), rgbArray.GetLength(1));
             for (int x = 0; x < rgbArray.GetLength(0); x++)
@@ -148,14 +148,14 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.jpg");
-            SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.jpg");
-            SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.jpg");
-            SaveImageToFile(hueBitmap, directory + saveName + "_HSBHueMaskTest.jpg");
-            SaveImageToFile(saturationBitmap, directory + saveName + "_HSBSaturationMaskTest.jpg");
-            SaveImageToFile(brightnessBitmap, directory + saveName + "_HSBBrightnessMaskTest.jpg");
-            SaveImageToFile(combinedBitmap, directory + saveName + "_TotalMaskTest.jpg");
-            SaveImageToFile(bitmap, directory + "Original.jpg");
+            SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.png");
+            SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.png");
+            SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.png");
+            SaveImageToFile(hueBitmap, directory + saveName + "_HSBHueMaskTest.png");
+            SaveImageToFile(saturationBitmap, directory + saveName + "_HSBSaturationMaskTest.png");
+            SaveImageToFile(brightnessBitmap, directory + saveName + "_HSBBrightnessMaskTest.png");
+            SaveImageToFile(combinedBitmap, directory + saveName + "_TotalMaskTest.png");
+            SaveImageToFile(bitmap, directory + "Original.png");
         }
     }
 }

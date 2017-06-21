@@ -79,7 +79,6 @@ namespace RunescapeBot.ImageTools
             {
                 return true;
             }
-            
             return HSBRange.ColorInRange(color);
         }
 

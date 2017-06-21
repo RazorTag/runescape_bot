@@ -31,7 +31,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         private void SetLeft(int screenWidth)
         {
-            double yIntercept = -369.5;
+            double yIntercept = -368.5;
             double slope = 0.5;
             Left = (int) Math.Round(yIntercept + (slope * screenWidth));
         }
@@ -41,7 +41,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         private void SetRight(int screenWidth)
         {
-            double yIntercept = 117.5;
+            double yIntercept = 118.5;
             double slope = 0.5;
             Right = (int) Math.Round(yIntercept + (slope * screenWidth));
         }
@@ -57,7 +57,7 @@ namespace RunescapeBot.BotPrograms.Popups
             }
             else
             {
-                double yIntercept = -482;
+                double yIntercept = -481.5;
                 double slope = 0.5;
                 Top = (int) Math.Round(yIntercept + (slope * screenHeight));
             }
@@ -74,7 +74,7 @@ namespace RunescapeBot.BotPrograms.Popups
             }
             else
             {
-                double yIntercept = 317;
+                double yIntercept = 317.5;
                 double slope = 0.5;
                 Bottom = (int)Math.Round(yIntercept + (slope * screenHeight));
             }

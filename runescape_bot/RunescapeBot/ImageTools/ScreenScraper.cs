@@ -1,13 +1,9 @@
-﻿using RunescapeBot.BotPrograms;
-using RunescapeBot.FileIO;
-using RunescapeBot.UITools;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.ImageTools
@@ -18,8 +14,8 @@ namespace RunescapeBot.ImageTools
     public static class ScreenScraper
     {
         #region constants
-        public static int OSBUDDY_TOOLBAR_WIDTH = 31;  //does not include the border underneath the toolbar
-        public static int OSBUDDY_BORDER_WIDTH = 2;
+        public const int OSBUDDY_TOOLBAR_WIDTH = 33;
+        public const int OSBUDDY_BORDER_WIDTH = 3;
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
         #endregion
@@ -203,7 +199,7 @@ namespace RunescapeBot.ImageTools
         /// <param name="windowRect"></param>
         private static bool TrimOSBuddy(ref RECT windowRect)
         {
-            windowRect.top += OSBUDDY_TOOLBAR_WIDTH + OSBUDDY_BORDER_WIDTH;
+            windowRect.top += OSBUDDY_TOOLBAR_WIDTH;
             windowRect.right -= OSBUDDY_BORDER_WIDTH;
             windowRect.bottom -= OSBUDDY_BORDER_WIDTH;
             windowRect.left += OSBUDDY_BORDER_WIDTH;
@@ -239,10 +235,14 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static bool RestartOSBuddy(string clientFilePath, ref Process OSBuddy)
         {
-            if ((OSBuddy != null) && !OSBuddy.CloseMainWindow())
+            if (OSBuddy != null)
             {
-                return false;   //unable to close the current instance of OSBuddy
+                if (!OSBuddy.CloseMainWindow())
+                {
+                    return false;   //unable to close the current instance of OSBuddy
+                }
             }
+            Thread.Sleep(5000);
             if (!StartOSBuddy(clientFilePath, ref OSBuddy))
             {
                 return false;   //unable to start a new instance of OSBuddy

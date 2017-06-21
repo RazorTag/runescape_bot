@@ -283,7 +283,6 @@ namespace RunescapeBot.BotPrograms
         private void Setup()
         {
             ReadWindow();
-            bool test = IsLoggedIn();
             if (IsLoggedOut())
             {
                 LogIn();
@@ -527,14 +526,17 @@ namespace RunescapeBot.BotPrograms
         /// <param name="tolerance">maximum allowed distance in pixels between subsequent object locations</param>
         /// <param name="maxWaitTime">time to wait before gving up</param>
         /// <param name="minimumSize">minimum required size of the object in pixels</param>
+        /// <param name="findObject">custom method to locate the object</param>
+        /// <param name="verificationPasses">number of times to verify the position of the object after finding it</param>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize, FindObject findObject = null)
+        protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize, FindObject findObject = null, int verificationPasses = 1)
         {
             findObject = findObject ?? LocateObject;
 
             foundObject = null;
             Point? lastPosition = null;
-            const int scanInterval = 100; //minimum time between checks in milliseconds
+            const int scanInterval = 200; //minimum time between checks in milliseconds
+            int passes = 0;
             Stopwatch intervalWatch = new Stopwatch();
             Stopwatch giveUpWatch = new Stopwatch();
             giveUpWatch.Start();
@@ -547,15 +549,20 @@ namespace RunescapeBot.BotPrograms
                 Blob objectBlob = null;
                 findObject(stationaryObject, out objectBlob, minimumSize);
 
-                if (objectBlob != null && objectBlob.Size >= minimumSize)
+                if (objectBlob != null)
                 {
                     if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
                     {
-                        foundObject = objectBlob;
-                        return true;
+                        passes++;
+                        if (passes >= verificationPasses)
+                        {
+                            foundObject = objectBlob;
+                            return true;
+                        }
                     }
                     else
                     {
+                        passes = 0;
                         lastPosition = objectBlob.Center;
                     }
                 }
@@ -773,8 +780,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true for the pixels on the minimap that match the filter</returns>
         protected bool[,] MinimapFilter(ColorRange filter, out Point offset)
         {
-            int left = ScreenWidth - 157;
-            int right = ScreenWidth - 8;
+            int left = ScreenWidth - 156;
+            int right = ScreenWidth - 7;
             int top = 8;
             int bottom = 159;
             Point center = new Point((left + right) / 2, (top + bottom) / 2);
@@ -788,12 +795,15 @@ namespace RunescapeBot.BotPrograms
                 for (int y = top; y <= bottom; y++)
                 {
                     distance = Math.Sqrt(Math.Pow(x - center.X, 2) + Math.Pow(y - center.Y, 2));
-                    if (distance < radius)
+                    if (distance <= radius)
                     {
                         minimapFilter[x - left, y - top] = filter.ColorInRange(ColorArray[x, y]);
                     }
                 }
             }
+
+            Color[,] testImage = ScreenPiece(left, right, top, bottom);
+            DebugUtilities.SaveImageToFile(testImage);
 
             return minimapFilter;
         }
@@ -827,7 +837,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of pixels taken up by an artifact</returns>
         protected int ArtifactSize(double artifactSize)
         {
-            double pixels = artifactSize * Bitmap.Size.Width * Bitmap.Size.Height;
+            double pixels = artifactSize * ColorArray.GetLength(0) * ColorArray.GetLength(1);
             return (int) Math.Round(pixels);
         }
 
@@ -846,9 +856,9 @@ namespace RunescapeBot.BotPrograms
             int width = mask.GetLength(0);
             int height = mask.GetLength(1);
 
-            EraseFromMask(ref mask, 0, 519, height - 159, height);              //erase chat box
-            EraseFromMask(ref mask, width - 241, width, height - 336, height);  //erase inventory
-            EraseFromMask(ref mask, width - 211, width, 0, 192);                //erase minimap
+            EraseFromMask(ref mask, 0, 518, height - 158, height);              //erase chat box
+            EraseFromMask(ref mask, width - 240, width, height - 335, height);  //erase inventory
+            EraseFromMask(ref mask, width - 210, width, 0, 192);                //erase minimap
         }
 
         /// <summary>
@@ -926,7 +936,7 @@ namespace RunescapeBot.BotPrograms
                 LeftClick(center + 16, 288);
 
                 //fill in login
-                LeftClick(center + 137, 259);
+                LeftClick(center + 137, 255);
                 Keyboard.Backspace(350);
                 Keyboard.WriteLine(RunParams.Login);
 
@@ -1041,7 +1051,7 @@ namespace RunescapeBot.BotPrograms
 
             //Compare the column against the expected value
             long columnSum = ImageProcessing.ColorSum(inventoryColumn);
-            long expectedColumnSum = 122689;
+            long expectedColumnSum = 133405;
             if (columnSum > (1.01 * expectedColumnSum) || columnSum < (0.99 * expectedColumnSum))
             {
                 return false;
@@ -1116,7 +1126,7 @@ namespace RunescapeBot.BotPrograms
 
             //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
             long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, 0, 160));
-            if (!Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01) && !Numerical.CloseEnough(LOGIN_LOGO_SUM_INFERNAL, colorSum, 0.01))
+            if (!Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01))
             {
                 return false;
             }
@@ -1243,18 +1253,20 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void ToggleRun()
         {
-            int x = ScreenWidth - 145;
-            int y = 144;
-            LeftClick(x, y, 3, 200);
+            int x = ScreenWidth - 161;
+            int y = 135;
+            LeftClick(x, y, 3);
         }
 
         /// <summary>
         /// Determines if the character is currently running
         /// </summary>
         /// <returns>true for running, false for walking</returns>
-        protected bool CharacterIsRunning()
+        protected bool CharacterIsRunning(bool readWindow = false)
         {
-            Color runColor = GetPixel(ScreenWidth - 145, 147);
+            if (readWindow) { ReadWindow(); }
+
+            Color runColor = GetPixel(ScreenWidth - 156, 137);
             ColorRange runEnergyFoot = ColorFilters.RunEnergyFoot();
             return runEnergyFoot.ColorInRange(runColor);
         }
@@ -1263,12 +1275,14 @@ namespace RunescapeBot.BotPrograms
         /// Determines if the character's run energy is above roughly 50%
         /// </summary>
         /// <returns></returns>
-        protected bool RunEnergyIsHigh()
+        protected bool RunEnergyIsHigh(bool readWindow = false)
         {
-            int left = ScreenWidth - 181;
-            int right = ScreenWidth - 162;
-            int top = 141;
-            int bottom = 155;
+            if (readWindow) { ReadWindow(); }
+
+            int left = ScreenWidth - 194;
+            int right = ScreenWidth - 174;
+            int top = 132;
+            int bottom = 146;
             Color[,] runEnergyPercentage = ScreenPiece(left, right, top, bottom);
             return MinimapGaugeIsHigh(runEnergyPercentage, 0.05);
         }

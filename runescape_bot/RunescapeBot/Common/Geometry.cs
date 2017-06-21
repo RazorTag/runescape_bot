@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.ImageTools;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -22,6 +23,19 @@ namespace RunescapeBot.Common
             int xDiff = a.Value.X - b.Value.X;
             int yDiff = a.Value.Y - b.Value.Y;
             return Math.Sqrt(Math.Pow(xDiff, 2.0) + Math.Pow(yDiff, 2.0));
+        }
+
+        /// <summary>
+        /// Adds the x and y values for two points together
+        /// </summary>
+        /// <param name="a">first point</param>
+        /// <param name="b">second point</param>
+        /// <returns>a new point that is the sum of the given two points</returns>
+        public static Point AddPoints(Point a, Point b)
+        {
+            int x = a.X + b.X;
+            int y = a.Y + b.Y;
+            return new Point(x, y);
         }
 
         /// <summary>
@@ -80,6 +94,20 @@ namespace RunescapeBot.Common
             int y = (int) Math.Round(yTotal / ((double)cluster.Count));
 
             return new Point(x, y);
+        }
+
+        /// <summary>
+        /// Determines how rectangular a shape is
+        /// </summary>
+        /// <param name="shape">blob to check for rectangularity</param>
+        /// <returns>rectangularity (0-1) indicating how rectangular a shape is</returns>
+        public static double Rectangularity(Blob shape)
+        {
+            int width = shape.RightBound - shape.LeftBound;
+            int height = shape.BottomBound - shape.TopBound;
+            double interiorVolume = width * height;
+            double rectangularity = shape.Size / interiorVolume;
+            return rectangularity;
         }
     }
 }
