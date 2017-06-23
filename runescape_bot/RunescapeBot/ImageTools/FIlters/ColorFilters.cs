@@ -56,7 +56,7 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(46, 43, 43);
             Color light = Color.FromArgb(85, 80, 78);
-            HSBRange hsbRange = new HSBRange(0, 0, 0.02f, 0.07f, 0.18f, 0.32f);
+            HSBRange hsbRange = new HSBRange(0, 360, 0.02f, 0.07f, 0.18f, 0.32f);
             return new ColorRange(dark, light, hsbRange);
         }
 

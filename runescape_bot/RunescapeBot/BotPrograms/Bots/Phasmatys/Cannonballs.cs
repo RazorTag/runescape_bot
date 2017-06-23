@@ -36,7 +36,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             SafeWaitPlus(TOTAL_SMITH_TIME - (int)watch.ElapsedMilliseconds, 3500);
-
+            RunParams.Iterations -= 27;
             return true;
         }
     }

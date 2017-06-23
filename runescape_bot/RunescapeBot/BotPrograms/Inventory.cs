@@ -96,7 +96,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Opens the inventory and clicks on an inventory slot
         /// </summary>
-        /// <param name="index">sequential slot in the inventory (1-28)</param>
+        /// <param name="index">sequential slot in the inventory (0-27)</param>
         public void ClickInventory(int index, bool safeTab = true)
         {
             Point inventorySlot = InventoryIndexToCoordinates(index);
@@ -104,7 +104,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// COnverts an inventory index (0-27) to inventory coordinates X:(0-3), Y:(0-6)
+        /// Converts an inventory index (0-27) to inventory coordinates X:(0-3), Y:(0-6)
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>

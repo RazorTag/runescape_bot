@@ -61,6 +61,10 @@ namespace RunescapeBot
             FletchShortBows,
             [Description("Fletching - String Bows")]
             StringBows,
+            [Description("Herblore - Make Prepared Potions")]
+            MakePotionsSimple,
+            [Description("Herblore - Make Potions from Scratch")]
+            MakePotionsFUll,
             [Description("Smithing - Cannonballs")]
             Cannonballs
         };
@@ -168,7 +172,15 @@ namespace RunescapeBot
                     break;
 
                 case BotActions.StringBows:
-                    RunningBot = new StringBows(startParams);
+                    RunningBot = new Use14On14(startParams, 16800);
+                    break;
+
+                case BotActions.MakePotionsSimple:
+                    RunningBot = new Use14On14(startParams, 8400);
+                    break;
+
+                case BotActions.MakePotionsFUll:
+                    RunningBot = new MakePotionFull(startParams);
                     break;
 
                 case BotActions.AgilityGnomeStronghold:

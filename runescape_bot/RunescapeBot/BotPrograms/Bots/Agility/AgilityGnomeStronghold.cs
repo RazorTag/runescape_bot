@@ -86,6 +86,7 @@ namespace RunescapeBot.BotPrograms
                 && TryPassObstacle(PassCargoNet, VerifyPassedCargoNetNorth)
                 && TryPassObstacle(PassDrainPipe, VerifyPassedDrainPipe))
             {
+                RunParams.Iterations--;
                 return true;
             }
             
@@ -396,7 +397,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             Line tightropeAxis = new Line(tightrope.GetLeft(), tightrope.GetRight());
-            Point click = tightropeAxis.OffsetFromStart(30);
+            Point click = tightropeAxis.OffsetFromStart(25);
             LeftClick(click.X, click.Y, 10);
 
             Mouse.RadialOffset(150, 500, 0, 360);

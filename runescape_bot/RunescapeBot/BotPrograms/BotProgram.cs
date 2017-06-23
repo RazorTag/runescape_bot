@@ -184,8 +184,6 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Begins execution of the bot program. Fails if a bot program is already running for the selected process.
         /// </summary>
-        /// <param name="runningBots"></param>
-        /// <param name="iterations"></param>
         public void Start()
         {
             BotIsDone = false;
@@ -204,7 +202,7 @@ namespace RunescapeBot.BotPrograms
         /// Makes sure that OSBuddy is running and starts it if it isn't
         /// </summary>
         /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
-        /// <returns></returns>
+        /// <returns>true if client is successfully prepared</returns>
         private bool PrepareClient(bool forceRestart = false)
         {
             if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
@@ -245,10 +243,21 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Process()
         {
+            //don't limit by iterations unless the user has specified a positive number of iterations
+            if (RunParams.Iterations == 0)
+            {
+                RunParams.Iterations = int.MaxValue;
+            }
+
+            //don't limit by run until time unless the user has specified a future date/time
+            if ((RunParams.RunUntil - DateTime.Now).TotalMilliseconds <= 0)
+            {
+                RunParams.RunUntil = DateTime.MaxValue;
+            }
+
             int awakeTime = UnitConversions.HoursToMilliseconds(12);
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
-
             Setup();
             sleepWatch.Start();
 
@@ -311,18 +320,6 @@ namespace RunescapeBot.BotPrograms
             if (StopFlag) { return true; }
             int randomFrameOffset, randomFrameTime;
             
-            //don't limit by iterations unless the user has specified a positive number of iterations
-            if (RunParams.Iterations == 0)
-            {
-                RunParams.Iterations = int.MaxValue;
-            }
-
-            //don't limit by run until time unless the user has specified a future date/time
-            if ((RunParams.RunUntil - DateTime.Now).TotalMilliseconds <= 0)
-            {
-                RunParams.RunUntil = DateTime.MaxValue;
-            }
-            
             //randomize the time between executions
             if (RunParams.RandomizeFrames)
             {
@@ -338,7 +335,7 @@ namespace RunescapeBot.BotPrograms
             workIntervalWatch.Start();
             int workInterval = RandomWorkTime();
 
-            while ((DateTime.Now < RunParams.RunUntil) && (RunParams.Iterations-- > 0))
+            while ((DateTime.Now < RunParams.RunUntil) && (RunParams.Iterations > 0))
             {
                 iterationWatch.Restart();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
@@ -361,7 +358,10 @@ namespace RunescapeBot.BotPrograms
                 }
                 else
                 {
-                    if (!HandleFailedLogIn()) { return true; }   //stop if we are unable to recover
+                    if (!HandleFailedLogIn())
+                    {
+                        return true;    //stop if we are unable to recover
+                    }
                 }
 
                 randomFrameTime = RunParams.FrameTime + RNG.Next(-randomFrameOffset, randomFrameOffset + 1);

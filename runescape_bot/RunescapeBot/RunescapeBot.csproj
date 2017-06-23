@@ -97,7 +97,8 @@
     <Compile Include="BotPrograms\Bots\Phasmatys\Cannonballs.cs" />
     <Compile Include="BotPrograms\Bots\Combat\NightmareZoneD.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\FurnacePhasmatys.cs" />
-    <Compile Include="BotPrograms\Bots\Phasmatys\StringBows.cs" />
+    <Compile Include="BotPrograms\Bots\Phasmatys\MakePotionFull.cs" />
+    <Compile Include="BotPrograms\Bots\Phasmatys\Use14On14.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />
     <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
     <Compile Include="BotPrograms\Popups\MakeAll.cs" />

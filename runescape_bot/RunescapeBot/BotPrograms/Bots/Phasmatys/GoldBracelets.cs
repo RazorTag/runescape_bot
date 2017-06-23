@@ -66,7 +66,7 @@ namespace RunescapeBot.BotPrograms
             //TODO verify that gold bars are being crafted
 
             SafeWaitPlus(CRAFTING_TIME, 2000);
-
+            RunParams.Iterations -= 27;
             return true;
         }
     }
