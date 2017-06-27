@@ -29,10 +29,8 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to the Port Phasmatys bank
         /// </summary>
         /// <returns>true if the bank icon is found</returns>
-        protected bool MoveToBank()
+        protected override bool MoveToBank(int minRunTimeToBank = 10000, bool readWindow = false)
         {
-            const int runTimeFromFurnaceToBank = 3000;  //approximate minimum milliseconds needed to run from the furnace to the bank
-
             Point? bankIcon = BankIconLocation();
             Point clickLocation;
 
@@ -53,7 +51,7 @@ namespace RunescapeBot.BotPrograms
                 clickLocation = (Point)bankIcon;
             }
             LeftClick(clickLocation.X, clickLocation.Y + 5, 3);
-            SafeWait(runTimeFromFurnaceToBank);
+            SafeWait(minRunTimeToBank);
 
             return true;
         }

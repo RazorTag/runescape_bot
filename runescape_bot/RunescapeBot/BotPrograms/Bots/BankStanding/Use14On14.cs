@@ -1,14 +1,14 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.ImageTools;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class Use14On14 : BankPhasmatys
+    public class Use14On14 : BankStand
     {
-        private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
-        private int FailedRuns;
-        protected int CraftingTime;
+
         protected Point UseOnInventorySlot;
         protected Point UseWithInventorySlot;
         protected Point UseOnBankSlot;
@@ -18,10 +18,9 @@ namespace RunescapeBot.BotPrograms
         /// Sets the time required to make 14 items
         /// </summary>
         /// <param name="startParams"></param>
-        /// <param name="craftingTime">time needed to make the 14 items being crafted</param>
-        public Use14On14(StartParams startParams, int craftingTime) : base(startParams)
+        /// <param name="makeTime">time needed to make the 14 items being crafted</param>
+        public Use14On14(StartParams startParams, int makeTime) : base(startParams, makeTime)
         {
-            this.CraftingTime = craftingTime;
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);
             UseOnBankSlot = new Point(6, 0);
@@ -30,41 +29,50 @@ namespace RunescapeBot.BotPrograms
 
         protected override void Run()
         {
+            //ReadWindow();
+            //bool[,] bankBooth = ColorFilter(ColorFilters.BankBoothVarrockWest());
+            //DebugUtilities.TestMask(Bitmap, ColorArray, ColorFilters.BankBoothVarrockWest(), bankBooth, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankBooth");
+
             Inventory.OpenInventory(true);
 
             //Open the bank
-            if (!ClickBankBooth())
+            Bank bankPopup;
+            if (!OpenBank(out bankPopup))
             {
                 if (!MoveToBank())
                 {
                     return;
                 }
-                ClickBankBooth();
+                if (!OpenBank(out bankPopup))
+                {
+                    return;
+                }
             }
-            Bank bank = new Bank(RSClient);
-            if (bank.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
-            {
-                bank.DepositInventory();
-                bank.WithdrawX(7, 0, 14);
-                bank.CloseBank();
-            }
+            bankPopup.DepositInventory();
+            bankPopup.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, 14);
+            bankPopup.CloseBank();
         }
 
+        /// <summary>
+        /// Makes potions from scratch
+        /// </summary>
+        /// <returns></returns>
         protected override bool Execute()
         {
-            if (FailedRuns > 1) { return false; }
+            if (FailedRuns >= 2) { return false; }
 
             if (StopFlag) { return false; }
             if(WithdrawItems(UseWithBankSlot, UseOnBankSlot)
                 && PreMake()
-                && MakeItems(CraftingTime)
+                && MakeItems(MakeTime)
                 && PostMake())
             {
                 FailedRuns = 0;
                 RunParams.Iterations -= 14;
                 return true;
             }
-            
+
+            FailedRuns++;
             return false;
         }
 
@@ -75,19 +83,18 @@ namespace RunescapeBot.BotPrograms
         protected bool WithdrawItems(Point useWith, Point useOn)
         {
             //Open the bank
-            if (!ClickBankBooth())
+            Bank bankPopup;
+            if (!OpenBank(out bankPopup))
             {
                 if (!MoveToBank())
                 {
-                    FailedRuns++;
                     return true;
                 }
-                ClickBankBooth();
+                OpenBank(out bankPopup);
             }
-            BankPopup = new Bank(RSClient);
+            Bank BankPopup = new Bank(RSClient);
             if (!BankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
-                FailedRuns++;
                 return false;
             }
 
@@ -109,7 +116,6 @@ namespace RunescapeBot.BotPrograms
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
             if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
             {
-                FailedRuns++;
                 return true;
             }
             return !SafeWait(craftTime, 300.0);

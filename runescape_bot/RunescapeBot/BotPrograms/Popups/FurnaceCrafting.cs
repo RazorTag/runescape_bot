@@ -82,6 +82,8 @@ namespace RunescapeBot.BotPrograms.Popups
 
             while (watch.ElapsedMilliseconds < timeout)
             {
+                if (BotProgram.StopFlag) { return false; }
+
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 titleHash = ImageProcessing.ColorSum(screen);

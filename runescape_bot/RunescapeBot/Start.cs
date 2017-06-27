@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.FileIO;
+using RunescapeBot.UITools;
+using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
-using RunescapeBot.BotPrograms;
-using RunescapeBot.UITools;
-using RunescapeBot.FileIO;
-using RunescapeBot.ImageTools;
-using System.Drawing;
 
 namespace RunescapeBot
 {
@@ -61,12 +58,16 @@ namespace RunescapeBot
             FletchShortBows,
             [Description("Fletching - String Bows")]
             StringBows,
+            [Description("Herblore - Make Unfinished Potions")]
+            MakeUnfinishedPotions,
             [Description("Herblore - Make Prepared Potions")]
             MakePotionsSimple,
             [Description("Herblore - Make Potions from Scratch")]
             MakePotionsFUll,
             [Description("Smithing - Cannonballs")]
-            Cannonballs
+            Cannonballs,
+            [Description("Woodcutting - Willows (drop)")]
+            WillowTrees
         };
 
         /// <summary>
@@ -130,6 +131,7 @@ namespace RunescapeBot
             Iterations.Value = settings.Iterations;
             SetIdleState();
             settings.Save();
+
         }
 
         /// <summary>
@@ -168,11 +170,15 @@ namespace RunescapeBot
                     break;
 
                 case BotActions.FletchShortBows:
-                    RunningBot = new FletchShortbows(startParams);
+                    RunningBot = new Use1On27(startParams, 50000);
                     break;
 
                 case BotActions.StringBows:
                     RunningBot = new Use14On14(startParams, 16800);
+                    break;
+
+                case BotActions.MakeUnfinishedPotions:
+                    RunningBot = new UnfinishedPotions(startParams);
                     break;
 
                 case BotActions.MakePotionsSimple:
@@ -189,6 +195,10 @@ namespace RunescapeBot
 
                 case BotActions.AgilitySeersVillage:
                     RunningBot = new AgilitySeersVillage(startParams);
+                    break;
+
+                case BotActions.WillowTrees:
+                    RunningBot = new WillowTrees(startParams);
                     break;
 
                 default:
@@ -214,7 +224,7 @@ namespace RunescapeBot
             }
             else
             {
-                startParams.RunUntil = DateTime.MaxValue;
+                startParams.RunUntil = RunUntil.MaxDate;
             }
             startParams.TaskComplete = new BotResponse(BotDone);
             startParams.BotAction = (BotActions) BotActionSelect.SelectedIndex;
@@ -233,6 +243,7 @@ namespace RunescapeBot
 
             SetActiveState();
             botProgram.Start();
+            UpdateTimer.Enabled = true;
             settings.SaveBot(botProgram.RunParams);
         }
 
@@ -264,12 +275,12 @@ namespace RunescapeBot
         /// </summary>
         public void BotDone()
         {
-            if (this.IsHandleCreated)
+            if (IsHandleCreated)
             {
-                this.Invoke((MethodInvoker)(() =>
+                Invoke((MethodInvoker)(() =>
                 {
                     SetIdleState();
-                    this.Enabled = true;
+                    Enabled = true;
                 }));
             }
         }
@@ -285,6 +296,7 @@ namespace RunescapeBot
             {
                 this.Enabled = false;
                 SetTransitionalState();
+                UpdateTimer.Enabled = false;
                 RunningBot.Stop();
             }
             else
@@ -365,6 +377,19 @@ namespace RunescapeBot
             {
                 ClientLocation.Text = FileSelect.FileName;
             }
+        }
+
+        /// <summary>
+        /// Updates the form with the status of the running bot
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (RunningBot == null) { return; }
+
+            RunUntil.Value = RunningBot.RunParams.RunUntil;
+            Iterations.Value = RunningBot.RunParams.Iterations;
         }
     }
 }

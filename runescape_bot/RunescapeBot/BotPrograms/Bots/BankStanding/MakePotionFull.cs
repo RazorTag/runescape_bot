@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class MakePotionFull : Use14On14
+    public class MakePotionFull : Herblore
     {
         protected const int MAKE_POTION_TIME = 16800;
-        protected const int WAIT_FOR_HERBS_TO_CLEAN = 600;
         protected Point SecondaryIngredientBankSlot;
         protected Point UnfPotionBankSlot;
 
@@ -31,11 +25,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool PreMake()
         {
-            for (int i = 0; i < 14; i++)
-            {
-                Inventory.ClickInventory(i, false);
-            }
-            return !SafeWaitPlus(WAIT_FOR_HERBS_TO_CLEAN, 200) ;
+            return CleanHerbs();
         }
 
         /// <summary>

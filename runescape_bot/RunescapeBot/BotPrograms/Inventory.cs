@@ -1,4 +1,5 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -11,17 +12,18 @@ namespace RunescapeBot.BotPrograms
     public class Inventory
     {
         private Color[,] Screen;
-        private bool[,] inventory;
+        private Keyboard Keyboard;
         private Random RNG;
         private Process RSClient;
+        private bool StopFlag;
 
-        public Inventory(Process rsClient, Color[,] screen)
+        public Inventory(Process rsClient, Color[,] screen, Keyboard keyboard)
         {
-            inventory = new bool[4, 7];
             RNG = new Random();
             this.RSClient = rsClient;
             SelectedTab = TabSelect.Unknown;
             this.Screen = screen;
+            this.Keyboard = keyboard;
         }
 
         /// <summary>
@@ -54,9 +56,9 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            int x = Screen.GetLength(0) - INVENTORY_TAB_OFFSET_LEFT + RNG.Next(-5, 6);
-            int y = Screen.GetLength(1) - INVENTORY_TAB_OFFSET_TOP + RNG.Next(-5, 6);
-            Mouse.LeftClick(x, y, RSClient);
+            int x = Screen.GetLength(0) - INVENTORY_TAB_OFFSET_LEFT;
+            int y = Screen.GetLength(1) - INVENTORY_TAB_OFFSET_TOP;
+            Mouse.LeftClick(x, y, RSClient, 6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Inventory;
             return true;
@@ -73,9 +75,9 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            int x = Screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_LEFT + RNG.Next(-5, 6);
-            int y = Screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_TOP + RNG.Next(-5, 6);
-            Mouse.LeftClick(x, y, RSClient);
+            int x = Screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_LEFT;
+            int y = Screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_TOP;
+            Mouse.LeftClick(x, y, RSClient, 6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Spellbook;
             return true;
@@ -101,6 +103,59 @@ namespace RunescapeBot.BotPrograms
         {
             Point inventorySlot = InventoryIndexToCoordinates(index);
             ClickInventory(inventorySlot.X, inventorySlot.Y, safeTab);
+        }
+
+        /// <summary>
+        /// Drops an item at the specified inventory coordinates
+        /// </summary>
+        /// <param name="x">slots from the left column of the inventory (0-3)</param>
+        /// <param name="y">slots from the top row of the inventory (0-6)</param>
+        public void DropItem(int x, int y, bool safeTab = true)
+        {
+            OpenInventory(safeTab);
+            InventoryToScreen(ref x, ref y);
+
+            Point click;
+            RightClickInventory dropPopup = null;
+            bool done = false;
+
+            while (!done)
+            {
+                click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
+                Mouse.RightClick(x, y, RSClient, 0);
+                dropPopup = new RightClickInventory(click.X, click.Y, RSClient);
+                if (dropPopup.WaitForPopup(1000))
+                {
+                    done = true;
+                }
+                else
+                {
+                    Mouse.RadialOffset(dropPopup.GetWidth(), 2 * dropPopup.GetWidth(), -5, 220);
+                }
+            }
+
+            dropPopup.DropItem();
+        }
+
+        /// <summary>
+        /// Drops all of the items in the inventory
+        /// </summary>
+        /// <param name="safeTab"></param>
+        public void DropInventory(bool safeTab = true)
+        {
+            Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            OpenInventory(safeTab);
+            for (int x = 0; x < INVENTORY_COLUMNS; x++)
+            {
+                for (int y = 0; y < INVENTORY_ROWS; y++)
+                {
+                    if (!SlotIsEmpty(x, y, false, false))
+                    {
+                        DropItem(x, y, false);
+                        if (StopFlag) { return; }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -172,7 +227,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">x location on the game screen (from left) where the item to telegrab is located</param>
         /// <param name="y">y location on the game screen (from top) where the item to telegrab is located</param>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public bool GrabAndAlch(int x, int y)
         {
             Point? emptySlot = FirstEmptySlot();
@@ -182,6 +237,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             Telegrab(x, y);
+            if (StopFlag) { return false; }
             Alch(emptySlot.Value.X, emptySlot.Value.Y);
 
             return true;
@@ -219,6 +275,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     return inventorySlot;
                 }
+                if (StopFlag) { return null; }
             }
 
             return null;
@@ -260,7 +317,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if translation succeeds</returns>
         private bool ScreenToInventory(ref int x, ref int y)
         {
-            if (x > 3 && y > 6)
+            if (x >= INVENTORY_COLUMNS && y >= INVENTORY_ROWS)
             {
                 //convert screen coordinates to inventory coordinates
                 int inventoryLeft = Screen.GetLength(0) - INVENTORY_OFFSET_LEFT;
@@ -270,7 +327,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             //check if we found an actual inventory spot
-            if ((x >= 0) && (x < 4) && (y >= 0) && (y < 7))
+            if ((x >= 0) && (x < INVENTORY_COLUMNS) && (y >= 0) && (y < INVENTORY_ROWS))
             {
                 return true;
             }
@@ -305,7 +362,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if translation succeeds</returns>
         public bool InventoryToScreen(ref int x, ref int y)
         {
-            if (x < 0 || x > 3 || y < 0 || y > 6)
+            if (x < 0 || x >= INVENTORY_COLUMNS || y < 0 || y >= INVENTORY_ROWS)
             {
                 return false;
             }
@@ -313,6 +370,14 @@ namespace RunescapeBot.BotPrograms
             x = Screen.GetLength(0) - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X);
             y = Screen.GetLength(1) - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y);
             return true;
+        }
+
+        /// <summary>
+        /// Stops any ongoing inventory processes
+        /// </summary>
+        public void Stop()
+        {
+            StopFlag = true;
         }
 
         #region constants
@@ -327,14 +392,18 @@ namespace RunescapeBot.BotPrograms
         private const int INVENTORY_OFFSET_TOP = 275;
         private const int INVENTORY_GAP_X = 42;
         private const int INVENTORY_GAP_Y = 36;
-        private const int INVENTORY_CAPACITY = 28;
+        public const int INVENTORY_CAPACITY = 28;
+        public const int INVENTORY_COLUMNS = 4;
+        public const int INVENTORY_ROWS = 7;
 
         private const int SPELLBOOK_TAB_OFFSET_LEFT = 19;
         private const int SPELLBOOK_TAB_OFFSET_TOP = 320;
         private const int SPELLBOOK_OFFSET_LEFT = 191;
         private const int SPELLBOOK_OFFSET_TOP = 272;
         private const int SPELLBOOK_GAP_X = 24;
-        private const int SPELLBOOK_GAP_Y = 24;        
+        private const int SPELLBOOK_GAP_Y = 24;
+        public const int SPELLBOOK_COLUMNS = 7;
+        public const int SPELLBOOK_ROWS = 10;
 
         public TabSelect SelectedTab { get; set; }
         public enum TabSelect : int

@@ -33,6 +33,7 @@ namespace RunescapeBot
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Start));
             this.StartButton = new System.Windows.Forms.Button();
             this.BotActionSelect = new System.Windows.Forms.ComboBox();
@@ -50,6 +51,7 @@ namespace RunescapeBot
             this.label6 = new System.Windows.Forms.Label();
             this.OSBuddySelect = new System.Windows.Forms.Button();
             this.FileSelect = new System.Windows.Forms.OpenFileDialog();
+            this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).BeginInit();
             this.SuspendLayout();
             // 
@@ -198,6 +200,10 @@ namespace RunescapeBot
             this.OSBuddySelect.UseVisualStyleBackColor = true;
             this.OSBuddySelect.Click += new System.EventHandler(this.OSBuddySelect_Click);
             // 
+            // UpdateTimer
+            // 
+            this.UpdateTimer.Tick += new System.EventHandler(this.UpdateTimer_Tick);
+            // 
             // Start
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -250,6 +256,7 @@ namespace RunescapeBot
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Button OSBuddySelect;
         private System.Windows.Forms.OpenFileDialog FileSelect;
+        private System.Windows.Forms.Timer UpdateTimer;
     }
 }
 

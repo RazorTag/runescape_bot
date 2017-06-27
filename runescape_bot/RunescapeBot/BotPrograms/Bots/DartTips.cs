@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RunescapeBot.BotPrograms.Bots
+namespace RunescapeBot.BotPrograms
 {
     class DartTips : BotProgram
     {

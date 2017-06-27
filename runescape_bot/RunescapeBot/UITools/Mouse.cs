@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Drawing;
 using static RunescapeBot.UITools.User32;
+using RunescapeBot.BotPrograms;
 
 namespace RunescapeBot.UITools
 {
@@ -135,6 +136,8 @@ namespace RunescapeBot.UITools
 
             for (int i = 0; i < discreteMovements; i++)
             {
+                if (BotProgram.StopFlag) { return; }
+
                 currentX += xMoveDistance;
                 currentY += yMoveDistance;
                 SetCursorPos((int) currentX, (int) currentY);
@@ -220,6 +223,8 @@ namespace RunescapeBot.UITools
 
             for (int i = 1; i <= discreteMovements; i++)
             {
+                if (BotProgram.StopFlag) { return; }
+
                 watch.Restart();
                 completion = (i * moveDistance) / totalDistance;
                 currentX = xSpline.Eval((float) completion);

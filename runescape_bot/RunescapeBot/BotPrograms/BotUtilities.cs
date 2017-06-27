@@ -36,6 +36,8 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < timeout)
             {
+                if (BotProgram.StopFlag) { return false; }
+
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(rsClient));
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 asteriskHash = ImageProcessing.ColorSum(screen);
@@ -61,7 +63,11 @@ namespace RunescapeBot.BotPrograms
             keyboard.Enter();
         }
 
-
+        /// <summary>
+        /// Selects Make All for the single make option that shows up over the chat box
+        /// </summary>
+        /// <param name="rsClient"></param>
+        /// <returns></returns>
         public static bool ChatBoxSingleOptionMakeAll(Process rsClient)
         {
             Point screenSize = ScreenScraper.GetOSBuddyWindowSize(rsClient);
@@ -76,6 +82,8 @@ namespace RunescapeBot.BotPrograms
             //Try to right-click the chatbox option
             for (int i = 0; i < CHATBOX_OPTION_RIGHT_CLICK_MAX_TRIES; i++)
             {
+                if (BotProgram.StopFlag) { return false; }
+
                 Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
                 rightClick = new Point(rng.Next(left, right), rng.Next(top, bottom));
                 Mouse.RightClick(rightClick.X, rightClick.Y, rsClient);

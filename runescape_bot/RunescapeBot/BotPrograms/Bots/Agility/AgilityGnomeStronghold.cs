@@ -12,7 +12,7 @@ namespace RunescapeBot.BotPrograms
     {
         protected const double STATIONARY_OBJECT_TOLERANCE = 10.0;
         private const int WAIT_FOR_NEXT_OBSTACLE = 10000;
-        private const int WAIT_FOR_VERIFICATION = 12000;
+        private const int WAIT_FOR_VERIFICATION = 9000;
 
         private ColorRange LogBalance;
         private ColorRange CargoNet;
@@ -462,7 +462,13 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
-
+        /// <summary>
+        /// Finds the leftmost drain pipe
+        /// </summary>
+        /// <param name="drainPipeColor"></param>
+        /// <param name="drainPipe"></param>
+        /// <param name="minimumSize"></param>
+        /// <returns></returns>
         private bool LocateDrainPipe(ColorRange drainPipeColor, out Blob drainPipe, int minimumSize = 1)
         {
             drainPipe = null;

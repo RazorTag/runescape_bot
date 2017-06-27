@@ -39,7 +39,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeOne()
         {
             const int yOffset = 25;
-            RandomClick(yOffset);
+            SelectOption(yOffset);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeFive()
         {
             const int yOffset = 40;
-            RandomClick(yOffset);
+            SelectOption(yOffset);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeX(int itemsToMake)
         {
             const int yOffset = 55;
-            RandomClick(yOffset);
+            SelectOption(yOffset);
 
             //Wait for the "Enter amount:" prompt to appear
             if (WaitForEnterAmount(5000))
@@ -72,19 +72,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void MakeAllItems()
         {
             const int yOffset = 70;
-            RandomClick(yOffset);
-        }
-
-        /// <summary>
-        /// Click a random spot on a given row
-        /// </summary>
-        /// <param name="yOffset"></param>
-        private void RandomClick(int yOffset)
-        {
-            const int padding = 2;
-            Point clickOffset = Probability.GaussianRectangle(-(Width / 2) + padding, (Width / 2) - padding, yOffset - 2, yOffset + 2);
-            Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
+            SelectOption(yOffset);
         }
     }
 }

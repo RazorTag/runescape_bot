@@ -1,7 +1,10 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 
 namespace RunescapeBot.BotPrograms.Popups
 {
@@ -11,8 +14,11 @@ namespace RunescapeBot.BotPrograms.Popups
         protected int XClick;
         protected int YClick;
         protected int Height;
-        protected int TitleHeight;
         protected int Width;
+        protected int TitleHeight;
+
+        public int GetHeight() { return Height; }
+        public int GetWidth() { return Width; }
 
         /// <summary>
         /// Create a record of a basic popup
@@ -63,41 +69,39 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public virtual bool WaitForPopup(int timeout)
+        public virtual bool WaitForPopup(int timeout = 3000)
         {
-            const int padding = 2;
-            const int mouseOffset = 10;
-
-            Color[,] screen;
-            int left = XClick - (Width / 2) + padding;
-            int right = XClick - mouseOffset;
-            int top = YClick + padding;
-            int bottom = YClick + TitleHeight - padding;
-
+            Bitmap screen = null;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             while (watch.ElapsedMilliseconds < timeout)
             {
-                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                if (BotProgram.StopFlag) { return false; }
+
+                screen = ScreenScraper.CaptureWindow(RSClient);
 
                 if (PopupIsCorrectSize(screen))
                 {
+                    screen.Dispose();
                     return true;
                 }
+                screen.Dispose();
             }
+
             return false;
         }
 
         /// <summary>
-        /// 
+        /// Verifies that the pop-up is roughly the expected size
         /// </summary>
         /// <returns></returns>
-        private bool PopupIsCorrectSize(Color[,] screen)
+        private bool PopupIsCorrectSize(Bitmap screen)
         {
-            const int padding = 5;
-            int x = XClick + Width / 2 - padding;
-            int y = YClick + Height - padding;
-            Color bottomRight = screen[x, y];
+            const int xPadding = 20;
+            const int yPadding = 6;
+            int x = XClick + Width / 2 - xPadding;
+            int y = YClick + Height - yPadding;
+            Color bottomRight = screen.GetPixel(x, y);
             ColorRange rightClickColor = ColorFilters.RightClickPopup();
             return rightClickColor.ColorInRange(bottomRight);
         }
@@ -110,6 +114,19 @@ namespace RunescapeBot.BotPrograms.Popups
         public bool WaitForEnterAmount(int timeout)
         {
             return BotUtilities.WaitForEnterAmount(RSClient, timeout);
+        }
+
+        /// <summary>
+        /// Selects an option from the right-click menu
+        /// </summary>
+        /// <param name="yOffset">y-offset of the middle of the option from the top of the popup</param>
+        public void SelectOption(int yOffset, int maxXOffset = int.MaxValue)
+        {
+            int xRandomization = Math.Min(maxXOffset, Math.Max(10, (Width / 2) - 5));
+            int yRandomization = 2;
+            Point clickOffset = Probability.GaussianRectangle(-xRandomization, xRandomization, yOffset - yRandomization, yOffset + yRandomization);
+            Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
+            Mouse.LeftClick(click.X, click.Y, RSClient, 0);
         }
     }
 }

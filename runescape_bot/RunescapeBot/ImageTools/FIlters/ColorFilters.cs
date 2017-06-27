@@ -72,6 +72,18 @@ namespace RunescapeBot.BotPrograms
             return new ColorRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// The teller side counter of a Port Phasmatys bank booth
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange BankBoothVarrockWest()
+        {
+            Color dark = Color.FromArgb(78, 67, 34);
+            Color light = Color.FromArgb(101, 87, 46);
+            HSBRange hsbRange = new HSBRange(43, 47, 0.358f, 0.395f, 0.217f, 0.290f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region agility obstacles

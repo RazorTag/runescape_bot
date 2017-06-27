@@ -14,10 +14,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="xClick">the x-coordinate of the click that opened the Make-X popup</param>
         /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
         /// <param name="rsClient"></param>
-        public MakeXSlim(int xClick, int yClick, Process rsClient) : base(xClick, yClick, rsClient)
-        {
-            
-        }
+        public MakeXSlim(int xClick, int yClick, Process rsClient) : base(xClick, yClick, rsClient) { }
 
         /// <summary>
         /// Sets the dimensions of the popup

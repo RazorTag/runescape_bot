@@ -27,7 +27,25 @@ namespace RunescapeBot.FileIO
         /// The number of times to run through a bot program's routine
         /// </summary>
         [DataMember]
-        public int Iterations { get; set; }
+        public int Iterations
+        {
+            get
+            {
+                return _iterations;
+            }
+            set
+            {
+                if (value == int.MaxValue || value < 0)
+                {
+                    _iterations = 0;
+                }
+                else
+                {
+                    _iterations = value;
+                }
+            }
+        }
+        private int _iterations;
 
         /// <summary>
         /// The file location of the RuneScape client to run

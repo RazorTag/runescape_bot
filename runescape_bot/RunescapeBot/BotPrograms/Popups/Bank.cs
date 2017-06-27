@@ -113,6 +113,8 @@ namespace RunescapeBot.BotPrograms.Popups
 
             while (watch.ElapsedMilliseconds < timeout)
             {
+                if (BotProgram.StopFlag) { return false; }
+
                 if (BankIsOpen())
                 {
                     return true;

@@ -1,5 +1,8 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace RunescapeBot.UITools
@@ -78,6 +81,7 @@ namespace RunescapeBot.UITools
             {
                 for (int i = 0; i < maxCharsToDelete; i++)
                 {
+                    if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{BACKSPACE}");
                 }
             }
@@ -114,6 +118,7 @@ namespace RunescapeBot.UITools
             {
                 for (int i = 0; i < iterations; i++)
                 {
+                    if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{UP}");
                 }
             }
@@ -128,6 +133,7 @@ namespace RunescapeBot.UITools
             {
                 for (int i = 0; i < iterations; i++)
                 {
+                    if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{RIGHT}");
                 }
             }
@@ -142,6 +148,7 @@ namespace RunescapeBot.UITools
             {
                 for (int i = 0; i < iterations; i++)
                 {
+                    if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{DOWN}");
                 }
             }
@@ -156,6 +163,7 @@ namespace RunescapeBot.UITools
             {
                 for (int i = 0; i < iterations; i++)
                 {
+                    if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{LEFT}");
                 }
             }

@@ -426,17 +426,45 @@ namespace RunescapeBot.ImageTools
             return Pixels.ElementAt(rng.Next(0, Pixels.Count)).Value;
         }
 
-
+        /// <summary>
+        /// Creates a new blob made up of all of the unique pixels from all of the blobs in the list
+        /// </summary>
+        /// <param name="blobs">list of blobs to combine</param>
+        /// <returns>new combined blob</returns>
         public static Blob Combine(List<Blob> blobs)
         {
             if (blobs == null || blobs.Count == 0) { return null; }
 
-            Blob megaBlob = blobs[0];
-            for (int i = 1; i < blobs.Count; i++)
+            Blob megaBlob = new Blob();
+            for (int i = 0; i < blobs.Count; i++)
             {
                 megaBlob.AddBlob(blobs[i]);
             }
             return megaBlob;
+        }
+
+        /// <summary>
+        /// Finds the closest blob in a list of blobs
+        /// </summary>
+        /// <param name="center">center point to search from</param>
+        /// <param name="blobs">list of blobs to search</param>
+        /// <returns>the blob from the blobs list that is closest to the center point</returns>
+        public static Blob ClosestBlob(Point center, List<Blob> blobs)
+        {
+            double minDistance = double.MaxValue;
+            double nextDistance;
+            Blob closestBlob = null;
+
+            for (int i = 0; i < blobs.Count; i++)
+            {
+                nextDistance = Geometry.DistanceBetweenPoints(center, blobs[i].Center);
+                if (nextDistance < minDistance)
+                {
+                    minDistance = nextDistance;
+                    closestBlob = blobs[i];
+                }
+            }
+            return closestBlob;
         }
 
         #region feature matching

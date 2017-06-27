@@ -1,4 +1,5 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -117,9 +118,9 @@ namespace RunescapeBot.BotPrograms
         protected Random RNG { get; set; }
 
         /// <summary>
-        /// Tells anyone listening to stop at their convenience
+        /// Tells anyone listening to stop at their earliest convenience
         /// </summary>
-        protected bool StopFlag { get; set; }
+        public static bool StopFlag { get; set; }
 
         /// <summary>
         /// Set to true after the bot stops naturally
@@ -178,7 +179,7 @@ namespace RunescapeBot.BotPrograms
             RunParams = startParams;
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);
-            Inventory = new Inventory(RSClient, ColorArray);
+            Inventory = new Inventory(RSClient, ColorArray, Keyboard);
         }
        
         /// <summary>
@@ -186,6 +187,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public void Start()
         {
+            StopFlag = false;
             BotIsDone = false;
             if (PrepareClient())
             {
@@ -618,7 +620,6 @@ namespace RunescapeBot.BotPrograms
             {
                 Bitmap.Dispose();
             }
-            if (StopFlag) { return false; }
 
             if (!PrepareClient()) { return false; }
             LastScreenShot = DateTime.Now;
@@ -1295,6 +1296,29 @@ namespace RunescapeBot.BotPrograms
             ColorRange highGauge = ColorFilters.MinimapGaugeYellowGreen();
             double highMatch = ImageProcessing.FractionalMatch(gaugePercentage, highGauge);
             return highMatch >= threshold;
+        }
+
+        /// <summary>
+        /// Moves the character to a bank icon on the minimap
+        /// </summary>
+        /// <returns>true if the bank icon is found</returns>
+        protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true)
+        {
+            if (readWindow)
+            {
+                ReadWindow();
+            }
+            
+            Point offset;
+            bool[,] minimapBankIcon = MinimapFilter(ColorFilters.BankIconDollar(), out offset);
+            Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
+            if (bankBlob == null || bankBlob.Size < 10) { return false; }
+
+            Point clickLocation = new Point(offset.X + bankBlob.Center.X, offset.Y + bankBlob.Center.Y);
+            LeftClick(clickLocation.X, clickLocation.Y, 3);
+            SafeWait(maxRunTimeToBank);
+
+            return true;
         }
         #endregion
     }
