@@ -4,7 +4,6 @@ namespace RunescapeBot.BotPrograms
 {
     public class MakePotionFull : Herblore
     {
-        protected const int MAKE_POTION_TIME = 16800;
         protected Point SecondaryIngredientBankSlot;
         protected Point UnfPotionBankSlot;
 
@@ -13,11 +12,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="startParams"></param>
         /// <param name="craftingTime">time needed to make the 14 items being crafted</param>
-        public MakePotionFull(StartParams startParams) : base(startParams, 8400)
-        {
-            SecondaryIngredientBankSlot = new Point(5, 0);
-            UnfPotionBankSlot = new Point(4, 0);
-        }
+        public MakePotionFull(StartParams startParams) : base(startParams, MAKE_UNFINISHED_POTION_TIME) { }
 
         /// <summary>
         /// Clean the grimy herbs before making the unfinished potions

@@ -29,7 +29,7 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to the Port Phasmatys bank
         /// </summary>
         /// <returns>true if the bank icon is found</returns>
-        protected override bool MoveToBank(int minRunTimeToBank = 10000, bool readWindow = false)
+        protected override bool MoveToBank(int minRunTimeToBank = 5000, bool readWindow = false)
         {
             Point? bankIcon = BankIconLocation();
             Point clickLocation;
@@ -50,7 +50,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)bankIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y + 5, 3);
+            LeftClick(clickLocation.X, clickLocation.Y, 3);
             SafeWait(minRunTimeToBank);
 
             return true;
@@ -75,23 +75,24 @@ namespace RunescapeBot.BotPrograms
             if (bankFloor == null)
             {
                 bankX = bankBlob.Center.X;
-                bankY = bankBlob.Center.Y;
+                bankY = bankBlob.Center.Y + 4;
             }
             else
             {
-                if (bankFloor.Width > 50)
+                if (bankFloor.Width > 40)
                 {
                     bankX = ((bankFloor.Center.X + bankFloor.LeftBound) / 2) + 6;
+                    bankY = bankFloor.Center.Y + 8;
                 }
                 else
                 {
-                    bankX = bankFloor.Center.X + 6;
+                    bankX = bankFloor.Center.X + 8;
+                    bankY = bankFloor.Center.Y + 4;
                 }
-                bankY = bankFloor.Center.Y + 5;
             }
 
-            int x = bankX + offset.X + RNG.Next(-1, 2);
-            int y = bankY + offset.Y + RNG.Next(-1, 2);
+            int x = bankX + offset.X;
+            int y = bankY + offset.Y;
             return new Point(x, y);
         }
 
@@ -119,12 +120,12 @@ namespace RunescapeBot.BotPrograms
             }
             else
             {
-                furnaceX = furnaceFloor.Center.X;
-                furnaceY = furnaceFloor.Center.Y;
+                furnaceX = furnaceFloor.Center.X + 6;
+                furnaceY = furnaceFloor.Center.Y - 2;
             }
 
-            int x = furnaceX + offset.X + RNG.Next(-2, 3);
-            int y = furnaceY + offset.Y + RNG.Next(-2, 3);
+            int x = furnaceX + offset.X;
+            int y = furnaceY + offset.Y;
             return new Point(x, y);
         }
 
@@ -143,7 +144,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
-            SafeWait(1000, 120); //TODO verify that the bank opened
+            SafeWait(200, 120); //TODO verify that the bank opened
             return true;
         }
 
@@ -192,8 +193,12 @@ namespace RunescapeBot.BotPrograms
             //Reduce the blob list to the bank booths
             boothBlobs = boothBlobs.GetRange(0, numberOfBankBooths);
             boothBlobs.Sort(new BlobHorizontalComparer());
-            Blob secondRightBooth = boothBlobs[numberOfBankBooths - 2];
-            bankBooth = secondRightBooth;
+            List<Blob> functioningBankBooths = new List<Blob>();
+            functioningBankBooths.Add(boothBlobs[1]);
+            functioningBankBooths.Add(boothBlobs[2]);
+            functioningBankBooths.Add(boothBlobs[4]);
+            functioningBankBooths.Add(boothBlobs[5]);
+            bankBooth = Blob.ClosestBlob(Center, functioningBankBooths);
             return true;
         }
 
@@ -224,7 +229,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)furnaceIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y, 3);
+            LeftClick(clickLocation.X, clickLocation.Y, 2);
             SafeWait(runTimeFromBankToFurnace);
 
             return true;

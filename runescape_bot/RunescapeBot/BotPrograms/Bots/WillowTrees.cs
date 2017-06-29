@@ -13,10 +13,21 @@ namespace RunescapeBot.BotPrograms
             RunParams.Run = true;
         }
 
-
+        /// <summary>
+        /// Called once when the bot starts running
+        /// </summary>
         protected override void Run()
         {
             Inventory.DropInventory();
+        }
+
+        /// <summary>
+        /// Called once for each iteration of the bot
+        /// </summary>
+        /// <returns></returns>
+        protected override bool Execute()
+        {
+            return true;
         }
     }
 }

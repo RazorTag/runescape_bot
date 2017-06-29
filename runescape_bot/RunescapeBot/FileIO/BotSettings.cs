@@ -169,6 +169,8 @@ namespace RunescapeBot.FileIO
             SettingsData.BotAction = startParams.BotAction;
             SettingsData.Iterations = startParams.Iterations;
             SettingsData.ClientFilePath = startParams.ClientFilePath;
+
+            Save();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using RunescapeBot.BotPrograms.Popups;
-using RunescapeBot.Common;
+﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -22,6 +21,16 @@ namespace RunescapeBot.BotPrograms
     public class BotProgram
     {
         #region properties
+        /// <summary>
+        /// Used to provide the current state of the bot for the start menu
+        /// </summary>
+        public enum BotState
+        {
+            Running,
+            Break,
+            Sleep
+        }
+
         /// <summary>
         /// Checksum for the RUNE SCAPE logo on the login page
         /// </summary>
@@ -152,7 +161,14 @@ namespace RunescapeBot.BotPrograms
         {
             get
             {
-                return ColorArray.GetLength(0);
+                if (ColorArray != null)
+                {
+                    return ColorArray.GetLength(0);
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 
@@ -163,7 +179,14 @@ namespace RunescapeBot.BotPrograms
         {
             get
             {
-                return ColorArray.GetLength(1);
+                if (ColorArray != null)
+                {
+                    return ColorArray.GetLength(1);
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
         #endregion
@@ -264,26 +287,29 @@ namespace RunescapeBot.BotPrograms
             sleepWatch.Start();
 
             //alternate between work periods (Iterate) and break periods
-            do
+            while (!done)
             {
+                RunParams.BotState = BotState.Running;
                 done = Iterate();
                 if (!done)
                 {
                     if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
                     {
-                        if (RNG.NextDouble() > 0.2) //20% chance to stay logged in until automatically loggin out after 5 minutes of inactivity
+                        if (RNG.NextDouble() >= 0.2) //20% chance to stay logged in until automatically loggin out after 5 minutes of inactivity
                         {
                             Logout();    //80% chance to log out normally
                         }
+                        RunParams.BotState = BotState.Break;
                         done = SafeWait(RandomBreakTime());
                     }
                     else  //get a good night's sleep before resuming
                     {
+                        RunParams.BotState = BotState.Sleep;
                         done = SafeWait(RandomSleepTime());
                         sleepWatch.Restart();
                     }
                 }
-            } while (!done);
+            }
             
             Done();
         }
@@ -414,33 +440,33 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the next work time in milliseconds</returns>
         private int RandomWorkTime()
         {
-            int workType = RNG.Next(0, 7);
+            double workType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
 
-            if (workType < 1)   // 0
+            if (workType < 0.25)   //25%
             {
                 mean = 45;
                 stdDev = 8;
             }
-            else if (workType < 2) // 1
+            else if (workType < 0.65) //40%
             {
-                mean = 90; 
+                mean = 92; 
                 stdDev = 5;
             }
-            else if (workType < 5) // 2-4
+            else if (workType < 0.95) //30%
             {
-                mean = 115;
+                mean = 117;
                 stdDev = 30;
             }
-            else  // 5-6
+            else  //5%
             {
-                mean = 255;
+                mean = 308;
                 stdDev = 56;
             }
 
             double workTime = Probability.BoundedGaussian(mean, stdDev, 1.0, double.MaxValue);
-            return (int) (workTime * 60 * 1000);
+            return UnitConversions.MinutesToMilliseconds(workTime);
         }
 
         /// <summary>
@@ -449,10 +475,29 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of milliseconds for the bot to rest</returns>
         private int RandomBreakTime()
         {
-            const int avgBreakLength = 15 * 60 * 1000;  // 15 minutes = 900,000 ms
-            const int minBreakTime = 2 * 60 * 1000;     // 2 minutes = 120,000 ms
-            int breakLength = (int)Probability.BoundedGaussian(avgBreakLength, 0.35 * avgBreakLength, minBreakTime, double.MaxValue);
-            return breakLength;
+            double breakType = RNG.NextDouble();
+            double mean, stdDev;   //measured in minutes
+
+
+            if (breakType < 0.60)   //60%
+            {
+                mean = 15;
+                stdDev = 5.5;
+            }
+            else if (breakType < 0.85)  //25%
+            {
+                mean = 43;
+                stdDev = 8.7;
+            }
+            else  //15%
+            {
+                mean = 105;
+                stdDev = 41;
+            }
+
+            int minBreakTime = 2;
+            int breakLength = (int) Probability.BoundedGaussian(mean, stdDev, minBreakTime, double.MaxValue);
+            return UnitConversions.MinutesToMilliseconds(breakLength);
         }
 
         /// <summary>
@@ -461,9 +506,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of milliseconds for the bot to sleep</returns>
         private int RandomSleepTime()
         {
-            const double avgSleepLength = 7.8 * 60 * 60 * 1000;  //7.8 hours = 28,080,000 ms
-            const double standardDeviation = 20 * 60 * 1000;   //20 minutes = 1,200,000 ms
-            int breakLength = (int)Probability.RandomGaussian(avgSleepLength, standardDeviation);
+            double avgSleepLength = UnitConversions.HoursToMilliseconds(10.6);
+            double standardDeviation = UnitConversions.MinutesToMilliseconds(30);
+            int breakLength = (int) Probability.RandomGaussian(avgSleepLength, standardDeviation);
             return breakLength;
         }
 
@@ -1087,9 +1132,9 @@ namespace RunescapeBot.BotPrograms
         /// Determines if the client is logged out
         /// </summary>
         /// <returns>true if we are verifiably logged out</returns>
-        private bool IsLoggedOut()
+        private bool IsLoggedOut(bool readWindow = false)
         {
-            MakeSureWindowHasBeenRead();
+            MakeSureWindowHasBeenRead(readWindow);
 
             Color color;
             int height = ScreenHeight;
@@ -1137,8 +1182,17 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void Logout()
         {
-            LeftClick(ScreenWidth - 120, ScreenHeight - 18);
-            LeftClick(ScreenWidth - 120, ScreenHeight - 86);
+            const int maxLogoutAttempts = 5;
+            int logoutAttempts = 0;
+
+            do
+            {
+                //TODO click x out of the world switcher
+                LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5);
+                LeftClick(ScreenWidth - 120, ScreenHeight - 86, 3);
+                SafeWait(1000);
+            }
+            while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts));
         }
         #endregion
 
@@ -1217,13 +1271,9 @@ namespace RunescapeBot.BotPrograms
         /// Calls ReadWindow if the current screen image is unsatisfactory
         /// </summary>
         /// <returns>true unless the window needs to be read but can't</returns>
-        private bool MakeSureWindowHasBeenRead()
+        private bool MakeSureWindowHasBeenRead(bool readWindow = false)
         {
-            if ((Bitmap == null) || (ColorArray == null))
-            {
-                return ReadWindow();
-            }
-            if ((ScreenWidth == 0) || (ScreenHeight == 0))
+            if (readWindow || (ScreenWidth == 0) || (ScreenHeight == 0))
             {
                 return ReadWindow();
             }

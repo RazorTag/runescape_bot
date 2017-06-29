@@ -8,7 +8,12 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class BankStand : BotProgram
+    /// <summary>
+    /// Targeted at the Varrock west bank
+    /// This probably works with many other banks but has only been tested for the Varrock west bank
+    /// This would theoreticaly work at banks where the color of a bank booth's counter matches the color of theVarrock west bank booths' counters
+    /// </summary>
+    public class GenericBank : BotProgram
     {
         protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
 
@@ -16,7 +21,7 @@ namespace RunescapeBot.BotPrograms
         protected int MakeTime;
         protected int FailedRuns;
 
-        public BankStand(StartParams startParams, int makeTime) : base(startParams)
+        public GenericBank(StartParams startParams, int makeTime) : base(startParams)
         {
             this.MakeTime = makeTime;
             GetReferenceColors();

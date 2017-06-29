@@ -119,12 +119,12 @@ namespace RunescapeBot
             this.Iterations.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Iterations.Location = new System.Drawing.Point(123, 256);
             this.Iterations.Maximum = new decimal(new int[] {
-            1000000000,
+            2147483647,
             0,
             0,
             0});
             this.Iterations.Name = "Iterations";
-            this.Iterations.Size = new System.Drawing.Size(89, 26);
+            this.Iterations.Size = new System.Drawing.Size(140, 26);
             this.Iterations.TabIndex = 10;
             // 
             // label4
@@ -202,6 +202,7 @@ namespace RunescapeBot
             // 
             // UpdateTimer
             // 
+            this.UpdateTimer.Interval = 1000;
             this.UpdateTimer.Tick += new System.EventHandler(this.UpdateTimer_Tick);
             // 
             // Start

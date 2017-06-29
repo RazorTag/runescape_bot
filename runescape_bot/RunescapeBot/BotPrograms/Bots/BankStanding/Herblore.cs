@@ -1,10 +1,18 @@
-﻿namespace RunescapeBot.BotPrograms
+﻿using System.Drawing;
+
+namespace RunescapeBot.BotPrograms
 {
     public class Herblore : Use14On14
     {
-        protected const int WAIT_FOR_HERBS_TO_CLEAN = 600;
+        protected const int WAIT_FOR_HERBS_TO_CLEAN = 300;
+        protected const int MAKE_POTION_TIME = 16800;
+        protected const int MAKE_UNFINISHED_POTION_TIME = 8400;
 
-        public Herblore(StartParams startParams, int makeTime) : base(startParams, makeTime) { }
+        public Herblore(StartParams startParams, int makeTime) : base(startParams, makeTime)
+        {
+            UseOnInventorySlot = new Point(3, 3);
+            UseWithInventorySlot = new Point(3, 2);
+        }
 
         /// <summary>
         /// Cleans the herbs in the first 14 inventory slots
@@ -28,7 +36,7 @@
             Inventory.ClickInventory(2, 2, false);
             Inventory.ClickInventory(3, 2, false);
 
-            return !SafeWaitPlus(WAIT_FOR_HERBS_TO_CLEAN, 100);
+            return !SafeWaitPlus(WAIT_FOR_HERBS_TO_CLEAN, 0.35 * WAIT_FOR_HERBS_TO_CLEAN);
         }
     }
 }

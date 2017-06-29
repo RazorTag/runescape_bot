@@ -9,7 +9,7 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class FurnacePhasmatys : BankPhasmatys
     {
-        private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 15000;
+        private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 8000;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 5;
         private int failedRuns;
 

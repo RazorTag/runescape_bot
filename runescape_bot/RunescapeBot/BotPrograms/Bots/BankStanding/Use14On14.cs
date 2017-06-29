@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class Use14On14 : BankStand
+    public class Use14On14 : GenericBank
     {
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
 

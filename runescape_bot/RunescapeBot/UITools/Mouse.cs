@@ -194,43 +194,60 @@ namespace RunescapeBot.UITools
         /// <summary>
         /// Moves a mouse across a screen like a human would
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="x">x-coordinate to move to</param>
+        /// <param name="y">y-coordinate to move to</param>
         private static void NaturalMove(int x, int y)
         {
-            int discreteMovements, sleepTime;
-            double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, completion, currentX, currentY, mouseMoveSpeed;
             POINT startingPosition;
             Stopwatch watch = new Stopwatch();
-            Random rng = new Random();
             GetCursorPos(out startingPosition);
-            currentX = startingPosition.X;
-            currentY = startingPosition.Y;
+            double currentX = startingPosition.X;
+            double currentY = startingPosition.Y;
             float slope = (float)((y - currentY) / (x - currentX));
 
-            xDistance = x - currentX;
-            yDistance = y - currentY;
-            totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
-            mouseMoveSpeed = Math.Max(1.0, rng.Next((int)(0.6 * MOUSE_MOVE_SPEED), (int)(1.6 * MOUSE_MOVE_SPEED)));
-            moveDistance = mouseMoveSpeed / MOUSE_MOVE_RATE;
-            discreteMovements = (int)(totalDistance / moveDistance);
-            xMoveDistance = xDistance / discreteMovements;
-            yMoveDistance = yDistance / discreteMovements;
-            sleepTime = (int)(1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
+            int sleepTime = (int)(1000.0 / MOUSE_MOVE_RATE);   //milliseconds per mouse movement
+            double mouseMoveSpeed = Probability.BoundedGaussian(MOUSE_MOVE_SPEED, 0.25 * MOUSE_MOVE_SPEED, 0.1 * MOUSE_MOVE_SPEED, double.MaxValue);
+            double incrementDistance = mouseMoveSpeed / MOUSE_MOVE_RATE;
+
+            double xDistance = x - currentX;
+            double yDistance = y - currentY;
+            double totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
+            double slowMoveDistance = Math.Min(totalDistance, Probability.BoundedGaussian(102, 10, 0, double.MaxValue));
+            double moveDistance = totalDistance - slowMoveDistance;
+            int discreteMovements = (int)(moveDistance / incrementDistance);
+            moveDistance = discreteMovements * incrementDistance;
+            slowMoveDistance = totalDistance - moveDistance;
 
             CubicSpline xSpline, ySpline;
             CreateParameterizedSplines(startingPosition, new Point(x, y), out xSpline, out ySpline);
 
+            //move at normal mouse speed when far away from the target
+            double completion = 0.0;
             for (int i = 1; i <= discreteMovements; i++)
             {
                 if (BotProgram.StopFlag) { return; }
 
                 watch.Restart();
-                completion = (i * moveDistance) / totalDistance;
+                completion = (i * incrementDistance) / totalDistance;
                 currentX = xSpline.Eval((float) completion);
                 currentY = ySpline.Eval((float) completion);
-                User32.SetCursorPos((int)currentX, (int)currentY);
-                watch.Stop();
+                SetCursorPos((int)currentX, (int)currentY);
+                Thread.Sleep(Math.Max(0, sleepTime - (int)watch.ElapsedMilliseconds));
+            }
+
+            //move the mouse slowly when close to the target
+            double completed = completion;
+            double slowIncrement = Probability.BoundedGaussian(0.5 * incrementDistance, 0.15 * incrementDistance, 0.2 * incrementDistance, 0.75 * incrementDistance);
+            double slowMovements = (int)(slowMoveDistance / slowIncrement);
+            for (int i = 1; i <= slowMovements; i++)
+            {
+                if (BotProgram.StopFlag) { return; }
+
+                watch.Restart();
+                completion = completed + ((i * slowIncrement) / totalDistance);
+                currentX = xSpline.Eval((float)completion);
+                currentY = ySpline.Eval((float)completion);
+                SetCursorPos((int)currentX, (int)currentY);
                 Thread.Sleep(Math.Max(0, sleepTime - (int)watch.ElapsedMilliseconds));
             }
             Move(x, y);

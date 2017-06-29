@@ -12,6 +12,7 @@ namespace RunescapeBot.BotPrograms
             {
                 FrameTime = 3000;
                 RandomizeFrames = true;
+                BotState = BotProgram.BotState.Running;
             }
         }
 
@@ -40,6 +41,11 @@ namespace RunescapeBot.BotPrograms
         /// Bot program to run
         /// </summary>
         public Start.BotActions BotAction { get; set; }
+
+        /// <summary>
+        /// Stores the bot's current position in its work cycle
+        /// </summary>
+        public BotProgram.BotState BotState { get; set; }
 
         /// <summary>
         /// Average number of milliseconds between frames

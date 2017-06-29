@@ -15,7 +15,6 @@ namespace RunescapeBot.BotPrograms
         private Keyboard Keyboard;
         private Random RNG;
         private Process RSClient;
-        private bool StopFlag;
 
         public Inventory(Process rsClient, Color[,] screen, Keyboard keyboard)
         {
@@ -117,12 +116,16 @@ namespace RunescapeBot.BotPrograms
 
             Point click;
             RightClickInventory dropPopup = null;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             bool done = false;
 
             while (!done)
             {
+                if (BotProgram.StopFlag) { return; }
+
                 click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
-                Mouse.RightClick(x, y, RSClient, 0);
+                Mouse.RightClick(click.X, click.Y, RSClient, 0);
                 dropPopup = new RightClickInventory(click.X, click.Y, RSClient);
                 if (dropPopup.WaitForPopup(1000))
                 {
@@ -130,7 +133,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 else
                 {
-                    Mouse.RadialOffset(dropPopup.GetWidth(), 2 * dropPopup.GetWidth(), -5, 220);
+                    OpenInventory(true);
                 }
             }
 
@@ -151,8 +154,8 @@ namespace RunescapeBot.BotPrograms
                 {
                     if (!SlotIsEmpty(x, y, false, false))
                     {
+                        if (BotProgram.StopFlag) { return; }
                         DropItem(x, y, false);
-                        if (StopFlag) { return; }
                     }
                 }
             }
@@ -237,7 +240,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             Telegrab(x, y);
-            if (StopFlag) { return false; }
+            if (BotProgram.StopFlag) { return false; }
             Alch(emptySlot.Value.X, emptySlot.Value.Y);
 
             return true;
@@ -275,7 +278,8 @@ namespace RunescapeBot.BotPrograms
                 {
                     return inventorySlot;
                 }
-                if (StopFlag) { return null; }
+
+                if (BotProgram.StopFlag) { return null; }
             }
 
             return null;
@@ -370,14 +374,6 @@ namespace RunescapeBot.BotPrograms
             x = Screen.GetLength(0) - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X);
             y = Screen.GetLength(1) - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y);
             return true;
-        }
-
-        /// <summary>
-        /// Stops any ongoing inventory processes
-        /// </summary>
-        public void Stop()
-        {
-            StopFlag = true;
         }
 
         #region constants

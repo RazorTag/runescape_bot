@@ -18,6 +18,8 @@ namespace RunescapeBot
         private const string FORM_NAME = "Roboport";
         private const string BOT_STOPPING = " is stopping";
         private const string BOT_RUNNING = " is running";
+        private const string BOT_TAKING_A_BREAK = " is taking a break";
+        private const string BOT_SLEEPING = " is sleeping";
 
         /// <summary>
         /// List of running bot programs
@@ -131,7 +133,6 @@ namespace RunescapeBot
             Iterations.Value = settings.Iterations;
             SetIdleState();
             settings.Save();
-
         }
 
         /// <summary>
@@ -280,7 +281,7 @@ namespace RunescapeBot
                 Invoke((MethodInvoker)(() =>
                 {
                     SetIdleState();
-                    Enabled = true;
+                    StartButton.Enabled = true;
                 }));
             }
         }
@@ -294,13 +295,15 @@ namespace RunescapeBot
 
             if (RunningBot != null)
             {
-                this.Enabled = false;
-                SetTransitionalState();
+                StartButton.Enabled = false;
                 UpdateTimer.Enabled = false;
+                SetTransitionalState();
+                settings.SaveBot(RunningBot.RunParams);
                 RunningBot.Stop();
             }
             else
             {
+                UpdateTimer.Enabled = false;
                 SetIdleState();
             }
         }
@@ -329,7 +332,8 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void Start_FormClosed(object sender, FormClosedEventArgs e)
         {
-            settings.Save();
+            StartParams botSettings = CollectStartParams();
+            settings.SaveBot(botSettings);
         }
 
         /// <summary>
@@ -360,7 +364,7 @@ namespace RunescapeBot
         private void SetActiveState()
         {
             botIsRunning = true;
-            this.Text = GetBotName() + BOT_RUNNING;
+            Text = GetBotName() + BOT_RUNNING;
             StartButton.Text = "Stop";
             StartButton.BackColor = ColorTranslator.FromHtml("#874C48");
         }
@@ -390,6 +394,25 @@ namespace RunescapeBot
 
             RunUntil.Value = RunningBot.RunParams.RunUntil;
             Iterations.Value = RunningBot.RunParams.Iterations;
+
+            switch (RunningBot.RunParams.BotState)
+            {
+                case BotProgram.BotState.Running:
+                    Text = GetBotName() + BOT_RUNNING;
+                    break;
+
+                case BotProgram.BotState.Break:
+                    Text = GetBotName() + BOT_TAKING_A_BREAK;
+                    break;
+
+                case BotProgram.BotState.Sleep:
+                    Text = GetBotName() + BOT_SLEEPING;
+                    break;
+
+                default:
+                    Text = GetBotName() + BOT_RUNNING;
+                    break;
+            }
         }
     }
 }

@@ -126,7 +126,7 @@ namespace RunescapeBot.BotPrograms.Popups
             int yRandomization = 2;
             Point clickOffset = Probability.GaussianRectangle(-xRandomization, xRandomization, yOffset - yRandomization, yOffset + yRandomization);
             Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
-            Mouse.LeftClick(click.X, click.Y, RSClient, 0);
+            Mouse.LeftClick(click.X, click.Y, RSClient);
         }
     }
 }

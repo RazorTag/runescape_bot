@@ -270,9 +270,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static ColorRange PhasmatysBuildingFloor()
         {
-            Color dark = Color.FromArgb(44, 50, 34);
-            Color light = Color.FromArgb(92, 96, 79);
-            HSBRange hsbRange = new HSBRange(334, 84, 0.053f, 0.204f, 0.154f, 0.354f);
+            Color dark = Color.FromArgb(36, 38, 26);
+            Color light = Color.FromArgb(92, 103, 82);
+            HSBRange hsbRange = new HSBRange(334, 93, 0.093f, 0.172f, 0.135f, 0.353f);
             return new ColorRange(dark, light, hsbRange);
         }
 

@@ -120,6 +120,8 @@
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
+    <Compile Include="ImageTools\FIlters\ClusterFilters.cs" />
+    <Compile Include="ImageTools\FIlters\ColorCluster.cs" />
     <Compile Include="ImageTools\FIlters\ColorFilters.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />

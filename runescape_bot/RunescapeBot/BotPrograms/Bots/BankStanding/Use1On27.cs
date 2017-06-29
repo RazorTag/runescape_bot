@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
-    class Use1On27 : BankStand
+    class Use1On27 : GenericBank
     {
         private const int WAIT_FOR_FLETCHING_WINDOW_TIMEOUT = 5000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
