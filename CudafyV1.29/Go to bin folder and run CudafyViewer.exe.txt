@@ -1,0 +1,8 @@
+Quick Start
+-----------
+1) Go to bin folder and run CudafyViewer.exe. This will check your environment is set up correctly.
+2) Open, build and run the two example Visual Studio projects.
+3) Read a primer on CUDA programming such as CUDA By Example by Sanders and Kandrot. http://developer.download.nvidia.com/books/cuda-by-example/cuda-by-example-sample.pdf
+4) Read the ******* manual. https://cudafy.codeplex.com/documentation
+5) Try writing your own code.
+6) Visit the Cudafy forum on Codeplex: https://cudafy.codeplex.com/discussions
