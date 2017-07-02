@@ -11,7 +11,7 @@ namespace RunescapeBot.Common
     public static class Geometry
     {
         /// <summary>
-        /// Calculates the distance between two point in a 2D plane.
+        /// Calculates the distance between two points.
         /// </summary>
         /// <param name="a">Point a</param>
         /// <param name="b">Point b</param>

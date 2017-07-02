@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace RunescapeBot.BotPrograms
 {
     /// <summary>
-    /// Used by the bot to inform that is has completed its task
+    /// Used by the bot to inform that is has completed its task before stopping the execution thread
     /// </summary>
     public delegate void BotResponse();
 
