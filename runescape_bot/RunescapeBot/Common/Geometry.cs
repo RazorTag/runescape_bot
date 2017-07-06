@@ -10,6 +10,20 @@ namespace RunescapeBot.Common
     /// </summary>
     public static class Geometry
     {
+        private static Random rng;
+        private static Random RNG
+        {
+            get
+            {
+                if (rng == null) { rng = new Random(); }
+                return rng;
+            }
+            set
+            {
+                rng = value;
+            }
+        }
+
         /// <summary>
         /// Calculates the distance between two points.
         /// </summary>
@@ -52,7 +66,7 @@ namespace RunescapeBot.Common
         /// Calculates the radius of a circle from its area
         /// </summary>
         /// <param name="area"></param>
-        /// <returns></returns>
+        /// <returns>the radius of the circle</returns>
         public static double CircleRadius(double area)
         {
             return Math.Sqrt(area / Math.PI);
@@ -66,9 +80,8 @@ namespace RunescapeBot.Common
         /// <returns>a random point between the two given points</returns>
         public static Point RandomMidpoint(Point a, Point b)
         {
-            Random rng = new Random();
             int midX, midY;
-            double bNess = rng.NextDouble();
+            double bNess = RNG.NextDouble();
             midX = (int)Math.Round((bNess * (b.X - a.X)) + a.X);
             midY = (int)Math.Round((bNess * (b.Y - a.Y)) + a.Y);
             return new Point(midX, midY);
@@ -103,8 +116,8 @@ namespace RunescapeBot.Common
         /// <returns>rectangularity (0-1) indicating how rectangular a shape is</returns>
         public static double Rectangularity(Blob shape)
         {
-            int width = shape.RightBound - shape.LeftBound;
-            int height = shape.BottomBound - shape.TopBound;
+            int width = shape.RightBound - shape.LeftBound + 1;
+            int height = shape.BottomBound - shape.TopBound + 1;
             double interiorVolume = width * height;
             double rectangularity = shape.Size / interiorVolume;
             return rectangularity;

@@ -8,9 +8,16 @@ namespace RunescapeBot.Common
     /// </summary>
     public class Line
     {
+        private const double infiniteSlope = 1000000000;
+
         //two points that define a line and a line seggment
         public Point StartPoint { get; set; }
         public Point EndPoint { get; set; }
+
+        public double Rise { get { return EndPoint.Y - StartPoint.Y; } }
+        public double Run { get { return EndPoint.X - StartPoint.X; } }
+        public double Slope { get { return (Run != 0) ? (Rise / Run) : infiniteSlope; } }  //use an arbitrarily large number for slope in the event of a vertical line
+        public double Length { get { return Math.Sqrt(Math.Pow(Rise, 2) + Math.Pow(Run, 2)); } }
 
         /// <summary>
         /// The distinction between start and end points is only meaningful for some operations on the line segment
@@ -68,12 +75,47 @@ namespace RunescapeBot.Common
         {
             double run = endPoint.X - startPoint.X;
             double rise = endPoint.Y - startPoint.Y;
-            double length = Math.Sqrt(Math.Pow(run, 2.0) + Math.Pow(rise, 2.0));
+            double length = Math.Sqrt(Math.Pow(run, 2) + Math.Pow(rise, 2));
             double runRate = run / length;
             double riseRate = rise / length;
             double x = startPoint.X + (offset * runRate);
             double y = startPoint.Y + (offset * riseRate);
             return new Point((int)Math.Round(x), (int)Math.Round(y));
+        }
+
+        /// <summary>
+        /// Determines if a point is close to the line
+        /// </summary>
+        /// <param name="point">point to check for closeness</param>
+        /// <param name="tolerance">allowed distance from the line</param>
+        /// <returns>true if the point is sufficiently close to the line</returns>
+        public bool LineContains(Point point, double tolerance = 1.415)
+        {
+            double slope = Slope;
+            double yIntercept = StartPoint.Y - (slope * StartPoint.X);
+            double normalSlope = (slope == 0) ? infiniteSlope : -Math.Pow(slope, -1);
+            double normalYIntercept = point.Y - (normalSlope * point.X);
+            double intersectionX = (normalYIntercept - yIntercept) / (slope - normalSlope);
+            double intersectionY = yIntercept + slope * intersectionX;
+            Point intersection = new Point((int)Math.Round(intersectionX), (int)Math.Round(intersectionY));
+            double distanceFromLine = Geometry.DistanceBetweenPoints(point, intersection);
+            return distanceFromLine <= tolerance;
+        }
+
+        /// <summary>
+        /// Determines if a point is close to the line segment bounded by the start and end points
+        /// </summary>
+        /// <param name="point">point to check for closeness</param>
+        /// <param name="tolerance">allowed distance from the line</param>
+        /// <returns>true if the point is sufficiently close to the line segment</returns>
+        public bool LineSegmentContains(Point point, double tolerance = 1.415)
+        {
+            if (!LineContains(point, tolerance)) { return false; }
+            bool horizontalFit = ((StartPoint.X - tolerance) <= point.X && point.X <= (EndPoint.X + tolerance))
+                || ((EndPoint.X - tolerance) <= point.X && point.X <= (StartPoint.X + tolerance));
+            bool verticalFit = ((StartPoint.Y - tolerance) <= point.Y && point.Y <= (EndPoint.Y + tolerance))
+                || ((EndPoint.Y - tolerance) <= point.Y && point.Y <= (StartPoint.Y + tolerance));
+            return horizontalFit && verticalFit;
         }
     }
 }
