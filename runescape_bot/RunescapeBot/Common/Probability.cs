@@ -5,6 +5,20 @@ namespace RunescapeBot.Common
 {
     public class Probability
     {
+        private static Random rng;
+        private static Random RNG
+        {
+            get
+            {
+                if (rng == null) { rng = new Random(); }
+                return rng;
+            }
+            set
+            {
+                rng = value;
+            }
+        }
+
         /// <summary>
         /// Generates a random value from a Gaussian distribution
         /// </summary>
@@ -13,9 +27,8 @@ namespace RunescapeBot.Common
         /// <returns>a random number from a Gaussian distribution</returns>
         public static double RandomGaussian(double mean, double stdDev)
         {
-            Random rng = new Random();
-            double u1 = 1.0 - rng.NextDouble();
-            double u2 = 1.0 - rng.NextDouble();
+            double u1 = 1.0 - RNG.NextDouble();
+            double u2 = 1.0 - RNG.NextDouble();
             double stdDevOffsets = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             double randomValue = mean + stdDev * stdDevOffsets; //random normal(mean,stdDev^2)
             return randomValue;
@@ -68,9 +81,8 @@ namespace RunescapeBot.Common
         /// <returns>a random point from a one-sided Gaussian distribution</returns>
         public static double HalfGaussian(double psuedoMean, double stdDev, bool positive = true)
         {
-            Random rng = new Random();
-            double u1 = 1.0 - rng.NextDouble();
-            double u2 = 1.0 - rng.NextDouble();
+            double u1 = 1.0 - RNG.NextDouble();
+            double u2 = 1.0 - RNG.NextDouble();
             double stdDevOffsets = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
 
             double randomValue;
@@ -94,7 +106,7 @@ namespace RunescapeBot.Common
         /// <param name="bottom">bottom bound (inclusive)</param>
         /// /// <param name="stdDevToRangeRatio">the ratio of the standard deviation to the range of possible values</param>
         /// <returns></returns>
-        public static Point GaussianRectangle(int left, int right, int top, int bottom, double stdDevToRangeRatio = 0.15)
+        public static Point GaussianRectangle(int left, int right, int top, int bottom)
         {
             double x = BoundedGaussian(left, right);
             double y = BoundedGaussian(top, bottom);
@@ -104,6 +116,7 @@ namespace RunescapeBot.Common
 
         /// <summary>
         /// Chooses a point from a Gaussian distribution radiating outward from a central point
+        /// Arc goes from right in a counter-clockwise motion if looking at the screen
         /// </summary>
         /// <param name="center">the center point of the distribution</param>
         /// <param name="stdDev">standard deviation for the Gaussian distribution</param>
@@ -113,23 +126,34 @@ namespace RunescapeBot.Common
         /// <returns>a random point</returns>
         public static Point GaussianCircle(Point center, double stdDev, double arcStart = 0, double arcEnd = 360, double maxRadius = double.MaxValue)
         {
-            Random rng = new Random();
             double radius = HalfGaussian(0, stdDev, true);
             radius %= maxRadius;
 
-            arcStart = arcStart % 360;
-            arcEnd = arcEnd % 360;
-            if (arcStart >= arcEnd)
-            {
-                arcEnd += 360;
-            }
-            double angle = arcStart + (rng.NextDouble() * (arcEnd - arcStart));
-            angle = (angle % 360) * ((2 * Math.PI) / 360.0);    //normalize and convert to radians
+            double angle = RandomAngle(arcStart, arcEnd);
+            angle = angle * ((2 * Math.PI) / 360.0);    //normalize and convert to radians
 
             int x = center.X + ((int)Math.Round(Math.Cos(angle) * radius));
             int y = center.Y - ((int)Math.Round(Math.Sin(angle) * radius));
 
             return new Point(x, y);
+        }
+
+        /// <summary>
+        /// Generates a random angle within an arc
+        /// </summary>
+        /// <param name="arcStart">lowest angle of an arc</param>
+        /// <param name="arcEnd">highest angle of an arc</param>
+        /// <returns>random angle from within an arc</returns>
+        public static double RandomAngle(double arcStart, double arcEnd)
+        {
+            arcStart = Numerical.Modulo(arcStart, 360);
+            arcEnd = Numerical.Modulo(arcEnd, 360);
+            if (arcStart >= arcEnd)
+            {
+                arcEnd += 360;
+            }
+            double angle = arcStart + (RNG.NextDouble() * (arcEnd - arcStart));
+            return Numerical.Modulo(angle, 360);
         }
     }
 }

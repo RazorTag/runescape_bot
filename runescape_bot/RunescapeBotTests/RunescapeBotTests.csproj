@@ -58,6 +58,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Common\GeometryTests.cs" />
+    <Compile Include="Common\LineTests.cs" />
+    <Compile Include="Common\NumericalTests.cs" />
+    <Compile Include="Common\ProbabilityTests.cs" />
+    <Compile Include="Common\UnitConversionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -15,7 +15,7 @@ namespace RunescapeBot.Common
         public static bool CloseEnough(long target, long test, double tolerance)
         {
             long miss = Math.Abs(test - target);
-            return miss < Math.Abs(target * tolerance);
+            return miss <= Math.Abs(target * tolerance);
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace RunescapeBot.Common
         /// Determines if a value is within specified bounds
         /// </summary>
         /// <param name="test">the value to check if it is within the upper and lower bounds</param>
-        /// <param name="lowerBound">minimum allowed value</param>
-        /// <param name="upperBound">maximum allowed value</param>
+        /// <param name="lowerBound">minimum allowed value (inclusive)</param>
+        /// <param name="upperBound">maximum allowed value (inclusive)</param>
         /// <returns>true if the test value is within bounds</returns>
         public static bool WithinBounds(double test, double lowerBound, double upperBound)
         {
@@ -48,7 +48,7 @@ namespace RunescapeBot.Common
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns>The arithmetic mean of a and b</returns>
-        public static double Average(int a, int b)
+        public static double Average(double a, double b)
         {
             return (a + b) / 2.0;
         }
@@ -61,8 +61,8 @@ namespace RunescapeBot.Common
         /// <returns></returns>
         public static Point Average(Point a, Point b)
         {
-            int x = (a.X + b.X) / 2;
-            int y = (a.Y + b.Y) / 2;
+            int x = (int) Math.Round((a.X + b.X) / 2.0);
+            int y = (int) Math.Round((a.Y + b.Y) / 2.0);
             return new Point(x, y);
         }
 
@@ -81,6 +81,35 @@ namespace RunescapeBot.Common
             {
                 return possibleZero;
             }
+        }
+
+        /// <summary>
+        /// Adds or subtracts two numerical values based on a boolean value
+        /// </summary>
+        /// <param name="a">first number</param>
+        /// <param name="b">number to add or subtract</param>
+        /// <param name="add">true to add, false to subtract</param>
+        /// <returns>sum or difference</returns>
+        public static double BooleanAdd(double a, double b, bool add)
+        {
+            if (add)
+            {
+                return a + b;
+            }
+            else
+            {
+                return a - b;
+            }
+        }
+
+        /// <summary>
+        /// Takes the modulus of a value
+        /// </summary>
+        /// <param name="value">value to be modulated</param>
+        /// <returns>modulation of a value</returns>
+        public static double Modulo(double value, double modulus)
+        {
+            return value - modulus * Math.Floor(value / modulus);
         }
     }
 }

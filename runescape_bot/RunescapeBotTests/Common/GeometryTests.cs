@@ -93,8 +93,10 @@ namespace RunescapeBot.Common.Tests
             double meanY = totalY / numTestPoints;
             double expectedX = (ax + bx) / 2.0;
             double expectedY = (ay + by) / 2.0;
-            double maxDeviation = testLine.Length / (2 * Math.Sqrt(numTestPoints));
-            Assert.IsTrue(Math.Abs(expectedX - meanX) <= maxDeviation);
+            double maxDeviationX = Math.Abs(testLine.Run / (Math.Sqrt(numTestPoints)));
+            double maxDeviationY = Math.Abs(testLine.Rise / (Math.Sqrt(numTestPoints)));
+            Assert.IsTrue(Math.Abs(expectedX - meanX) <= maxDeviationX);
+            Assert.IsTrue(Math.Abs(expectedY - meanY) <= maxDeviationY);
         }
 
         [TestMethod()]

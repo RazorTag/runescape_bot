@@ -22,7 +22,7 @@ namespace RunescapeBot.Common
         /// <returns>number of milliseconds in the given number of hours rounded to the nearest millisecond</returns>
         public static int HoursToMilliseconds(double hours)
         {
-            int milliseconds = (int)Math.Round(hours * 3600000);
+            int milliseconds = (int) Math.Round(hours * 3600000);
             return milliseconds;
         }
     }
