@@ -262,9 +262,9 @@ namespace RunescapeBot.UITools
         /// <param name="ySpline"></param>
         public static void CreateParameterizedSplines(Point start, Point end, out CubicSpline xSpline, out CubicSpline ySpline)
         {
-            const double randomization = 0.02;
-            const int maxRandomAllowed = 25;
-            const double newMidPointDistance = 500.0;
+            const double randomization = 0.05;
+            const int maxRandomAllowed = 50;
+            const double newMidPointDistance = 800.0;
             int xRandomization = Math.Min(maxRandomAllowed, Math.Abs((int)(randomization * (end.Y - start.Y))));
             int yRandomization = Math.Min(maxRandomAllowed, Math.Abs((int)(randomization * (end.X - start.X))));
             double moveDistance = Geometry.DistanceBetweenPoints(start, end);

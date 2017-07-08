@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms
         private const int CONSECUTIVE_FAILURES_ALLOWED = 5;
         private int failedRuns;
 
-        public FurnacePhasmatys(StartParams startParams) : base(startParams)
+        public FurnacePhasmatys(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
             failedRuns = 0;

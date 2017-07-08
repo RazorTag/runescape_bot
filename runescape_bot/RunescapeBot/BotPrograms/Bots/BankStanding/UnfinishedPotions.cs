@@ -6,7 +6,7 @@ namespace RunescapeBot.BotPrograms
     {
         /// <param name="startParams"></param>
         /// <param name="craftingTime">time needed to make the 14 items being crafted</param>
-        public UnfinishedPotions(StartParams startParams) : base(startParams, MAKE_UNFINISHED_POTION_TIME) { }
+        public UnfinishedPotions(RunParams startParams) : base(startParams, MAKE_UNFINISHED_POTION_TIME) { }
 
         /// <summary>
         /// Clean the grimy herbs before making the unfinished potions

@@ -52,13 +52,14 @@ namespace RunescapeBot
             this.OSBuddySelect = new System.Windows.Forms.Button();
             this.FileSelect = new System.Windows.Forms.OpenFileDialog();
             this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
+            this.StatusMessage = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).BeginInit();
             this.SuspendLayout();
             // 
             // StartButton
             // 
             this.StartButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StartButton.Location = new System.Drawing.Point(151, 306);
+            this.StartButton.Location = new System.Drawing.Point(155, 304);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(125, 55);
             this.StartButton.TabIndex = 11;
@@ -145,7 +146,6 @@ namespace RunescapeBot
             this.RunUntil.Name = "RunUntil";
             this.RunUntil.Size = new System.Drawing.Size(287, 26);
             this.RunUntil.TabIndex = 8;
-            this.RunUntil.ValueChanged += new System.EventHandler(this.RunUntil_ValueChanged);
             // 
             // label5
             // 
@@ -205,11 +205,21 @@ namespace RunescapeBot
             this.UpdateTimer.Interval = 1000;
             this.UpdateTimer.Tick += new System.EventHandler(this.UpdateTimer_Tick);
             // 
+            // StatusMessage
+            // 
+            this.StatusMessage.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.StatusMessage.Location = new System.Drawing.Point(26, 376);
+            this.StatusMessage.Multiline = true;
+            this.StatusMessage.Name = "StatusMessage";
+            this.StatusMessage.Size = new System.Drawing.Size(392, 86);
+            this.StatusMessage.TabIndex = 15;
+            // 
             // Start
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(437, 381);
+            this.ClientSize = new System.Drawing.Size(437, 474);
+            this.Controls.Add(this.StatusMessage);
             this.Controls.Add(this.OSBuddySelect);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.ClientLocation);
@@ -258,6 +268,7 @@ namespace RunescapeBot
         private System.Windows.Forms.Button OSBuddySelect;
         private System.Windows.Forms.OpenFileDialog FileSelect;
         private System.Windows.Forms.Timer UpdateTimer;
+        private System.Windows.Forms.TextBox StatusMessage;
     }
 }
 

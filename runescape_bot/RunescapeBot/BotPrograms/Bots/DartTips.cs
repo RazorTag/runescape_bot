@@ -11,7 +11,7 @@ namespace RunescapeBot.BotPrograms
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
         private int failedRuns;
 
-        public DartTips(StartParams startParams) : base(startParams)
+        public DartTips(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
             failedRuns = 0;

@@ -18,7 +18,7 @@ namespace RunescapeBot.BotPrograms
         //set to double.MaxValue when no hitpoint bar is found
         private KeyValuePair<DateTime, double> oldHitpoints;
 
-        public Combat(StartParams startParams) : base(startParams) { }
+        public Combat(RunParams startParams) : base(startParams) { }
 
         /// <summary>
         /// Determines whether the player is in combat using OSBuddy's target hitpoints indicator

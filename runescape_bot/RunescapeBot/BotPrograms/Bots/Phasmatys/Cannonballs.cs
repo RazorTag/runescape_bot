@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms
         private const int CANNONBALL_COLOR_SUM = 13219;
         Stopwatch watch;
 
-        public Cannonballs(StartParams startParams) : base(startParams)
+        public Cannonballs(RunParams startParams) : base(startParams)
         {
             watch = new Stopwatch();
         }

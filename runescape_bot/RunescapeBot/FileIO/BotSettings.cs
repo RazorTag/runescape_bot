@@ -162,7 +162,7 @@ namespace RunescapeBot.FileIO
         /// Updates the settings for a single bot program
         /// </summary>
         /// <param name="botType"></param>
-        public void SaveBot(StartParams startParams)
+        public void SaveBot(RunParams startParams)
         {
             SettingsData.Login = startParams.Login;
             SettingsData.Password = startParams.Password;

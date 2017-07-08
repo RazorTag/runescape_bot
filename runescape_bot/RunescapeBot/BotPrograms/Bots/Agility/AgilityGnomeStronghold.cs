@@ -30,7 +30,7 @@ namespace RunescapeBot.BotPrograms
         private int MinTightropeSize;
         private int MinDrainPipeSize;        
 
-        public AgilityGnomeStronghold(StartParams startParams) : base(startParams)
+        public AgilityGnomeStronghold(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
             SetObjectSizes();

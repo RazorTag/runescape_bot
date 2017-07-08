@@ -21,7 +21,7 @@ namespace RunescapeBot.BotPrograms
         protected int MakeTime;
         protected int FailedRuns;
 
-        public GenericBank(StartParams startParams, int makeTime) : base(startParams)
+        public GenericBank(RunParams startParams, int makeTime) : base(startParams)
         {
             this.MakeTime = makeTime;
             GetReferenceColors();

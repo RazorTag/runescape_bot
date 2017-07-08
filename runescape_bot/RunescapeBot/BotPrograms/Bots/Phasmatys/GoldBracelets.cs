@@ -15,7 +15,7 @@ namespace RunescapeBot.BotPrograms
         private const int WAIT_FOR_CRAFTING_WINDOW_TIMEOUT = 10000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
 
-        public GoldBracelets(StartParams startParams) : base(startParams) { }
+        public GoldBracelets(RunParams startParams) : base(startParams) { }
 
         protected override void Run()
         {

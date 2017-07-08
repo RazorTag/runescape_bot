@@ -62,6 +62,7 @@
     <Compile Include="Common\NumericalTests.cs" />
     <Compile Include="Common\ProbabilityTests.cs" />
     <Compile Include="Common\UnitConversionsTests.cs" />
+    <Compile Include="ImageTools\Blob\BlobTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

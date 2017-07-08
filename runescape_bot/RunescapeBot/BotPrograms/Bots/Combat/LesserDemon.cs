@@ -45,7 +45,7 @@ namespace RunescapeBot.BotPrograms
         private DateTime LastDemonTime;
 
 
-        public LesserDemon(StartParams startParams) : base(startParams)
+        public LesserDemon(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
             ReadWindow();

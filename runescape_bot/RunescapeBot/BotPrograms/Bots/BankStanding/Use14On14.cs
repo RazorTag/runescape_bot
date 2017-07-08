@@ -19,7 +19,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="startParams"></param>
         /// <param name="makeTime">time needed to make the 14 items being crafted</param>
-        public Use14On14(StartParams startParams, int makeTime) : base(startParams, makeTime)
+        public Use14On14(RunParams startParams, int makeTime) : base(startParams, makeTime)
         {
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);

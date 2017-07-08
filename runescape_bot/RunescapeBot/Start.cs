@@ -16,10 +16,12 @@ namespace RunescapeBot
     public partial class Start : Form
     {
         private const string FORM_NAME = "Roboport";
-        private const string BOT_STOPPING = " is stopping";
-        private const string BOT_RUNNING = " is running";
-        private const string BOT_TAKING_A_BREAK = " is taking a break";
-        private const string BOT_SLEEPING = " is sleeping";
+        private const string BOT_STOPPING = "is stopping";
+        private const string BOT_RUNNING = "is running";
+        private const string BOT_TAKING_A_BREAK = "is taking a break";
+        private const string BOT_SLEEPING = "is sleeping";
+        private const string STOPPING = "stopping for a break";
+        private const string RESUMING = "getting back to work";
 
         /// <summary>
         /// List of running bot programs
@@ -35,11 +37,6 @@ namespace RunescapeBot
         /// True if a bot is currently running
         /// </summary>
         private bool botIsRunning;
-
-        /// <summary>
-        /// Set to true if a user has selected a date to run until
-        /// </summary>
-        private bool endTimeSelected;
 
         /// <summary>
         /// List of existing bot programs. Add a new bot program to this list.
@@ -149,7 +146,7 @@ namespace RunescapeBot
                 return;
             }
 
-            StartParams startParams = CollectStartParams();
+            RunParams startParams = CollectStartParams();
 
             switch ((BotActions)BotActionSelect.SelectedIndex)
             {
@@ -213,20 +210,13 @@ namespace RunescapeBot
         /// Gets the start parameters specified by the user in the startup form
         /// </summary>
         /// <returns></returns>
-        private StartParams CollectStartParams()
+        private RunParams CollectStartParams()
         {
-            StartParams startParams = new StartParams();
+            RunParams startParams = new RunParams();
             startParams.Login = Login.Text;
             startParams.Password = Password.Text;
             startParams.Iterations = (int) Iterations.Value;
-            if (endTimeSelected)
-            {
-                startParams.RunUntil = RunUntil.Value;
-            }
-            else
-            {
-                startParams.RunUntil = RunUntil.MaxDate;
-            }
+            startParams.RunUntil = RunUntil.Value;
             startParams.TaskComplete = new BotResponse(BotDone);
             startParams.BotAction = (BotActions) BotActionSelect.SelectedIndex;
             startParams.ClientFilePath = ClientLocation.Text;
@@ -246,16 +236,6 @@ namespace RunescapeBot
             botProgram.Start();
             UpdateTimer.Enabled = true;
             settings.SaveBot(botProgram.RunParams);
-        }
-
-        /// <summary>
-        /// Flags the end time as selected when a user selects a DateTime
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RunUntil_ValueChanged(object sender, EventArgs e)
-        {
-            endTimeSelected = true;
         }
 
         /// <summary>
@@ -332,7 +312,7 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void Start_FormClosed(object sender, FormClosedEventArgs e)
         {
-            StartParams botSettings = CollectStartParams();
+            RunParams botSettings = CollectStartParams();
             settings.SaveBot(botSettings);
         }
 
@@ -346,6 +326,7 @@ namespace RunescapeBot
             Text = FORM_NAME;
             StartButton.Text = "Start";
             StartButton.BackColor = ColorTranslator.FromHtml("#527E3F");
+            StatusMessage.Text = "";
         }
 
         /// <summary>
@@ -353,9 +334,10 @@ namespace RunescapeBot
         /// </summary>
         private void SetTransitionalState()
         {
-            Text = GetBotName() + BOT_STOPPING;
+            Text = GetBotName() + " " + BOT_STOPPING;
             StartButton.Text = "";
             StartButton.BackColor = ColorTranslator.FromHtml("#7E7E37");
+            StatusMessage.Text = "";
         }
 
         /// <summary>
@@ -364,9 +346,10 @@ namespace RunescapeBot
         private void SetActiveState()
         {
             botIsRunning = true;
-            Text = GetBotName() + BOT_RUNNING;
+            Text = GetBotName() + " " + BOT_RUNNING;
             StartButton.Text = "Stop";
             StartButton.BackColor = ColorTranslator.FromHtml("#874C48");
+            StatusMessage.Text = "";
         }
 
         /// <summary>
@@ -391,28 +374,43 @@ namespace RunescapeBot
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
             if (RunningBot == null) { return; }
-
-            RunUntil.Value = RunningBot.RunParams.RunUntil;
+            //make sure that the date for the RunUntil field doesn't exceed the max value for that field
+            RunUntil.Value = RunningBot.RunParams.RunUntil < RunUntil.MaxDate ? RunningBot.RunParams.RunUntil : RunUntil.MaxDate;
             Iterations.Value = RunningBot.RunParams.Iterations;
 
+            Text = GetBotName();
+            string botState = "";
+            string nextState = "";
             switch (RunningBot.RunParams.BotState)
             {
                 case BotProgram.BotState.Running:
-                    Text = GetBotName() + BOT_RUNNING;
+                    botState = BOT_RUNNING;
+                    nextState = STOPPING;
                     break;
 
                 case BotProgram.BotState.Break:
-                    Text = GetBotName() + BOT_TAKING_A_BREAK;
+                    botState = BOT_TAKING_A_BREAK;
+                    nextState = RESUMING;
                     break;
 
                 case BotProgram.BotState.Sleep:
-                    Text = GetBotName() + BOT_SLEEPING;
+                    botState = BOT_SLEEPING;
+                    nextState = RESUMING;
                     break;
 
                 default:
-                    Text = GetBotName() + BOT_RUNNING;
+                    botState = BOT_RUNNING;
+                    nextState = STOPPING;
                     break;
             }
+            Text += " " + botState;
+            string stateTimeRemaining = (RunningBot.RunParams.CurrentStateEnd - DateTime.Now).ToString(@"hh\:mm\:ss");
+            Text += " (" + stateTimeRemaining + ")";
+
+            string stateStartTime = RunningBot.RunParams.CurrentStateStart.ToString("MM/dd/yyyy h:mm tt");
+            string stateEndTime = RunningBot.RunParams.CurrentStateEnd.ToString("MM/dd/yyyy h:mm tt"); 
+            StatusMessage.Text = GetBotName() + " " + botState + "." + " It has " + stateTimeRemaining + " left before " + nextState + ".";
+            StatusMessage.Text += " It entered this state at " + stateStartTime + " and will complete this state at " + stateEndTime + ".";
         }
     }
 }

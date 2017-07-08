@@ -50,7 +50,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Specifies how the bot should be run
         /// </summary>
-        public StartParams RunParams;
+        public RunParams RunParams;
 
         /// <summary>
         /// Process to which this bot program is attached
@@ -196,7 +196,7 @@ namespace RunescapeBot.BotPrograms
         /// Initializes a bot program with a client matching startParams
         /// </summary>
         /// <param name="startParams">specifies the username to search for</param>
-        protected BotProgram(StartParams startParams)
+        protected BotProgram(RunParams startParams)
         {
             RSClient = ScreenScraper.GetOSBuddy(out LoadError);
             RunParams = startParams;
@@ -212,15 +212,8 @@ namespace RunescapeBot.BotPrograms
         {
             StopFlag = false;
             BotIsDone = false;
-            if (PrepareClient())
-            {
-                RunThread = new Thread(Process);
-                RunThread.Start();
-            }
-            else
-            {
-                Done();
-            }
+            RunThread = new Thread(Process);
+            RunThread.Start();
         }
 
         /// <summary>
@@ -268,6 +261,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Process()
         {
+            if (!PrepareClient())
+            {
+                Done();
+                return;
+            }
+
             //don't limit by iterations unless the user has specified a positive number of iterations
             if (RunParams.Iterations == 0)
             {
@@ -287,31 +286,58 @@ namespace RunescapeBot.BotPrograms
             sleepWatch.Start();
 
             //alternate between work periods (Iterate) and break periods
-            while (!done)
+            while (!(done = Iterate()))
             {
-                RunParams.BotState = BotState.Running;
-                done = Iterate();
-                if (!done)
+                if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
                 {
-                    if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
+                    if (RNG.NextDouble() >= 0.2) //20% chance to stay logged in until automatically loggin out after 5 minutes of inactivity
                     {
-                        if (RNG.NextDouble() >= 0.2) //20% chance to stay logged in until automatically loggin out after 5 minutes of inactivity
-                        {
-                            Logout();    //80% chance to log out normally
-                        }
-                        RunParams.BotState = BotState.Break;
-                        done = SafeWait(RandomBreakTime());
+                        Logout();    //80% chance to log out normally
                     }
-                    else  //get a good night's sleep before resuming
-                    {
-                        RunParams.BotState = BotState.Sleep;
-                        done = SafeWait(RandomSleepTime());
-                        sleepWatch.Restart();
-                    }
+                    done = Break();
+                }
+                else  //get a good night's sleep before resuming
+                {
+                    done = Sleep();
+                    sleepWatch.Restart();
                 }
             }
             
             Done();
+        }
+
+        /// <summary>
+        /// Updates the amount of time remaining in the current bot state
+        /// </summary>
+        private void UpdateStateTimer()
+        {
+
+        }
+
+        /// <summary>
+        /// Takes a break from executing the bot
+        /// </summary>
+        /// <returns>true if execution should stop</returns>
+        private bool Break()
+        {
+            RunParams.BotState = BotState.Break;
+            long breakLength = RandomBreakTime();
+            RunParams.SetNewState(breakLength);
+            bool quit = SafeWait(breakLength);
+            return quit || (DateTime.Now >= RunParams.RunUntil);
+        }
+
+        /// <summary>
+        /// Pretends to sleep for the night
+        /// </summary>
+        /// <returns>true if execution should stop</returns>
+        private bool Sleep()
+        {
+            RunParams.BotState = BotState.Sleep;
+            long sleepLength = RandomSleepTime();
+            RunParams.SetNewState(sleepLength);
+            bool quit = SafeWait(sleepLength);
+            return quit || (DateTime.Now >= RunParams.RunUntil);
         }
 
         /// <summary>
@@ -358,10 +384,11 @@ namespace RunescapeBot.BotPrograms
                 randomFrameOffset = 0;
             }
 
+            RunParams.BotState = BotState.Running;
+            long workInterval = RandomWorkTime();
+            RunParams.SetNewState(workInterval);
             Stopwatch iterationWatch = new Stopwatch();
             Stopwatch workIntervalWatch = new Stopwatch();
-            workIntervalWatch.Start();
-            int workInterval = RandomWorkTime();
 
             while ((DateTime.Now < RunParams.RunUntil) && (RunParams.Iterations > 0))
             {
@@ -1202,20 +1229,20 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="waitTime"></param>
         /// <returns>true if the StopFlag has been raised</returns>
-        protected bool SafeWait(int waitTime)
+        protected bool SafeWait(long waitTime)
         {
             int nextWaitTime;
             int waitInterval = 100;
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            while (watch.ElapsedMilliseconds < waitTime)
+            while ((watch.ElapsedMilliseconds < waitTime) && (DateTime.Now < RunParams.RunUntil))
             {
                 nextWaitTime = Math.Min(waitInterval, (int)(waitTime - watch.ElapsedMilliseconds));
                 Thread.Sleep(nextWaitTime);
                 if (StopFlag) { return true; }
             }
-            return StopFlag;
+            return StopFlag || (DateTime.Now >= RunParams.RunUntil);
         }
 
         /// <summary>
@@ -1224,7 +1251,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="meanWaitTime">average wait time</param>
         /// <param name="standardDeviation">standard deviation froom the mean</param>
         /// <returns>true if the StopFlag has been raised</returns>
-        protected bool SafeWait(int meanWaitTime, double standardDeviation)
+        protected bool SafeWait(long meanWaitTime, double standardDeviation)
         {
             if (meanWaitTime <= 0)
             {
@@ -1243,7 +1270,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minWaitTime"></param>
         /// <param name="stdDev"></param>
         /// <returns></returns>
-        protected bool SafeWaitPlus(int minWaitTime, double stdDev)
+        protected bool SafeWaitPlus(long minWaitTime, double stdDev)
         {
             if (minWaitTime <= 0)
             {

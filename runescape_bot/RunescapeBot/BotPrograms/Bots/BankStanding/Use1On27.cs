@@ -17,7 +17,7 @@ namespace RunescapeBot.BotPrograms
         protected Point UseWithBankSlot;
         protected Point UseOnBankSlot;
 
-        public Use1On27(StartParams startParams, int makeTime) : base(startParams, makeTime) { }
+        public Use1On27(RunParams startParams, int makeTime) : base(startParams, makeTime) { }
 
         protected override void Run()
         {

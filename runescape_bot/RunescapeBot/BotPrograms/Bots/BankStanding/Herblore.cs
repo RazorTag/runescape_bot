@@ -8,7 +8,7 @@ namespace RunescapeBot.BotPrograms
         protected const int MAKE_POTION_TIME = 16800;
         protected const int MAKE_UNFINISHED_POTION_TIME = 8400;
 
-        public Herblore(StartParams startParams, int makeTime) : base(startParams, makeTime)
+        public Herblore(RunParams startParams, int makeTime) : base(startParams, makeTime)
         {
             UseOnInventorySlot = new Point(3, 3);
             UseWithInventorySlot = new Point(3, 2);

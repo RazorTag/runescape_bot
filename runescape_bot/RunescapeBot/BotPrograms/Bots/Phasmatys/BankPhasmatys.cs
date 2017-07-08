@@ -20,7 +20,7 @@ namespace RunescapeBot.BotPrograms
         protected Bank BankPopup;
 
 
-        protected BankPhasmatys(StartParams startParams) : base(startParams)
+        protected BankPhasmatys(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
         }

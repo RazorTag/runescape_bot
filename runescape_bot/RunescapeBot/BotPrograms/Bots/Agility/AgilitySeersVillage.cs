@@ -8,7 +8,7 @@ namespace RunescapeBot.BotPrograms
 {
     public class AgilitySeersVillage : BotProgram
     {
-        public AgilitySeersVillage(StartParams startParams) : base(startParams) { }
+        public AgilitySeersVillage(RunParams startParams) : base(startParams) { }
 
         protected override bool Execute()
         {

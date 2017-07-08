@@ -4,9 +4,9 @@ using System.Xml.Serialization;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class StartParams
+    public class RunParams
     {
-        public StartParams()
+        public RunParams()
         {
             if (FrameTime == 0)
             {
@@ -30,7 +30,22 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Time when the bot program should cease execution
         /// </summary>
-        public DateTime RunUntil { get; set; }
+        private DateTime runUntil;
+        public DateTime RunUntil
+        {
+            get { return runUntil; }
+            set
+            {
+                if (value > DateTime.Now)
+                {
+                    runUntil = value;
+                }
+                else
+                {
+                    runUntil = DateTime.MaxValue;
+                }
+            }
+        }
 
         /// <summary>
         /// Number of iterations after which the bot program should cease execution
@@ -46,6 +61,16 @@ namespace RunescapeBot.BotPrograms
         /// Stores the bot's current position in its work cycle
         /// </summary>
         public BotProgram.BotState BotState { get; set; }
+
+        /// <summary>
+        /// Time when the current bot state began
+        /// </summary>
+        public DateTime CurrentStateStart { get; set; }
+
+        /// <summary>
+        /// TIme when the current bot state will end
+        /// </summary>
+        public DateTime CurrentStateEnd { get; set; }
 
         /// <summary>
         /// Average number of milliseconds between frames
@@ -68,6 +93,16 @@ namespace RunescapeBot.BotPrograms
         public bool Run { get; set; }
 
         #endregion
+
+        /// <summary>
+        /// Sets the start time and length of a new bot state
+        /// </summary>
+        /// <param name="stateLength">length of the new bot state in milliseconds</param>
+        public void SetNewState(long stateLength)
+        {
+            CurrentStateStart = DateTime.Now;
+            CurrentStateEnd = CurrentStateStart.AddMilliseconds(stateLength);
+        }
 
         #region delegates
         /// <summary>

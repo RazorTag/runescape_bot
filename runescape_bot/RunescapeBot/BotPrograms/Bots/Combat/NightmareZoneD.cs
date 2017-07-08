@@ -8,7 +8,7 @@ namespace RunescapeBot.BotPrograms
 {
     class NightmareZoneD : BotProgram
     {
-        public NightmareZoneD(StartParams startParams) : base(startParams)
+        public NightmareZoneD(RunParams startParams) : base(startParams)
         {
 
         }

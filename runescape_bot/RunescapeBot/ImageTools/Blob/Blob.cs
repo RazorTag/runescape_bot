@@ -296,8 +296,8 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Calculates the distance to another point
         /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
+        /// <param name="point">reference point</param>
+        /// <returns>distance between the center of a blob and the reference point</returns>
         public double DistanceTo(Point point)
         {
             int rise = Center.Y - point.Y;

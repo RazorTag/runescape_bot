@@ -24,6 +24,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+using RunescapeBot.Common;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -95,8 +96,8 @@ namespace RunecapeBot.UITools.Spline
             nodesY.Add(start.Y);
             for (int i = 1; i <= midPoints; i++)
             {
-                x = start.X + ((i / (float)(midPoints + 1)) * run) + rng.Next(-xRandomization, xRandomization + 1);
-                y = start.Y + ((i / (float)(midPoints + 1)) * rise) + rng.Next(-yRandomization, yRandomization + 1);
+                x = start.X + ((i / (float)(midPoints + 1)) * run) + (float)Probability.RandomGaussian(0, xRandomization);
+                y = start.Y + ((i / (float)(midPoints + 1)) * rise) + (float)Probability.RandomGaussian(0, yRandomization);
                 nodesX.Add(x);
                 nodesY.Add(y);
             }

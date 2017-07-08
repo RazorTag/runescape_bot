@@ -8,7 +8,7 @@ namespace RunescapeBot.BotPrograms
 {
     public class WillowTrees : BotProgram
     {
-        public WillowTrees(StartParams startParams) : base(startParams)
+        public WillowTrees(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
         }

@@ -10,7 +10,7 @@ namespace RunescapeBot.BotPrograms
     {
         private const int MAX_PASS_OBSTACLE_TRIES = 3;
 
-        public Agility(StartParams startParams) : base(startParams)
+        public Agility(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
         }
