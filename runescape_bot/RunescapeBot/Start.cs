@@ -186,18 +186,18 @@ namespace RunescapeBot
         private void StopBot()
         {
             User32.SetForegroundWindow(Handle.ToInt32());
+            UpdateTimer.Enabled = false;
 
             if (RunningBot != null)
             {
                 StartButton.Enabled = false;
-                UpdateTimer.Enabled = false;
                 SetTransitionalState();
                 settings.SaveBot(RunningBot.RunParams);
                 RunningBot.Stop();
+                UpdateTimer_Tick(null, null);
             }
             else
             {
-                UpdateTimer.Enabled = false;
                 SetIdleState();
             }
         }

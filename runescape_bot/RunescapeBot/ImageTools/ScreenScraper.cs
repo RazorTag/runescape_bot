@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.BotPrograms;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -163,7 +164,7 @@ namespace RunescapeBot.ImageTools
             foreach (Process process in processlist)
             {
                 mainWindowTitle = process.MainWindowTitle.ToUpper();
-                if (mainWindowTitle.Contains(windowName))
+                if (mainWindowTitle.Contains(windowName) && !mainWindowTitle.Contains("LOADER"))
                 {
                     return process;
                 }
@@ -180,12 +181,15 @@ namespace RunescapeBot.ImageTools
         /// <returns>true if the process is found, false otherwise</returns>
         public static bool ProcessExists(Process processToFind)
         {
-            if (processToFind == null) { return false; }
+            if (processToFind == null)
+            {
+                return false;
+            }
 
             try
             {
                 Process process = Process.GetProcessById(processToFind.Id);
-                return process != null;
+                return (process != null) && !process.HasExited;
             }
             catch
             {
@@ -232,33 +236,52 @@ namespace RunescapeBot.ImageTools
         /// Closes an instance of OSBuddy and opens a new one
         /// </summary>
         /// <param name="OSBuddy"></param>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public static bool RestartOSBuddy(string clientFilePath, ref Process OSBuddy)
         {
-            if (OSBuddy != null)
+            return CloseOSBuddy(ref OSBuddy) && StartOSBuddy(clientFilePath, ref OSBuddy);
+        }
+
+        /// <summary>
+        /// Attempts to close an OSBuddy window if one exists
+        /// </summary>
+        /// <param name="OSBuddy">OSBuddy main window</param>
+        /// <returns>true if successful</returns>
+        public static bool CloseOSBuddy(ref Process OSBuddy)
+        {
+            if (ProcessExists(OSBuddy))
             {
                 if (!OSBuddy.CloseMainWindow())
                 {
                     return false;   //unable to close the current instance of OSBuddy
                 }
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                string loadError;
+                while (ProcessExists(OSBuddy) && (watch.ElapsedMilliseconds < 30000) && !BotProgram.StopFlag)
+                {
+                    Thread.Sleep(500);
+                    OSBuddy = GetOSBuddy(out loadError);
+                }
+                if (ProcessExists(OSBuddy))
+                {
+                    return false;
+                }
             }
-            Thread.Sleep(5000);
-            if (!StartOSBuddy(clientFilePath, ref OSBuddy))
-            {
-                return false;   //unable to start a new instance of OSBuddy
-            }
+
+            OSBuddy = null;
             return true;
         }
 
         /// <summary>
         /// Starts a new instance of the OSBuddy client
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public static bool StartOSBuddy(string clientFilePath, ref Process OSBuddy)
         {
             string error;
             OSBuddy = GetOSBuddy(out error);
-            if (OSBuddy != null)
+            if (ProcessExists(OSBuddy))
             {
                 return true;    //OSBuddy is already running
             }
@@ -266,9 +289,20 @@ namespace RunescapeBot.ImageTools
             //start OSBuddy
             try
             {
-                OSBuddy = new Process();
-                OSBuddy.StartInfo.FileName = clientFilePath;
-                return OSBuddy.Start();
+                Process startProcess = new Process();
+                startProcess.StartInfo.FileName = clientFilePath;
+                startProcess.Start();
+
+                //verify that OSBuddy has loaded
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                string loadError;
+                while (!ProcessExists(OSBuddy) && (watch.ElapsedMilliseconds < 300000) && !BotProgram.StopFlag)
+                {
+                    Thread.Sleep(500);
+                    OSBuddy = GetOSBuddy(out loadError);
+                }
+                return ProcessExists(OSBuddy);
             }
             catch
             {

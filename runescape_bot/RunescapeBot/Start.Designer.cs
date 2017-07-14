@@ -160,6 +160,7 @@ namespace RunescapeBot
             this.OSBuddySelect.TabIndex = 29;
             this.OSBuddySelect.Text = ". . .";
             this.OSBuddySelect.UseVisualStyleBackColor = true;
+            this.OSBuddySelect.Click += new System.EventHandler(this.OSBuddySelect_Click);
             // 
             // label4
             // 

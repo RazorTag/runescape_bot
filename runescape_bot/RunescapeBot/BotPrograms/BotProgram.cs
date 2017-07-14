@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -37,11 +38,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
         private const long LOGIN_LOGO_SUM_INFERNAL = 10145709;
-
-        /// <summary>
-        /// Approximate time in milliseconds needed for OSBuddy to start
-        /// </summary>
-        private const int OSBUDDY_LOAD_TIME = 30000;
 
         /// <summary>
         /// Error message to show the user for a start error
@@ -262,14 +258,6 @@ namespace RunescapeBot.BotPrograms
             }
             
             Done();
-        }
-
-        /// <summary>
-        /// Updates the amount of time remaining in the current bot state
-        /// </summary>
-        private void UpdateStateTimer()
-        {
-
         }
 
         /// <summary>
@@ -711,17 +699,18 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected bool ReadWindow()
         {
+            if (!PrepareClient()) { return false; }
+
             if (Bitmap != null)
             {
                 Bitmap.Dispose();
             }
 
-            if (!PrepareClient()) { return false; }
             LastScreenShot = DateTime.Now;
             Bitmap = ScreenScraper.CaptureWindow(RSClient);
             ColorArray = ScreenScraper.GetRGB(Bitmap);
 
-            return Bitmap != null;
+            return (Bitmap != null) && (ScreenHeight > 0) && (ScreenWidth > 0);
         }
 
         /// <summary>
@@ -876,6 +865,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true for the pixels on the minimap that match the filter</returns>
         protected bool[,] MinimapFilter(ColorRange filter, out Point offset)
         {
+            if (!MakeSureWindowHasBeenRead())
+            {
+                offset = new Point(0, 0);
+                return null;
+            }
+
             int left = ScreenWidth - 156;
             int right = ScreenWidth - 7;
             int top = 8;
@@ -919,7 +914,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the fraction of  the screen taken up by an artifact of known size</returns>
         protected double ArtifactSize(int artifactSize)
         {
-            MakeSureWindowHasBeenRead();
+            if (!MakeSureWindowHasBeenRead()) { return 0; }
             double screenSize = Bitmap.Size.Width * Bitmap.Size.Height;
             return artifactSize / screenSize;
         }
@@ -931,7 +926,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of pixels taken up by an artifact</returns>
         protected int ArtifactSize(double artifactSize)
         {
-            MakeSureWindowHasBeenRead();
+            if (!MakeSureWindowHasBeenRead()) { return 0; }
             double pixels = artifactSize * ColorArray.GetLength(0) * ColorArray.GetLength(1);
             return (int) Math.Round(pixels);
         }
@@ -943,17 +938,24 @@ namespace RunescapeBot.BotPrograms
         /// <param name="mask"></param>
         protected void EraseClientUIFromMask(ref bool[,] mask)
         {
-            if (mask == null)
-            {
-                return;
-            }
+            if (mask == null) { return; }
+
+            const int chatBoxWidth = 518;
+            const int chatBoxHeight = 158;
+            const int inventoryWidth = 240;
+            const int inventoryHeight = 335;
+            const int minimapWidth = 210;
+            const int minimapHeight = 192;
 
             int width = mask.GetLength(0);
             int height = mask.GetLength(1);
+            int requiredWidth = Math.Max(Math.Max(chatBoxWidth, inventoryWidth), minimapWidth);
+            int requiredHeight = Math.Max(Math.Max(chatBoxHeight, inventoryHeight), minimapHeight);
+            if ((width < requiredWidth) || (height < requiredHeight)) { return; }
 
-            EraseFromMask(ref mask, 0, 518, height - 158, height);              //erase chat box
-            EraseFromMask(ref mask, width - 240, width, height - 335, height);  //erase inventory
-            EraseFromMask(ref mask, width - 210, width, 0, 192);                //erase minimap
+            EraseFromMask(ref mask, 0, chatBoxWidth, height - chatBoxHeight, height);              //erase chat box
+            EraseFromMask(ref mask, width - inventoryWidth, width, height - inventoryHeight, height);  //erase inventory
+            EraseFromMask(ref mask, width - minimapWidth, width, 0, minimapHeight);                //erase minimap
         }
 
         /// <summary>
@@ -990,30 +992,28 @@ namespace RunescapeBot.BotPrograms
 
             while (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
             {
-                if (SafeWait(OSBUDDY_LOAD_TIME)) { return false; }  //intentional stop
-
+                RSClient = client;
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                while ((RSClient == null) && (watch.ElapsedMilliseconds < 300000))
+                while (!IsLoggedOut(true) && (watch.ElapsedMilliseconds < 600000) && !StopFlag)
                 {
-                    RSClient = ScreenScraper.GetOSBuddy(out LoadError);
-                    if (SafeWait(1000)) { return false; }
+                    SafeWait(5000);
                 }
-                if (RSClient == null)
+                if (IsLoggedOut(true) || IsLoggedIn())
+                {
+                    BroadcastConnection();
+                    return true;
+                }
+                else
                 {
                     BroadcastDisconnect();
-                    string errorMessage = (LoadError != "") ? LoadError : "Client did not start correctly";
-                    MessageBox.Show(errorMessage);
-                    return false;
-                }
-
-                ReadWindow();
-                if (IsLoggedOut())
-                {
-                    return true;
                 }
             }
 
+            BroadcastDisconnect();
+            string errorMessage = (LoadError != "") ? LoadError : "Client did not start correctly";
+            MessageBox.Show(errorMessage);
+            client = null;
             return false;
         }
 
@@ -1175,9 +1175,9 @@ namespace RunescapeBot.BotPrograms
         /// Determines if  the client is logged in
         /// </summary>
         /// <returns>true if we are verifiably logged in</returns>
-        private bool IsLoggedIn()
+        private bool IsLoggedIn(bool readWindow = true)
         {
-            MakeSureWindowHasBeenRead();
+            if (readWindow) { ReadWindow(); }
 
             //Get a piece of the column from the right of the inventory
             int right = ScreenWidth - 10;
@@ -1228,7 +1228,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we are verifiably logged out</returns>
         private bool IsLoggedOut(bool readWindow = false)
         {
-            MakeSureWindowHasBeenRead(readWindow);
+            if (readWindow && !ReadWindow()) { return false; }
 
             Color color;
             int height = ScreenHeight;
@@ -1471,6 +1471,11 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region broadcasting
+
+        private void BroadcastConnection()
+        {
+
+        }
 
         private void BroadcastDisconnect()
         {

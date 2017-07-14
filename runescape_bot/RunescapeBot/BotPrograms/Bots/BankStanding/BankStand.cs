@@ -86,10 +86,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a bank booth is found</returns>
         protected bool LocateBankBooth(ColorRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
         {
+            bankBooth = null;
             int bankBoothMinSize = ArtifactSize(0.000156);
             int bankBoothMaxSize = ArtifactSize(0.000416);
 
-            ReadWindow();
+            if (!ReadWindow()) { return false; }
             bool[,] bankBooths = ColorFilter(BankBoothCounter);
             List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, false, bankBoothMinSize, bankBoothMaxSize);
             bankBooth = Blob.ClosestBlob(Center, boothBlobs);

@@ -51,7 +51,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            ReadWindow();
+            if (!ReadWindow()) { return false; }
             Blob teaStall;
             if (!LocateObject(TeaStallRoof, out teaStall, minTeaStallSize))
             {
