@@ -13,7 +13,12 @@ namespace RunescapeBot.ImageTools
             this.SearchPoint = searchPoint;
         }
 
-
+        /// <summary>
+        /// Used to sort from closest to farthest
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public int Compare(Blob a, Blob b)
         {
             double aDistance = Geometry.DistanceBetweenPoints(a.Center, SearchPoint);

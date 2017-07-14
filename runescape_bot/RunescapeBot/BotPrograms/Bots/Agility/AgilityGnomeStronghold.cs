@@ -33,10 +33,9 @@ namespace RunescapeBot.BotPrograms
         public AgilityGnomeStronghold(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
-            SetObjectSizes();
         }
 
-        protected override void Run()
+        protected override bool Run()
         {
             //PassLogBalance();
             //PassCargoNet();
@@ -74,6 +73,9 @@ namespace RunescapeBot.BotPrograms
             //ReadWindow();
             //bool[,] drainPipe = ColorFilter(DrainPipe);
             //DebugUtilities.TestMask(Bitmap, ColorArray, DrainPipe, drainPipe, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "drainPipe");
+
+            SetObjectSizes();
+            return true;
         }
 
         protected override bool Execute()
@@ -520,13 +522,13 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            LogBalance = ColorFilters.LogBalance();
-            CargoNet = ColorFilters.CargoNetFrameTop();
-            TreeBranch = ColorFilters.GnomeTreeBranch();
-            TreeTrunk = ColorFilters.GnomeTreeTrunk();
-            Tightrope = ColorFilters.Tightrope();
-            DrainPipe = ColorFilters.DrainPipe();
-            Black = ColorFilters.Black();
+            LogBalance = RGBHSBRanges.LogBalance();
+            CargoNet = RGBHSBRanges.CargoNetFrameTop();
+            TreeBranch = RGBHSBRanges.GnomeTreeBranch();
+            TreeTrunk = RGBHSBRanges.GnomeTreeTrunk();
+            Tightrope = RGBHSBRanges.Tightrope();
+            DrainPipe = RGBHSBRanges.DrainPipe();
+            Black = RGBHSBRanges.Black();
         }
 
         /// <summary>

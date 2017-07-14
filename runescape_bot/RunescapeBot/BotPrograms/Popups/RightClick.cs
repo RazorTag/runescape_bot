@@ -10,6 +10,7 @@ namespace RunescapeBot.BotPrograms.Popups
 {
     public class RightClick
     {
+        protected const int RowHeight = 15;
         protected Process RSClient;
         protected int XClick;
         protected int YClick;
@@ -48,7 +49,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <summary>
         /// Adjusts the popup position in cases where the popup runs into the bottom, left, or right of the screen
         /// </summary>
-        private void AdjustPosition()
+        protected void AdjustPosition()
         {
             Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
             if (screenSize != null)
@@ -95,14 +96,14 @@ namespace RunescapeBot.BotPrograms.Popups
         /// Verifies that the pop-up is roughly the expected size
         /// </summary>
         /// <returns></returns>
-        private bool PopupIsCorrectSize(Bitmap screen)
+        protected virtual bool PopupIsCorrectSize(Bitmap screen)
         {
             const int xPadding = 20;
             const int yPadding = 6;
             int x = XClick + Width / 2 - xPadding;
             int y = YClick + Height - yPadding;
             Color bottomRight = screen.GetPixel(x, y);
-            ColorRange rightClickColor = ColorFilters.RightClickPopup();
+            ColorRange rightClickColor = RGBHSBRanges.RightClickPopup();
             return rightClickColor.ColorInRange(bottomRight);
         }
 
@@ -117,7 +118,7 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Selects an option from the right-click menu
+        /// Selects an option from the right-click menu by y-offset in terms pf pixels
         /// </summary>
         /// <param name="yOffset">y-offset of the middle of the option from the top of the popup</param>
         public void SelectOption(int yOffset, int maxXOffset = int.MaxValue)
@@ -127,6 +128,16 @@ namespace RunescapeBot.BotPrograms.Popups
             Point clickOffset = Probability.GaussianRectangle(-xRandomization, xRandomization, yOffset - yRandomization, yOffset + yRandomization);
             Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
             Mouse.LeftClick(click.X, click.Y, RSClient);
+        }
+
+        /// <summary>
+        /// Select an option from the right-click menu in terms of order in the list of options
+        /// </summary>
+        /// <param name="whichOption">the row number (starting from 0) of the option to click</param>
+        public void CustomOption(int whichOption)
+        {
+            int yOffset = 25 + (RowHeight * whichOption);
+            SelectOption(yOffset);
         }
     }
 }

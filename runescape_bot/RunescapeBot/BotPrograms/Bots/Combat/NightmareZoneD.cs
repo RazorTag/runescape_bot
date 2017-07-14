@@ -10,7 +10,7 @@ namespace RunescapeBot.BotPrograms
     {
         public NightmareZoneD(RunParams startParams) : base(startParams)
         {
-
+            startParams.FrameTime = 30000;
         }
 
         protected override bool Execute()

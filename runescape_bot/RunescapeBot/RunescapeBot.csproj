@@ -83,14 +83,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotPrograms\BotProgram.cs" />
+    <Compile Include="BotPrograms\BotRegistry.cs" />
     <Compile Include="BotPrograms\Bots\Agility\Agility.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilityGnomeStronghold.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilitySeersVillage.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\BankStand.cs" />
+    <Compile Include="BotPrograms\Bots\BankStanding\Enchant.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Herblore.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\UnfinishedPotions.cs" />
     <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
-    <Compile Include="BotPrograms\Bots\DartTips.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use1On27.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\Cannonballs.cs" />
@@ -98,7 +99,8 @@
     <Compile Include="BotPrograms\Bots\Phasmatys\FurnacePhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\MakePotionFull.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use14On14.cs" />
-    <Compile Include="BotPrograms\Bots\WillowTrees.cs" />
+    <Compile Include="BotPrograms\Bots\TeaStall.cs" />
+    <Compile Include="BotPrograms\Bots\Woodcutting\Woodcutting.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />
     <Compile Include="BotPrograms\Popups\RightClickInventory.cs" />
     <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
@@ -119,7 +121,7 @@
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
     <Compile Include="ImageTools\FIlters\ClusterFilters.cs" />
     <Compile Include="ImageTools\FIlters\ColorCluster.cs" />
-    <Compile Include="ImageTools\FIlters\ColorFilters.cs" />
+    <Compile Include="ImageTools\FIlters\RGBHSBRanges.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
@@ -136,7 +138,7 @@
     <Compile Include="ImageTools\Blob\Blob.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\GoldBracelets.cs" />
     <Compile Include="BotPrograms\Bots\Combat\LesserDemon.cs" />
-    <Compile Include="ImageTools\FIlters\ColorRange.cs" />
+    <Compile Include="ImageTools\FIlters\RGBHSBRange.cs" />
     <Compile Include="ImageTools\FIlters\HSBRange.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />

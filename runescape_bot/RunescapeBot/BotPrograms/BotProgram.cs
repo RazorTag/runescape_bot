@@ -2,6 +2,7 @@
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -40,7 +41,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Approximate time in milliseconds needed for OSBuddy to start
         /// </summary>
-        private const int OSBUDDY_LOAD_TIME = 20000;
+        private const int OSBUDDY_LOAD_TIME = 30000;
 
         /// <summary>
         /// Error message to show the user for a start error
@@ -217,51 +218,11 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Makes sure that OSBuddy is running and starts it if it isn't
-        /// </summary>
-        /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
-        /// <returns>true if client is successfully prepared</returns>
-        private bool PrepareClient(bool forceRestart = false)
-        {
-            if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
-
-            if (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
-            {
-                for (int i = 0; i < 180; i++)
-                {
-                    if (SafeWait(OSBUDDY_LOAD_TIME)) { return false; }
-                    RSClient = ScreenScraper.GetOSBuddy(out LoadError);
-
-                    if (RSClient != null)
-                    {
-                        ReadWindow();
-                        if (IsLoggedOut())
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            //The client did not start correctly
-            if (String.IsNullOrEmpty(LoadError))
-            {
-                MessageBox.Show("OSBuddy did not start correctly");
-            }
-            else
-            {
-                MessageBox.Show(LoadError);
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Handles the sequential calling of the methods used to do bot work
         /// </summary>
         private void Process()
         {
-            if (!PrepareClient())
+            if (!PrepareClient() || !Setup())
             {
                 Done();
                 return;
@@ -282,7 +243,6 @@ namespace RunescapeBot.BotPrograms
             int awakeTime = UnitConversions.HoursToMilliseconds(12);
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
-            Setup();
             sleepWatch.Start();
 
             //alternate between work periods (Iterate) and break periods
@@ -290,14 +250,12 @@ namespace RunescapeBot.BotPrograms
             {
                 if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
                 {
-                    if (RNG.NextDouble() >= 0.2) //20% chance to stay logged in until automatically loggin out after 5 minutes of inactivity
-                    {
-                        Logout();    //80% chance to log out normally
-                    }
+                    Logout();    //80% chance to log out normally
                     done = Break();
                 }
                 else  //get a good night's sleep before resuming
                 {
+                    Logout();
                     done = Sleep();
                     sleepWatch.Restart();
                 }
@@ -343,15 +301,16 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Standard setup before running a bot
         /// </summary>
-        private void Setup()
+        /// <returns>true if setup is successful</returns>
+        private bool Setup()
         {
             ReadWindow();
             if (IsLoggedOut())
             {
                 LogIn();
             }
-            if (StopFlag) { return; }
-            Run();
+            if (StopFlag) { return false; }
+            return Run();
         }
 
         /// <summary>
@@ -359,9 +318,10 @@ namespace RunescapeBot.BotPrograms
         /// Executes before beginning iteration
         /// <param name="timeout">length of time after which the bot program should quit</param>
         /// </summary>
-        protected virtual void Run()
+        /// <returns>false if execution should stop</returns>
+        protected virtual bool Run()
         {
-            if (StopFlag) { return; }
+            return !StopFlag;
         }
 
         /// <summary>
@@ -389,6 +349,7 @@ namespace RunescapeBot.BotPrograms
             RunParams.SetNewState(workInterval);
             Stopwatch iterationWatch = new Stopwatch();
             Stopwatch workIntervalWatch = new Stopwatch();
+            workIntervalWatch.Start();
 
             while ((DateTime.Now < RunParams.RunUntil) && (RunParams.Iterations > 0))
             {
@@ -426,7 +387,10 @@ namespace RunescapeBot.BotPrograms
                     SafeWait(randomFrameTime - (int)iterationWatch.ElapsedMilliseconds);
                 }
                 if (StopFlag) { return true; }
-                if (workIntervalWatch.ElapsedMilliseconds > workInterval) { return false; } //stop execution so that the bot can take a break and resume later
+                if (workIntervalWatch.ElapsedMilliseconds > workInterval)
+                {
+                    return false;    //stop execution so that the bot can take a break and resume later
+                } 
             }
 
             return true;
@@ -470,7 +434,7 @@ namespace RunescapeBot.BotPrograms
             double workType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
-
+            //average of 98.55 minutes
             if (workType < 0.25)   //25%
             {
                 mean = 45;
@@ -505,20 +469,20 @@ namespace RunescapeBot.BotPrograms
             double breakType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
-
-            if (breakType < 0.60)   //60%
+            //average of 22.4 minutes
+            if (breakType < 0.75)   //75%
             {
                 mean = 15;
                 stdDev = 5.5;
             }
-            else if (breakType < 0.85)  //25%
+            else if (breakType < 0.90)  //15%
             {
-                mean = 43;
+                mean = 33;
                 stdDev = 8.7;
             }
-            else  //15%
+            else  //10%
             {
-                mean = 105;
+                mean = 62;
                 stdDev = 41;
             }
 
@@ -651,6 +615,7 @@ namespace RunescapeBot.BotPrograms
 
             return false;
         }
+        protected delegate bool FindObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize = 1);
 
         /// <summary>
         /// Looks for an object that matches a filter
@@ -665,6 +630,36 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             bool[,] objectPixels = ColorFilter(stationaryObject);
             EraseClientUIFromMask(ref objectPixels);
+            return LocateObject(objectPixels, out foundObject, minimumSize);
+        }
+
+        /// <summary>
+        /// Looks for an object that matches a filter in a particular region of the screen
+        /// </summary>
+        /// <param name="stationaryObject"></param>
+        /// <param name="foundObject"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
+        /// <param name="minimumSize"></param>
+        /// <returns></returns>
+        protected bool LocateObject(ColorRange stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1)
+        {
+            ReadWindow();
+            bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
+            return LocateObject(objectPixels, out foundObject, minimumSize);
+        }
+
+        /// <summary>
+        /// Finds the biggest blob in a binary image
+        /// </summary>
+        /// <param name="objectPixels"></param>
+        /// <param name="foundObject"></param>
+        /// <param name="minimumSize"></param>
+        /// <returns></returns>
+        protected bool LocateObject(bool[,] objectPixels, out Blob foundObject, int minimumSize = 1)
+        {
             Blob objectBlob = ImageProcessing.BiggestBlob(objectPixels);
 
             if (objectBlob != null && objectBlob.Size >= minimumSize)
@@ -679,7 +674,35 @@ namespace RunescapeBot.BotPrograms
             }
         }
 
-        protected delegate bool FindObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize = 1);
+        /// <summary>
+        /// Waits for a specified type of mouseover text to appear
+        /// </summary>
+        /// <param name="textColor">the color of the mousover text to wait for</param>
+        /// <param name="timeout">time to wait before giving up</param>
+        /// <returns></returns>
+        protected bool WaitForMouseOverText(ColorRange textColor, int timeout = 5000)
+        {
+            const int left = 5;
+            const int right = 500;
+            const int top = 5;
+            const int bottom = 18;
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            Blob mouseoverText = null;
+
+            while (mouseoverText == null)
+            {
+                if ((watch.ElapsedMilliseconds > timeout) || StopFlag)
+                {
+                    return false;
+                }
+                LocateObject(textColor, out mouseoverText, left, right, top, bottom, 10);
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region vision utilities
@@ -896,6 +919,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the fraction of  the screen taken up by an artifact of known size</returns>
         protected double ArtifactSize(int artifactSize)
         {
+            MakeSureWindowHasBeenRead();
             double screenSize = Bitmap.Size.Width * Bitmap.Size.Height;
             return artifactSize / screenSize;
         }
@@ -907,6 +931,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of pixels taken up by an artifact</returns>
         protected int ArtifactSize(double artifactSize)
         {
+            MakeSureWindowHasBeenRead();
             double pixels = artifactSize * ColorArray.GetLength(0) * ColorArray.GetLength(1);
             return (int) Math.Round(pixels);
         }
@@ -949,9 +974,49 @@ namespace RunescapeBot.BotPrograms
                 }
             }
         }
+
         #endregion
 
         #region login/restart
+
+        /// <summary>
+        /// Makes sure that OSBuddy is running and starts it if it isn't
+        /// </summary>
+        /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
+        /// <returns>true if client is successfully prepared</returns>
+        private bool PrepareClient(bool forceRestart = false)
+        {
+            if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
+
+            while (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
+            {
+                if (SafeWait(OSBUDDY_LOAD_TIME)) { return false; }  //intentional stop
+
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                while ((RSClient == null) && (watch.ElapsedMilliseconds < 300000))
+                {
+                    RSClient = ScreenScraper.GetOSBuddy(out LoadError);
+                    if (SafeWait(1000)) { return false; }
+                }
+                if (RSClient == null)
+                {
+                    BroadcastDisconnect();
+                    string errorMessage = (LoadError != "") ? LoadError : "Client did not start correctly";
+                    MessageBox.Show(errorMessage);
+                    return false;
+                }
+
+                ReadWindow();
+                if (IsLoggedOut())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Respond to a failed attempt to log in
         /// </summary>
@@ -1033,11 +1098,13 @@ namespace RunescapeBot.BotPrograms
             //verify the log in
             if (ConfirmLogin())
             {
+                BroadcastLogin();
                 DefaultCamera();
                 return true;
             }
             else
             {
+                BroadcastLogout();
                 return false;
             }
         }
@@ -1059,7 +1126,7 @@ namespace RunescapeBot.BotPrograms
             int totalSize = width * height;
             int redBlobSize;
 
-            ColorRange red = ColorFilters.WelcomeScreenClickHere();
+            ColorRange red = RGBHSBRanges.WelcomeScreenClickHere();
             bool[,] clickHere = ColorFilterPiece(red, left, right, top, bottom);
             Blob enterGame = ImageProcessing.BiggestBlob(clickHere);
             redBlobSize = enterGame.Size;
@@ -1168,30 +1235,32 @@ namespace RunescapeBot.BotPrograms
             int centerX = Center.X;
             int checkRow = Math.Min(height - 1, ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
             int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 2;
+            int blackPixels = 0;
+            int totalPixels = 0;
+
             for (int x = centerX - xOffset; x < centerX + xOffset; x++)
             {
                 //check bottom of login box
                 color = ColorArray[x, checkRow];
-                if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
-                {
-                    return false;
-                }
+                blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
+                totalPixels++;
             }
             for (int y = 0; y < checkRow; y++)  //check sides
             {
                 //check left of login box
                 color = ColorArray[centerX - xOffset, y];
-                if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
-                {
-                    return false;
-                }
+                blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
+                totalPixels++;
 
                 //check right of login box
                 color = ColorArray[centerX + xOffset, y];
-                if (!ImageProcessing.ColorsAreEqual(color, Color.Black))
-                {
-                    return false;
-                }
+                blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
+                totalPixels++;
+            }
+            //assume we are logged out if a majority off the border pixels are perfectly black
+            if ((blackPixels / ((double)totalPixels)) < 0.5)
+            {
+                return false;
             }
 
             //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
@@ -1209,17 +1278,19 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void Logout()
         {
-            const int maxLogoutAttempts = 5;
+            const int maxLogoutAttempts = 10;
             int logoutAttempts = 0;
 
             do
             {
-                //TODO click x out of the world switcher
-                LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5);
-                LeftClick(ScreenWidth - 120, ScreenHeight - 86, 3);
-                SafeWait(1000);
+                LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5); //logout tab
+                LeftClick(ScreenWidth - 38, ScreenHeight - 286);    //close out of world switcher
+                LeftClick(ScreenWidth - 120, ScreenHeight - 86, 3); //click here to logout
+                SafeWait(2000);
             }
             while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts));
+
+            BroadcastLogout();
         }
         #endregion
 
@@ -1342,7 +1413,7 @@ namespace RunescapeBot.BotPrograms
             if (readWindow) { ReadWindow(); }
 
             Color runColor = GetPixel(ScreenWidth - 156, 137);
-            ColorRange runEnergyFoot = ColorFilters.RunEnergyFoot();
+            ColorRange runEnergyFoot = RGBHSBRanges.RunEnergyFoot();
             return runEnergyFoot.ColorInRange(runColor);
         }
 
@@ -1370,7 +1441,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the gauge is low, false otherwise</returns>
         protected bool MinimapGaugeIsHigh(Color[,] gaugePercentage, double threshold)
         {
-            ColorRange highGauge = ColorFilters.MinimapGaugeYellowGreen();
+            ColorRange highGauge = RGBHSBRanges.MinimapGaugeYellowGreen();
             double highMatch = ImageProcessing.FractionalMatch(gaugePercentage, highGauge);
             return highMatch >= threshold;
         }
@@ -1387,7 +1458,7 @@ namespace RunescapeBot.BotPrograms
             }
             
             Point offset;
-            bool[,] minimapBankIcon = MinimapFilter(ColorFilters.BankIconDollar(), out offset);
+            bool[,] minimapBankIcon = MinimapFilter(RGBHSBRanges.BankIconDollar(), out offset);
             Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
             if (bankBlob == null || bankBlob.Size < 10) { return false; }
 
@@ -1397,6 +1468,25 @@ namespace RunescapeBot.BotPrograms
 
             return true;
         }
+        #endregion
+
+        #region broadcasting
+
+        private void BroadcastDisconnect()
+        {
+
+        }
+
+        private void BroadcastLogin()
+        {
+
+        }
+
+        private void BroadcastLogout()
+        {
+
+        }
+
         #endregion
     }
 }

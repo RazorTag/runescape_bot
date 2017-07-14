@@ -55,7 +55,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Bot program to run
         /// </summary>
-        public Start.BotActions BotAction { get; set; }
+        public BotRegistry.BotActions BotAction { get; set; }
 
         /// <summary>
         /// Stores the bot's current position in its work cycle

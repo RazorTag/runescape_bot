@@ -3,6 +3,7 @@ using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -16,6 +17,12 @@ namespace RunescapeBot.BotPrograms
         private Random RNG;
         private Process RSClient;
 
+        /// <summary>
+        /// Inventory slots to be dropped when more space is needed
+        /// </summary>
+        protected bool[,] EmptySlots;
+
+
         public Inventory(Process rsClient, Color[,] screen, Keyboard keyboard)
         {
             RNG = new Random();
@@ -23,6 +30,7 @@ namespace RunescapeBot.BotPrograms
             SelectedTab = TabSelect.Unknown;
             this.Screen = screen;
             this.Keyboard = keyboard;
+            EmptySlots = new bool[INVENTORY_COLUMNS, INVENTORY_ROWS];
         }
 
         /// <summary>
@@ -109,24 +117,25 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">slots from the left column of the inventory (0-3)</param>
         /// <param name="y">slots from the top row of the inventory (0-6)</param>
-        public void DropItem(int x, int y, bool safeTab = true)
+        public void DropItem(int x, int y, bool safeTab = true, int[] extraOptions = null)
         {
             OpenInventory(safeTab);
             InventoryToScreen(ref x, ref y);
 
             Point click;
-            RightClickInventory dropPopup = null;
+            const int timeout = 8000;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             bool done = false;
+            RightClickInventory dropPopup = null;
 
-            while (!done)
+            while (!done && (watch.ElapsedMilliseconds < timeout))
             {
                 if (BotProgram.StopFlag) { return; }
 
                 click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
                 Mouse.RightClick(click.X, click.Y, RSClient, 0);
-                dropPopup = new RightClickInventory(click.X, click.Y, RSClient);
+                dropPopup = new RightClickInventory(click.X, click.Y, RSClient, extraOptions);
                 if (dropPopup.WaitForPopup(1000))
                 {
                     done = true;
@@ -141,10 +150,31 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Set the list of empty inventory slots
+        /// </summary>
+        public void SetEmptySlots()
+        {
+            OpenInventory();
+            Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            EmptySlots = new bool[INVENTORY_COLUMNS, INVENTORY_ROWS];
+
+            for (int x = 0; x < INVENTORY_COLUMNS; x++)
+            {
+                for (int y = 0; y < INVENTORY_ROWS; y++)
+                {
+                    if (SlotIsEmpty(x, y))
+                    {
+                        EmptySlots[x, y] = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Drops all of the items in the inventory
         /// </summary>
         /// <param name="safeTab"></param>
-        public void DropInventory(bool safeTab = true)
+        public void DropInventory(bool safeTab = true, bool onlyDropPreviouslyEmptySlots = false)
         {
             Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             OpenInventory(safeTab);
@@ -152,7 +182,7 @@ namespace RunescapeBot.BotPrograms
             {
                 for (int y = 0; y < INVENTORY_ROWS; y++)
                 {
-                    if (!SlotIsEmpty(x, y, false, false))
+                    if ((!onlyDropPreviouslyEmptySlots || EmptySlots[x, y]) && !SlotIsEmpty(x, y, false, false))
                     {
                         if (BotProgram.StopFlag) { return; }
                         DropItem(x, y, false);
@@ -193,11 +223,36 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         /// <param name="x">x pixel location on the screen</param>
         /// <param name="y">y pixel location on the screen</param>
-        public void Telegrab(int x, int y, bool safeTab = true)
+        public void Telegrab(int x, int y, bool safeTab = true, bool autoWait = true)
         {
             ClickSpellbook(5, 2, safeTab);
             Mouse.LeftClick(x, y, RSClient, 1);
-            Thread.Sleep((int)Probability.HalfGaussian(5000, 300, true)); //telegrab takes about 5 seconds
+            if (autoWait) { Thread.Sleep((int)Probability.HalfGaussian(5000, 300, true)); } //telegrab takes about 5 seconds
+        }
+
+        /// <summary>
+        /// Casts a spell on an item in the inventory. Assumes that casting the spell reopens the spellbook.
+        /// </summary>
+        /// <param name="spellBookX"></param>
+        /// <param name="spellBookY"></param>
+        /// <param name="castTime">cooldown time of the spell</param>
+        /// <param name="x">x inventory or screen coordinate within the inventory</param>
+        /// <param name="y">y inventory or screen coordinate within the inventory</param>
+        /// <param name="safeTab"></param>
+        /// <returns>true if the spell is cast successfully</returns>
+        private bool CastInventorySpell(int spellBookX, int spellBookY, int castTime, int x, int y, bool safeTab = true, bool autoWait = true)
+        {
+            if (ScreenToInventory(ref x, ref y))
+            {
+                OpenSpellbook(safeTab);
+                ClickSpellbook(spellBookX, spellBookY, safeTab);
+                SelectedTab = TabSelect.Inventory;
+                ClickInventory(x, y, false);
+                SelectedTab = TabSelect.Spellbook;
+                if (autoWait) { Thread.Sleep((int)Probability.HalfGaussian(castTime, 100, true)); }
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -207,20 +262,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
         /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
         /// <returns>true if the alch succeeds</returns>
-        public bool Alch(int x, int y, bool safeTab = true)
+        public bool Alch(int x, int y, bool safeTab = true, bool autoWait = true)
         {
-            if (ScreenToInventory(ref x, ref y))
-            {
-                OpenSpellbook();
-                ClickSpellbook(6, 4);
-                SelectedTab = TabSelect.Inventory;
-                ClickInventory(x, y, false);
-                SelectedTab = TabSelect.Spellbook;
-                Thread.Sleep((int)Probability.HalfGaussian(2000, 200, true));
-                return true;
-            }
-
-            return false;
+            return CastInventorySpell(6, 4, 3000, x, y, safeTab, autoWait);
         }
 
         /// <summary>
@@ -244,6 +288,50 @@ namespace RunescapeBot.BotPrograms
             Alch(emptySlot.Value.X, emptySlot.Value.Y);
 
             return true;
+        }
+
+        /// <summary>
+        /// Casts an enchant spell on jewelry within the inventory
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="safeTab"></param>
+        /// <param name="autoWait"></param>
+        /// <returns>true if successful</returns>
+        public bool Enchant(int x, int y, int enchantLevel, bool safeTab = true, bool autoWait = true)
+        {
+            if (enchantLevel < 1 || enchantLevel > 7)
+            {
+                throw new Exception("Enchantment level " + enchantLevel + " is not supported.");
+            }
+
+            Point spell = new Point(0, 0);
+
+            switch (enchantLevel)
+            {
+                case 1:
+                    spell = new Point(5, 0);
+                    break;
+                case 2:
+                    spell = new Point(2, 2);
+                    break;
+                case 3:
+                    spell = new Point(0, 4);
+                    break;
+                case 4:
+                    spell = new Point(1, 5);
+                    break;
+                case 5:
+                    spell = new Point(1, 7);
+                    break;
+                case 6:
+                    spell = new Point(0, 9);
+                    break;
+                case 7:
+                    spell = new Point(2, 9);
+                    break;
+            }
+            return CastInventorySpell(spell.X, spell.Y, 1800, x, y, safeTab, autoWait);
         }
 
         /// <summary>
@@ -308,7 +396,7 @@ namespace RunescapeBot.BotPrograms
             int bottom = y + yOffset;
 
             Color[,] itemIcon = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
-            double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, ColorFilters.EmptyInventorySlot());
+            double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRanges.EmptyInventorySlot());
             return emptyMatch > 0.99; //99% match needed to pass
         }
 

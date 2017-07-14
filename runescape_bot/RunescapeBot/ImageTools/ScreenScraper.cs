@@ -258,7 +258,7 @@ namespace RunescapeBot.ImageTools
         {
             string error;
             OSBuddy = GetOSBuddy(out error);
-            if (!(OSBuddy == null))
+            if (OSBuddy != null)
             {
                 return true;    //OSBuddy is already running
             }

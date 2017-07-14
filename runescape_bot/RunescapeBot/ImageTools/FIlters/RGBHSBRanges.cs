@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
-    public static class ColorFilters
+    public static class RGBHSBRanges
     {
         #region login
         /// <summary>
@@ -41,7 +41,7 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(30, 30, 30);
-            HSBRange hsbRange = new HSBRange(0, 0, 0.030f, 0.400f, 0.020f, 0.120f);
+            HSBRange hsbRange = new HSBRange(355, 5, 0.030f, 0.400f, 0.020f, 0.120f);
             return new ColorRange(dark, light, hsbRange);
         }
         #endregion
@@ -57,6 +57,18 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(46, 43, 43);
             Color light = Color.FromArgb(85, 80, 78);
             HSBRange hsbRange = new HSBRange(0, 360, 0.02f, 0.07f, 0.18f, 0.32f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The white tarp above a tea stall
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange TeaStallRoof()
+        {
+            Color dark = Color.FromArgb(173, 159, 135);
+            Color light = Color.FromArgb(203, 189, 168);
+            HSBRange hsbRange = new HSBRange(31, 44, 0.169f, 0.260f, 0.603f, 0.728f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -272,7 +284,7 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(25, 31, 19);
             Color light = Color.FromArgb(92, 103, 82);
-            HSBRange hsbRange = new HSBRange(334, 93, 0.083f, 0.191f, 0.117f, 0.363f);
+            HSBRange hsbRange = new HSBRange(334, 90, 0.083f, 0.191f, 0.117f, 0.363f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -315,6 +327,18 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(253, 150, 29);
             Color light = Color.FromArgb(255, 154, 33);
             HSBRange hsbRange = new HSBRange(31, 33, 0.995f, 1.000f, 0.556f, 0.566f);
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The orange text for an item in an inventory right click menu
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange InventoryRightClickItemName()
+        {
+            Color dark = Color.FromArgb(245, 139, 59);
+            Color light = Color.FromArgb(255, 149, 69);
+            HSBRange hsbRange = new HSBRange(23, 27, 0.990f, 1.000f, 0.615f, 0.635f);
             return new ColorRange(dark, light, hsbRange);
         }
 
@@ -369,6 +393,50 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(0, 0, 0);
             HSBRange hsbRange = null;
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        #endregion
+
+        #region mouseover description
+
+        /// <summary>
+        /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange MouseoverTextStationaryObject()
+        {
+            Color dark = Color.FromArgb(0, 189, 188);
+            Color light = Color.FromArgb(39, 246, 245);
+            HSBRange hsbRange = new HSBRange(175.8f, 182.0f, 0.717f, 1.000f, 0.352f, 0.542f); ;
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange MouseoverTextNPC()
+        {
+            Color dark = Color.FromArgb(181, 181, 0);
+            Color light = Color.FromArgb(225, 225, 16);
+            HSBRange hsbRange = new HSBRange(58.0f, 62.0f, 0.970f, 1.000f, 0.336f, 0.462f); ;
+            return new ColorRange(dark, light, hsbRange);
+        }
+
+        #endregion
+
+        #region mining rocks
+
+        /// <summary>
+        /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
+        /// </summary>
+        /// <returns></returns>
+        public static ColorRange IronRock()
+        {
+            Color dark = Color.FromArgb(0, 189, 188);
+            Color light = Color.FromArgb(39, 246, 245);
+            HSBRange hsbRange = new HSBRange(175.8f, 182.0f, 0.717f, 1.000f, 0.352f, 0.542f); ;
             return new ColorRange(dark, light, hsbRange);
         }
 

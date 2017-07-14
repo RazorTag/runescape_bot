@@ -23,6 +23,9 @@ namespace RunescapeBot.BotPrograms
         private ColorRange MithrilArmor;
         private ColorRange ChaosRune;
         private ColorRange DeathRune;
+        private ColorRange MouseoverTextNPC;
+        private bool PickUpStackables;
+        private bool PickUpAlchables;
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -45,14 +48,14 @@ namespace RunescapeBot.BotPrograms
         private DateTime LastDemonTime;
 
 
-        public LesserDemon(RunParams startParams) : base(startParams)
+        public LesserDemon(RunParams startParams, bool pickUpAlchables = true, bool pickUpStackables = true) : base(startParams)
         {
             GetReferenceColors();
-            ReadWindow();
-            MinDemonSize = (int) (0.001 * ScreenWidth * ScreenHeight);
+            PickUpStackables = pickUpStackables;
+            PickUpAlchables = pickUpAlchables;
         }
 
-        protected override void Run()
+        protected override bool Run()
         {
             //ReadWindow();
             //ColorRange empty = ColorFilters.ChaosRuneOrange();
@@ -73,12 +76,26 @@ namespace RunescapeBot.BotPrograms
             //bool[,] binaryM = ColorFilter(filterM);
             //double testM = ImageProcessing.FractionalMatch(binaryM);
 
+            //ColorRange color = ColorFilters.LesserDemonHorn();
+            //bool[,] mask = ColorFilter(color);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, color, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "cloves");
+
+            //SafeWait(3000);
+            //ReadWindow();
+            //ColorRange color = ColorFilters.MouseoverTextNPC();
+            //bool[,] mask = ColorFilter(color);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, color, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "mouseoverNPCText");
+
             //LastDemonLocation = Center;
             //CheckDrops();
 
             //Point trimOffset;
             //Color[,] screenDropArea = ScreenPiece(0, 1800, 0, 900, out trimOffset);
             //FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE);
+
+            MinDemonSize = ArtifactSize(0.0005);
+            LastDemonTime = DateTime.Now;
+            return true;
         }
 
         /// <summary>
@@ -92,12 +109,15 @@ namespace RunescapeBot.BotPrograms
             if (LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
             {
                 LastDemonTime = DateTime.Now;
-                MinDemonSize = demon.Size / 2;
                 int maxOffset = (int)(0.05 * cloveRange);
                 if (!InCombat() || !HitpointsHaveDecreased())    //engage the demon
                 {
-                    LeftClick(demon.Center.X, demon.Center.Y, maxOffset, 200);
-                    Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
+                    Mouse.MoveMouse(demon.Center.X, demon.Center.Y, RSClient);
+                    if (WaitForMouseOverText(MouseoverTextNPC, 3000))
+                    {
+                        LeftClick(demon.Center.X, demon.Center.Y, 0, 0);
+                        Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
+                    }
                 }
                 MissedDemons = 0;
                 LastDemonLocation = demon.Center;
@@ -108,6 +128,7 @@ namespace RunescapeBot.BotPrograms
                 MissedDemon();
             }
 
+            RunParams.Iterations--;
             return true;
         }
 
@@ -154,10 +175,17 @@ namespace RunescapeBot.BotPrograms
             Point trimOffset;
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
-            if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE)){ return true; }
-            if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE)) { return true; }
-            if (FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE)) { return true; }
-            if (FindAndGrab(screenDropArea, trimOffset, DeathRune, DEATH_RUNE_MIN_SIZE)) { return true; }
+            if (PickUpStackables)
+            {
+                if (FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE)) { return true; }
+                if (FindAndGrab(screenDropArea, trimOffset, DeathRune, DEATH_RUNE_MIN_SIZE)) { return true; }
+            }
+
+            if (PickUpAlchables)
+            {
+                if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE)) { return true; }
+                if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE)) { return true; }
+            }
 
             return false;
         }
@@ -269,12 +297,13 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            LesserDemonSkin = ColorFilters.LesserDemonSkin();
-            LesserDemonHorn = ColorFilters.LesserDemonHorn();
-            RuneMedHelm = ColorFilters.RuneMedHelm();
-            MithrilArmor = ColorFilters.MithrilArmor();
-            ChaosRune = ColorFilters.ChaosRuneOrange();
-            DeathRune = ColorFilters.DeathRuneWhite();
+            LesserDemonSkin = RGBHSBRanges.LesserDemonSkin();
+            LesserDemonHorn = RGBHSBRanges.LesserDemonHorn();
+            RuneMedHelm = RGBHSBRanges.RuneMedHelm();
+            MithrilArmor = RGBHSBRanges.MithrilArmor();
+            ChaosRune = RGBHSBRanges.ChaosRuneOrange();
+            DeathRune = RGBHSBRanges.DeathRuneWhite();
+            MouseoverTextNPC = RGBHSBRanges.MouseoverTextNPC();
         }
     }
 }

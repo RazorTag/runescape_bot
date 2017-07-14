@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using RunescapeBot.BotPrograms.Popups;
+using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -29,7 +30,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool PostMake()
         {
-            WithdrawItems(SecondaryIngredientBankSlot, UnfPotionBankSlot);
+            Bank bank;
+            OpenBank(out bank);
+            WithdrawItems(bank);
             MakeItems(MAKE_POTION_TIME);
             return true;
         }

@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
-    class Use1On27 : GenericBank
+    class Use1On27 : BankStand
     {
         private const int WAIT_FOR_FLETCHING_WINDOW_TIMEOUT = 5000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
@@ -16,47 +16,42 @@ namespace RunescapeBot.BotPrograms
         protected Point UseOnInventorySlot;
         protected Point UseWithBankSlot;
         protected Point UseOnBankSlot;
+        protected int MakeTime;
 
-        public Use1On27(RunParams startParams, int makeTime) : base(startParams, makeTime) { }
-
-        protected override void Run()
+        public Use1On27(RunParams startParams, int makeTime) : base(startParams)
         {
-            Inventory.OpenInventory(true);
+            MakeTime = makeTime;
             UseWithInventorySlot = new Point(0, 0);
             UseOnInventorySlot = new Point(1, 0);
             UseWithBankSlot = new Point(7, 0);
             UseOnBankSlot = new Point(6, 0);
         }
 
-        protected override bool Execute()
+        protected override bool Run()
         {
-            //Open the bank
-            Bank bankPopup;
-            if (!OpenBank(out bankPopup))
-            {
-                if (!MoveToBank())
-                {
-                    FailedRuns++;
-                    return false;
-                }
-                OpenBank(out bankPopup);
-            }
+            Inventory.OpenInventory(true);
 
-            //Refresh inventory to a knife and 27 logs
-            if (StopFlag) { return false; }
+            return true;
+        }
 
-            if (!bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
-            {
-                MoveToBank();
-                FailedRuns++;
-                return true;
-            }
-            bankPopup.DepositInventory();
-            bankPopup.WithdrawOne(7, 0);
-            bankPopup.WithdrawAll(6, 0);
-            bankPopup.CloseBank();
+        /// <summary>
+        /// Withdraw two sets of 14 items from the bank
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected override bool WithdrawItems(Bank bank)
+        {
+            bank.DepositInventory();
+            bank.WithdrawOne(7, 0);
+            bank.WithdrawAll(6, 0);
+            return true;
+        }
 
-            //Fletch the logs
+        /// <summary>
+        /// Use the first 14 items on the second 14 items
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected override bool ProcessInventory()
+        {
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
             int left = 170;
             int right = 222;
@@ -72,8 +67,8 @@ namespace RunescapeBot.BotPrograms
             }
             MakeXSlim.MakeXItems(27);
 
-            //Wait for the inventory to be fletched
-            SafeWaitPlus(MakeTime, 1200);
+            //Wait for the inventory to be processed
+            SafeWaitPlus(MakeTime, 0);
 
             return true;
         }

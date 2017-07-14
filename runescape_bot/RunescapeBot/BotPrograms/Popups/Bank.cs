@@ -96,7 +96,7 @@ namespace RunescapeBot.BotPrograms.Popups
             Color[,] screen;
             screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
-            titleMatch = ImageProcessing.FractionalMatch(screen, ColorFilters.BankTitle());
+            titleMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRanges.BankTitle());
             
             return titleMatch > minTitleMatch;
         }
@@ -106,7 +106,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns>true if the bank pop-up opens</returns>
-        public bool WaitForPopup(int timeout)
+        public bool WaitForPopup(int timeout = 3000)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();

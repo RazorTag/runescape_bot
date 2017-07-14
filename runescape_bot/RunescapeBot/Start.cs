@@ -39,37 +39,6 @@ namespace RunescapeBot
         private bool botIsRunning;
 
         /// <summary>
-        /// List of existing bot programs. Add a new bot program to this list.
-        /// </summary>
-        public enum BotActions : int
-        {
-            [Description("Agility - Gnome Stronghold")]
-            AgilityGnomeStronghold,
-            [Description("Agility - Seers' Village")]
-            AgilitySeersVillage,
-            [Description("Combat - Lesser Demon")]
-            LesserDemon,
-            [Description("Combat - Nightmare Zone")]
-            NightmareZoneD,
-            [Description("Crafting - Gold Bracelets")]
-            GoldBracelets,
-            [Description("Fletching - Short Bows")]
-            FletchShortBows,
-            [Description("Fletching - String Bows")]
-            StringBows,
-            [Description("Herblore - Make Unfinished Potions")]
-            MakeUnfinishedPotions,
-            [Description("Herblore - Make Prepared Potions")]
-            MakePotionsSimple,
-            [Description("Herblore - Make Potions from Scratch")]
-            MakePotionsFUll,
-            [Description("Smithing - Cannonballs")]
-            Cannonballs,
-            [Description("Woodcutting - Willows (drop)")]
-            WillowTrees
-        };
-
-        /// <summary>
         /// Gets the display name for an enum
         /// </summary>
         /// <param name="value"></param>
@@ -116,7 +85,7 @@ namespace RunescapeBot
         {
             settings = new BotSettings();
             InitializeComponent();
-            Array actions = Enum.GetValues(typeof(BotActions));
+            Array actions = Enum.GetValues(typeof(BotRegistry.BotActions));
             string[] names = new string[actions.Length];
             for (int i = 0; i < actions.Length; i++)
             {
@@ -147,62 +116,7 @@ namespace RunescapeBot
             }
 
             RunParams startParams = CollectStartParams();
-
-            switch ((BotActions)BotActionSelect.SelectedIndex)
-            {
-                case BotActions.LesserDemon:
-                    RunningBot = new LesserDemon(startParams);
-                    break;
-
-                case BotActions.GoldBracelets:
-                    RunningBot = new GoldBracelets(startParams);
-                    break;
-
-                case BotActions.Cannonballs:
-                    RunningBot = new Cannonballs(startParams);
-                    break;
-
-                case BotActions.NightmareZoneD:
-                    startParams.FrameTime = 30000;
-                    RunningBot = new NightmareZoneD(startParams);
-                    break;
-
-                case BotActions.FletchShortBows:
-                    RunningBot = new Use1On27(startParams, 50000);
-                    break;
-
-                case BotActions.StringBows:
-                    RunningBot = new Use14On14(startParams, 16800);
-                    break;
-
-                case BotActions.MakeUnfinishedPotions:
-                    RunningBot = new UnfinishedPotions(startParams);
-                    break;
-
-                case BotActions.MakePotionsSimple:
-                    RunningBot = new Use14On14(startParams, 8400);
-                    break;
-
-                case BotActions.MakePotionsFUll:
-                    RunningBot = new MakePotionFull(startParams);
-                    break;
-
-                case BotActions.AgilityGnomeStronghold:
-                    RunningBot = new AgilityGnomeStronghold(startParams);
-                    break;
-
-                case BotActions.AgilitySeersVillage:
-                    RunningBot = new AgilitySeersVillage(startParams);
-                    break;
-
-                case BotActions.WillowTrees:
-                    RunningBot = new WillowTrees(startParams);
-                    break;
-
-                default:
-                    return;
-            }
-
+            RunningBot = BotRegistry.GetSelectedBot(startParams, (BotRegistry.BotActions)BotActionSelect.SelectedIndex);
             RunBotProgram(RunningBot);
         }
 
@@ -218,7 +132,7 @@ namespace RunescapeBot
             startParams.Iterations = (int) Iterations.Value;
             startParams.RunUntil = RunUntil.Value;
             startParams.TaskComplete = new BotResponse(BotDone);
-            startParams.BotAction = (BotActions) BotActionSelect.SelectedIndex;
+            startParams.BotAction = (BotRegistry.BotActions)BotActionSelect.SelectedIndex;
             startParams.ClientFilePath = ClientLocation.Text;
 
             return startParams;
@@ -404,7 +318,8 @@ namespace RunescapeBot
                     break;
             }
             Text += " " + botState;
-            string stateTimeRemaining = (RunningBot.RunParams.CurrentStateEnd - DateTime.Now).ToString(@"hh\:mm\:ss");
+            TimeSpan timeRemaining = (DateTime.Now < RunningBot.RunParams.CurrentStateEnd) ? (RunningBot.RunParams.CurrentStateEnd - DateTime.Now) : TimeSpan.Zero;
+            string stateTimeRemaining = timeRemaining.ToString(@"hh\:mm\:ss");
             Text += " (" + stateTimeRemaining + ")";
 
             string stateStartTime = RunningBot.RunParams.CurrentStateStart.ToString("MM/dd/yyyy h:mm tt");

@@ -2,6 +2,7 @@
 using RunescapeBot.ImageTools;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,18 +14,47 @@ namespace RunescapeBot.BotPrograms
     /// This probably works with many other banks but has only been tested for the Varrock west bank
     /// This would theoreticaly work at banks where the color of a bank booth's counter matches the color of theVarrock west bank booths' counters
     /// </summary>
-    public class GenericBank : BotProgram
+    public class BankStand : BotProgram
     {
         protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
-
         protected ColorRange BankBoothCounter;
-        protected int MakeTime;
         protected int FailedRuns;
 
-        public GenericBank(RunParams startParams, int makeTime) : base(startParams)
+
+        public BankStand(RunParams startParams) : base(startParams)
         {
-            this.MakeTime = makeTime;
             GetReferenceColors();
+        }
+
+        /// <summary>
+        /// Open bank, withdraw items, close bank, do work with items
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected override bool Execute()
+        {
+            Bank bank;
+            if (!OpenBank(out bank) || !WithdrawItems(bank)) { return false; }
+            bank.CloseBank();
+            if (!ProcessInventory()) { return false; }
+            return true;
+        }
+
+        /// <summary>
+        /// Used to withdraw items from the bank
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected virtual bool WithdrawItems(Bank bank)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Used to do work on the items in the inventory after being withdrawn from the bank
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool ProcessInventory()
+        {
+            return true;
         }
 
         /// <summary>
@@ -72,7 +102,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            BankBoothCounter = ColorFilters.BankBoothVarrockWest();
+            BankBoothCounter = RGBHSBRanges.BankBoothVarrockWest();
         }
     }
 }

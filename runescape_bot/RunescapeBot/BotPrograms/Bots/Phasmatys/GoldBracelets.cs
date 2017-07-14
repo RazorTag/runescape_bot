@@ -17,7 +17,7 @@ namespace RunescapeBot.BotPrograms
 
         public GoldBracelets(RunParams startParams) : base(startParams) { }
 
-        protected override void Run()
+        protected override bool Run()
         {
             //ReadWindow();
             //bool[,] furnaceIcon = ColorFilter(FurnaceIconOrange);
@@ -50,6 +50,8 @@ namespace RunescapeBot.BotPrograms
             //ColorRange floor = ColorFilters.PhasmatysBuildingFloor();
             //bool[,] mask = ColorFilter(floor);
             //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
+
+            return true;
         }
 
         protected override bool FurnaceActions()

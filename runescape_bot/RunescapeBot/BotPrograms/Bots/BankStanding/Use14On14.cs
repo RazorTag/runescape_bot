@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class Use14On14 : GenericBank
+    public class Use14On14 : BankStand
     {
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
 
@@ -13,21 +13,23 @@ namespace RunescapeBot.BotPrograms
         protected Point UseWithInventorySlot;
         protected Point UseOnBankSlot;
         protected Point UseWithBankSlot;
+        protected int MakeTime;
 
         /// <summary>
         /// Sets the time required to make 14 items
         /// </summary>
         /// <param name="startParams"></param>
         /// <param name="makeTime">time needed to make the 14 items being crafted</param>
-        public Use14On14(RunParams startParams, int makeTime) : base(startParams, makeTime)
+        public Use14On14(RunParams startParams, int makeTime) : base(startParams)
         {
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);
             UseOnBankSlot = new Point(6, 0);
             UseWithBankSlot = new Point(7, 0);
+            MakeTime = makeTime;
         }
 
-        protected override void Run()
+        protected override bool Run()
         {
             //ReadWindow();
             //bool[,] bankBooth = ColorFilter(ColorFilters.BankBoothVarrockWest());
@@ -41,69 +43,48 @@ namespace RunescapeBot.BotPrograms
             {
                 if (!MoveToBank())
                 {
-                    return;
+                    return false;
                 }
                 if (!OpenBank(out bankPopup))
                 {
-                    return;
+                    return false;
                 }
             }
             bankPopup.DepositInventory();
             bankPopup.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, 14);
             bankPopup.CloseBank();
-        }
 
-        /// <summary>
-        /// Makes potions from scratch
-        /// </summary>
-        /// <returns></returns>
-        protected override bool Execute()
-        {
-            if (FailedRuns >= 2) { return false; }
-
-            if (StopFlag) { return false; }
-            if(WithdrawItems(UseWithBankSlot, UseOnBankSlot)
-                && PreMake()
-                && MakeItems(MakeTime)
-                && PostMake())
-            {
-                FailedRuns = 0;
-                RunParams.Iterations -= 14;
-                return true;
-            }
-
-            FailedRuns++;
-            return false;
+            return true;
         }
 
         /// <summary>
         /// Withdraw two sets of 14 items from the bank
         /// </summary>
         /// <returns>true if successful</returns>
-        protected bool WithdrawItems(Point useWith, Point useOn)
+        protected override bool WithdrawItems(Bank bank)
         {
-            //Open the bank
-            Bank bankPopup;
-            if (!OpenBank(out bankPopup))
-            {
-                if (!MoveToBank())
-                {
-                    return true;
-                }
-                OpenBank(out bankPopup);
-            }
-            Bank BankPopup = new Bank(RSClient);
-            if (!BankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
-            {
-                return false;
-            }
-
-            //waithdraw items from the bank
-            BankPopup.DepositInventory();
-            BankPopup.WithdrawN(useWith.X, useWith.Y);
-            BankPopup.WithdrawN(useOn.X, useOn.Y);
-            BankPopup.CloseBank();
+            bank.DepositInventory();
+            bank.WithdrawN(UseWithBankSlot.X, UseWithBankSlot.Y);
+            bank.WithdrawN(UseOnBankSlot.X, UseOnBankSlot.Y);
             return true;
+        }
+
+        /// <summary>
+        /// Use the first 14 items on the second 14 items
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected override bool ProcessInventory()
+        {
+            if (PreMake() && MakeItems(MakeTime) && PostMake())
+            {
+                FailedRuns = 0;
+                RunParams.Iterations -= 14;
+                return true;
+            }
+            else
+            {
+                return ++FailedRuns > 2;
+            }
         }
 
         /// <summary>
@@ -118,7 +99,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return true;
             }
-            return !SafeWait(craftTime, 300.0);
+            return !SafeWaitPlus(craftTime, 300.0);
         }
 
         /// <summary>

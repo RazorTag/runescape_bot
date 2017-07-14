@@ -4,6 +4,12 @@ namespace RunescapeBot.ImageTools
 {
     public class BlobVerticalComparer : IComparer<Blob>
     {
+        /// <summary>
+        /// Used to sort from top to bottom
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public int Compare(Blob a, Blob b)
         {
             if (a.Center.Y > b.Center.Y)

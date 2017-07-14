@@ -240,11 +240,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            FurnaceIconOrange = ColorFilters.FurnaceIconOrange();
-            BankIconDollar = ColorFilters.BankIconDollar();
-            BuildingFloor = ColorFilters.PhasmatysBuildingFloor();
-            Furnace = ColorFilters.Furnace();
-            BankBooth = ColorFilters.BankBoothPhasmatys();
+            FurnaceIconOrange = RGBHSBRanges.FurnaceIconOrange();
+            BankIconDollar = RGBHSBRanges.BankIconDollar();
+            BuildingFloor = RGBHSBRanges.PhasmatysBuildingFloor();
+            Furnace = RGBHSBRanges.Furnace();
+            BankBooth = RGBHSBRanges.BankBoothPhasmatys();
         }
     }
 }

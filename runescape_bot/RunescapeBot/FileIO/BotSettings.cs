@@ -65,7 +65,7 @@ namespace RunescapeBot.FileIO
         /// <summary>
         /// Last bot program used
         /// </summary>
-        public Start.BotActions BotAction
+        public BotRegistry.BotActions BotAction
         {
             get
             {

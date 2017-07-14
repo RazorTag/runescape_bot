@@ -264,7 +264,7 @@ namespace RunescapeBot.UITools
         {
             const double randomization = 0.05;
             const int maxRandomAllowed = 50;
-            const double newMidPointDistance = 800.0;
+            const double newMidPointDistance = 1000.0;
             int xRandomization = Math.Min(maxRandomAllowed, Math.Abs((int)(randomization * (end.Y - start.Y))));
             int yRandomization = Math.Min(maxRandomAllowed, Math.Abs((int)(randomization * (end.X - start.X))));
             double moveDistance = Geometry.DistanceBetweenPoints(start, end);

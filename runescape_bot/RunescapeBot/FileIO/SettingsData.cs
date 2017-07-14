@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using RunescapeBot.BotPrograms;
+using System.Runtime.Serialization;
 
 namespace RunescapeBot.FileIO
 {
@@ -21,7 +22,7 @@ namespace RunescapeBot.FileIO
         /// The most recently started bot program
         /// </summary>
         [DataMember]
-        public Start.BotActions BotAction { get; set; }
+        public BotRegistry.BotActions BotAction { get; set; }
 
         /// <summary>
         /// The number of times to run through a bot program's routine
