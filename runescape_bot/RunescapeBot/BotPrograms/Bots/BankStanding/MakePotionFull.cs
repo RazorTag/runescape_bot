@@ -13,7 +13,10 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="startParams"></param>
         /// <param name="craftingTime">time needed to make the 14 items being crafted</param>
-        public MakePotionFull(RunParams startParams) : base(startParams, MAKE_UNFINISHED_POTION_TIME) { }
+        public MakePotionFull(RunParams startParams) : base(startParams, MAKE_UNFINISHED_POTION_TIME)
+        {
+            SingleMakeTime = MAKE_POTION_TIME;
+        }
 
         /// <summary>
         /// Clean the grimy herbs before making the unfinished potions
@@ -25,6 +28,23 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Use the first 14 items on the second 14 items
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected override bool ProcessInventory()
+        {
+            if (PreMake() && MakeItems(false) && PostMake())
+            {
+                FailedRuns = 0;
+                return true;
+            }
+            else
+            {
+                return ++FailedRuns > 2;
+            }
+        }
+
+        /// <summary>
         /// Withdraw secondary ingredients and unfinished potions then makes finished potions
         /// </summary>
         /// <returns></returns>
@@ -33,7 +53,7 @@ namespace RunescapeBot.BotPrograms
             Bank bank;
             OpenBank(out bank);
             WithdrawItems(bank);
-            MakeItems(MAKE_POTION_TIME);
+            MakeItems(true);
             return true;
         }
     }

@@ -27,6 +27,29 @@ namespace RunescapeBot.UITools
         /// Mouse movements per second to execute when moving the mouse smoothly
         /// </summary>
         private const double MOUSE_MOVE_RATE = 125.0;
+
+        /// <summary>
+        /// Gets the cursor's current location
+        /// </summary>
+        public static Point Location
+        {
+            get
+            {
+                POINT location;
+                GetCursorPos(out location);
+                return location;
+            }
+        }
+
+        /// <summary>
+        /// Gets the cursor's current X coordinate
+        /// </summary>
+        public static int X { get { return Location.X; } }
+
+        /// <summary>
+        /// Gets the cursor's current Y coordiinate
+        /// </summary>
+        public static int Y { get { return Location.Y; } }
         #endregion
 
         #region click handlers
@@ -121,10 +144,8 @@ namespace RunescapeBot.UITools
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY;
-            POINT startingPosition;
-            GetCursorPos(out startingPosition);
-            currentX = startingPosition.X;
-            currentY = startingPosition.Y;
+            currentX = Location.X;
+            currentY = Location.Y;
             xDistance = x - currentX;
             yDistance = y - currentY;
             totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
@@ -155,10 +176,8 @@ namespace RunescapeBot.UITools
         public static void Offset(int x, int y, int randomize = 100)
         {
             Random rng = new Random();
-            POINT startingPosition;
-            GetCursorPos(out startingPosition);
-            x += startingPosition.X + rng.Next(-randomize, randomize + 1);
-            y += startingPosition.Y + rng.Next(-randomize, randomize + 1);
+            x += Location.X + rng.Next(-randomize, randomize + 1);
+            y += Location.Y + rng.Next(-randomize, randomize + 1);
             NaturalMove(x, y);
         }
 
@@ -184,10 +203,8 @@ namespace RunescapeBot.UITools
             double angle = arcStart + (rng.NextDouble() * (arcEnd - arcStart));
             angle = (angle % 360) * ((2 * Math.PI) / 360.0);
 
-            POINT startingPosition;
-            GetCursorPos(out startingPosition);
-            int x = startingPosition.X + ((int) Math.Round(Math.Cos(angle) * radius));
-            int y = startingPosition.Y - ((int) Math.Round(Math.Sin(angle) * radius));
+            int x = Location.X + ((int) Math.Round(Math.Cos(angle) * radius));
+            int y = Location.Y - ((int) Math.Round(Math.Sin(angle) * radius));
             NaturalMove(x, y);
         }
 
@@ -198,9 +215,8 @@ namespace RunescapeBot.UITools
         /// <param name="y">y-coordinate to move to</param>
         private static void NaturalMove(int x, int y)
         {
-            POINT startingPosition;
             Stopwatch watch = new Stopwatch();
-            GetCursorPos(out startingPosition);
+            Point startingPosition = Location;
             double currentX = startingPosition.X;
             double currentY = startingPosition.Y;
             float slope = (float)((y - currentY) / (x - currentX));
@@ -286,6 +302,19 @@ namespace RunescapeBot.UITools
                 TranslateClick(ref x, ref y, rsClient);
                 NaturalMove(x, y);
             }
+        }
+
+        /// <summary>
+        /// Fire and forget version of MoveMouse.
+        /// Only use if you don't need the mouse for several seconds afterward
+        /// </summary>
+        /// <param name="x">x-coordinate within the game screen</param>
+        /// <param name="y">y-coordinate within the game screen</param>
+        /// <param name="rsClient">RuneScape client in which to move the mouse</param>
+        public static void MoveMouseAsynchronous(int x, int y, Process rsClient)
+        {
+            Thread moveMouse = new Thread(unused => MoveMouse(0, (int)Probability.BoundedGaussian(x, y), rsClient));
+            moveMouse.Start();
         }
         #endregion
     }

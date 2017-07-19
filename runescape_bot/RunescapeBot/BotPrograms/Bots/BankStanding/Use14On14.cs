@@ -9,11 +9,11 @@ namespace RunescapeBot.BotPrograms
     {
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
 
+
         protected Point UseOnInventorySlot;
         protected Point UseWithInventorySlot;
         protected Point UseOnBankSlot;
         protected Point UseWithBankSlot;
-        protected int MakeTime;
 
         /// <summary>
         /// Sets the time required to make 14 items
@@ -22,11 +22,12 @@ namespace RunescapeBot.BotPrograms
         /// <param name="makeTime">time needed to make the 14 items being crafted</param>
         public Use14On14(RunParams startParams, int makeTime) : base(startParams)
         {
+            SingleMakeTime = makeTime;
+            MakeQuantity = 14;
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);
             UseOnBankSlot = new Point(6, 0);
             UseWithBankSlot = new Point(7, 0);
-            MakeTime = makeTime;
         }
 
         protected override bool Run()
@@ -63,6 +64,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool WithdrawItems(Bank bank)
         {
+            if (RunParams.Iterations < 14) { return false; }
+
             bank.DepositInventory();
             bank.WithdrawN(UseWithBankSlot.X, UseWithBankSlot.Y);
             bank.WithdrawN(UseOnBankSlot.X, UseOnBankSlot.Y);
@@ -75,10 +78,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool ProcessInventory()
         {
-            if (PreMake() && MakeItems(MakeTime) && PostMake())
+            if (PreMake() && MakeItems(true) && PostMake())
             {
                 FailedRuns = 0;
-                RunParams.Iterations -= 14;
                 return true;
             }
             else
@@ -92,14 +94,16 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="craftTime">time to wait for he items to be made</param>
         /// <returns>true if successful</returns>
-        protected bool MakeItems(int craftTime)
+        protected bool MakeItems(bool finishedProduct)
         {
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
             if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
             {
-                return true;
+                return false;
             }
-            return !SafeWaitPlus(craftTime, 300.0);
+
+            CountDownItems(finishedProduct);
+            return !SafeWaitPlus(0, 300.0);
         }
 
         /// <summary>

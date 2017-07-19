@@ -2,7 +2,9 @@
 using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -11,11 +13,15 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class GoldBracelets : FurnacePhasmatys
     {
-        private const int CRAFTING_TIME = 50000;
+        private const int SINGLE_CRAFTING_TIME = 1800;
         private const int WAIT_FOR_CRAFTING_WINDOW_TIMEOUT = 10000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
 
-        public GoldBracelets(RunParams startParams) : base(startParams) { }
+        public GoldBracelets(RunParams startParams) : base(startParams)
+        {
+            SingleMakeTime = SINGLE_CRAFTING_TIME;
+            MakeQuantity = 27;
+        }
 
         protected override bool Run()
         {
@@ -65,9 +71,9 @@ namespace RunescapeBot.BotPrograms
             }
             CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
 
-            //TODO verify that gold bars are being crafted
-
-            SafeWaitPlus(CRAFTING_TIME, 2000);
+            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.OSBUDDY_BORDER_WIDTH, (int)Probability.RandomGaussian(Mouse.Y + 100, 100), RSClient);
+            CountDownItems(true);
+            SafeWaitPlus(0, 2000);
             RunParams.Iterations -= 27;
             return true;
         }

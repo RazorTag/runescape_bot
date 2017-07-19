@@ -205,7 +205,7 @@ namespace RunescapeBot.BotPrograms
             if (biggestBlob.Size > minimumSize)
             {
                 Point blobCenter = biggestBlob.Center;
-                return Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                return Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y) && Inventory.OpenInventory();
             }
             return false;
         }
@@ -226,7 +226,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Point blobCenter = biggestBlob.Center;
                 Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
-                return true;
+                Inventory.OpenInventory();
             }
             return false;
         }
@@ -249,6 +249,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     Point blobCenter = chaosRunes[i].Center;
                     Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                    Inventory.OpenInventory();
                     return true;
                 }
             }

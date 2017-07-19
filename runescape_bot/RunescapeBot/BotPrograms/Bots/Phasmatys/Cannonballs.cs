@@ -1,4 +1,6 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System.Diagnostics;
 
 namespace RunescapeBot.BotPrograms
@@ -9,13 +11,12 @@ namespace RunescapeBot.BotPrograms
     public class Cannonballs : FurnacePhasmatys
     {
         private const int SINGLE_SMITH_TIME = 6000;
-        private const int TOTAL_SMITH_TIME = 162000;
         private const int CANNONBALL_COLOR_SUM = 13219;
-        Stopwatch watch;
 
         public Cannonballs(RunParams startParams) : base(startParams)
         {
-            watch = new Stopwatch();
+            SingleMakeTime = SINGLE_SMITH_TIME;
+            MakeQuantity = 27;
         }
 
         /// <summary>
@@ -25,18 +26,9 @@ namespace RunescapeBot.BotPrograms
         protected override bool FurnaceActions()
         {
             BotUtilities.ChatBoxSingleOptionMakeAll(RSClient);
-
-            //verify that cannonballs are being smithed
-            watch.Restart();
-            SafeWait(3 * SINGLE_SMITH_TIME);
-            watch.Stop();
-            if (!Inventory.SlotIsEmpty(2, 0, true))   //steel bars aren't being processed
-            {
-                return false;
-            }
-
-            SafeWaitPlus(TOTAL_SMITH_TIME - (int)watch.ElapsedMilliseconds, 3500);
-            RunParams.Iterations -= 27;
+            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.OSBUDDY_BORDER_WIDTH, (int)Probability.RandomGaussian(Mouse.Y + 200, 100), RSClient);
+            CountDownItems(true);
+            SafeWaitPlus(0, 3500);
             return true;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.FileIO;
 using System.Runtime.Serialization;
 
 namespace RunescapeBot.FileIO
@@ -6,53 +7,7 @@ namespace RunescapeBot.FileIO
     [DataContract]
     public class SettingsData : ISerializable
     {
-        /// <summary>
-        /// Last login name used
-        /// </summary>
-        [DataMember]
-        public string Login { get; set; }
-
-        /// <summary>
-        /// Last password
-        /// </summary>
-        [DataMember]
-        public string Password { get; set; }
-
-        /// <summary>
-        /// The most recently started bot program
-        /// </summary>
-        [DataMember]
-        public BotRegistry.BotActions BotAction { get; set; }
-
-        /// <summary>
-        /// The number of times to run through a bot program's routine
-        /// </summary>
-        [DataMember]
-        public int Iterations
-        {
-            get
-            {
-                return _iterations;
-            }
-            set
-            {
-                if (value == int.MaxValue || value < 0)
-                {
-                    _iterations = 0;
-                }
-                else
-                {
-                    _iterations = value;
-                }
-            }
-        }
-        private int _iterations;
-
-        /// <summary>
-        /// The file location of the RuneScape client to run
-        /// </summary>
-        [DataMember]
-        public string ClientFilePath { get; set; }
+        public SettingsData() { }
 
         /// <summary>
         /// Serializes SettingsData
@@ -63,11 +18,52 @@ namespace RunescapeBot.FileIO
         {
             if (info == null) { throw new System.ArgumentNullException("info"); }
 
-            info.AddValue("Login", Login);
-            info.AddValue("Password", Password);
-            info.AddValue("BotAction", BotAction);
-            info.AddValue("Iterations", Iterations);
-            info.AddValue("ClientFilePath", ClientFilePath);
+            info.AddValue(nameof(SoloBotSettings), SoloBotSettings);
+            info.AddValue(nameof(PhasmatysSettings), PhasmatysSettings ?? new PhasmatysSettings());
+            info.AddValue(nameof(SelectedTab), SelectedTab);
         }
+
+        /// <summary>
+        /// Saves the relevant run parameters to serialized objects
+        /// </summary>
+        /// <param name="runParams"></param>
+        /// <param name="selectedTab"></param>
+        public void Save(RunParams runParams)
+        {
+            SoloBotSettings = SoloBotSettings ?? new SoloBotSettings();
+            SoloBotSettings.Save(runParams);
+            PhasmatysSettings = PhasmatysSettings ?? new PhasmatysSettings();
+            PhasmatysSettings.Save(runParams);
+        }
+
+        /// <summary>
+        /// Loads the relevant run parameters from serialized objects
+        /// </summary>
+        /// <param name="runParams"></param>
+        public void Load(ref RunParams runParams)
+        {
+            SoloBotSettings = SoloBotSettings ?? new SoloBotSettings();
+            SoloBotSettings.Load(ref runParams);
+            PhasmatysSettings = PhasmatysSettings ?? new PhasmatysSettings();
+            PhasmatysSettings.Load(ref runParams);
+        }
+
+        /// <summary>
+        /// Index of the most recently selected tab
+        /// </summary>
+        [DataMember]
+        public int SelectedTab { get; set; }
+
+        /// <summary>
+        /// Settings for the standard solo bot
+        /// </summary>
+        [DataMember]
+        public SoloBotSettings SoloBotSettings { get; set; }
+
+        /// <summary>
+        /// Settings for the phasmatys rotation bot
+        /// </summary>
+        [DataMember]
+        public PhasmatysSettings PhasmatysSettings { get; set; }
     }
 }

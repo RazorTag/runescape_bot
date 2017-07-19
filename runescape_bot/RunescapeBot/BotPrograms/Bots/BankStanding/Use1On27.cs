@@ -16,11 +16,11 @@ namespace RunescapeBot.BotPrograms
         protected Point UseOnInventorySlot;
         protected Point UseWithBankSlot;
         protected Point UseOnBankSlot;
-        protected int MakeTime;
 
         public Use1On27(RunParams startParams, int makeTime) : base(startParams)
         {
-            MakeTime = makeTime;
+            SingleMakeTime = makeTime;
+            MakeQuantity = 27;
             UseWithInventorySlot = new Point(0, 0);
             UseOnInventorySlot = new Point(1, 0);
             UseWithBankSlot = new Point(7, 0);
@@ -40,6 +40,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool WithdrawItems(Bank bank)
         {
+            if (RunParams.Iterations < 14) { return false; }
+
             bank.DepositInventory();
             bank.WithdrawOne(7, 0);
             bank.WithdrawAll(6, 0);
@@ -47,7 +49,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Use the first 14 items on the second 14 items
+        /// Use the tool on the other 27 items
         /// </summary>
         /// <returns>true if successful</returns>
         protected override bool ProcessInventory()
@@ -68,7 +70,8 @@ namespace RunescapeBot.BotPrograms
             MakeXSlim.MakeXItems(27);
 
             //Wait for the inventory to be processed
-            SafeWaitPlus(MakeTime, 0);
+            CountDownItems(true);
+            SafeWaitPlus(0, 300);
 
             return true;
         }

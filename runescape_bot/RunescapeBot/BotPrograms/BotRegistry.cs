@@ -10,6 +10,11 @@ namespace RunescapeBot.BotPrograms
     public class BotRegistry
     {
         /// <summary>
+        /// Number of milliseconds in a sngle game tick
+        /// </summary>
+        public const int GAME_TICK = 600;
+
+        /// <summary>
         /// List of existing bot programs. Add a new bot program to this list.
         /// </summary>
         public enum BotActions : int
@@ -71,16 +76,16 @@ namespace RunescapeBot.BotPrograms
                     bot = new NightmareZoneD(runParams);
                     break;
                 case BotActions.FletchShortBows:
-                    bot = new Use1On27(runParams, 50000);
+                    bot = new Use1On27(runParams, 3 * GAME_TICK);
                     break;
                 case BotActions.StringBows:
-                    bot = new Use14On14(runParams, 16800);
+                    bot = new Use14On14(runParams, 2 * GAME_TICK);
                     break;
                 case BotActions.MakeUnfinishedPotions:
                     bot = new UnfinishedPotions(runParams);
                     break;
                 case BotActions.MakePotionsSimple:
-                    bot = new Use14On14(runParams, 8400);
+                    bot = new Use14On14(runParams, GAME_TICK);
                     break;
                 case BotActions.MakePotionsFull:
                     bot = new MakePotionFull(runParams);
@@ -98,10 +103,39 @@ namespace RunescapeBot.BotPrograms
                     bot = new TeaStall(runParams);
                     break;
                 case BotActions.CutGems:
-                    bot = new Use1On27(runParams, 32400);
+                    bot = new Use1On27(runParams, 2 * GAME_TICK);
                     break;
                 case BotActions.EnchantLevel2:
                     bot = new Enchant(runParams, 2);
+                    break;
+            }
+            return bot;
+        }
+
+        /// <summary>
+        /// List of managers to run bot programs
+        /// </summary>
+        public enum BotManager : int
+        {
+            None,
+            Standard,
+            Phasmatys
+        }
+
+        public static BotProgram GetSelectedBot(RunParams runParams, BotManager botManager, BotActions selectedBot)
+        {
+            BotProgram bot = null;
+
+            switch (botManager)
+            {
+                case BotManager.None:
+                    bot = null;
+                    break;
+                case BotManager.Standard:
+                    bot = GetSelectedBot(runParams, selectedBot); ;
+                    break;
+                case BotManager.Phasmatys:
+                    bot = new Phasmatys(runParams);
                     break;
             }
             return bot;

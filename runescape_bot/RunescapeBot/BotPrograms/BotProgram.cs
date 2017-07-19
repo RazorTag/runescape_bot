@@ -119,6 +119,16 @@ namespace RunescapeBot.BotPrograms
         protected Inventory Inventory { get; set; }
 
         /// <summary>
+        /// Expected time to complete a single iteration
+        /// </summary>
+        protected int SingleMakeTime;
+
+        /// <summary>
+        /// Number of iterations in a single execution
+        /// </summary>
+        protected int MakeQuantity;
+
+        /// <summary>
         /// Stock random number generator
         /// </summary>
         protected Random RNG { get; set; }
@@ -227,7 +237,7 @@ namespace RunescapeBot.BotPrograms
             //don't limit by iterations unless the user has specified a positive number of iterations
             if (RunParams.Iterations == 0)
             {
-                RunParams.Iterations = int.MaxValue;
+                RunParams.InfiniteIterations = true;
             }
 
             //don't limit by run until time unless the user has specified a future date/time
@@ -236,6 +246,15 @@ namespace RunescapeBot.BotPrograms
                 RunParams.RunUntil = DateTime.MaxValue;
             }
 
+            ManageBot();
+            Done();
+        }
+
+        /// <summary>
+        /// Handles break, sleep, and rotation cycles
+        /// </summary>
+        protected virtual void ManageBot()
+        {
             int awakeTime = UnitConversions.HoursToMilliseconds(12);
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
@@ -256,8 +275,6 @@ namespace RunescapeBot.BotPrograms
                     sleepWatch.Restart();
                 }
             }
-            
-            Done();
         }
 
         /// <summary>
@@ -339,7 +356,7 @@ namespace RunescapeBot.BotPrograms
             Stopwatch workIntervalWatch = new Stopwatch();
             workIntervalWatch.Start();
 
-            while ((DateTime.Now < RunParams.RunUntil) && (RunParams.Iterations > 0))
+            while ((DateTime.Now < RunParams.RunUntil) && ((RunParams.Iterations > 0) || (RunParams.InfiniteIterations == true)))
             {
                 iterationWatch.Restart();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
@@ -362,6 +379,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 else
                 {
+                    if (StopFlag) { return true; }
                     if (!HandleFailedLogIn())
                     {
                         return true;    //stop if we are unable to recover
@@ -1309,9 +1327,9 @@ namespace RunescapeBot.BotPrograms
 
             while ((watch.ElapsedMilliseconds < waitTime) && (DateTime.Now < RunParams.RunUntil))
             {
+                if (StopFlag) { return true; }
                 nextWaitTime = Math.Min(waitInterval, (int)(waitTime - watch.ElapsedMilliseconds));
                 Thread.Sleep(nextWaitTime);
-                if (StopFlag) { return true; }
             }
             return StopFlag || (DateTime.Now >= RunParams.RunUntil);
         }
@@ -1468,6 +1486,30 @@ namespace RunescapeBot.BotPrograms
 
             return true;
         }
+
+        /// <summary>
+        /// Decrements the Iterations counter as items are made
+        /// Assumes that items are being made in time. Does not visually check.
+        /// </summary>
+        /// <param name="decrement">Set to true to decrement Iterations during the countdown</param>
+        protected void CountDownItems(bool decrement)
+        {
+            RunParams.BotIdle = true;
+            for (int i = 0; i < MakeQuantity; i++)
+            {
+                if (SafeWait(SingleMakeTime))
+                {
+                    RunParams.BotIdle = false;
+                    return;
+                }
+                if (decrement)
+                {
+                    RunParams.Iterations--;
+                }
+            }
+            RunParams.BotIdle = false;
+        }
+
         #endregion
 
         #region broadcasting

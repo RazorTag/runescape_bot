@@ -63,7 +63,6 @@ namespace RunescapeBot.BotPrograms
                 failedRuns++;
                 return true;
             }
-            SafeWaitPlus(0, 1500);
 
             failedRuns = 0;
             return true;

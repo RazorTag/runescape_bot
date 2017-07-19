@@ -82,6 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BotPrograms\BotManagers\Phasmatys.cs" />
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\BotRegistry.cs" />
     <Compile Include="BotPrograms\Bots\Agility\Agility.cs" />
@@ -110,11 +111,15 @@
     <Compile Include="BotPrograms\Popups\MakeXSlim.cs" />
     <Compile Include="BotPrograms\Popups\RightClick.cs" />
     <Compile Include="BotPrograms\BotUtilities.cs" />
+    <Compile Include="BotPrograms\RunParams\PhasmatysParams.cs" />
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Line.cs" />
     <Compile Include="Common\Numerical.cs" />
     <Compile Include="Common\Probability.cs" />
     <Compile Include="Common\UnitConversions.cs" />
+    <Compile Include="FileIO\PhasmatysBot.cs" />
+    <Compile Include="FileIO\PhasmatysSettings.cs" />
+    <Compile Include="FileIO\SoloBotSettings.cs" />
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
@@ -153,7 +158,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BotPrograms\RunParams.cs" />
+    <Compile Include="BotPrograms\RunParams\RunParams.cs" />
     <Compile Include="UITools\GDI32.cs" />
     <Compile Include="UITools\Kernel32.cs" />
     <Compile Include="UITools\Keyboard.cs" />
@@ -173,6 +178,7 @@
       <DependentUpon>Start.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\RunescapeBot.BotPrograms.RunParams.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -41,66 +41,12 @@ namespace RunescapeBot.FileIO
         public SettingsData SettingsData;
 
         /// <summary>
-        /// Last login name used
+        /// Loads the last used bot settings from disk
         /// </summary>
-        public string Login
-        {
-            get
-            {
-                return SettingsData.Login;
-            }
-        }
-
-        /// <summary>
-        /// Last password used
-        /// </summary>
-        public string Password
-        {
-            get
-            {
-                return SettingsData.Password;
-            }
-        }
-
-        /// <summary>
-        /// Last bot program used
-        /// </summary>
-        public BotRegistry.BotActions BotAction
-        {
-            get
-            {
-                return SettingsData.BotAction;
-            }
-        }
-
-        /// <summary>
-        /// The number of times to run through a bot program's routine
-        /// </summary>
-        public int Iterations
-        {
-            get
-            {
-                return SettingsData.Iterations;
-            }
-        }
-
-        /// <summary>
-        /// The location of the client to run
-        /// </summary>
-        public string ClientFilePath
-        {
-            get
-            {
-                return SettingsData.ClientFilePath;
-            }
-        }
-
-
         public BotSettings()
         {
             directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Roboport";
             serializer = new XmlSerializer(typeof(SettingsData));
-            Load();
         }
 
         /// <summary>
@@ -108,7 +54,7 @@ namespace RunescapeBot.FileIO
         /// </summary>
         /// <param name="botAction"></param>
         /// <returns>true if the load is successful</returns>
-        private bool Load()
+        public bool LoadSettings()
         {
             Stream stream = null;
             XmlDocument document = new XmlDocument();
@@ -136,10 +82,10 @@ namespace RunescapeBot.FileIO
         }
 
         /// <summary>
-        /// Saves the last used settings for all bot programs
+        /// Saves the last used settings for all bot programs to disk
         /// </summary>
         /// <returns>true if the save is successful</returns>
-        public bool Save()
+        public bool SaveSettings()
         {
             Stream stream = null;
             XmlDocument document = new XmlDocument();
@@ -160,17 +106,21 @@ namespace RunescapeBot.FileIO
 
         /// <summary>
         /// Updates the settings for a single bot program
+        /// Saves to disk after updating
         /// </summary>
-        /// <param name="botType"></param>
-        public void SaveBot(RunParams startParams)
+        /// <param name="runParams"></param>
+        public void SaveRunParams(RunParams runParams)
         {
-            SettingsData.Login = startParams.Login;
-            SettingsData.Password = startParams.Password;
-            SettingsData.BotAction = startParams.BotAction;
-            SettingsData.Iterations = startParams.Iterations;
-            SettingsData.ClientFilePath = startParams.ClientFilePath;
+            SettingsData.Save(runParams);
+        }
 
-            Save();
+        /// <summary>
+        /// Loads the settings data into RunParams
+        /// </summary>
+        /// <param name="runParams">runParams to store the settings</param>
+        public void LoadRunParams(ref RunParams runParams)
+        {
+            SettingsData.Load(ref runParams);
         }
     }
 }

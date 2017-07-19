@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
@@ -13,10 +14,18 @@ namespace RunescapeBot.BotPrograms
                 FrameTime = 3000;
                 RandomizeFrames = true;
                 BotState = BotProgram.BotState.Running;
+                RunUntil = DateTime.Now;
+
+                PhasmatysParams = new List<PhasmatysParams>(Phasmatys.NUMBER_OF_BOTS);
+                for (int i = 0; i < Phasmatys.NUMBER_OF_BOTS; i++)
+                {
+                    PhasmatysParams.Add(new PhasmatysParams());
+                }
             }
         }
 
         #region settings
+
         /// <summary>
         /// Username to use when logging in
         /// </summary>
@@ -50,7 +59,19 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Number of iterations after which the bot program should cease execution
         /// </summary>
-        public int Iterations { get; set; }
+        public int Iterations {
+            get { return iterations; }
+            set
+            {
+                iterations = Math.Max(0, value);
+            }
+        }
+        private int iterations;
+
+        /// <summary>
+        /// Set to true to run for infinitely many iterations
+        /// </summary>
+        public bool InfiniteIterations { get; set; }
 
         /// <summary>
         /// Bot program to run
@@ -91,6 +112,16 @@ namespace RunescapeBot.BotPrograms
         /// Toggles run on when the player has run energy
         /// </summary>
         public bool Run { get; set; }
+
+        /// <summary>
+        /// Set to true when the bot is idle so that the start form knows it can show itself
+        /// </summary>
+        public bool BotIdle { get; set; }
+
+        /// <summary>
+        /// List of bots to run on the Phasmatys rotation
+        /// </summary>
+        public List<PhasmatysParams> PhasmatysParams { get; set; }
 
         #endregion
 
