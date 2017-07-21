@@ -58,31 +58,31 @@ namespace RunescapeBot.BotPrograms
         protected override bool Run()
         {
             //ReadWindow();
-            //ColorRange empty = ColorFilters.ChaosRuneOrange();
+            //ColorRange empty = RGBHSBRanges.ChaosRuneOrange();
             //bool[,] mask = ColorFilter(empty);
             //DebugUtilities.TestMask(Bitmap, ColorArray, empty, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "chaosRune");
 
             //ReadWindow();
-            //ColorRange filter = ColorFilters.ChaosRuneOrange();
+            //ColorRange filter = RGBHSBRanges.ChaosRuneOrange();
             //bool[,] binary = ColorFilter(filter);
             //double test = ImageProcessing.FractionalMatch(binary);
 
-            //ColorRange filter = ColorFilters.DeathRuneWhite();
+            //ColorRange filter = RGBHSBRanges.DeathRuneWhite();
             //bool[,] mask = ColorFilter(filter);
             //DebugUtilities.TestMask(Bitmap, ColorArray, filter, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "deathRune");
             //double test = ImageProcessing.FractionalMatch(mask);
 
-            //ColorRange filterM = ColorFilters.MithrilArmor();
+            //ColorRange filterM = RGBHSBRanges.MithrilArmor();
             //bool[,] binaryM = ColorFilter(filterM);
             //double testM = ImageProcessing.FractionalMatch(binaryM);
 
-            //ColorRange color = ColorFilters.LesserDemonHorn();
+            //ColorRange color = RGBHSBRanges.LesserDemonHorn();
             //bool[,] mask = ColorFilter(color);
             //DebugUtilities.TestMask(Bitmap, ColorArray, color, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "cloves");
 
             //SafeWait(3000);
             //ReadWindow();
-            //ColorRange color = ColorFilters.MouseoverTextNPC();
+            //ColorRange color = RGBHSBRanges.MouseoverTextNPC();
             //bool[,] mask = ColorFilter(color);
             //DebugUtilities.TestMask(Bitmap, ColorArray, color, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "mouseoverNPCText");
 

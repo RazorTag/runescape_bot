@@ -358,14 +358,13 @@ namespace RunescapeBot.BotPrograms
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
                 if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
 
-                //Turn on run if the player has run energy
-                RunCharacter();
-
                 //Only do the actual botting if we are logged in
                 if (CheckLogIn())
                 {
                     if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                     {
+                        RunCharacter(); //Turn on run if the player has run energy
+
                         if (!Execute()) //quit by an override Execute method
                         {
                             return true;
@@ -575,7 +574,7 @@ namespace RunescapeBot.BotPrograms
 
             foundObject = null;
             Point? lastPosition = null;
-            const int scanInterval = 200; //minimum time between checks in milliseconds
+            const int scanInterval = 500; //minimum time between checks in milliseconds
             int passes = 0;
             Stopwatch intervalWatch = new Stopwatch();
             Stopwatch giveUpWatch = new Stopwatch();
@@ -711,9 +710,9 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Wrapper for ScreenScraper.CaptureWindow
         /// </summary>
-        protected bool ReadWindow()
+        protected bool ReadWindow(bool checkClient = true)
         {
-            if (!PrepareClient()) { return false; }
+            if (checkClient && !PrepareClient()) { return false; }
 
             if (Bitmap != null)
             {
@@ -1009,11 +1008,14 @@ namespace RunescapeBot.BotPrograms
                 RSClient = client;
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                while (!IsLoggedOut(true) && (watch.ElapsedMilliseconds < 600000) && !StopFlag)
+                do
                 {
                     SafeWait(5000);
+                    ReadWindow(false);
                 }
-                if (IsLoggedOut(true) || IsLoggedIn())
+                while ((!IsLoggedOut(false) && (watch.ElapsedMilliseconds < 600000) && !StopFlag));
+
+                if (IsLoggedOut(false) || IsLoggedIn())
                 {
                     BroadcastConnection();
                     return true;
@@ -1076,16 +1078,17 @@ namespace RunescapeBot.BotPrograms
         private bool LogIn()
         {
             Point? clickLocation;
+            Point loginOffset = ScreenScraper.LoginScreenOffset();
             int center = ScreenWidth / 2;
 
             //log in at the login screen
             if (!IsWelcomeScreen(out clickLocation))
             {
                 //Click existing account. Clicks in a dead space if we are already on the login screen.
-                LeftClick(center + 16, 288);
+                LeftClick(center + 16 + loginOffset.X, 288 + loginOffset.Y);
 
                 //fill in login
-                LeftClick(center + 137, 255);
+                LeftClick(center + 137 + loginOffset.X, 255 + loginOffset.Y);
                 Keyboard.Backspace(350);
                 Keyboard.WriteLine(RunParams.Login);
 
@@ -1415,9 +1418,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void ToggleRun()
         {
-            int x = ScreenWidth - 161;
-            int y = 135;
-            LeftClick(x, y, 3);
+            Point runOrb = RunOrbSamplePoint();
+            LeftClick(runOrb.X, runOrb.Y, 5);
         }
 
         /// <summary>
@@ -1428,9 +1430,32 @@ namespace RunescapeBot.BotPrograms
         {
             if (readWindow) { ReadWindow(); }
 
-            Color runColor = GetPixel(ScreenWidth - 156, 137);
+            DebugUtilities.SaveImageToFile(Bitmap);
+            Point runOrb = RunOrbSamplePoint();
+            Color runColor = GetPixel(runOrb.X, runOrb.Y);
             ColorRange runEnergyFoot = RGBHSBRanges.RunEnergyFoot();
             return runEnergyFoot.ColorInRange(runColor);
+        }
+
+        /// <summary>
+        /// Returns the point to look at or click on for the run energy orb next to the minimap
+        /// </summary>
+        /// <returns></returns>
+        protected Point RunOrbSamplePoint()
+        {
+            Point runOrb;
+            switch (ScreenScraper.ClientType)
+            {
+                case ScreenScraper.Client.Jagex:
+                    runOrb = new Point(ScreenWidth - 145, 146);
+                    break;
+                case ScreenScraper.Client.OSBuddy:
+                    runOrb = new Point(ScreenWidth - 156, 137);
+                    break;
+                default:
+                    return new Point(0, 0);
+            }
+            return runOrb;
         }
 
         /// <summary>
@@ -1441,10 +1466,25 @@ namespace RunescapeBot.BotPrograms
         {
             if (readWindow) { ReadWindow(); }
 
-            int left = ScreenWidth - 194;
-            int right = ScreenWidth - 174;
-            int top = 132;
-            int bottom = 146;
+            int left, right, top, bottom;
+            switch (ScreenScraper.ClientType)
+            {
+                case ScreenScraper.Client.Jagex:
+                    left = ScreenWidth - 181;
+                    right = ScreenWidth - 161;
+                    top = 142;
+                    bottom = 156;
+                    break;
+                case ScreenScraper.Client.OSBuddy:
+                    left = ScreenWidth - 193;
+                    right = ScreenWidth - 173;
+                    top = 133;
+                    bottom = 147;
+                    break;
+                default:
+                    return false;
+            }
+
             Color[,] runEnergyPercentage = ScreenPiece(left, right, top, bottom);
             return MinimapGaugeIsHigh(runEnergyPercentage, 0.05);
         }

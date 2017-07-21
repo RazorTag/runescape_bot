@@ -17,8 +17,8 @@ namespace RunescapeBot.ImageTools
         #region constants
         public const int OSBUDDY_TOOLBAR_WIDTH = 33;
         public const int OSBUDDY_BORDER_WIDTH = 3;
-        public const int JAGEX_TOOLBAR_WIDTH = 31;
-        public const int JAGEX_BORDER_WIDTH = 8;
+        public const int JAGEX_TOOLBAR_WIDTH = 23;
+        public const int JAGEX_BORDER_WIDTH = 0;
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
         #endregion
@@ -204,6 +204,16 @@ namespace RunescapeBot.ImageTools
         /// <param name="windowRect"></param>
         private static bool TrimClient(ref RECT windowRect)
         {
+            //correct for ghost padding issue seen with the Jagex client
+            if (windowRect.top < 0)
+            {
+                int ghostPadding = -windowRect.top;
+                windowRect.top += ghostPadding;
+                windowRect.right -= ghostPadding;
+                windowRect.bottom -= ghostPadding;
+                windowRect.left += ghostPadding;
+            }
+
             switch (ClientType)
             {
                 case Client.Jagex:
