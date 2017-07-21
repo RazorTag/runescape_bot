@@ -313,7 +313,7 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient">RuneScape client in which to move the mouse</param>
         public static void MoveMouseAsynchronous(int x, int y, Process rsClient)
         {
-            Thread moveMouse = new Thread(unused => MoveMouse(0, (int)Probability.BoundedGaussian(x, y), rsClient));
+            Thread moveMouse = new Thread(unused => MoveMouse(x, y, rsClient));
             moveMouse.Start();
         }
         #endregion

@@ -131,7 +131,8 @@ namespace RunescapeBot
             //standard bot manager
             Login.Text = RunParams.Login;
             Password.Text = RunParams.Password;
-            ClientLocation.Text = RunParams.ClientFilePath;
+            JagexClientLocation.Text = RunParams.JagexClient;
+            OSBuddyClientLocation.Text = RunParams.OSBuddyClient;
             BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
             Iterations.Value = RunParams.Iterations;
 
@@ -220,7 +221,8 @@ namespace RunescapeBot
             RunParams.RunUntil = RunUntil.Value;
             RunParams.TaskComplete = new BotResponse(BotDone);
             RunParams.BotAction = (BotRegistry.BotActions)BotActionSelect.SelectedIndex;
-            RunParams.ClientFilePath = ClientLocation.Text;
+            RunParams.JagexClient = JagexClientLocation.Text;
+            RunParams.OSBuddyClient = OSBuddyClientLocation.Text;
         }
 
         /// <summary>
@@ -320,7 +322,7 @@ namespace RunescapeBot
             if (RunningBot != null)
             {
                 StartButton.Enabled = false;
-                SetTransitionalState(startButton);
+                SetTransitionalState();
                 SaveBot();
                 RunningBot.Stop();
                 UpdateTimer_Tick(null, null);
@@ -367,6 +369,9 @@ namespace RunescapeBot
             RunningBot = null;
             BotIsRunning = false;
             Text = FORM_NAME;
+            BotManager = BotRegistry.BotManager.None;
+            StatusMessage.Text = "";
+            PhasmatysStatus.Text = "";
 
             foreach (Button button in StartButtons)
             {
@@ -374,25 +379,23 @@ namespace RunescapeBot
                 button.BackColor = ColorTranslator.FromHtml("#527E3F");
                 button.Enabled = true;
             }
-            BotManager = BotRegistry.BotManager.None;
         }
 
         /// <summary>
         /// Sets up the Start for for a transitional state
         /// </summary>
-        private void SetTransitionalState(Button startButton)
+        private void SetTransitionalState()
         {
             Text = GetBotName() + " " + BOT_STOPPING;
-
-            if (startButton != null)
-            {
-                startButton.Text = "";
-                startButton.BackColor = ColorTranslator.FromHtml("#7E7E37");
-            }
-            
+            BotManager = BotRegistry.BotManager.None;
             StatusMessage.Text = "";
             PhasmatysStatus.Text = "";
-            BotManager = BotRegistry.BotManager.None;
+
+            foreach (Button button in StartButtons)
+            {
+                button.Text = "";
+                button.BackColor = ColorTranslator.FromHtml("#7E7E37");
+            }
         }
 
         /// <summary>
@@ -430,7 +433,21 @@ namespace RunescapeBot
             DialogResult result = FileSelect.ShowDialog();
             if (result == DialogResult.OK)
             {
-                ClientLocation.Text = FileSelect.FileName;
+                OSBuddyClientLocation.Text = FileSelect.FileName;
+            }
+        }
+
+        /// <summary>
+        /// Opens a file dialog for the user to select the Jagex client executable
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void JagexClientSelect_Click(object sender, EventArgs e)
+        {
+            DialogResult result = FileSelect.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                JagexClientLocation.Text = FileSelect.FileName;
             }
         }
 
@@ -443,8 +460,19 @@ namespace RunescapeBot
         {
             if (RunningBot == null) { return; }
 
-            //Show th start form for periods when the bot is idling
-            TopMost = RunParams.BotIdle ? true : TopMost;
+            //Show the start form for periods when the bot is idling
+            if (TopMost != RunParams.BotIdle)
+            {
+                TopMost = RunParams.BotIdle;
+                if (TopMost)
+                {
+                    BringToFront();
+                }
+                else
+                {
+                    SendToBack();
+                }
+            }
 
             //make sure that the date for the RunUntil field doesn't exceed the max value for that field
             RunUntil.Value = RunningBot.RunParams.RunUntil < RunUntil.MaxDate ? RunningBot.RunParams.RunUntil : RunUntil.MaxDate;

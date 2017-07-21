@@ -17,9 +17,26 @@ namespace RunescapeBot.ImageTools
         #region constants
         public const int OSBUDDY_TOOLBAR_WIDTH = 33;
         public const int OSBUDDY_BORDER_WIDTH = 3;
+        public const int JAGEX_TOOLBAR_WIDTH = 31;
+        public const int JAGEX_BORDER_WIDTH = 8;
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
         #endregion
+
+        /// <summary>
+        /// The client to look for 
+        /// </summary>
+        public enum Client
+        {
+            None = 0,
+            Jagex,
+            OSBuddy
+        }
+
+        /// <summary>
+        /// THe client type most recently found
+        /// </summary>
+        public static Client ClientType { get; set; }
 
         #region screenreader
         /// <summary>
@@ -40,7 +57,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Maximizes a window if it isn;t already
+        /// Maximizes a window if it isn't already
         /// </summary>
         /// <param name="rsClient"></param>
         /// <returns></returns>
@@ -66,7 +83,7 @@ namespace RunescapeBot.ImageTools
             BringToForeGround(rsClient);
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
-            if (!TrimOSBuddy(ref windowRect))
+            if (!TrimClient(ref windowRect))
             {
                 return null;
             }
@@ -88,7 +105,7 @@ namespace RunescapeBot.ImageTools
             BringToForeGround(rsClient);
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
-            if (!TrimOSBuddy(ref windowRect))
+            if (!TrimClient(ref windowRect))
             {
                 return null;
             }
@@ -146,50 +163,34 @@ namespace RunescapeBot.ImageTools
             }
             return rgbArray;
         }
+
         #endregion
 
-        #region OSBuddy
-        /// <summary>
-        /// Finds the OSBuddy client process to attach to
-        /// </summary>
-        /// <param name="loadError">used to output an error in finding a process</param>
-        /// <returns></returns>
-        public static Process GetOSBuddy(out string loadError)
-        {
-            loadError = "";
-            string windowName = "OSBUDDY";
-            string mainWindowTitle;
-            Process[] processlist = Process.GetProcesses();
-
-            foreach (Process process in processlist)
-            {
-                mainWindowTitle = process.MainWindowTitle.ToUpper();
-                if (mainWindowTitle.Contains(windowName) && !mainWindowTitle.Contains("LOADER"))
-                {
-                    return process;
-                }
-            }
-            
-            loadError = "No OSBuddy client found";
-            return null;    //no OSBuddy client found
-        }
+        #region attach to process
 
         /// <summary>
         /// Determines if a process is currently running
         /// </summary>
         /// <param name="processToFind"></param>
         /// <returns>true if the process is found, false otherwise</returns>
-        public static bool ProcessExists(Process processToFind)
+        public static bool ProcessExists(Process processToFind, Client clientType = Client.None)
         {
-            if (processToFind == null)
-            {
-                return false;
-            }
+            if (processToFind == null) { return false; }
 
             try
             {
                 Process process = Process.GetProcessById(processToFind.Id);
-                return (process != null) && !process.HasExited;
+                if (process == null || process.HasExited) { return false; }
+
+                switch (clientType)
+                {
+                    case Client.Jagex:
+                        return IsJagex(process);
+                    case Client.OSBuddy:
+                        return IsOSBuddy(process);
+                    default:
+                        return true;
+                }
             }
             catch
             {
@@ -198,15 +199,26 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Trims out the borders of the OSBuddy client from the target rectangle
+        /// Trims out the borders of the client from the target rectangle
         /// </summary>
         /// <param name="windowRect"></param>
-        private static bool TrimOSBuddy(ref RECT windowRect)
+        private static bool TrimClient(ref RECT windowRect)
         {
-            windowRect.top += OSBUDDY_TOOLBAR_WIDTH;
-            windowRect.right -= OSBUDDY_BORDER_WIDTH;
-            windowRect.bottom -= OSBUDDY_BORDER_WIDTH;
-            windowRect.left += OSBUDDY_BORDER_WIDTH;
+            switch (ClientType)
+            {
+                case Client.Jagex:
+                    windowRect.top += JAGEX_TOOLBAR_WIDTH;
+                    windowRect.right -= JAGEX_BORDER_WIDTH;
+                    windowRect.bottom -= JAGEX_BORDER_WIDTH;
+                    windowRect.left += JAGEX_BORDER_WIDTH;
+                    break;
+                case Client.OSBuddy:
+                    windowRect.top += OSBUDDY_TOOLBAR_WIDTH;
+                    windowRect.right -= OSBUDDY_BORDER_WIDTH;
+                    windowRect.bottom -= OSBUDDY_BORDER_WIDTH;
+                    windowRect.left += OSBUDDY_BORDER_WIDTH;
+                    break;
+            }
 
             //Ignore any portion of the game screen that is not visible
             windowRect.top = Math.Max(0, windowRect.top);
@@ -220,95 +232,178 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Gets the width and height of a window
         /// </summary>
-        /// <param name="OSBuddy"></param>
+        /// <param name="client"></param>
         /// <returns>Point(width, height)</returns>
-        public static Point GetOSBuddyWindowSize(Process OSBuddy)
+        public static Point GetWindowSize(Process client)
         {
-            if (!ProcessExists(OSBuddy)) { return new Point(); }
+            if (!ProcessExists(client)) { return new Point(); }
 
             RECT windowRect = new RECT();
-            GetWindowRect(OSBuddy.MainWindowHandle, ref windowRect);
-            TrimOSBuddy(ref windowRect);
+            GetWindowRect(client.MainWindowHandle, ref windowRect);
+            TrimClient(ref windowRect);
             return new Point(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
         }
 
         /// <summary>
-        /// Closes an instance of OSBuddy and opens a new one
+        /// Closes an instance of a RuneScape client and opens a new one
         /// </summary>
-        /// <param name="OSBuddy"></param>
+        /// <param name="client"></param>
         /// <returns>true if successful</returns>
-        public static bool RestartOSBuddy(string clientFilePath, ref Process OSBuddy)
+        public static bool RestartClient(ref Process client, string clientFilePath, string arguments)
         {
-            return CloseOSBuddy(ref OSBuddy) && StartOSBuddy(clientFilePath, ref OSBuddy);
+            return CloseClient(ref client) && StartClient(ref client, clientFilePath, arguments);
         }
 
         /// <summary>
-        /// Attempts to close an OSBuddy window if one exists
+        /// Attempts to close an RuneScape client window if one exists
         /// </summary>
-        /// <param name="OSBuddy">OSBuddy main window</param>
+        /// <param name="client">RuneScape client main window</param>
         /// <returns>true if successful</returns>
-        public static bool CloseOSBuddy(ref Process OSBuddy)
+        public static bool CloseClient(ref Process client)
         {
-            if (ProcessExists(OSBuddy))
+            if (ProcessExists(client))
             {
-                if (!OSBuddy.CloseMainWindow())
+                if (!client.CloseMainWindow())
                 {
-                    return false;   //unable to close the current instance of OSBuddy
+                    return false;   //unable to close the current instance of the RuneScape client
                 }
+
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                string loadError;
-                while (ProcessExists(OSBuddy) && (watch.ElapsedMilliseconds < 30000) && !BotProgram.StopFlag)
+                while (ProcessExists(client) && (watch.ElapsedMilliseconds < 30000) && !BotProgram.StopFlag)
                 {
                     Thread.Sleep(500);
-                    OSBuddy = GetOSBuddy(out loadError);
+                    client = GetClient();
                 }
-                if (ProcessExists(OSBuddy))
+                if (ProcessExists(client))
                 {
                     return false;
                 }
             }
 
-            OSBuddy = null;
+            client = null;
+            ClientType = Client.None;
             return true;
         }
 
         /// <summary>
-        /// Starts a new instance of the OSBuddy client
+        /// Starts a new instance of the Runescape client
         /// </summary>
         /// <returns>true if successful</returns>
-        public static bool StartOSBuddy(string clientFilePath, ref Process OSBuddy)
+        public static bool StartClient(ref Process client, string clientFilePath, string arguments)
         {
-            string error;
-            OSBuddy = GetOSBuddy(out error);
-            if (ProcessExists(OSBuddy))
+            client = GetClient();
+            if (ProcessExists(client))
             {
-                return true;    //OSBuddy is already running
+                return true;    //the Runescape client is already running
             }
-            
-            //start OSBuddy
+
+            //start the Runescape client
             try
             {
-                Process startProcess = new Process();
-                startProcess.StartInfo.FileName = clientFilePath;
-                startProcess.Start();
+                Process.Start(clientFilePath, arguments);
 
-                //verify that OSBuddy has loaded
+                //verify that the Runescape client has loaded
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                string loadError;
-                while (!ProcessExists(OSBuddy) && (watch.ElapsedMilliseconds < 300000) && !BotProgram.StopFlag)
+                while (!ProcessExists(client) && (watch.ElapsedMilliseconds < 300000) && !BotProgram.StopFlag)
                 {
                     Thread.Sleep(500);
-                    OSBuddy = GetOSBuddy(out loadError);
+                    client = GetClient();
                 }
-                return ProcessExists(OSBuddy);
+                return ProcessExists(client);
             }
             catch
             {
                 return false;
             }
         }
+
+        /// <summary>
+        /// Returns a RuneScape client of the specified type
+        /// </summary>
+        /// <param name="loadError"></param>
+        /// <param name="clientType"></param>
+        /// <returns>null if no client is found</returns>
+        public static Process GetClient()
+        {
+            Process[] processlist = Process.GetProcesses();
+
+            foreach (Process process in processlist)
+            {
+                if (IsJagex(process)
+                    || IsOSBuddy(process))
+                {
+                    return process;
+                }
+            }
+            return null;    //no OSBuddy client found
+        }
+
+        /// <summary>
+        /// Determines if a process is an OSBuddy client
+        /// </summary>
+        /// <param name="process"></param>
+        /// <returns></returns>
+        public static bool IsOSBuddy(Process process)
+        {
+            if (process == null) { return false; }
+
+            const string windowName = "OSBUDDY";
+            string mainWindowTitle = process.MainWindowTitle.ToUpper();
+            if (mainWindowTitle.Contains(windowName) && !mainWindowTitle.Contains("LOADER"))
+            {
+                ClientType = Client.OSBuddy;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Determines if a process is the Jagex client
+        /// </summary>
+        /// <param name="process"></param>
+        /// <returns></returns>
+        public static bool IsJagex(Process process)
+        {
+            if (process == null) { return false; }
+
+            string windowName = "OLD SCHOOL RUNESCAPE";
+            string mainWindowTitle = process.MainWindowTitle.ToUpper();
+            if (mainWindowTitle.Contains(windowName))
+            {
+                ClientType = Client.Jagex;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         #endregion
+
+        /// <summary>
+        /// Gives the offset of the position of the login screen based on the client
+        /// </summary>
+        /// <returns></returns>
+        public static Point LoginScreenOffset()
+        {
+            Point offset = new Point(0, 0);
+
+            switch (ClientType)
+            {
+                case Client.Jagex:
+                    offset = new Point(0, 20);
+                    break;
+                default:
+                    offset = new Point(0, 0);
+                    break;
+            }
+            return offset;
+        }
     }
 }

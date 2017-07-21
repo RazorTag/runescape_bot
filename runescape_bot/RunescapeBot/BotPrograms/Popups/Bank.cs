@@ -19,7 +19,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public Bank(Process RSClient)
         {
             this.RSClient = RSClient;
-            Point screenSize = ScreenScraper.GetOSBuddyWindowSize(RSClient);
+            Point screenSize = ScreenScraper.GetWindowSize(RSClient);
             SetLeft(screenSize.X);
             SetRight(screenSize.X);
             SetTop(screenSize.Y);

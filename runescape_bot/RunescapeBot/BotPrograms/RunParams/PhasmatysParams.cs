@@ -42,5 +42,14 @@ namespace RunescapeBot.BotPrograms
         /// Number of unstrung bows remaining
         /// </summary>
         public int Bows { get; set; }
+
+        /// <summary>
+        /// Sets the values from this PhasmatysParams into the provided RunParams
+        /// </summary>
+        /// <param name="runParams"></param>
+        public void SetParams(ref RunParams runParams)
+        {
+            //runParams.
+        }
     }
 }

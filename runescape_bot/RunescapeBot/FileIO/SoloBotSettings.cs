@@ -26,7 +26,7 @@ namespace RunescapeBot.FileIO
             info.AddValue(nameof(Password), Password);
             info.AddValue(nameof(BotAction), BotAction);
             info.AddValue(nameof(Iterations), Iterations);
-            info.AddValue(nameof(ClientFilePath), ClientFilePath);
+            info.AddValue(nameof(OSBuddyClient), OSBuddyClient);
         }
 
         /// <summary>
@@ -54,10 +54,16 @@ namespace RunescapeBot.FileIO
         public int Iterations { get; set; }
 
         /// <summary>
-        /// The file location of the RuneScape client to run
+        /// The file path of the standard Jagex client
         /// </summary>
         [DataMember]
-        public string ClientFilePath { get; set; }
+        public string JagexClient { get; set; }
+
+        /// <summary>
+        /// The file path of the OSBuddy client
+        /// </summary>
+        [DataMember]
+        public string OSBuddyClient { get; set; }
 
         /// <summary>
         /// Saves general bot settings and solo bot settings
@@ -69,7 +75,8 @@ namespace RunescapeBot.FileIO
             Password = generalSettings.Password;
             BotAction = generalSettings.BotAction;
             Iterations = generalSettings.Iterations;
-            ClientFilePath = generalSettings.ClientFilePath;
+            JagexClient = generalSettings.JagexClient;
+            OSBuddyClient = generalSettings.OSBuddyClient;
         }
 
         /// <summary>
@@ -82,7 +89,8 @@ namespace RunescapeBot.FileIO
             generalSettings.Password = Password;
             generalSettings.BotAction = BotAction;
             generalSettings.Iterations = Iterations;
-            generalSettings.ClientFilePath = ClientFilePath;
+            generalSettings.JagexClient = JagexClient;
+            generalSettings.OSBuddyClient = OSBuddyClient;
         }
     }
 }

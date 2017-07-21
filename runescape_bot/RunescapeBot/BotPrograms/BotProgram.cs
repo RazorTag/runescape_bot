@@ -40,11 +40,6 @@ namespace RunescapeBot.BotPrograms
         private const long LOGIN_LOGO_SUM_INFERNAL = 10145709;
 
         /// <summary>
-        /// Error message to show the user for a start error
-        /// </summary>
-        private string LoadError;
-
-        /// <summary>
         /// Specifies how the bot should be run
         /// </summary>
         public RunParams RunParams;
@@ -205,11 +200,12 @@ namespace RunescapeBot.BotPrograms
         /// <param name="startParams">specifies the username to search for</param>
         protected BotProgram(RunParams startParams)
         {
-            RSClient = ScreenScraper.GetOSBuddy(out LoadError);
+            RSClient = ScreenScraper.GetClient();
             RunParams = startParams;
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);
             Inventory = new Inventory(RSClient, ColorArray, Keyboard);
+            RunParams.ClientType = ScreenScraper.Client.Jagex;
         }
        
         /// <summary>
@@ -1000,7 +996,7 @@ namespace RunescapeBot.BotPrograms
         #region login/restart
 
         /// <summary>
-        /// Makes sure that OSBuddy is running and starts it if it isn't
+        /// Makes sure that a client is running and starts it if it isn't
         /// </summary>
         /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
         /// <returns>true if client is successfully prepared</returns>
@@ -1008,7 +1004,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
 
-            while (ScreenScraper.RestartOSBuddy(RunParams.ClientFilePath, ref client))
+            while (ScreenScraper.RestartClient(ref client, RunParams.RuneScapeClient, RunParams.ClientFlags))
             {
                 RSClient = client;
                 Stopwatch watch = new Stopwatch();
@@ -1029,7 +1025,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             BroadcastDisconnect();
-            string errorMessage = (LoadError != "") ? LoadError : "Client did not start correctly";
+            const string errorMessage = "Client did not start correctly";
             MessageBox.Show(errorMessage);
             client = null;
             return false;
@@ -1249,9 +1245,11 @@ namespace RunescapeBot.BotPrograms
             if (readWindow && !ReadWindow()) { return false; }
 
             Color color;
+            Point loginOffset = ScreenScraper.LoginScreenOffset();
             int height = ScreenHeight;
-            int centerX = Center.X;
-            int checkRow = Math.Min(height - 1, ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
+            int top = loginOffset.Y;
+            int centerX = Center.X + loginOffset.X;
+            int checkRow = Math.Min(height - 1, loginOffset.Y + ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
             int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 2;
             int blackPixels = 0;
             int totalPixels = 0;
@@ -1263,7 +1261,7 @@ namespace RunescapeBot.BotPrograms
                 blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
                 totalPixels++;
             }
-            for (int y = 0; y < checkRow; y++)  //check sides
+            for (int y = top; y < checkRow; y++)  //check sides
             {
                 //check left of login box
                 color = ColorArray[centerX - xOffset, y];
@@ -1282,7 +1280,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
-            long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, 0, 160));
+            long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, top, top + 160));
             if (!Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01))
             {
                 return false;

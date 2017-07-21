@@ -22,7 +22,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the prompt appears</returns>
         public static bool WaitForEnterAmount(Process rsClient, int timeout)
         {
-            Point screenSize = ScreenScraper.GetOSBuddyWindowSize(rsClient);
+            Point screenSize = ScreenScraper.GetWindowSize(rsClient);
             const int asterisk = 91235;
             const int left = 252;
             const int right = 265;
@@ -70,7 +70,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static bool ChatBoxSingleOptionMakeAll(Process rsClient)
         {
-            Point screenSize = ScreenScraper.GetOSBuddyWindowSize(rsClient);
+            Point screenSize = ScreenScraper.GetWindowSize(rsClient);
             int left = 230;
             int right = 282;
             int top = screenSize.Y - 110;

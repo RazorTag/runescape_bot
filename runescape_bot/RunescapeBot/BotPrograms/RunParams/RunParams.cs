@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.ImageTools;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
@@ -104,9 +105,57 @@ namespace RunescapeBot.BotPrograms
         public bool RandomizeFrames { get; set; }
 
         /// <summary>
-        /// File location of the client to run
+        /// File path of the standard Jagex OSRS client
         /// </summary>
-        public string ClientFilePath { get; set; }
+        public string JagexClient { get; set; }
+
+        /// <summary>
+        /// File path of the OSBuddy client
+        /// </summary>
+        public string OSBuddyClient { get; set; }
+
+        /// <summary>
+        /// The file path of the RuneScape client to use
+        /// </summary>
+        public string RuneScapeClient
+        {
+            get
+            {
+                switch (ClientType)
+                {
+                    case ScreenScraper.Client.Jagex:
+                        return JagexClient;
+                    case ScreenScraper.Client.OSBuddy:
+                        return OSBuddyClient;
+                    default:
+                        return JagexClient;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Arguments to be supplied with the file path when starting a client
+        /// </summary>
+        public string ClientFlags
+        {
+            get
+            {
+                switch (ClientType)
+                {
+                    case ScreenScraper.Client.Jagex:
+                        return "oldschool";
+                    case ScreenScraper.Client.OSBuddy:
+                        return "";
+                    default:
+                        return "oldschool";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Specifies which client to use
+        /// </summary>
+        public ScreenScraper.Client ClientType { get; set; }
 
         /// <summary>
         /// Toggles run on when the player has run energy
@@ -117,6 +166,11 @@ namespace RunescapeBot.BotPrograms
         /// Set to true when the bot is idle so that the start form knows it can show itself
         /// </summary>
         public bool BotIdle { get; set; }
+
+        /// <summary>
+        /// Index of the active bot from a list of bots being used by a BotManager
+        /// </summary>
+        public int ActiveBot { get; set; }
 
         /// <summary>
         /// List of bots to run on the Phasmatys rotation

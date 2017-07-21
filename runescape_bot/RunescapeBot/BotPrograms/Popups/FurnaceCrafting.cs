@@ -38,7 +38,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public FurnaceCrafting(Process rsClient)
         {
             this.RSClient = rsClient;
-            Point screenSize = ScreenScraper.GetOSBuddyWindowSize(RSClient);
+            Point screenSize = ScreenScraper.GetWindowSize(RSClient);
             SetLeft(screenSize.X);
             SetTop(screenSize.Y);
         }

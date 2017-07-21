@@ -40,9 +40,12 @@ namespace RunescapeBot
             this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.BotManagerType = new System.Windows.Forms.TabControl();
             this.SoloBot = new System.Windows.Forms.TabPage();
+            this.JagexClientLocation = new System.Windows.Forms.TextBox();
+            this.JagexClientSelect = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
             this.StatusMessage = new System.Windows.Forms.TextBox();
             this.StartButton = new System.Windows.Forms.Button();
-            this.ClientLocation = new System.Windows.Forms.TextBox();
+            this.OSBuddyClientLocation = new System.Windows.Forms.TextBox();
             this.OSBuddySelect = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.BotActionSelect = new System.Windows.Forms.ComboBox();
@@ -103,9 +106,12 @@ namespace RunescapeBot
             // 
             // SoloBot
             // 
+            this.SoloBot.Controls.Add(this.JagexClientLocation);
+            this.SoloBot.Controls.Add(this.JagexClientSelect);
+            this.SoloBot.Controls.Add(this.label13);
             this.SoloBot.Controls.Add(this.StatusMessage);
             this.SoloBot.Controls.Add(this.StartButton);
-            this.SoloBot.Controls.Add(this.ClientLocation);
+            this.SoloBot.Controls.Add(this.OSBuddyClientLocation);
             this.SoloBot.Controls.Add(this.OSBuddySelect);
             this.SoloBot.Controls.Add(this.label4);
             this.SoloBot.Controls.Add(this.BotActionSelect);
@@ -126,6 +132,36 @@ namespace RunescapeBot
             this.SoloBot.Text = "Solo Bot";
             this.SoloBot.UseVisualStyleBackColor = true;
             // 
+            // JagexClientLocation
+            // 
+            this.JagexClientLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.JagexClientLocation.Location = new System.Drawing.Point(84, 6);
+            this.JagexClientLocation.Name = "JagexClientLocation";
+            this.JagexClientLocation.Size = new System.Drawing.Size(339, 26);
+            this.JagexClientLocation.TabIndex = 31;
+            // 
+            // JagexClientSelect
+            // 
+            this.JagexClientSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.JagexClientSelect.Image = ((System.Drawing.Image)(resources.GetObject("JagexClientSelect.Image")));
+            this.JagexClientSelect.Location = new System.Drawing.Point(423, 5);
+            this.JagexClientSelect.Name = "JagexClientSelect";
+            this.JagexClientSelect.Size = new System.Drawing.Size(35, 28);
+            this.JagexClientSelect.TabIndex = 32;
+            this.JagexClientSelect.Text = ". . .";
+            this.JagexClientSelect.UseVisualStyleBackColor = true;
+            this.JagexClientSelect.Click += new System.EventHandler(this.JagexClientSelect_Click);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(3, 10);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(54, 18);
+            this.label13.TabIndex = 33;
+            this.label13.Text = "Jagex:";
+            // 
             // StatusMessage
             // 
             this.StatusMessage.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -138,7 +174,7 @@ namespace RunescapeBot
             // StartButton
             // 
             this.StartButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StartButton.Location = new System.Drawing.Point(173, 293);
+            this.StartButton.Location = new System.Drawing.Point(169, 302);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(125, 55);
             this.StartButton.TabIndex = 8;
@@ -146,21 +182,21 @@ namespace RunescapeBot
             this.StartButton.UseVisualStyleBackColor = true;
             this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
-            // ClientLocation
+            // OSBuddyClientLocation
             // 
-            this.ClientLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ClientLocation.Location = new System.Drawing.Point(103, 15);
-            this.ClientLocation.Name = "ClientLocation";
-            this.ClientLocation.Size = new System.Drawing.Size(320, 26);
-            this.ClientLocation.TabIndex = 1;
+            this.OSBuddyClientLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OSBuddyClientLocation.Location = new System.Drawing.Point(84, 45);
+            this.OSBuddyClientLocation.Name = "OSBuddyClientLocation";
+            this.OSBuddyClientLocation.Size = new System.Drawing.Size(339, 26);
+            this.OSBuddyClientLocation.TabIndex = 1;
             // 
             // OSBuddySelect
             // 
             this.OSBuddySelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.OSBuddySelect.Image = ((System.Drawing.Image)(resources.GetObject("OSBuddySelect.Image")));
-            this.OSBuddySelect.Location = new System.Drawing.Point(423, 14);
+            this.OSBuddySelect.Location = new System.Drawing.Point(423, 44);
             this.OSBuddySelect.Name = "OSBuddySelect";
-            this.OSBuddySelect.Size = new System.Drawing.Size(35, 27);
+            this.OSBuddySelect.Size = new System.Drawing.Size(35, 28);
             this.OSBuddySelect.TabIndex = 2;
             this.OSBuddySelect.Text = ". . .";
             this.OSBuddySelect.UseVisualStyleBackColor = true;
@@ -170,7 +206,7 @@ namespace RunescapeBot
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(3, 208);
+            this.label4.Location = new System.Drawing.Point(3, 217);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(73, 18);
             this.label4.TabIndex = 22;
@@ -180,30 +216,30 @@ namespace RunescapeBot
             // 
             this.BotActionSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BotActionSelect.FormattingEnabled = true;
-            this.BotActionSelect.Location = new System.Drawing.Point(103, 154);
+            this.BotActionSelect.Location = new System.Drawing.Point(84, 168);
             this.BotActionSelect.MaxDropDownItems = 12;
             this.BotActionSelect.Name = "BotActionSelect";
-            this.BotActionSelect.Size = new System.Drawing.Size(355, 28);
+            this.BotActionSelect.Size = new System.Drawing.Size(374, 28);
             this.BotActionSelect.TabIndex = 5;
             // 
             // Iterations
             // 
             this.Iterations.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Iterations.Location = new System.Drawing.Point(103, 251);
+            this.Iterations.Location = new System.Drawing.Point(84, 255);
             this.Iterations.Maximum = new decimal(new int[] {
             2147483647,
             0,
             0,
             0});
             this.Iterations.Name = "Iterations";
-            this.Iterations.Size = new System.Drawing.Size(355, 26);
+            this.Iterations.Size = new System.Drawing.Size(374, 26);
             this.Iterations.TabIndex = 7;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(3, 19);
+            this.label6.Location = new System.Drawing.Point(3, 49);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(79, 18);
             this.label6.TabIndex = 28;
@@ -213,16 +249,16 @@ namespace RunescapeBot
             // 
             this.RunUntil.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RunUntil.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.RunUntil.Location = new System.Drawing.Point(103, 203);
+            this.RunUntil.Location = new System.Drawing.Point(84, 212);
             this.RunUntil.Name = "RunUntil";
-            this.RunUntil.Size = new System.Drawing.Size(355, 26);
+            this.RunUntil.Size = new System.Drawing.Size(374, 26);
             this.RunUntil.TabIndex = 6;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(3, 160);
+            this.label1.Location = new System.Drawing.Point(3, 174);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(56, 18);
             this.label1.TabIndex = 20;
@@ -232,7 +268,7 @@ namespace RunescapeBot
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(3, 253);
+            this.label3.Location = new System.Drawing.Point(3, 257);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 18);
             this.label3.TabIndex = 24;
@@ -241,25 +277,25 @@ namespace RunescapeBot
             // Password
             // 
             this.Password.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Password.Location = new System.Drawing.Point(103, 104);
+            this.Password.Location = new System.Drawing.Point(84, 127);
             this.Password.Name = "Password";
             this.Password.PasswordChar = '*';
-            this.Password.Size = new System.Drawing.Size(355, 26);
+            this.Password.Size = new System.Drawing.Size(374, 26);
             this.Password.TabIndex = 4;
             // 
             // Login
             // 
             this.Login.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Login.Location = new System.Drawing.Point(103, 59);
+            this.Login.Location = new System.Drawing.Point(84, 86);
             this.Login.Name = "Login";
-            this.Login.Size = new System.Drawing.Size(355, 26);
+            this.Login.Size = new System.Drawing.Size(374, 26);
             this.Login.TabIndex = 3;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(3, 65);
+            this.label2.Location = new System.Drawing.Point(3, 92);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 18);
             this.label2.TabIndex = 16;
@@ -269,7 +305,7 @@ namespace RunescapeBot
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(3, 110);
+            this.label5.Location = new System.Drawing.Point(3, 133);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(82, 18);
             this.label5.TabIndex = 18;
@@ -302,9 +338,9 @@ namespace RunescapeBot
             // PhasmatysLogin
             // 
             this.PhasmatysLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PhasmatysLogin.Location = new System.Drawing.Point(95, 67);
+            this.PhasmatysLogin.Location = new System.Drawing.Point(88, 67);
             this.PhasmatysLogin.Name = "PhasmatysLogin";
-            this.PhasmatysLogin.Size = new System.Drawing.Size(366, 26);
+            this.PhasmatysLogin.Size = new System.Drawing.Size(373, 26);
             this.PhasmatysLogin.TabIndex = 10;
             // 
             // label10
@@ -320,14 +356,14 @@ namespace RunescapeBot
             // Bows
             // 
             this.Bows.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Bows.Location = new System.Drawing.Point(95, 255);
+            this.Bows.Location = new System.Drawing.Point(88, 255);
             this.Bows.Maximum = new decimal(new int[] {
             2147483647,
             0,
             0,
             0});
             this.Bows.Name = "Bows";
-            this.Bows.Size = new System.Drawing.Size(366, 26);
+            this.Bows.Size = new System.Drawing.Size(373, 26);
             this.Bows.TabIndex = 14;
             // 
             // PhasmatysStartButton
@@ -344,27 +380,27 @@ namespace RunescapeBot
             // GoldBars
             // 
             this.GoldBars.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GoldBars.Location = new System.Drawing.Point(95, 166);
+            this.GoldBars.Location = new System.Drawing.Point(88, 166);
             this.GoldBars.Maximum = new decimal(new int[] {
             2147483647,
             0,
             0,
             0});
             this.GoldBars.Name = "GoldBars";
-            this.GoldBars.Size = new System.Drawing.Size(366, 26);
+            this.GoldBars.Size = new System.Drawing.Size(373, 26);
             this.GoldBars.TabIndex = 12;
             // 
             // SteelBars
             // 
             this.SteelBars.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SteelBars.Location = new System.Drawing.Point(95, 210);
+            this.SteelBars.Location = new System.Drawing.Point(88, 210);
             this.SteelBars.Maximum = new decimal(new int[] {
             2147483647,
             0,
             0,
             0});
             this.SteelBars.Name = "SteelBars";
-            this.SteelBars.Size = new System.Drawing.Size(366, 26);
+            this.SteelBars.Size = new System.Drawing.Size(373, 26);
             this.SteelBars.TabIndex = 13;
             // 
             // label9
@@ -409,10 +445,10 @@ namespace RunescapeBot
             // PhasmatysBotSelector
             // 
             this.PhasmatysBotSelector.FormattingEnabled = true;
-            this.PhasmatysBotSelector.Location = new System.Drawing.Point(95, 12);
+            this.PhasmatysBotSelector.Location = new System.Drawing.Point(88, 12);
             this.PhasmatysBotSelector.MaxDropDownItems = 3;
             this.PhasmatysBotSelector.Name = "PhasmatysBotSelector";
-            this.PhasmatysBotSelector.Size = new System.Drawing.Size(366, 28);
+            this.PhasmatysBotSelector.Size = new System.Drawing.Size(373, 28);
             this.PhasmatysBotSelector.TabIndex = 9;
             this.PhasmatysBotSelector.SelectionChangeCommitted += new System.EventHandler(this.PhasmatysBotSelector_SelectionChangeCommitted);
             // 
@@ -429,10 +465,10 @@ namespace RunescapeBot
             // PhasmatysPassword
             // 
             this.PhasmatysPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PhasmatysPassword.Location = new System.Drawing.Point(95, 116);
+            this.PhasmatysPassword.Location = new System.Drawing.Point(88, 116);
             this.PhasmatysPassword.Name = "PhasmatysPassword";
             this.PhasmatysPassword.PasswordChar = '*';
-            this.PhasmatysPassword.Size = new System.Drawing.Size(366, 26);
+            this.PhasmatysPassword.Size = new System.Drawing.Size(373, 26);
             this.PhasmatysPassword.TabIndex = 11;
             // 
             // label12
@@ -486,7 +522,7 @@ namespace RunescapeBot
         private System.Windows.Forms.TabPage SoloBot;
         private System.Windows.Forms.TextBox StatusMessage;
         private System.Windows.Forms.Button StartButton;
-        private System.Windows.Forms.TextBox ClientLocation;
+        private System.Windows.Forms.TextBox OSBuddyClientLocation;
         private System.Windows.Forms.Button OSBuddySelect;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox BotActionSelect;
@@ -515,6 +551,9 @@ namespace RunescapeBot
         private System.Windows.Forms.TextBox PhasmatysLogin;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.BindingSource runParamsBindingSource;
+        private System.Windows.Forms.TextBox JagexClientLocation;
+        private System.Windows.Forms.Button JagexClientSelect;
+        private System.Windows.Forms.Label label13;
     }
 }
 

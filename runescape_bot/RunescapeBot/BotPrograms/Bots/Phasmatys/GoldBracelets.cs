@@ -70,8 +70,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
-
-            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.OSBUDDY_BORDER_WIDTH, (int)Probability.RandomGaussian(Mouse.Y + 100, 100), RSClient);
+            SafeWait(300);
+            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.OSBUDDY_BORDER_WIDTH, (int)Probability.RandomGaussian(Mouse.Y, 100), RSClient);
             CountDownItems(true);
             SafeWaitPlus(0, 2000);
             RunParams.Iterations -= 27;
