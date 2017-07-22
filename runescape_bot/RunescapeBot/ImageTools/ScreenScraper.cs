@@ -14,13 +14,16 @@ namespace RunescapeBot.ImageTools
     /// </summary>
     public static class ScreenScraper
     {
-        #region constants
+        #region properties
         public const int OSBUDDY_TOOLBAR_WIDTH = 33;
         public const int OSBUDDY_BORDER_WIDTH = 3;
         public const int JAGEX_TOOLBAR_WIDTH = 23;
         public const int JAGEX_BORDER_WIDTH = 0;
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
+
+        private const int MULTIPLE_SCREEN_READ_INTERVAL = 500;
+        private static DateTime LastScan;
         #endregion
 
         /// <summary>
@@ -98,7 +101,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
         /// <returns></returns>
-        public static Bitmap CaptureWindow(Process rsClient)
+        public static Bitmap CaptureWindow(Process rsClient, bool fastCapture = false)
         {
             if (!ProcessExists(rsClient)) { return null; }
 
@@ -113,10 +116,28 @@ namespace RunescapeBot.ImageTools
             int width = windowRect.right - windowRect.left;
             int height = windowRect.bottom - windowRect.top;
             Bitmap screenShot = new Bitmap(width, height, PixelFormat.Format32bppRgb);
+            WaitToCapture(fastCapture);
             Graphics gScreen = Graphics.FromImage(screenShot);
             gScreen.CopyFromScreen(windowRect.left, windowRect.top, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
 
             return screenShot;
+        }
+
+        /// <summary>
+        /// Makes sure that we don't take screenshots too close together
+        /// </summary>
+        private static void WaitToCapture(bool fastCapture)
+        {
+            if (!fastCapture)
+            {
+                int timeSinceLastCapture = (int)(DateTime.Now - LastScan).TotalMilliseconds;
+                int waitTimeRemaining = MULTIPLE_SCREEN_READ_INTERVAL - timeSinceLastCapture;
+                if (waitTimeRemaining > 0)
+                {
+                    Thread.Sleep(waitTimeRemaining);
+                }
+            }
+            LastScan = DateTime.Now;
         }
 
         /// <summary>
@@ -383,7 +404,7 @@ namespace RunescapeBot.ImageTools
 
             string windowName = "OLD SCHOOL RUNESCAPE";
             string mainWindowTitle = process.MainWindowTitle.ToUpper();
-            if (mainWindowTitle.Contains(windowName))
+            if (mainWindowTitle.Equals(windowName))
             {
                 ClientType = Client.Jagex;
                 return true;

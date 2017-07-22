@@ -574,7 +574,6 @@ namespace RunescapeBot.BotPrograms
 
             foundObject = null;
             Point? lastPosition = null;
-            const int scanInterval = 500; //minimum time between checks in milliseconds
             int passes = 0;
             Stopwatch intervalWatch = new Stopwatch();
             Stopwatch giveUpWatch = new Stopwatch();
@@ -611,7 +610,6 @@ namespace RunescapeBot.BotPrograms
                 }
 
                 if (StopFlag) { return false; }
-                SafeWait(Math.Max(0, scanInterval - (int)intervalWatch.ElapsedMilliseconds));
             }
 
             return false;

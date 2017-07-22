@@ -83,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotPrograms\BotManagers\Phasmatys.cs" />
-    <Compile Include="BotPrograms\BotManagers\SlaveDriver.cs" />
+    <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
     <Compile Include="BotPrograms\BotProgram.cs" />
     <Compile Include="BotPrograms\BotRegistry.cs" />
     <Compile Include="BotPrograms\Bots\Agility\Agility.cs" />
