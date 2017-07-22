@@ -75,7 +75,7 @@ namespace RunescapeBot.Common
         {
             if (possibleZero == 0.0)
             {
-                return 0.000000001;
+                return 0.000001;
             }
             else
             {

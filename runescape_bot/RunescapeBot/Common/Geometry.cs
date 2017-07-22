@@ -122,5 +122,30 @@ namespace RunescapeBot.Common
             double rectangularity = shape.Size / interiorVolume;
             return rectangularity;
         }
+
+        /// <summary>
+        /// Adds all of the points within a circle definition to an existing blob
+        /// </summary>
+        /// <param name="blob"></param>
+        /// <param name="circleCenter"></param>
+        /// <param name="circleRadius"></param>
+        public static void AddMinimapIconToBlob(ref Blob blob, Point circleCenter)
+        {
+            const int circleRadius = 7;
+            double maxRadius = circleRadius + Numerical.NonZero(0);
+            Point point;
+
+            for (int x = circleCenter.X - circleRadius; x <= circleCenter.X + circleCenter.X; x++)
+            {
+                for (int y = circleCenter.Y - circleRadius; y <= circleCenter.Y + circleRadius; y++)
+                {
+                    point = new Point(x, y);
+                    if (DistanceBetweenPoints(point, circleCenter) <= maxRadius)
+                    {
+                        blob.AddPixel(point, true);
+                    }
+                }
+            }
+        }
     }
 }

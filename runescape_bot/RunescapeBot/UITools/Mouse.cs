@@ -98,29 +98,11 @@ namespace RunescapeBot.UITools
             }
 
             ScreenScraper.BringToForeGround(rsClient);
-            TranslateClick(ref x, ref y, rsClient);
+            ScreenScraper.GameScreenToWindow(ref x, ref y, rsClient);
             NaturalMove(x, y);
             Thread.Sleep(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
             mouse_event(clickTypeDown, x, y, 0, 0);
             mouse_event(clickTypeUp, x, y, 0, 0);
-        }
-
-        /// <summary>
-        /// Translate a click location from a position within the diplay portion of OSBuddy to a position on the screen.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        private static void TranslateClick(ref int x, ref int y, Process rsClient)
-        {
-            //adjust for the position of the OSBuddy window
-            RECT windowRect = new RECT();
-            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
-            x += windowRect.left;
-            y += windowRect.top;
-
-            //adjust for the borders and toolbar
-            x += ScreenScraper.OSBUDDY_BORDER_WIDTH;
-            y += ScreenScraper.OSBUDDY_TOOLBAR_WIDTH + ScreenScraper.OSBUDDY_BORDER_WIDTH;
         }
 
         /// <summary>
@@ -299,7 +281,7 @@ namespace RunescapeBot.UITools
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
-                TranslateClick(ref x, ref y, rsClient);
+                ScreenScraper.GameScreenToWindow(ref x, ref y, rsClient);
                 NaturalMove(x, y);
             }
         }

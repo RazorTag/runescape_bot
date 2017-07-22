@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,7 +8,6 @@ namespace RunescapeBot.BotPrograms
 {
     public class BankPhasmatys : BotProgram
     {
-        protected const int BANK_BOOTH_MIN_SIZE = 100;
         protected const int FURNACE_TO_BANK_ICON_OFFSET_HORIZONTAL = 15;
         protected const int FURNACE_TO_BANK_ICON_OFFSET_VERICAL = 50;
         protected const double STATIONARY_OBJECT_TOLERANCE = 15.0;
@@ -18,6 +18,9 @@ namespace RunescapeBot.BotPrograms
         protected ColorRange BankBooth;
         protected FurnaceCrafting CraftPopup;
         protected Bank BankPopup;
+        protected int BankBoothMinSize { get { return ArtifactSize(0.0003); } }
+        protected int BankFloorMaxSize { get { return ArtifactSize(0.0015); } }
+        protected int FurnaceFloorMaxSize { get { return ArtifactSize(0.00035); } }
 
 
         protected BankPhasmatys(RunParams startParams) : base(startParams)
@@ -29,7 +32,7 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to the Port Phasmatys bank
         /// </summary>
         /// <returns>true if the bank icon is found</returns>
-        protected override bool MoveToBank(int minRunTimeToBank = 5000, bool readWindow = false)
+        protected override bool MoveToBank(int minRunTimeToBank = 6500, bool readWindow = false)
         {
             Point? bankIcon = BankIconLocation();
             Point clickLocation;
@@ -50,7 +53,7 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)bankIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y, 3);
+            LeftClick(clickLocation.X, clickLocation.Y, 1);
             SafeWait(minRunTimeToBank);
 
             return true;
@@ -72,13 +75,14 @@ namespace RunescapeBot.BotPrograms
             int bankX, bankY;
             bool[,] minimapBankFloor = MinimapFilter(BuildingFloor, out offset);
             Blob bankFloor = ImageProcessing.ClosestBlob(minimapBankFloor, bankBlob.Center, 100);
-            if (bankFloor == null)
+            if (bankFloor == null || bankFloor.Size > BankFloorMaxSize)
             {
                 bankX = bankBlob.Center.X;
                 bankY = bankBlob.Center.Y + 4;
             }
             else
             {
+                Geometry.AddMinimapIconToBlob(ref bankFloor, bankBlob.Center);
                 if (bankFloor.Width > 40)
                 {
                     bankX = ((bankFloor.Center.X + bankFloor.LeftBound) / 2) + 6;
@@ -87,7 +91,7 @@ namespace RunescapeBot.BotPrograms
                 else
                 {
                     bankX = bankFloor.Center.X + 8;
-                    bankY = bankFloor.Center.Y + 4;
+                    bankY = bankFloor.Center.Y + 6;
                 }
             }
 
@@ -113,15 +117,16 @@ namespace RunescapeBot.BotPrograms
             Blob furnaceFloor = Blob.Combine(floors);
 
             int furnaceX, furnaceY;
-            if (furnaceFloor == null)
+            if (furnaceFloor == null || furnaceFloor.Size > FurnaceFloorMaxSize)
             {
                 furnaceX = furnaceBlob.Center.X;
                 furnaceY = furnaceBlob.Center.Y;
             }
             else
             {
-                furnaceX = furnaceFloor.Center.X + 6;
-                furnaceY = furnaceFloor.Center.Y - 2;
+                Geometry.AddMinimapIconToBlob(ref furnaceFloor, furnaceBlob.Center);
+                furnaceX = furnaceFloor.Center.X + 8;
+                furnaceY = furnaceFloor.Center.Y;
             }
 
             int x = furnaceX + offset.X;
@@ -139,7 +144,7 @@ namespace RunescapeBot.BotPrograms
         {
             Blob bankBooth;
             const int maxWaitTime = 12000;
-            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, BANK_BOOTH_MIN_SIZE, LocateBankBooth))
+            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, BankBoothMinSize, LocateBankBooth))
             {
                 return false;
             }
@@ -157,11 +162,10 @@ namespace RunescapeBot.BotPrograms
             bankBooth = null;
             const int numberOfBankBooths = 6;
             const double maxBoothHeightToWidthRatio = 3.2;
-            int minBankBoothSize = ArtifactSize(0.0001);
 
             ReadWindow();
             bool[,] bankBooths = ColorFilter(bankBoothColor);
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, minBankBoothSize);    //list of blobs from biggest to smallest
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, BankBoothMinSize);    //list of blobs from biggest to smallest
             Blob blob;
             int blobIndex = 0;
 
@@ -175,7 +179,7 @@ namespace RunescapeBot.BotPrograms
 
                 blob = boothBlobs[blobIndex];
 
-                if (blob.Size < BANK_BOOTH_MIN_SIZE)
+                if (blob.Size < BankBoothMinSize)
                 {
                     return false;   //We did not find the expected number of bank booths
                 }
@@ -208,7 +212,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the furnace icon is found</returns>
         protected bool MoveToFurnace()
         {
-            const int runTimeFromBankToFurnace = 3000;  //appproximate milliseconds needed to run from the bank to the furnace
+            const int runTimeFromBankToFurnace = 5500;  //appproximate milliseconds needed to run from the bank to the furnace
+            const int selectFirstItemTime = 800;
 
             Point? furnaceIcon = FurnaceIconLocation();
             Point clickLocation;
@@ -229,8 +234,8 @@ namespace RunescapeBot.BotPrograms
             {
                 clickLocation = (Point)furnaceIcon;
             }
-            LeftClick(clickLocation.X, clickLocation.Y, 2);
-            SafeWait(runTimeFromBankToFurnace);
+            LeftClick(clickLocation.X, clickLocation.Y, 1);
+            SafeWait(runTimeFromBankToFurnace - selectFirstItemTime);
 
             return true;
         }

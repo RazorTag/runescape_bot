@@ -309,11 +309,11 @@ namespace RunescapeBot.ImageTools
         /// Add a new pixel to the blob
         /// </summary>
         /// <param name="newPixel"></param>
-        public bool AddPixel(Point newPixel)
+        public bool AddPixel(Point newPixel, bool skipQueue = false)
         {
             if (!ContainsPixel(newPixel))
             {
-                FoundPixels.Enqueue(newPixel);
+                if (!skipQueue) { FoundPixels.Enqueue(newPixel); }
                 Pixels.Add(newPixel, newPixel);
                 center = null;
                 boundsCalculated = false;

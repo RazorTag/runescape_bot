@@ -53,7 +53,7 @@ namespace RunescapeBot.BotPrograms
             //crafting.MakeBracelets(FurnaceCrafting.Jewel.None, 27, 60000);
 
             //ReadWindow();
-            //ColorRange floor = ColorFilters.PhasmatysBuildingFloor();
+            //ColorRange floor = RGBHSBRanges.PhasmatysBuildingFloor();
             //bool[,] mask = ColorFilter(floor);
             //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
 
@@ -71,7 +71,7 @@ namespace RunescapeBot.BotPrograms
             }
             CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
             SafeWait(300);
-            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.OSBUDDY_BORDER_WIDTH, (int)Probability.RandomGaussian(Mouse.Y, 100), RSClient);
+            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.BorderWidth, (int)Probability.RandomGaussian(Mouse.Y, 100), RSClient);
             CountDownItems(true);
             SafeWaitPlus(0, 2000);
             RunParams.Iterations -= 27;

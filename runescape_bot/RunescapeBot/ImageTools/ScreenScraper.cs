@@ -15,6 +15,7 @@ namespace RunescapeBot.ImageTools
     public static class ScreenScraper
     {
         #region properties
+
         public const int OSBUDDY_TOOLBAR_WIDTH = 33;
         public const int OSBUDDY_BORDER_WIDTH = 3;
         public const int JAGEX_TOOLBAR_WIDTH = 23;
@@ -24,7 +25,42 @@ namespace RunescapeBot.ImageTools
 
         private const int MULTIPLE_SCREEN_READ_INTERVAL = 500;
         private static DateTime LastScan;
-        #endregion
+
+        /// <summary>
+        /// Gets the toolbar width of the client being used
+        /// </summary>
+        public static int ToolbarWidth
+        {
+            get
+            {
+                switch (ClientType)
+                {
+                    case Client.Jagex:
+                        return JAGEX_TOOLBAR_WIDTH;
+                    case Client.OSBuddy:
+                        return OSBUDDY_TOOLBAR_WIDTH;
+                }
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the border width of the client being used
+        /// </summary>
+        public static int BorderWidth
+        {
+            get
+            {
+                switch (ClientType)
+                {
+                    case Client.Jagex:
+                        return JAGEX_BORDER_WIDTH;
+                    case Client.OSBuddy:
+                        return OSBUDDY_BORDER_WIDTH;
+                }
+                return 0;
+            }
+        }
 
         /// <summary>
         /// The client to look for 
@@ -35,6 +71,8 @@ namespace RunescapeBot.ImageTools
             Jagex,
             OSBuddy
         }
+
+        #endregion
 
         /// <summary>
         /// THe client type most recently found
@@ -235,21 +273,10 @@ namespace RunescapeBot.ImageTools
                 windowRect.left += ghostPadding;
             }
 
-            switch (ClientType)
-            {
-                case Client.Jagex:
-                    windowRect.top += JAGEX_TOOLBAR_WIDTH;
-                    windowRect.right -= JAGEX_BORDER_WIDTH;
-                    windowRect.bottom -= JAGEX_BORDER_WIDTH;
-                    windowRect.left += JAGEX_BORDER_WIDTH;
-                    break;
-                case Client.OSBuddy:
-                    windowRect.top += OSBUDDY_TOOLBAR_WIDTH;
-                    windowRect.right -= OSBUDDY_BORDER_WIDTH;
-                    windowRect.bottom -= OSBUDDY_BORDER_WIDTH;
-                    windowRect.left += OSBUDDY_BORDER_WIDTH;
-                    break;
-            }
+            windowRect.top += ToolbarWidth;
+            windowRect.right -= BorderWidth;
+            windowRect.bottom -= BorderWidth;
+            windowRect.left += BorderWidth;
 
             //Ignore any portion of the game screen that is not visible
             windowRect.top = Math.Max(0, windowRect.top);
@@ -258,6 +285,27 @@ namespace RunescapeBot.ImageTools
             windowRect.left = Math.Max(0, windowRect.left);
 
             return ((windowRect.right > windowRect.left) && (windowRect.bottom > windowRect.top));
+        }
+
+        /// <summary>
+        /// COnverts a pixel from game screen coordinates to game window coordinates
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static void GameScreenToWindow(ref int x, ref int y, Process rsClient)
+        {
+            RECT windowRect = new RECT();
+            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            int windowLeft = windowRect.left;
+            int windowTop = windowRect.top;
+            if (windowTop < 0)
+            {
+                windowLeft -= windowTop;
+                windowTop = 0;
+            }
+
+            x += windowLeft + BorderWidth;
+            y += windowTop + ToolbarWidth;
         }
 
         /// <summary>

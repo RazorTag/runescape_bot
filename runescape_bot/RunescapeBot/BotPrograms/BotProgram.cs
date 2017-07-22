@@ -1428,7 +1428,6 @@ namespace RunescapeBot.BotPrograms
         {
             if (readWindow) { ReadWindow(); }
 
-            DebugUtilities.SaveImageToFile(Bitmap);
             Point runOrb = RunOrbSamplePoint();
             Color runColor = GetPixel(runOrb.X, runOrb.Y);
             ColorRange runEnergyFoot = RGBHSBRanges.RunEnergyFoot();
