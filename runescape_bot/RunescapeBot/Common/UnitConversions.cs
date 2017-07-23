@@ -5,6 +5,17 @@ namespace RunescapeBot.Common
     public static class UnitConversions
     {
         /// <summary>
+        /// Converts seconds to milliseconds
+        /// </summary>
+        /// <param name="minutes">number of seconds to convert</param>
+        /// <returns>number of milliseconds in the given number of seconds rounded to the nearest millisecond</returns>
+        public static int SecondsToMilliseconds(double seconds)
+        {
+            int milliseconds = (int)Math.Round(seconds * 1000);
+            return milliseconds;
+        }
+
+        /// <summary>
         /// Converts minutes to milliseconds
         /// </summary>
         /// <param name="minutes">number of minutes to convert</param>

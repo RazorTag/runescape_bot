@@ -10,18 +10,31 @@ namespace RunescapeBot.BotPrograms
     {
         public RunParams()
         {
-            if (FrameTime == 0)
-            {
-                FrameTime = 3000;
-                RandomizeFrames = true;
-                BotState = BotProgram.BotState.Running;
-                RunUntil = DateTime.Now;
+            InitializeBaseParams();
+        }
 
-                PhasmatysParams = new List<PhasmatysParams>(Phasmatys.NUMBER_OF_BOTS);
-                for (int i = 0; i < Phasmatys.NUMBER_OF_BOTS; i++)
-                {
-                    PhasmatysParams.Add(new PhasmatysParams());
-                }
+        public RunParams(bool baseParams = true)
+        {
+            if (baseParams)
+            {
+                InitializeBaseParams();
+            }
+        }
+
+        /// <summary>
+        /// Sets the normal default values for commonly used run parameters
+        /// </summary>
+        private void InitializeBaseParams()
+        {
+            FrameTime = 3000;
+            RandomizeFrames = true;
+            BotState = BotProgram.BotState.Running;
+            RunUntil = DateTime.Now;
+
+            PhasmatysParams = new RunParamsList(Phasmatys.NUMBER_OF_BOTS);
+            for (int i = 0; i < PhasmatysParams.Count; i++)
+            {
+                PhasmatysParams.ParamsList[i] = new PhasmatysRunParams();
             }
         }
 
@@ -65,9 +78,16 @@ namespace RunescapeBot.BotPrograms
             set
             {
                 iterations = Math.Max(0, value);
+                SetIterations(iterations);
             }
         }
         private int iterations;
+
+        /// <summary>
+        /// Called when a new value is set for Iterations.
+        /// </summary>
+        /// <param name="iterations">new value for iterations</param>
+        protected virtual void SetIterations(int iterations) { }
 
         /// <summary>
         /// Set to true to run for infinitely many iterations
@@ -168,14 +188,9 @@ namespace RunescapeBot.BotPrograms
         public bool BotIdle { get; set; }
 
         /// <summary>
-        /// Index of the active bot from a list of bots being used by a BotManager
-        /// </summary>
-        public int ActiveBot { get; set; }
-
-        /// <summary>
         /// List of bots to run on the Phasmatys rotation
         /// </summary>
-        public List<PhasmatysParams> PhasmatysParams { get; set; }
+        public RunParamsList PhasmatysParams { get; set; }
 
         #endregion
 

@@ -54,7 +54,7 @@ namespace RunescapeBot.FileIO
         /// <summary>
         /// Saves Phasmatys bot settings
         /// </summary>
-        public void Save(PhasmatysParams phasmatysParams)
+        public void Save(PhasmatysRunParams phasmatysParams)
         {
             BotName = phasmatysParams.BotName;
             Login = phasmatysParams.Login;
@@ -68,7 +68,7 @@ namespace RunescapeBot.FileIO
         /// Copies the loaded bot settings to RunParams
         /// </summary>
         /// <param name="phasmatysParams"></param>
-        public void Load(ref PhasmatysParams phasmatysParams)
+        public void Load(ref PhasmatysRunParams phasmatysParams)
         {
             phasmatysParams.BotName = BotName;
             phasmatysParams.Login = Login;

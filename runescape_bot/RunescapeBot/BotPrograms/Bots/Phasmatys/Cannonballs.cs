@@ -27,7 +27,7 @@ namespace RunescapeBot.BotPrograms
         {
             BotUtilities.ChatBoxSingleOptionMakeAll(RSClient);
             SafeWait(300);
-            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.OSBUDDY_BORDER_WIDTH, (int)Probability.RandomGaussian(Mouse.Y - 200, 100), RSClient);
+            WatchNetflix(-200);
             CountDownItems(true);
             SafeWaitPlus(0, 3500);
             return true;

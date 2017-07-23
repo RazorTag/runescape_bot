@@ -71,7 +71,7 @@ namespace RunescapeBot.BotPrograms
             }
             CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
             SafeWait(300);
-            Mouse.MoveMouseAsynchronous(0 - ScreenScraper.BorderWidth, (int)Probability.RandomGaussian(Mouse.Y, 100), RSClient);
+            WatchNetflix(0);
             CountDownItems(true);
             SafeWaitPlus(0, 2000);
             RunParams.Iterations -= 27;

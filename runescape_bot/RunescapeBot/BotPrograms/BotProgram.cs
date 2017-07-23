@@ -23,6 +23,9 @@ namespace RunescapeBot.BotPrograms
     public class BotProgram
     {
         #region properties
+
+        private const long LOGIN_LOGO_COLOR_SUM = 15456063;
+
         /// <summary>
         /// Used to provide the current state of the bot for the start menu
         /// </summary>
@@ -32,12 +35,6 @@ namespace RunescapeBot.BotPrograms
             Break,
             Sleep
         }
-
-        /// <summary>
-        /// Checksum for the RUNE SCAPE logo on the login page
-        /// </summary>
-        private const long LOGIN_LOGO_COLOR_SUM = 15456063;
-        private const long LOGIN_LOGO_SUM_INFERNAL = 10145709;
 
         /// <summary>
         /// Specifies how the bot should be run
@@ -717,9 +714,16 @@ namespace RunescapeBot.BotPrograms
                 Bitmap.Dispose();
             }
 
-            LastScreenShot = DateTime.Now;
-            Bitmap = ScreenScraper.CaptureWindow(RSClient);
-            ColorArray = ScreenScraper.GetRGB(Bitmap);
+            try
+            {
+                LastScreenShot = DateTime.Now;
+                Bitmap = ScreenScraper.CaptureWindow(RSClient);
+                ColorArray = ScreenScraper.GetRGB(Bitmap);
+            }
+            catch
+            {
+                return false;
+            }   
 
             return (Bitmap != null) && (ScreenHeight > 0) && (ScreenWidth > 0);
         }
@@ -1001,30 +1005,33 @@ namespace RunescapeBot.BotPrograms
         {
             if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
 
-            while (ScreenScraper.RestartClient(ref client, RunParams.RuneScapeClient, RunParams.ClientFlags))
+            Stopwatch longWatch = new Stopwatch();
+            longWatch.Start();
+            while (longWatch.ElapsedMilliseconds < UnitConversions.HoursToMilliseconds(24))
             {
+                if (!ScreenScraper.RestartClient(ref client, RunParams.RuneScapeClient, RunParams.ClientFlags))
+                {
+                    continue;
+                }
                 RSClient = client;
+
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 do
                 {
-                    SafeWait(5000);
-                    ReadWindow(false);
+                    SafeWait(UnitConversions.SecondsToMilliseconds(5));
+                    if (ReadWindow(false) && (IsLoggedOut(false) || IsLoggedIn()))
+                    {
+                        BroadcastConnection();
+                        return true;
+                    }
                 }
-                while ((!IsLoggedOut(false) && (watch.ElapsedMilliseconds < 600000) && !StopFlag));
+                while ((watch.ElapsedMilliseconds < UnitConversions.MinutesToMilliseconds(5)) && !StopFlag);
 
-                if (IsLoggedOut(false) || IsLoggedIn())
-                {
-                    BroadcastConnection();
-                    return true;
-                }
-                else
-                {
-                    BroadcastDisconnect();
-                }
+                BroadcastDisconnect();
             }
 
-            BroadcastDisconnect();
+            BroadcastFailure();
             const string errorMessage = "Client did not start correctly";
             MessageBox.Show(errorMessage);
             client = null;
@@ -1070,13 +1077,27 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Finds the offset for the login screen
+        /// </summary>
+        /// <returns></returns>
+        private Point LoginScreenOffset()
+        {
+            int yOffset = 0;
+            while (ImageProcessing.ColorsAreEqual(GetPixel(Center.X, yOffset), Color.Black))
+            {
+                yOffset++;
+            }
+            return new Point(0, yOffset);
+        }
+
+        /// <summary>
         /// Tries to log in.
         /// </summary>
         /// <returns>true if login is successful, false if login fails</returns>
         private bool LogIn()
         {
             Point? clickLocation;
-            Point loginOffset = ScreenScraper.LoginScreenOffset();
+            Point loginOffset = LoginScreenOffset();
             int center = ScreenWidth / 2;
 
             //log in at the login screen
@@ -1246,11 +1267,11 @@ namespace RunescapeBot.BotPrograms
             if (readWindow && !ReadWindow()) { return false; }
 
             Color color;
-            Point loginOffset = ScreenScraper.LoginScreenOffset();
+            Point loginOffset = LoginScreenOffset();
             int height = ScreenHeight;
             int top = loginOffset.Y;
             int centerX = Center.X + loginOffset.X;
-            int checkRow = Math.Min(height - 1, loginOffset.Y + ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
+            int checkRow = Math.Min(Math.Max(0, height - 1), loginOffset.Y + ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
             int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 2;
             int blackPixels = 0;
             int totalPixels = 0;
@@ -1281,13 +1302,11 @@ namespace RunescapeBot.BotPrograms
             }
 
             //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
-            long colorSum = ImageProcessing.ColorSum(ScreenPiece(Center.X - 224, Center.X + 220, top, top + 160));
-            if (!Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01))
-            {
-                return false;
-            }
-
-            return true;
+            int left = Center.X - 224 + loginOffset.X;
+            int right = left + 444;
+            int bottom = top + 160;
+            long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
+            return Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01);
         }
 
         /// <summary>
@@ -1545,6 +1564,17 @@ namespace RunescapeBot.BotPrograms
             RunParams.BotIdle = false;
         }
 
+        /// <summary>
+        /// Moves the mouse to the left side of the window as if leaving to watch Netflix
+        /// </summary>
+        /// <param name="yOffset">vertcal offset for the average location of the position to move to</param>
+        protected void WatchNetflix(int yOffset)
+        {
+            int x = -ScreenScraper.BorderWidth;
+            int y = (int)Probability.RandomGaussian(Mouse.Y + yOffset, 100);
+            Mouse.MoveMouseAsynchronous(x, y, RSClient);
+        }
+
         #endregion
 
         #region broadcasting
@@ -1555,6 +1585,11 @@ namespace RunescapeBot.BotPrograms
         }
 
         private void BroadcastDisconnect()
+        {
+
+        }
+
+        private void BroadcastFailure()
         {
 
         }

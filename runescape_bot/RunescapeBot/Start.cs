@@ -152,7 +152,7 @@ namespace RunescapeBot
             string[] botnames = new string[RunParams.PhasmatysParams.Count];
             for (int i = 0; i < botnames.Length; i++)
             {
-                botnames[i] = RunParams.PhasmatysParams[i].BotName;
+                botnames[i] = ((PhasmatysRunParams)RunParams.PhasmatysParams[i]).BotName;
             }
             PhasmatysBotSelector.DataSource = botnames;
             PhasmatysBotSelector.SelectedIndex = PhasmatysBotSelection;
@@ -229,9 +229,9 @@ namespace RunescapeBot
         /// Collects the start parameters for the Phasmatys rotation manager form
         /// </summary>
         /// <returns></returns>
-        private PhasmatysParams CollectPhasmatysSettings()
+        private PhasmatysRunParams CollectPhasmatysSettings()
         {
-            PhasmatysParams phasmatysParams = new PhasmatysParams();
+            PhasmatysRunParams phasmatysParams = new PhasmatysRunParams();
             phasmatysParams.BotName = PhasmatysBotSelector.Text;
             phasmatysParams.Login = PhasmatysLogin.Text;
             phasmatysParams.Password = PhasmatysPassword.Text;
@@ -246,7 +246,7 @@ namespace RunescapeBot
         /// </summary>
         private void WritePhasmatysSettings()
         {
-            PhasmatysParams settings = RunParams.PhasmatysParams[PhasmatysBotSelection];
+            PhasmatysRunParams settings = (PhasmatysRunParams)RunParams.PhasmatysParams[PhasmatysBotSelection];
             PhasmatysLogin.Text = settings.Login;
             PhasmatysPassword.Text = settings.Password;
             GoldBars.Value = settings.GoldBars;

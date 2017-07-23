@@ -41,7 +41,7 @@ namespace RunescapeBot.FileIO
         {
             for (int i = 0; i < Bots.Count; i++)
             {
-                Bots[i].Save(runParams.PhasmatysParams[i]);
+                Bots[i].Save((PhasmatysRunParams)runParams.PhasmatysParams[i]);
             }
         }
 
@@ -51,12 +51,12 @@ namespace RunescapeBot.FileIO
         /// <param name="runParams"></param>
         public void Load(ref RunParams runParams)
         {
-            PhasmatysParams phasmatysParams;
+            PhasmatysRunParams phasmatysParams;
             Bots = Bots ?? new List<PhasmatysBot>(Phasmatys.NUMBER_OF_BOTS);
 
             for (int i = 0; i < Bots.Count; i++)
             {
-                phasmatysParams = runParams.PhasmatysParams[i];
+                phasmatysParams = (PhasmatysRunParams)runParams.PhasmatysParams[i];
                 Bots[i].Load(ref phasmatysParams);
                 runParams.PhasmatysParams[i] = phasmatysParams;
             }

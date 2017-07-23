@@ -112,7 +112,8 @@
     <Compile Include="BotPrograms\Popups\MakeXSlim.cs" />
     <Compile Include="BotPrograms\Popups\RightClick.cs" />
     <Compile Include="BotPrograms\BotUtilities.cs" />
-    <Compile Include="BotPrograms\RunParams\PhasmatysParams.cs" />
+    <Compile Include="BotPrograms\RunParams\PhasmatysRunParams.cs" />
+    <Compile Include="BotPrograms\RunParams\RunParamsList.cs" />
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Line.cs" />
     <Compile Include="Common\Numerical.cs" />

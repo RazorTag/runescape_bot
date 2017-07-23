@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.Common;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -385,7 +386,7 @@ namespace RunescapeBot.ImageTools
                 //verify that the Runescape client has loaded
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                while (!ProcessExists(client) && (watch.ElapsedMilliseconds < 300000) && !BotProgram.StopFlag)
+                while (!ProcessExists(client) && (watch.ElapsedMilliseconds < UnitConversions.MinutesToMilliseconds(10)) && !BotProgram.StopFlag)
                 {
                     Thread.Sleep(500);
                     client = GetClient();
@@ -464,25 +465,5 @@ namespace RunescapeBot.ImageTools
         }
 
         #endregion
-
-        /// <summary>
-        /// Gives the offset of the position of the login screen based on the client
-        /// </summary>
-        /// <returns></returns>
-        public static Point LoginScreenOffset()
-        {
-            Point offset = new Point(0, 0);
-
-            switch (ClientType)
-            {
-                case Client.Jagex:
-                    offset = new Point(0, 20);
-                    break;
-                default:
-                    offset = new Point(0, 0);
-                    break;
-            }
-            return offset;
-        }
     }
 }
