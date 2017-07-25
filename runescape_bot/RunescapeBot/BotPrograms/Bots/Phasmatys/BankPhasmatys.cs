@@ -18,8 +18,8 @@ namespace RunescapeBot.BotPrograms
         protected RGBHSBRange BankBooth;
         protected FurnaceCrafting CraftPopup;
         protected Bank BankPopup;
-        protected int BankFloorMaxSize { get { return ArtifactSize(0.00283); } }
-        protected int FurnaceFloorMaxSize { get { return ArtifactSize(0.00066); } }
+        protected const int BankFloorMaxSize = 2500;
+        protected const int FurnaceFloorMaxSize = 1000;
 
 
         protected BankPhasmatys(RunParams startParams) : base(startParams)
