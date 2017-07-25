@@ -153,56 +153,6 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Finds the closest bank booth in the Port Phasmatys bank
-        /// </summary>
-        /// <returns>True if the bank booths are found</returns>
-        protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
-        {
-            bankBooth = null;
-            const int numberOfBankBooths = 6;
-            const double maxBoothHeightToWidthRatio = 3.2;
-            int bankBoothMinSize = ArtifactSize(0.000156);
-            int bankBoothMaxSize = ArtifactSize(0.00045);
-
-            ReadWindow();
-            bool[,] bankBooths = ColorFilter(bankBoothColor);
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, bankBoothMinSize, bankBoothMaxSize);    //list of blobs from biggest to smallest
-            Blob blob;
-            int blobIndex = 0;
-
-            //Remove blobs that aren't bank booths
-            while (blobIndex < numberOfBankBooths)
-            {
-                if (blobIndex > boothBlobs.Count - 1)
-                {
-                    return false;   //We did not find the expected number of bank booths
-                }
-
-                blob = boothBlobs[blobIndex];
-
-                if ((blob.Width / blob.Height) > maxBoothHeightToWidthRatio)
-                {
-                    boothBlobs.RemoveAt(blobIndex); //This blob is too wide to be a bank booth counter.
-                }
-                else
-                {
-                    blobIndex++;
-                }
-            }
-
-            //Reduce the blob list to the bank booths
-            boothBlobs = boothBlobs.GetRange(0, numberOfBankBooths);
-            boothBlobs.Sort(new BlobHorizontalComparer());
-            List<Blob> functioningBankBooths = new List<Blob>();
-            functioningBankBooths.Add(boothBlobs[1]);
-            functioningBankBooths.Add(boothBlobs[2]);
-            functioningBankBooths.Add(boothBlobs[4]);
-            functioningBankBooths.Add(boothBlobs[5]);
-            bankBooth = Blob.ClosestBlob(Center, functioningBankBooths);
-            return true;
-        }
-
-        /// <summary>
         /// Moves the character to the Port Phasmatys furnace
         /// </summary>
         /// <returns>true if the furnace icon is found</returns>

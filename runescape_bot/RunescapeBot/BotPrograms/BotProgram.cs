@@ -1418,6 +1418,15 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
+        /// <summary>
+        /// Finds the closest bank booth in the Port Phasmatys bank
+        /// </summary>
+        /// <returns>True if the bank booths are found</returns>
+        protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
+        {
+            return LocateBankBoothPhasmatys(out bankBooth);
+        }
+
         #endregion
 
         #region miscellaneous
