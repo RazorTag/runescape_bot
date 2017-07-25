@@ -18,8 +18,8 @@ namespace RunescapeBot.BotPrograms
         protected RGBHSBRange BankBooth;
         protected FurnaceCrafting CraftPopup;
         protected Bank BankPopup;
-        protected int BankFloorMaxSize { get { return ArtifactSize(0.0015); } }
-        protected int FurnaceFloorMaxSize { get { return ArtifactSize(0.00035); } }
+        protected int BankFloorMaxSize { get { return ArtifactSize(0.00283); } }
+        protected int FurnaceFloorMaxSize { get { return ArtifactSize(0.00066); } }
 
 
         protected BankPhasmatys(RunParams startParams) : base(startParams)
@@ -143,7 +143,7 @@ namespace RunescapeBot.BotPrograms
         {
             Blob bankBooth;
             const int maxWaitTime = 12000;
-            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, BankBoothMinSize, LocateBankBoothPhasmatys))
+            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, MinBankBoothSize, LocateBankBoothPhasmatys))
             {
                 return false;
             }

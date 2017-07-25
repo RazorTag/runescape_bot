@@ -25,7 +25,6 @@ namespace RunescapeBot.BotPrograms
         #region properties
 
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
-        protected int BankBoothMinSize { get { return ArtifactSize(0.0003); } }
 
         /// <summary>
         /// Used to provide the current state of the bot for the start menu
@@ -243,6 +242,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void ManageBot()
         {
+            Run();
+
             if (RunParams.SlaveDriver)
             {
                 while (!StopFlag)
@@ -916,18 +917,6 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines the portion of the screen taken up by an artifact of a known number of pixels
-        /// </summary>
-        /// <param name="artifactSize">the size of an artifact in pixels</param>
-        /// <returns>the fraction of  the screen taken up by an artifact of known size</returns>
-        protected double ArtifactSize(int artifactSize)
-        {
-            if (!MakeSureWindowHasBeenRead()) { return 0; }
-            double screenSize = Bitmap.Size.Width * Bitmap.Size.Height;
-            return artifactSize / screenSize;
-        }
-
-        /// <summary>
         /// Determines the pixels on the screen taken up by an artifact of a known fraction of the screen
         /// </summary>
         /// <param name="artifactSize">the size of an artifact in terms of fraction of the screen</param>
@@ -935,7 +924,7 @@ namespace RunescapeBot.BotPrograms
         protected int ArtifactSize(double artifactSize)
         {
             if (!MakeSureWindowHasBeenRead()) { return 0; }
-            double pixels = artifactSize * ColorArray.GetLength(0) * ColorArray.GetLength(1);
+            double pixels = artifactSize * ScreenHeight * ScreenHeight;
             return (int) Math.Round(pixels);
         }
 
@@ -1355,8 +1344,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected delegate bool BankLocator(out Blob bankBooth);
 
-        protected int MinBankBoothSize { get { return ArtifactSize(0.000156); } }
-        protected int MaxBankBoothSize { get { return ArtifactSize(0.00045); } }
+        protected int MinBankBoothSize { get { return ArtifactSize(0.000295); } }
+        protected int MaxBankBoothSize { get { return ArtifactSize(0.00085); } }
 
         /// <summary>
         /// Locates a bank booth with the counter color from the Varrock west bank
@@ -1378,11 +1367,11 @@ namespace RunescapeBot.BotPrograms
         {
             bankBooth = null;
             const int numberOfBankBooths = 6;
-            const double maxBoothHeightToWidthRatio = 3.2;
+            const double maxBoothWidthToHeightRatio = 3.3;
 
             ReadWindow();
             bool[,] bankBooths = ColorFilter(RGBHSBRanges.BankBoothPhasmatys());
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, MinBankBoothSize, MaxBankBoothSize);    //list of blobs from biggest to smallest
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, MinBankBoothSize, MaxBankBoothSize);  //list of blobs from biggest to smallest
             Blob blob;
             int blobIndex = 0;
 
@@ -1396,7 +1385,7 @@ namespace RunescapeBot.BotPrograms
 
                 blob = boothBlobs[blobIndex];
 
-                if ((blob.Width / blob.Height) > maxBoothHeightToWidthRatio)
+                if ((blob.Width / blob.Height) > maxBoothWidthToHeightRatio)
                 {
                     boothBlobs.RemoveAt(blobIndex); //This blob is too wide to be a bank booth counter.
                 }

@@ -93,7 +93,7 @@ namespace RunescapeBot.BotPrograms
             //Color[,] screenDropArea = ScreenPiece(0, 1800, 0, 900, out trimOffset);
             //FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE);
 
-            MinDemonSize = ArtifactSize(0.0005);
+            MinDemonSize = ArtifactSize(0.000944);
             LastDemonTime = DateTime.Now;
             return true;
         }

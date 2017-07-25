@@ -537,13 +537,13 @@ namespace RunescapeBot.BotPrograms
         private void SetObjectSizes()
         {
             ReadWindow();
-            MinLogSize = ArtifactSize(0.00026);
-            MinCargoNetSize = ArtifactSize(0.00011);
-            MinTreeBranchSize = ArtifactSize(0.0006);
-            MinTreeTrunkSize = ArtifactSize(0.0001);
-            MaxTreeTrunkSize = ArtifactSize(0.0002);
-            MinTightropeSize = ArtifactSize(0.0001);
-            MinDrainPipeSize = ArtifactSize(0.0003);
+            MinLogSize = ArtifactSize(0.00049);
+            MinCargoNetSize = ArtifactSize(0.0002);
+            MinTreeBranchSize = ArtifactSize(0.00113);
+            MinTreeTrunkSize = ArtifactSize(0.000189);
+            MaxTreeTrunkSize = ArtifactSize(0.000378);
+            MinTightropeSize = ArtifactSize(0.000189);
+            MinDrainPipeSize = ArtifactSize(0.000566);
     }
     }
 }
