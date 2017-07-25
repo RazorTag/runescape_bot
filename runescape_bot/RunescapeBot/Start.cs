@@ -467,10 +467,12 @@ namespace RunescapeBot
                 if (TopMost)
                 {
                     BringToFront();
+                    WindowState = FormWindowState.Normal;
                 }
                 else
                 {
                     SendToBack();
+                    WindowState = FormWindowState.Minimized;
                 }
             }
 

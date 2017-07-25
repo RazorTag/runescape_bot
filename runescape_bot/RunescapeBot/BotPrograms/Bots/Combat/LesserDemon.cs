@@ -17,13 +17,13 @@ namespace RunescapeBot.BotPrograms
         private const int MITHRIL_ARMOR_MIN_SIZE = 100;
         private const int CHAOS_RUNE_MIN_SIZE = 3;
         private const int DEATH_RUNE_MIN_SIZE = 5;
-        private ColorRange LesserDemonSkin;
-        private ColorRange LesserDemonHorn;
-        private ColorRange RuneMedHelm;
-        private ColorRange MithrilArmor;
-        private ColorRange ChaosRune;
-        private ColorRange DeathRune;
-        private ColorRange MouseoverTextNPC;
+        private RGBHSBRange LesserDemonSkin;
+        private RGBHSBRange LesserDemonHorn;
+        private RGBHSBRange RuneMedHelm;
+        private RGBHSBRange MithrilArmor;
+        private RGBHSBRange ChaosRune;
+        private RGBHSBRange DeathRune;
+        private RGBHSBRange MouseoverTextNPC;
         private bool PickUpStackables;
         private bool PickUpAlchables;
 
@@ -197,7 +197,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found, picked up, and alched. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndAlch(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        private bool FindAndAlch(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
@@ -217,7 +217,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndGrab(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        private bool FindAndGrab(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
@@ -238,7 +238,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndGrabChaosRune(Color[,] screenDropArea, Point offset, ColorRange referenceColor, int minimumSize = 50)
+        private bool FindAndGrabChaosRune(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             List<Blob> chaosRunes = ImageProcessing.FindBlobs(matchedPixels, true);

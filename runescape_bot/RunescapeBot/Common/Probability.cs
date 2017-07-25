@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace RunescapeBot.Common
 {
@@ -154,6 +156,33 @@ namespace RunescapeBot.Common
             }
             double angle = arcStart + (RNG.NextDouble() * (arcEnd - arcStart));
             return Numerical.Modulo(angle, 360);
+        }
+
+        /// <summary>
+        /// Randomly selects a value with probabilities of being selected weighted by the magnitude of the value
+        /// </summary>
+        /// <param name="weights">list of weights to choose from</param>
+        /// <returns>a randomly selected index from the list of weights</returns>
+        public static int ChooseFromWeights(List<double> weights)
+        {
+            if (weights == null || weights.Count <= 0) { return -1; }
+            for (int i = 0; i < weights.Count; i++)
+            {
+                weights[i] = Math.Max(0, weights[i]);
+            }
+
+            double totalWeight = weights.Sum();
+            double randomChoice = RNG.NextDouble() * totalWeight;
+            double currentWeight = 0;
+            for (int i = 0; i < weights.Count; i++)
+            {
+                currentWeight += weights[i];
+                if (currentWeight > randomChoice)
+                {
+                    return i;
+                }
+            }
+            return -1;   //Should never be hit.
         }
     }
 }

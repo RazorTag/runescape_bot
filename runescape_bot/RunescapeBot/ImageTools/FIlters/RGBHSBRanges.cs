@@ -10,12 +10,12 @@ namespace RunescapeBot.BotPrograms
         /// Creates the color range to represent a lesser demon's red skin
         /// </summary>
         /// <returns></returns>
-        public static ColorRange WelcomeScreenClickHere()
+        public static RGBHSBRange WelcomeScreenClickHere()
         {
             Color dark = Color.FromArgb(25, 0, 0);
             Color light = Color.FromArgb(140, 70, 50);
             HSBRange hsbRange = new HSBRange(355, 20, 0.4f, 1f, 0.05f, 0.5f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
         #endregion
 
@@ -24,12 +24,12 @@ namespace RunescapeBot.BotPrograms
         /// Creates the color range to represent a lesser demon's red skin
         /// </summary>
         /// <returns></returns>
-        public static ColorRange LesserDemonSkin()
+        public static RGBHSBRange LesserDemonSkin()
         {
             Color dark = Color.FromArgb(25, 5, 0);
             Color light = Color.FromArgb(140, 70, 50);
             HSBRange hsbRange = new HSBRange(355, 20, 0.4f, 1f, 0.05f, 0.5f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
 
         }
 
@@ -37,12 +37,12 @@ namespace RunescapeBot.BotPrograms
         /// Creates the color range to represent a lesser demon's horns, hoofs, and tail spike
         /// </summary>
         /// <returns></returns>
-        public static ColorRange LesserDemonHorn()
+        public static RGBHSBRange LesserDemonHorn()
         {
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(30, 30, 30);
             HSBRange hsbRange = new HSBRange(355, 5, 0.030f, 0.400f, 0.020f, 0.120f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
         #endregion
 
@@ -52,48 +52,48 @@ namespace RunescapeBot.BotPrograms
         /// The gray top of a furnace
         /// </summary>
         /// <returns></returns>
-        public static ColorRange Furnace()
+        public static RGBHSBRange Furnace()
         {
             Color dark = Color.FromArgb(46, 43, 43);
             Color light = Color.FromArgb(85, 80, 78);
             HSBRange hsbRange = new HSBRange(0, 360, 0.02f, 0.07f, 0.18f, 0.32f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The white tarp above a tea stall
         /// </summary>
         /// <returns></returns>
-        public static ColorRange TeaStallRoof()
+        public static RGBHSBRange TeaStallRoof()
         {
             Color dark = Color.FromArgb(173, 159, 135);
             Color light = Color.FromArgb(203, 189, 168);
             HSBRange hsbRange = new HSBRange(31, 44, 0.169f, 0.260f, 0.603f, 0.728f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The teller side counter of a Port Phasmatys bank booth
         /// </summary>
         /// <returns></returns>
-        public static ColorRange BankBoothPhasmatys()
+        public static RGBHSBRange BankBoothPhasmatys()
         {
             Color dark = Color.FromArgb(62, 67, 27);
             Color light = Color.FromArgb(71, 76, 36);
             HSBRange hsbRange = new HSBRange(64, 72, 0.360f, 0.418f, 0.182f, 0.222f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The teller side counter of a Port Phasmatys bank booth
         /// </summary>
         /// <returns></returns>
-        public static ColorRange BankBoothVarrockWest()
+        public static RGBHSBRange BankBoothVarrockWest()
         {
             Color dark = Color.FromArgb(78, 67, 34);
             Color light = Color.FromArgb(101, 87, 46);
             HSBRange hsbRange = new HSBRange(43, 47, 0.358f, 0.395f, 0.217f, 0.290f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion
@@ -104,72 +104,72 @@ namespace RunescapeBot.BotPrograms
         /// The teller side counter of a Port Phasmatys bank booth
         /// </summary>
         /// <returns></returns>
-        public static ColorRange LogBalance()
+        public static RGBHSBRange LogBalance()
         {
             Color dark = Color.FromArgb(61, 33, 0);
             Color light = Color.FromArgb(110, 68, 14);
             HSBRange hsbRange = new HSBRange(26, 40, 0.728f, 1.000f, 0.079f, 0.274f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The wooden frame for a cargo net
         /// </summary>
         /// <returns></returns>
-        public static ColorRange CargoNetFrameTop()
+        public static RGBHSBRange CargoNetFrameTop()
         {
             Color dark = Color.FromArgb(90, 54, 8);
             Color light = Color.FromArgb(92, 56, 10);
             HSBRange hsbRange = new HSBRange(33, 35, 0.815f, 0.825f, 0.191f, 0.201f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// Climbable tree branch from the Gnome Stronghold agility course
         /// </summary>
         /// <returns></returns>
-        public static ColorRange GnomeTreeBranch()
+        public static RGBHSBRange GnomeTreeBranch()
         {
             Color dark = Color.FromArgb(52, 39, 8);
             Color light = Color.FromArgb(147, 121, 71);
             HSBRange hsbRange = new HSBRange(37, 44, 0.355f, 0.668f, 0.127f, 0.418f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The cutout of the tree trunk for a climbable tree
         /// </summary>
         /// <returns></returns>
-        public static ColorRange GnomeTreeTrunk()
+        public static RGBHSBRange GnomeTreeTrunk()
         {
             Color dark = Color.FromArgb(75, 59, 39);
             Color light = Color.FromArgb(148, 120, 86);
             HSBRange hsbRange = new HSBRange(30, 37, 0.263f, 0.302f, 0.233f, 0.449f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// Traversable tightrope
         /// </summary>
         /// <returns></returns>
-        public static ColorRange Tightrope()
+        public static RGBHSBRange Tightrope()
         {
             Color dark = Color.FromArgb(119, 95, 65);
             Color light = Color.FromArgb(174, 142, 101);
             HSBRange hsbRange = new HSBRange(31, 36, 0.264f, 0.308f, 0.370f, 0.530f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// THe rim of the opening of a drain pipe
         /// </summary>
         /// <returns></returns>
-        public static ColorRange DrainPipe()
+        public static RGBHSBRange DrainPipe()
         {
             Color dark = Color.FromArgb(86, 80, 80);
             Color light = Color.FromArgb(129, 121, 121);
             HSBRange hsbRange = new HSBRange(355, 12, 0.027f, 0.044f, 0.335f, 0.483f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion
@@ -179,12 +179,12 @@ namespace RunescapeBot.BotPrograms
         /// Creates the color range to represent the rune color
         /// </summary>
         /// <returns></returns>
-        public static ColorRange RuneMedHelm()
+        public static RGBHSBRange RuneMedHelm()
         {
             Color dark = Color.FromArgb(52, 70, 77);
             Color light = Color.FromArgb(95, 131, 137);
             HSBRange hsbRange = new HSBRange(190, 200, 0.18f, 0.21f, 0.245f, 0.48f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
@@ -192,36 +192,36 @@ namespace RunescapeBot.BotPrograms
         /// we have to be careful with this filter because it also picks up water and similarly colored shades
         /// </summary>
         /// <returns></returns>
-        public static ColorRange MithrilArmor()
+        public static RGBHSBRange MithrilArmor()
         {
             Color dark = Color.FromArgb(45, 45, 70);
             Color light = Color.FromArgb(105, 105, 130);
             HSBRange hsbRange = new HSBRange(215, 315, 0.100f, 0.200f, 0.203f, 0.460f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The orange outline on a chaos rune
         /// </summary>
         /// <returns></returns>
-        public static ColorRange ChaosRuneOrange()
+        public static RGBHSBRange ChaosRuneOrange()
         {
             Color dark = Color.FromArgb(218, 161, 20);
             Color light = Color.FromArgb(229, 174, 33);
             HSBRange hsbRange = new HSBRange(40, 46, 0.728f, 0.848f, 0.436f, 0.544f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The white skull and crossbones on a death rune
         /// </summary>
         /// <returns></returns>
-        public static ColorRange DeathRuneWhite()
+        public static RGBHSBRange DeathRuneWhite()
         {
             Color dark = Color.FromArgb(223, 219, 219);
             Color light = Color.FromArgb(234, 230, 230);
             HSBRange hsbRange = new HSBRange(357, 3, 0.021f, 0.121f, 0.840f, 0.940f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
         #endregion
 
@@ -231,12 +231,12 @@ namespace RunescapeBot.BotPrograms
         /// The yellow version of the run energy foot icon
         /// </summary>
         /// <returns></returns>
-        public static ColorRange RunEnergyFoot()
+        public static RGBHSBRange RunEnergyFoot()
         {
             Color dark = Color.FromArgb(215, 192, 77);
             Color light = Color.FromArgb(255, 236, 130);
             HSBRange hsbRange = new HSBRange(39, 60, 0.668f, 0.948f, 0.557f, 0.778f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
@@ -244,48 +244,48 @@ namespace RunescapeBot.BotPrograms
         /// (hitpoints, prayer points, run energy, special attack energy)
         /// </summary>
         /// <returns></returns>
-        public static ColorRange MinimapGaugeYellowGreen()
+        public static RGBHSBRange MinimapGaugeYellowGreen()
         {
             Color dark = Color.FromArgb(0, 163, 0);
             Color light = Color.FromArgb(194, 255, 121);
             HSBRange hsbRange = new HSBRange(67, 130, 0.174f, 1.000f, 0.400f, 0.663f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The orange part of a furnace minimap icon
         /// </summary>
         /// <returns></returns>
-        public static ColorRange FurnaceIconOrange()
+        public static RGBHSBRange FurnaceIconOrange()
         {
             Color dark = Color.FromArgb(146, 83, 0);
             Color light = Color.FromArgb(255, 255, 136);
             HSBRange hsbRange = new HSBRange(15, 40, 0.330f, 1.000f, 0.380f, 0.770f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The yellow part of a bank minimap icon
         /// </summary>
         /// <returns></returns>
-        public static ColorRange BankIconDollar()
+        public static RGBHSBRange BankIconDollar()
         {
             Color dark = Color.FromArgb(94, 80, 0);
             Color light = Color.FromArgb(233, 231, 136);
             HSBRange hsbRange = new HSBRange(43, 69, 0.433f, 1.000f, 0.164f, 0.709f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The brown floor of a builidng on the minimap
         /// </summary>
         /// <returns></returns>
-        public static ColorRange PhasmatysBuildingFloor()
+        public static RGBHSBRange PhasmatysBuildingFloor()
         {
             Color dark = Color.FromArgb(25, 31, 19);
             Color light = Color.FromArgb(92, 103, 82);
             HSBRange hsbRange = new HSBRange(334, 90, 0.083f, 0.191f, 0.117f, 0.363f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion
@@ -295,12 +295,12 @@ namespace RunescapeBot.BotPrograms
         /// Catches most of the colors found in the opaque background of the inventory
         /// </summary>
         /// <returns></returns>
-        public static ColorRange EmptyInventorySlot()
+        public static RGBHSBRange EmptyInventorySlot()
         {
             Color dark = Color.FromArgb(56, 48, 35);
             Color light = Color.FromArgb(66, 58, 45);
             HSBRange hsbRange = new HSBRange(28, 40, 0.15f, 0.25f, 0.15f, 0.25f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
         #endregion
 
@@ -310,36 +310,36 @@ namespace RunescapeBot.BotPrograms
         /// The gray background color of a right-click menu
         /// </summary>
         /// <returns></returns>
-        public static ColorRange RightClickPopup()
+        public static RGBHSBRange RightClickPopup()
         {
             Color dark = Color.FromArgb(91, 82, 69);
             Color light = Color.FromArgb(95, 86, 73);
             HSBRange hsbRange = new HSBRange(33, 37, 0.126f, 0.143f, 0.309f, 0.334f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The orange title text in the bank screen
         /// </summary>
         /// <returns></returns>
-        public static ColorRange BankTitle()
+        public static RGBHSBRange BankTitle()
         {
             Color dark = Color.FromArgb(253, 150, 29);
             Color light = Color.FromArgb(255, 154, 33);
             HSBRange hsbRange = new HSBRange(31, 33, 0.995f, 1.000f, 0.556f, 0.566f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The orange text for an item in an inventory right click menu
         /// </summary>
         /// <returns></returns>
-        public static ColorRange InventoryRightClickItemName()
+        public static RGBHSBRange InventoryRightClickItemName()
         {
             Color dark = Color.FromArgb(245, 139, 59);
             Color light = Color.FromArgb(255, 149, 69);
             HSBRange hsbRange = new HSBRange(23, 27, 0.990f, 1.000f, 0.615f, 0.635f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion
@@ -349,36 +349,36 @@ namespace RunescapeBot.BotPrograms
         /// The gray background on the OSBuddy popup in the top-left of the screen that shows the current target's hitpoints
         /// </summary>
         /// <returns></returns>
-        public static ColorRange OSBuddyEnemyHitpointsBackground()
+        public static RGBHSBRange OSBuddyEnemyHitpointsBackground()
         {
             Color dark = Color.FromArgb(66, 60, 52);
             Color light = Color.FromArgb(68, 62, 54);
             HSBRange hsbRange = new HSBRange(33, 35, 0.116f, 0.118f, 0.234f, 0.236f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The green portion of the health bar on the OSBuddy popup in the top-left of the screen that shows the current target's hitpoints
         /// </summary>
         /// <returns></returns>
-        public static ColorRange OSBuddyEnemyHitpointsGreen()
+        public static RGBHSBRange OSBuddyEnemyHitpointsGreen()
         {
             Color dark = Color.FromArgb(45, 121, 35);
             Color light = Color.FromArgb(47, 123, 37);
             HSBRange hsbRange = new HSBRange(112, 114, 0.543f, 0.545f, 0.309f, 0.311f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The red portion of the health bar on the OSBuddy popup in the top-left of the screen that shows the current target's hitpoints
         /// </summary>
         /// <returns></returns>
-        public static ColorRange OSBuddyEnemyHitpointsRed()
+        public static RGBHSBRange OSBuddyEnemyHitpointsRed()
         {
             Color dark = Color.FromArgb(125, 41, 35);
             Color light = Color.FromArgb(127, 43, 37);
             HSBRange hsbRange = new HSBRange(3, 5, 0.555f, 0.557f, 0.317f, 0.319f);
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
         #endregion
 
@@ -388,12 +388,12 @@ namespace RunescapeBot.BotPrograms
         /// perfect black
         /// </summary>
         /// <returns></returns>
-        public static ColorRange Black()
+        public static RGBHSBRange Black()
         {
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(0, 0, 0);
             HSBRange hsbRange = null;
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion
@@ -404,24 +404,24 @@ namespace RunescapeBot.BotPrograms
         /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
         /// </summary>
         /// <returns></returns>
-        public static ColorRange MouseoverTextStationaryObject()
+        public static RGBHSBRange MouseoverTextStationaryObject()
         {
             Color dark = Color.FromArgb(0, 189, 188);
             Color light = Color.FromArgb(39, 246, 245);
             HSBRange hsbRange = new HSBRange(175.8f, 182.0f, 0.717f, 1.000f, 0.352f, 0.542f); ;
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
         /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
         /// </summary>
         /// <returns></returns>
-        public static ColorRange MouseoverTextNPC()
+        public static RGBHSBRange MouseoverTextNPC()
         {
             Color dark = Color.FromArgb(181, 181, 0);
             Color light = Color.FromArgb(225, 225, 16);
             HSBRange hsbRange = new HSBRange(58.0f, 62.0f, 0.970f, 1.000f, 0.336f, 0.462f); ;
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion
@@ -432,12 +432,12 @@ namespace RunescapeBot.BotPrograms
         /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
         /// </summary>
         /// <returns></returns>
-        public static ColorRange IronRock()
+        public static RGBHSBRange IronRock()
         {
             Color dark = Color.FromArgb(0, 189, 188);
             Color light = Color.FromArgb(39, 246, 245);
             HSBRange hsbRange = new HSBRange(175.8f, 182.0f, 0.717f, 1.000f, 0.352f, 0.542f); ;
-            return new ColorRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, hsbRange);
         }
 
         #endregion

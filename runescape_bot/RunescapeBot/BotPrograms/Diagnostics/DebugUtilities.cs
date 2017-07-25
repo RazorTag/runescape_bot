@@ -54,7 +54,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="directory">e.x. "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\"</param>
         /// <param name="saveName"></param>
         /// <param name="mask"></param>
-        public static void TestMask(Bitmap bitmap, Color[,] colorArray, ColorRange bodyPart, bool[,] mask, string directory, string saveName)
+        public static void TestMask(Bitmap bitmap, Color[,] colorArray, RGBHSBRange bodyPart, bool[,] mask, string directory, string saveName)
         {
             Bitmap redBitmap = (Bitmap)bitmap.Clone();
             Bitmap greenBitmap = (Bitmap)bitmap.Clone();

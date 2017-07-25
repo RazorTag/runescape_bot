@@ -17,13 +17,17 @@ namespace RunescapeBot.BotPrograms
     public class BankStand : BotProgram
     {
         protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
-        protected ColorRange BankBoothCounter;
+        protected const int WAIT_FOR_BANK_LOCATION = 8000;
+        protected List<BankLocator> PossibleBankTypes;
+        protected BankLocator BankBoothLocator;
         protected int FailedRuns;
 
 
         public BankStand(RunParams startParams) : base(startParams)
         {
-            GetReferenceColors();
+            PossibleBankTypes = new List<BankLocator>();
+            PossibleBankTypes.Add(LocateBankBoothVarrock);
+            PossibleBankTypes.Add(LocateBankBoothPhasmatys);
         }
 
         /// <summary>
@@ -58,52 +62,62 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Finds the Port Phasmatys bank booths and clicks on them to open the bank.
-        /// Assumes that the player has a ghostspeak amulet equipped.
-        /// Fails if the Port Phasmatys bank booths are not visible on the screen.
+        /// Locates and opens an unknown bank type
+        /// Refer to member PossibleBankBooths for a list of possible bank types
         /// </summary>
-        /// <returns>True if the bank is opened</returns>
+        /// <returns>true if the bank is opened</returns>
         protected bool OpenBank(out Bank bankPopup)
         {
-            const int maxWaitTime = 8000;
-            Blob bankBooth;
-            if (!LocateStationaryObject(BankBoothCounter, out bankBooth, 15, maxWaitTime, 1, LocateBankBooth))
+            bankPopup = null;
+
+            if (OpenKnownBank(out bankPopup))
             {
-                bankPopup = null;
-                return false;
+                return true;
             }
-            LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
-            bankPopup = new Bank(RSClient);
-            return bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT);
+            else
+            {
+                return IdentifyBank() && OpenKnownBank(out bankPopup);
+            }
         }
 
         /// <summary>
-        /// Finds the closest bank booth in the Varrock west bank
+        /// Locates and opens a nown bank type
         /// </summary>
-        /// <param name="bankBoothColor">not used</param>
-        /// <param name="bankBooth">returns the found bank booth blob</param>
-        /// <param name="minimumSize">not used</param>
-        /// <returns>true if a bank booth is found</returns>
-        protected bool LocateBankBooth(ColorRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
+        /// <param name="bankPopup"></param>
+        /// <returns></returns>
+        protected bool OpenKnownBank(out Bank bankPopup)
         {
-            bankBooth = null;
-            int bankBoothMinSize = ArtifactSize(0.000156);
-            int bankBoothMaxSize = ArtifactSize(0.000416);
+            bankPopup = null;
+            if (BankBoothLocator == null) { return false; }
 
-            if (!ReadWindow()) { return false; }
-            bool[,] bankBooths = ColorFilter(BankBoothCounter);
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, false, bankBoothMinSize, bankBoothMaxSize);
-            bankBooth = Blob.ClosestBlob(Center, boothBlobs);
-
-            return bankBooth != null;
+            Blob bankBooth;
+            if (BankBoothLocator(out bankBooth))
+            {
+                LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
+                bankPopup = new Bank(RSClient);
+                return bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT);
+            }
+            return false;
         }
 
         /// <summary>
-        /// Gets color filters for multiple use
+        /// Determines if any of the possible bank types appear on screen.
+        /// Sets BankBoothCounter to the first match found.
         /// </summary>
-        private void GetReferenceColors()
+        /// <returns>true if any of them do</returns>
+        protected bool IdentifyBank()
         {
-            BankBoothCounter = RGBHSBRanges.BankBoothVarrockWest();
+            Blob booth;
+            ReadWindow();
+            foreach (BankLocator bankLocator in PossibleBankTypes)
+            {
+                if (bankLocator(out booth))
+                {
+                    BankBoothLocator = bankLocator;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

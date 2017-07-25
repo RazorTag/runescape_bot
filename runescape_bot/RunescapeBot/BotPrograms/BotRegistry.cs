@@ -50,64 +50,52 @@ namespace RunescapeBot.BotPrograms
             [Description("Thieving - Tea Stall")]
             TeaStall,
             [Description("Woodcutting - Willows (drop)")]
-            WillowTrees
+            WillowTrees,
+            [Description("Other - Do Nothing")]
+            DoNothing
         };
 
 
-        public static BotProgram GetSelectedBot(RunParams runParams, BotActions selectedBot)
+        public static BotProgram GetSelectedBot(RunParams runParams)
         {
             BotProgram bot = null;
 
-            switch (selectedBot)
+            switch (runParams.BotAction)
             {
                 case BotActions.LesserDemon:
-                    bot = new LesserDemon(runParams);
-                    break;
+                    return new LesserDemon(runParams);
                 case BotActions.LesserDemonSimple:
-                    bot = new LesserDemon(runParams, false, false);
-                    break;
+                    return new LesserDemon(runParams, false, false);
                 case BotActions.GoldBracelets:
-                    bot = new GoldBracelets(runParams);
-                    break;
+                    return new GoldBracelets(runParams);
                 case BotActions.Cannonballs:
-                    bot = new Cannonballs(runParams);
-                    break;
+                    return new Cannonballs(runParams);
                 case BotActions.NightmareZoneD:
-                    bot = new NightmareZoneD(runParams);
-                    break;
+                    return new NightmareZoneD(runParams);
                 case BotActions.FletchShortBows:
-                    bot = new Use1On27(runParams, 3 * GAME_TICK);
-                    break;
+                    return new Use1On27(runParams, Use14On14.FLETCH_BOW_TIME);
                 case BotActions.StringBows:
-                    bot = new Use14On14(runParams, 2 * GAME_TICK);
-                    break;
+                    return new Use14On14(runParams, Use14On14.STRING_BOW_TIME);
                 case BotActions.MakeUnfinishedPotions:
-                    bot = new UnfinishedPotions(runParams);
-                    break;
+                    return new UnfinishedPotions(runParams);
                 case BotActions.MakePotionsSimple:
-                    bot = new Use14On14(runParams, GAME_TICK);
-                    break;
+                    return new Use14On14(runParams, Herblore.MAKE_UNFINISHED_POTION_TIME);
                 case BotActions.MakePotionsFull:
-                    bot = new MakePotionFull(runParams);
-                    break;
+                    return new MakePotionFull(runParams);
                 case BotActions.AgilityGnomeStronghold:
-                    bot = new AgilityGnomeStronghold(runParams);
-                    break;
+                    return new AgilityGnomeStronghold(runParams);
                 case BotActions.AgilitySeersVillage:
-                    bot = new AgilitySeersVillage(runParams);
-                    break;
+                    return new AgilitySeersVillage(runParams);
                 case BotActions.WillowTrees:
-                    bot = new Woodcutting(runParams);
-                    break;
+                    return new Woodcutting(runParams);
                 case BotActions.TeaStall:
-                    bot = new TeaStall(runParams);
-                    break;
+                    return new TeaStall(runParams);
                 case BotActions.CutGems:
-                    bot = new Use1On27(runParams, 2 * GAME_TICK);
-                    break;
+                    return new Use1On27(runParams, Use1On27.CUT_GEM_TIME);
                 case BotActions.EnchantLevel2:
-                    bot = new Enchant(runParams, 2);
-                    break;
+                    return new Enchant(runParams, 2);
+                case BotActions.DoNothing:
+                    return new DoNothing(runParams);
             }
             return bot;
         }
@@ -119,6 +107,7 @@ namespace RunescapeBot.BotPrograms
         {
             None,
             Standard,
+            Rotation,
             Phasmatys
         }
 
@@ -131,21 +120,17 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static BotProgram GetSelectedBot(RunParams runParams, BotManager botManager, BotActions selectedBot)
         {
-            BotProgram bot = null;
-
             switch (botManager)
             {
-                case BotManager.None:
-                    bot = null;
-                    break;
                 case BotManager.Standard:
-                    bot = GetSelectedBot(runParams, selectedBot); ;
-                    break;
+                    return GetSelectedBot(runParams);
+                case BotManager.Rotation:
+                    return new SimpleRotation(runParams, runParams.RotationParams);
                 case BotManager.Phasmatys:
-                    bot = new Phasmatys(runParams);
-                    break;
+                    return new PhasmatysRotation(runParams, runParams.PhasmatysParams);
+                default:
+                    return null;
             }
-            return bot;
         }
     }
 }

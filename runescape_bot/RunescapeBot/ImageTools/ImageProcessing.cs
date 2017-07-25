@@ -13,7 +13,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static bool[,] ColorFilter(Color[,] rgbImage, ColorRange filter)
+        public static bool[,] ColorFilter(Color[,] rgbImage, RGBHSBRange filter)
         {
             if (rgbImage == null || filter == null) { return new bool[0, 0]; }
 
@@ -73,7 +73,7 @@ namespace RunescapeBot.ImageTools
         /// <param name="xMax">exclusive</param>
         /// <param name="yMin">inclusive</param>
         /// <param name="yMax">exclusive</param>
-        private static void ColorFilterPiece(Color[,] rgbImage, ColorRange filter, ref bool[,] filterPixels, int xMin, int xMax)
+        private static void ColorFilterPiece(Color[,] rgbImage, RGBHSBRange filter, ref bool[,] filterPixels, int xMin, int xMax)
         {
             Color pixelColor;
             int height = rgbImage.GetLength(1);
@@ -368,7 +368,7 @@ namespace RunescapeBot.ImageTools
         /// <param name="rgbImage">image to match on</param>
         /// <param name="filter">filter to use for matching</param>
         /// <returns>The fraction (0-1) of the image that matches the filter</returns>
-        public static double FractionalMatch(Color[,] rgbImage, ColorRange filter)
+        public static double FractionalMatch(Color[,] rgbImage, RGBHSBRange filter)
         {
             bool[,] binaryImage = ColorFilter(rgbImage, filter);
             return FractionalMatch(binaryImage);

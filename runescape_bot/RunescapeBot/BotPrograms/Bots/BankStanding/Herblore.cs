@@ -5,8 +5,8 @@ namespace RunescapeBot.BotPrograms
     public class Herblore : Use14On14
     {
         protected const int WAIT_FOR_HERBS_TO_CLEAN = 300;
-        protected const int MAKE_POTION_TIME = 2 * BotRegistry.GAME_TICK;
-        protected const int MAKE_UNFINISHED_POTION_TIME = BotRegistry.GAME_TICK;
+        public const int MAKE_POTION_TIME = 2 * BotRegistry.GAME_TICK;
+        public const int MAKE_UNFINISHED_POTION_TIME = BotRegistry.GAME_TICK;
 
         public Herblore(RunParams startParams, int makeTime) : base(startParams, makeTime)
         {

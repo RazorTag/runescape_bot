@@ -8,15 +8,7 @@ namespace RunescapeBot.BotPrograms
 {
     public class PhasmatysRunParams : RunParams
     {
-        public PhasmatysRunParams() : base(false)
-        {
-            BotName = "New Bot";
-        }
-
-        /// <summary>
-        /// Username of the bot account
-        /// </summary>
-        public string BotName { get; set; }
+        public PhasmatysRunParams() : base(false) { }
 
         /// <summary>
         /// Number of gold bars remaining

@@ -11,14 +11,13 @@ namespace RunescapeBot.BotPrograms
         protected const int FURNACE_TO_BANK_ICON_OFFSET_HORIZONTAL = 15;
         protected const int FURNACE_TO_BANK_ICON_OFFSET_VERICAL = 50;
         protected const double STATIONARY_OBJECT_TOLERANCE = 15.0;
-        protected ColorRange FurnaceIconOrange;
-        protected ColorRange BankIconDollar;
-        protected ColorRange BuildingFloor;
-        protected ColorRange Furnace;
-        protected ColorRange BankBooth;
+        protected RGBHSBRange FurnaceIconOrange;
+        protected RGBHSBRange BankIconDollar;
+        protected RGBHSBRange BuildingFloor;
+        protected RGBHSBRange Furnace;
+        protected RGBHSBRange BankBooth;
         protected FurnaceCrafting CraftPopup;
         protected Bank BankPopup;
-        protected int BankBoothMinSize { get { return ArtifactSize(0.0003); } }
         protected int BankFloorMaxSize { get { return ArtifactSize(0.0015); } }
         protected int FurnaceFloorMaxSize { get { return ArtifactSize(0.00035); } }
 
@@ -144,7 +143,7 @@ namespace RunescapeBot.BotPrograms
         {
             Blob bankBooth;
             const int maxWaitTime = 12000;
-            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, BankBoothMinSize, LocateBankBooth))
+            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, BankBoothMinSize, LocateBankBoothPhasmatys))
             {
                 return false;
             }
@@ -157,15 +156,17 @@ namespace RunescapeBot.BotPrograms
         /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if the bank booths are found</returns>
-        protected bool LocateBankBooth(ColorRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
+        protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
         {
             bankBooth = null;
             const int numberOfBankBooths = 6;
             const double maxBoothHeightToWidthRatio = 3.2;
+            int bankBoothMinSize = ArtifactSize(0.000156);
+            int bankBoothMaxSize = ArtifactSize(0.00045);
 
             ReadWindow();
             bool[,] bankBooths = ColorFilter(bankBoothColor);
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, BankBoothMinSize);    //list of blobs from biggest to smallest
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, bankBoothMinSize, bankBoothMaxSize);    //list of blobs from biggest to smallest
             Blob blob;
             int blobIndex = 0;
 
@@ -178,11 +179,6 @@ namespace RunescapeBot.BotPrograms
                 }
 
                 blob = boothBlobs[blobIndex];
-
-                if (blob.Size < BankBoothMinSize)
-                {
-                    return false;   //We did not find the expected number of bank booths
-                }
 
                 if ((blob.Width / blob.Height) > maxBoothHeightToWidthRatio)
                 {

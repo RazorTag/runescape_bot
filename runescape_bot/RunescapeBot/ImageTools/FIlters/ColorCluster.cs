@@ -9,7 +9,7 @@ namespace RunescapeBot.ImageTools.FIlters
 {
     public class ColorCluster
     {
-        private List<ColorRange> cluster;
+        private List<RGBHSBRange> cluster;
 
 
         public ColorCluster() { }
@@ -19,7 +19,7 @@ namespace RunescapeBot.ImageTools.FIlters
         /// Adds a color range to the cluster
         /// </summary>
         /// <param name="color"></param>
-        public void Add(ColorRange color)
+        public void Add(RGBHSBRange color)
         {
             cluster.Add(color);
         }

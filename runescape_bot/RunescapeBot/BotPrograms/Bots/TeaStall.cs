@@ -10,8 +10,8 @@ namespace RunescapeBot.BotPrograms
     {
         private const int FAIL_LIMIT = 5;
         private Point TeaInventorySlot;
-        private ColorRange TeaStallRoof;
-        private ColorRange MouseOverText;
+        private RGBHSBRange TeaStallRoof;
+        private RGBHSBRange MouseOverText;
         private int minTeaStallSize;
         private int FailedRuns;
 

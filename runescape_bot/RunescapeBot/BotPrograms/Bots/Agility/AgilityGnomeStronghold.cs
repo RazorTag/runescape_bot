@@ -14,13 +14,13 @@ namespace RunescapeBot.BotPrograms
         private const int WAIT_FOR_NEXT_OBSTACLE = 10000;
         private const int WAIT_FOR_VERIFICATION = 9000;
 
-        private ColorRange LogBalance;
-        private ColorRange CargoNet;
-        private ColorRange TreeBranch;
-        private ColorRange TreeTrunk;
-        private ColorRange Tightrope;
-        private ColorRange DrainPipe;
-        private ColorRange Black;
+        private RGBHSBRange LogBalance;
+        private RGBHSBRange CargoNet;
+        private RGBHSBRange TreeBranch;
+        private RGBHSBRange TreeTrunk;
+        private RGBHSBRange Tightrope;
+        private RGBHSBRange DrainPipe;
+        private RGBHSBRange Black;
 
         private int MinLogSize;
         private int MinCargoNetSize;
@@ -203,7 +203,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="cargoNet">returns the top of the middle cargo net</param>
         /// <param name="minimumSize">conservative size floor</param>
         /// <returns>true if a set of cargo nets is found</returns>
-        private bool LocateMiddleCargoNet(ColorRange cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1)
+        private bool LocateMiddleCargoNet(RGBHSBRange cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1)
         {
             cargoNet = null;
             ReadWindow();
@@ -330,7 +330,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="trunk">returns a climbable tree trunk if found</param>
         /// <param name="minimumSize">not used</param>
         /// <returns>true if a climbable tree trunk is found</returns>
-        private bool FindTreeTrunk(ColorRange trunkColor, out Blob trunk, int minimumSize = 1)
+        private bool FindTreeTrunk(RGBHSBRange trunkColor, out Blob trunk, int minimumSize = 1)
         {
             trunk = null;
             ReadWindow();
@@ -471,7 +471,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="drainPipe"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        private bool LocateDrainPipe(ColorRange drainPipeColor, out Blob drainPipe, int minimumSize = 1)
+        private bool LocateDrainPipe(RGBHSBRange drainPipeColor, out Blob drainPipe, int minimumSize = 1)
         {
             drainPipe = null;
             ReadWindow();

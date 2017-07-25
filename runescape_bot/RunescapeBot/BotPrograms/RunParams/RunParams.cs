@@ -11,13 +11,20 @@ namespace RunescapeBot.BotPrograms
         public RunParams()
         {
             InitializeBaseParams();
+            InitializePhasmatys();
         }
 
+        /// <summary>
+        /// Call this constructor to initialize a bot for a rotation
+        /// </summary>
+        /// <param name="baseParams">Set to false if the bot is part of a rotation and not the base RunParams</param>
         public RunParams(bool baseParams = true)
         {
+            InitializeBaseParams();
+
             if (baseParams)
             {
-                InitializeBaseParams();
+                InitializePhasmatys();
             }
         }
 
@@ -26,19 +33,33 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void InitializeBaseParams()
         {
+            BotName = "New Bot";
             FrameTime = 3000;
             RandomizeFrames = true;
             BotState = BotProgram.BotState.Running;
             RunUntil = DateTime.Now;
+        }
 
-            PhasmatysParams = new RunParamsList(Phasmatys.NUMBER_OF_BOTS);
+        /// <summary>
+        /// Initializes the Phasmatys rotation bot list.
+        /// This should only be called to initialize the base RunParams.
+        /// </summary>
+        private void InitializePhasmatys()
+        {
+            PhasmatysParams = new RunParamsList(SimpleRotation.NUMBER_OF_BOTS);
             for (int i = 0; i < PhasmatysParams.Count; i++)
             {
                 PhasmatysParams.ParamsList[i] = new PhasmatysRunParams();
+                PhasmatysParams.ParamsList[i].TaskComplete = new BotResponse(DoNothing);
             }
         }
 
         #region settings
+
+        /// <summary>
+        /// Username of the bot account
+        /// </summary>
+        public string BotName { get; set; }
 
         /// <summary>
         /// Username to use when logging in
@@ -188,6 +209,16 @@ namespace RunescapeBot.BotPrograms
         public bool BotIdle { get; set; }
 
         /// <summary>
+        /// Set to true to run the bot without breaks until it fails or is stopped externally
+        /// </summary>
+        public bool SlaveDriver { get; set; }
+
+        /// <summary>
+        /// List of bots to run on a rotation
+        /// </summary>
+        public RunParamsList RotationParams { get; set; }
+
+        /// <summary>
         /// List of bots to run on the Phasmatys rotation
         /// </summary>
         public RunParamsList PhasmatysParams { get; set; }
@@ -209,6 +240,12 @@ namespace RunescapeBot.BotPrograms
         /// Used by the bot to inform that is has completed its task
         /// </summary>
         public BotResponse TaskComplete;
+
+        /// <summary>
+        /// Method that does nothing at all.
+        /// Used as filler for a BotDone callback when nothing should be done.
+        /// </summary>
+        private void DoNothing() { }
         #endregion
     }
 }

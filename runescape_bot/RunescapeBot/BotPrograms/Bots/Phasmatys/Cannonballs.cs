@@ -10,7 +10,7 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class Cannonballs : FurnacePhasmatys
     {
-        private const int SINGLE_SMITH_TIME = 6000;
+        public const int SINGLE_SMITH_TIME = 6000;
         private const int CANNONBALL_COLOR_SUM = 13219;
 
         public Cannonballs(RunParams startParams) : base(startParams)

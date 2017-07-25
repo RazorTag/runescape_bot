@@ -103,7 +103,7 @@ namespace RunescapeBot.BotPrograms.Popups
             int x = XClick + Width / 2 - xPadding;
             int y = YClick + Height - yPadding;
             Color bottomRight = screen.GetPixel(x, y);
-            ColorRange rightClickColor = RGBHSBRanges.RightClickPopup();
+            RGBHSBRange rightClickColor = RGBHSBRanges.RightClickPopup();
             return rightClickColor.ColorInRange(bottomRight);
         }
 

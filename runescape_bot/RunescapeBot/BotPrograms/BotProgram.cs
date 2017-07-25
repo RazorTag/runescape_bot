@@ -25,6 +25,7 @@ namespace RunescapeBot.BotPrograms
         #region properties
 
         private const long LOGIN_LOGO_COLOR_SUM = 15456063;
+        protected int BankBoothMinSize { get { return ArtifactSize(0.0003); } }
 
         /// <summary>
         /// Used to provide the current state of the bot for the start menu
@@ -221,14 +222,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Process()
         {
-            if (!PrepareClient() || !Setup())
-            {
-                Done();
-                return;
-            }
-
             //don't limit by iterations unless the user has specified a positive number of iterations
-            if (RunParams.Iterations == 0)
+            if (RunParams.Iterations <= 0)
             {
                 RunParams.InfiniteIterations = true;
             }
@@ -248,6 +243,15 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void ManageBot()
         {
+            if (RunParams.SlaveDriver)
+            {
+                while (!StopFlag)
+                {
+                    Iterate();
+                }
+                return;
+            }
+
             int awakeTime = UnitConversions.HoursToMilliseconds(12);
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
@@ -279,7 +283,9 @@ namespace RunescapeBot.BotPrograms
             RunParams.BotState = BotState.Break;
             long breakLength = RandomBreakTime();
             RunParams.SetNewState(breakLength);
+            RunParams.BotIdle = true;
             bool quit = SafeWait(breakLength);
+            RunParams.BotIdle = false;
             return quit || (DateTime.Now >= RunParams.RunUntil);
         }
 
@@ -292,23 +298,10 @@ namespace RunescapeBot.BotPrograms
             RunParams.BotState = BotState.Sleep;
             long sleepLength = RandomSleepTime();
             RunParams.SetNewState(sleepLength);
+            RunParams.BotIdle = true;
             bool quit = SafeWait(sleepLength);
+            RunParams.BotIdle = false;
             return quit || (DateTime.Now >= RunParams.RunUntil);
-        }
-
-        /// <summary>
-        /// Standard setup before running a bot
-        /// </summary>
-        /// <returns>true if setup is successful</returns>
-        private bool Setup()
-        {
-            ReadWindow();
-            if (IsLoggedOut())
-            {
-                LogIn();
-            }
-            if (StopFlag) { return false; }
-            return Run();
         }
 
         /// <summary>
@@ -427,7 +420,7 @@ namespace RunescapeBot.BotPrograms
         /// Generates a number of milliseconds for the bot to run before logging out and resting
         /// </summary>
         /// <returns>the next work time in milliseconds</returns>
-        private int RandomWorkTime()
+        public int RandomWorkTime()
         {
             double workType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
@@ -540,7 +533,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="afterClickWait">time to wait after clicking on the stationary object</param>
         /// <param name="maxWaitTime">maximum time to wait before giving up</param>
         /// <returns></returns>
-        protected bool ClickStationaryObject(ColorRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
+        protected bool ClickStationaryObject(RGBHSBRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
         {
             Blob foundObject;
 
@@ -565,7 +558,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="findObject">custom method to locate the object</param>
         /// <param name="verificationPasses">number of times to verify the position of the object after finding it</param>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(ColorRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize, FindObject findObject = null, int verificationPasses = 1)
+        protected bool LocateStationaryObject(RGBHSBRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize, FindObject findObject = null, int verificationPasses = 1)
         {
             findObject = findObject ?? LocateObject;
 
@@ -611,7 +604,7 @@ namespace RunescapeBot.BotPrograms
 
             return false;
         }
-        protected delegate bool FindObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize = 1);
+        protected delegate bool FindObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1);
 
         /// <summary>
         /// Looks for an object that matches a filter
@@ -621,7 +614,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWaitTime"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(ColorRange stationaryObject, out Blob foundObject, int minimumSize = 1)
+        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilter(stationaryObject);
@@ -640,7 +633,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bottom"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(ColorRange stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1)
+        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
@@ -676,7 +669,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="textColor">the color of the mousover text to wait for</param>
         /// <param name="timeout">time to wait before giving up</param>
         /// <returns></returns>
-        protected bool WaitForMouseOverText(ColorRange textColor, int timeout = 5000)
+        protected bool WaitForMouseOverText(RGBHSBRange textColor, int timeout = 5000)
         {
             const int left = 5;
             const int right = 500;
@@ -766,7 +759,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="artifactColor"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilter(ColorRange artifactColor)
+        protected bool[,] ColorFilter(RGBHSBRange artifactColor)
         {
             return ColorFilter(ColorArray, artifactColor);
         }
@@ -776,7 +769,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="artifactColor"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilter(Color[,] image, ColorRange artifactColor)
+        protected bool[,] ColorFilter(Color[,] image, RGBHSBRange artifactColor)
         {
             if (ColorArray == null)
             {
@@ -794,7 +787,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="top"></param>
         /// <param name="bottom"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilterPiece(ColorRange filter, int left, int right, int top, int bottom, out Point trimOffset)
+        protected bool[,] ColorFilterPiece(RGBHSBRange filter, int left, int right, int top, int bottom, out Point trimOffset)
         {
             Color[,] colorArray = ScreenPiece(left, right, top, bottom, out trimOffset);
             if (ColorArray == null)
@@ -813,7 +806,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="top"></param>
         /// <param name="bottom"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilterPiece(ColorRange filter, int left, int right, int top, int bottom)
+        protected bool[,] ColorFilterPiece(RGBHSBRange filter, int left, int right, int top, int bottom)
         {
             Point empty;
             return ColorFilterPiece(filter, left, right, top, bottom, out empty);
@@ -827,7 +820,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="radius"></param>
         /// <param name="offset"></param>
         /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
-        protected bool[,] ColorFilterPiece(ColorRange filter, Point center, int radius, out Point offset)
+        protected bool[,] ColorFilterPiece(RGBHSBRange filter, Point center, int radius, out Point offset)
         {
             int left = center.X - radius;
             int right = center.X + radius;
@@ -843,7 +836,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="center"></param>
         /// <param name="radius"></param>
         /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
-        protected bool[,] ColorFilterPiece(ColorRange filter, Point center, int radius)
+        protected bool[,] ColorFilterPiece(RGBHSBRange filter, Point center, int radius)
         {
             Point offset;
             return ColorFilterPiece(filter, center, radius, out offset);
@@ -878,7 +871,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="filter">the filter to use on the minimap</param>
         /// <param name="offset">gets set to the offset from the game screen to the minimap piece</param>
         /// <returns>true for the pixels on the minimap that match the filter</returns>
-        protected bool[,] MinimapFilter(ColorRange filter, out Point offset)
+        protected bool[,] MinimapFilter(RGBHSBRange filter, out Point offset)
         {
             if (!MakeSureWindowHasBeenRead())
             {
@@ -916,7 +909,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="filter">the filter to use on the minimap</param>
         /// <returns>true for the pixels on the minimap that match the filter</returns>
-        protected bool[,] MinimapFilter(ColorRange filter)
+        protected bool[,] MinimapFilter(RGBHSBRange filter)
         {
             Point offset;
             return MinimapFilter(filter, out offset);
@@ -1007,7 +1000,7 @@ namespace RunescapeBot.BotPrograms
 
             Stopwatch longWatch = new Stopwatch();
             longWatch.Start();
-            while (longWatch.ElapsedMilliseconds < UnitConversions.HoursToMilliseconds(24))
+            while (longWatch.ElapsedMilliseconds < UnitConversions.HoursToMilliseconds(24) && !StopFlag)
             {
                 if (!ScreenScraper.RestartClient(ref client, RunParams.RuneScapeClient, RunParams.ClientFlags))
                 {
@@ -1031,9 +1024,13 @@ namespace RunescapeBot.BotPrograms
                 BroadcastDisconnect();
             }
 
-            BroadcastFailure();
-            const string errorMessage = "Client did not start correctly";
-            MessageBox.Show(errorMessage);
+            if (!StopFlag)
+            {
+                BroadcastFailure();
+                const string errorMessage = "Client did not start correctly";
+                MessageBox.Show(errorMessage);
+            }
+            
             client = null;
             return false;
         }
@@ -1162,7 +1159,7 @@ namespace RunescapeBot.BotPrograms
             int totalSize = width * height;
             int redBlobSize;
 
-            ColorRange red = RGBHSBRanges.WelcomeScreenClickHere();
+            RGBHSBRange red = RGBHSBRanges.WelcomeScreenClickHere();
             bool[,] clickHere = ColorFilterPiece(red, left, right, top, bottom);
             Blob enterGame = ImageProcessing.BiggestBlob(clickHere);
             redBlobSize = enterGame.Size;
@@ -1330,6 +1327,99 @@ namespace RunescapeBot.BotPrograms
         }
         #endregion
 
+        #region banking
+
+        /// <summary>
+        /// Finds the closest bank booth in the Varrock west bank
+        /// </summary>
+        /// <param name="bankBoothColor">not used</param>
+        /// <param name="bankBooth">returns the found bank booth blob</param>
+        /// <param name="minimumSize">not used</param>
+        /// <returns>true if a bank booth is found</returns>
+        protected bool LocateBankBooth(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
+        {
+            bankBooth = null;
+
+            if (!ReadWindow()) { return false; }
+            bool[,] bankBooths = ColorFilter(bankBoothColor);
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);
+            bankBooth = Blob.ClosestBlob(Center, boothBlobs);
+
+            return bankBooth != null;
+        }
+
+        /// <summary>
+        /// Delegate for custom bank locators
+        /// </summary>
+        /// <param name="bankBooth"></param>
+        /// <returns></returns>
+        protected delegate bool BankLocator(out Blob bankBooth);
+
+        protected int MinBankBoothSize { get { return ArtifactSize(0.000156); } }
+        protected int MaxBankBoothSize { get { return ArtifactSize(0.00045); } }
+
+        /// <summary>
+        /// Locates a bank booth with the counter color from the Varrock west bank
+        /// </summary>
+        /// <param name="bankBoothColor"></param>
+        /// <param name="bankBooth"></param>
+        /// <param name="minimumSize"></param>
+        /// <returns></returns>
+        protected bool LocateBankBoothVarrock(out Blob bankBooth)
+        {
+            return LocateBankBooth(RGBHSBRanges.BankBoothVarrockWest(), out bankBooth);
+        }
+
+        /// <summary>
+        /// Finds the closest bank booth in the Port Phasmatys bank
+        /// </summary>
+        /// <returns>True if the bank booths are found</returns>
+        protected bool LocateBankBoothPhasmatys(out Blob bankBooth)
+        {
+            bankBooth = null;
+            const int numberOfBankBooths = 6;
+            const double maxBoothHeightToWidthRatio = 3.2;
+
+            ReadWindow();
+            bool[,] bankBooths = ColorFilter(RGBHSBRanges.BankBoothPhasmatys());
+            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, MinBankBoothSize, MaxBankBoothSize);    //list of blobs from biggest to smallest
+            Blob blob;
+            int blobIndex = 0;
+
+            //Remove blobs that aren't bank booths
+            while (blobIndex < numberOfBankBooths)
+            {
+                if (blobIndex > boothBlobs.Count - 1)
+                {
+                    return false;   //We did not find the expected number of bank booths
+                }
+
+                blob = boothBlobs[blobIndex];
+
+                if ((blob.Width / blob.Height) > maxBoothHeightToWidthRatio)
+                {
+                    boothBlobs.RemoveAt(blobIndex); //This blob is too wide to be a bank booth counter.
+                }
+                else
+                {
+                    blobIndex++;
+                }
+            }
+
+            //Reduce the blob list to the bank booths
+            boothBlobs = boothBlobs.GetRange(0, numberOfBankBooths);
+            boothBlobs.Sort(new BlobHorizontalComparer());
+            List<Blob> functioningBankBooths = new List<Blob>();
+            functioningBankBooths.Add(boothBlobs[1]);
+            functioningBankBooths.Add(boothBlobs[2]);
+            functioningBankBooths.Add(boothBlobs[4]);
+            functioningBankBooths.Add(boothBlobs[5]);
+            bankBooth = Blob.ClosestBlob(Center, functioningBankBooths);
+            return true;
+        }
+
+        #endregion
+
         #region miscellaneous
         /// <summary>
         /// Waits for the specified time while periodically checking for the stop flag
@@ -1449,7 +1539,7 @@ namespace RunescapeBot.BotPrograms
 
             Point runOrb = RunOrbSamplePoint();
             Color runColor = GetPixel(runOrb.X, runOrb.Y);
-            ColorRange runEnergyFoot = RGBHSBRanges.RunEnergyFoot();
+            RGBHSBRange runEnergyFoot = RGBHSBRanges.RunEnergyFoot();
             return runEnergyFoot.ColorInRange(runColor);
         }
 
@@ -1513,7 +1603,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the gauge is low, false otherwise</returns>
         protected bool MinimapGaugeIsHigh(Color[,] gaugePercentage, double threshold)
         {
-            ColorRange highGauge = RGBHSBRanges.MinimapGaugeYellowGreen();
+            RGBHSBRange highGauge = RGBHSBRanges.MinimapGaugeYellowGreen();
             double highMatch = ImageProcessing.FractionalMatch(gaugePercentage, highGauge);
             return highMatch >= threshold;
         }
@@ -1524,10 +1614,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the bank icon is found</returns>
         protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true)
         {
-            if (readWindow)
-            {
-                ReadWindow();
-            }
+            if (readWindow) { ReadWindow(); }
             
             Point offset;
             bool[,] minimapBankIcon = MinimapFilter(RGBHSBRanges.BankIconDollar(), out offset);

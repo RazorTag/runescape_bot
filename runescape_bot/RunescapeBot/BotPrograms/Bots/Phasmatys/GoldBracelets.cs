@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class GoldBracelets : FurnacePhasmatys
     {
-        private const int SINGLE_CRAFTING_TIME = 1800;
+        public const int SINGLE_CRAFTING_TIME = 1800;
         private const int WAIT_FOR_CRAFTING_WINDOW_TIMEOUT = 10000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
 

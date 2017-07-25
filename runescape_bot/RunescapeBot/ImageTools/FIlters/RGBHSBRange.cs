@@ -5,7 +5,7 @@ namespace RunescapeBot.ImageTools
     /// <summary>
     /// Represents a range of RGB colors used to identify artifacts of a known color
     /// </summary>
-    public class ColorRange
+    public class RGBHSBRange
     {
         /// <summary>
         /// The color with the values closest to black that occur in an artifact
@@ -27,7 +27,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="darkestColor">The color with the values closest to black that occur in an artifact</param>
         /// <param name="lightestColor">The color with the values closest to white that occur in an artifact</param>
-        public ColorRange(Color darkestColor, Color lightestColor)
+        public RGBHSBRange(Color darkestColor, Color lightestColor)
         {
             this.DarkestColor = darkestColor;
             this.LightestColor = lightestColor;
@@ -39,7 +39,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="darkestColor">The color with the values closest to black that occur in an artifact</param>
         /// <param name="lightestColor">The color with the values closest to white that occur in an artifact</param>
-        public ColorRange(HSBRange hsbRange)
+        public RGBHSBRange(HSBRange hsbRange)
         {
             this.DarkestColor = Color.FromArgb(0, 0, 0);
             this.LightestColor = Color.FromArgb(255, 255, 255);
@@ -51,7 +51,7 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="darkestColor">The color with the values closest to black that occur in an artifact</param>
         /// <param name="lightestColor">The color with the values closest to white that occur in an artifact</param>
-        public ColorRange(Color darkestColor, Color lightestColor, HSBRange hsbRange)
+        public RGBHSBRange(Color darkestColor, Color lightestColor, HSBRange hsbRange)
         {
             this.DarkestColor = darkestColor;
             this.LightestColor = lightestColor;

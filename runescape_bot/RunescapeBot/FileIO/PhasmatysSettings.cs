@@ -52,7 +52,7 @@ namespace RunescapeBot.FileIO
         public void Load(ref RunParams runParams)
         {
             PhasmatysRunParams phasmatysParams;
-            Bots = Bots ?? new List<PhasmatysBot>(Phasmatys.NUMBER_OF_BOTS);
+            Bots = Bots ?? new List<PhasmatysBot>(SimpleRotation.NUMBER_OF_BOTS);
 
             for (int i = 0; i < Bots.Count; i++)
             {

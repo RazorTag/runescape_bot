@@ -7,8 +7,9 @@ namespace RunescapeBot.BotPrograms
 {
     public class Use14On14 : BankStand
     {
+        public const int STRING_BOW_TIME = 2 * BotRegistry.GAME_TICK;
+        public const int FLETCH_BOW_TIME = 3 * BotRegistry.GAME_TICK;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
-
 
         protected Point UseOnInventorySlot;
         protected Point UseWithInventorySlot;

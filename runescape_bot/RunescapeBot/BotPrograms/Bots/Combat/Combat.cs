@@ -31,7 +31,7 @@ namespace RunescapeBot.BotPrograms
         {
             const double minBackground = 0.1;
 
-            ColorRange background = RGBHSBRanges.OSBuddyEnemyHitpointsBackground();
+            RGBHSBRange background = RGBHSBRanges.OSBuddyEnemyHitpointsBackground();
             UpdateScreenshot();
 
             bool[,] targetBackground = ColorFilterPiece(background, TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
@@ -57,10 +57,10 @@ namespace RunescapeBot.BotPrograms
 
             UpdateScreenshot();
             Color[,] targetHitpoints = ScreenPiece(TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
-            ColorRange greenHPBar = RGBHSBRanges.OSBuddyEnemyHitpointsGreen();
+            RGBHSBRange greenHPBar = RGBHSBRanges.OSBuddyEnemyHitpointsGreen();
             bool[,] greenHP = ColorFilter(targetHitpoints, greenHPBar);
             double greenWidth = ImageProcessing.BiggestBlob(greenHP).Width;
-            ColorRange redHPBar = RGBHSBRanges.OSBuddyEnemyHitpointsRed();
+            RGBHSBRange redHPBar = RGBHSBRanges.OSBuddyEnemyHitpointsRed();
             bool[,] redHP = ColorFilter(targetHitpoints, redHPBar);
             double redWidth = ImageProcessing.BiggestBlob(redHP).Width;
 
