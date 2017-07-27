@@ -211,6 +211,7 @@ namespace RunescapeBot.BotPrograms
         public void Start()
         {
             StopFlag = false;
+            StopFlag = false;
             BotIsDone = false;
             RunThread = new Thread(Process);
             RunThread.Start();
@@ -345,9 +346,9 @@ namespace RunescapeBot.BotPrograms
 
             while ((DateTime.Now < RunParams.RunUntil) && ((RunParams.Iterations > 0) || (RunParams.InfiniteIterations == true)))
             {
+                if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
                 iterationWatch.Restart();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
-                if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
 
                 //Only do the actual botting if we are logged in
                 if (CheckLogIn())
@@ -1344,8 +1345,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected delegate bool BankLocator(out Blob bankBooth);
 
-        protected int MinBankBoothSize { get { return ArtifactSize(0.000295); } }
-        protected int MaxBankBoothSize { get { return ArtifactSize(0.00085); } }
+        protected int MinBankBoothSize { get { return ArtifactSize(0.0005); } }
+        protected int MaxBankBoothSize { get { return ArtifactSize(0.0012); } }
 
         /// <summary>
         /// Locates a bank booth with the counter color from the Varrock west bank

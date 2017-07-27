@@ -36,17 +36,12 @@ namespace RunescapeBot.FileIO
         private XmlSerializer serializer;
 
         /// <summary>
-        /// Bot settings data
-        /// </summary>
-        public SettingsData SettingsData;
-
-        /// <summary>
         /// Loads the last used bot settings from disk
         /// </summary>
         public BotSettings()
         {
             directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Roboport";
-            serializer = new XmlSerializer(typeof(SettingsData));
+            serializer = new XmlSerializer(typeof(RunParams), new Type[] { typeof(PhasmatysRunParams) });
         }
 
         /// <summary>
@@ -54,21 +49,21 @@ namespace RunescapeBot.FileIO
         /// </summary>
         /// <param name="botAction"></param>
         /// <returns>true if the load is successful</returns>
-        public bool LoadSettings()
+        public RunParams LoadSettings()
         {
             Stream stream = null;
             XmlDocument document = new XmlDocument();
+            RunParams runParams;
 
             try
             {
                 Directory.CreateDirectory(directoryPath);   //create the directory if it doesn't already exist
                 stream = File.Open(filePath, FileMode.Open);
-                SettingsData = (SettingsData) serializer.Deserialize(stream);
+                runParams = (RunParams) serializer.Deserialize(stream);
             }
             catch
             {
-                SettingsData = new SettingsData();
-                return false;
+                runParams = new RunParams();
             }
             finally
             {
@@ -78,14 +73,14 @@ namespace RunescapeBot.FileIO
                 }
             }
 
-            return true;
+            return runParams;
         }
 
         /// <summary>
         /// Saves the last used settings for all bot programs to disk
         /// </summary>
         /// <returns>true if the save is successful</returns>
-        public bool SaveSettings()
+        public bool SaveSettings(RunParams runParams)
         {
             Stream stream = null;
             XmlDocument document = new XmlDocument();
@@ -94,7 +89,7 @@ namespace RunescapeBot.FileIO
             {
                 Directory.CreateDirectory(directoryPath);   //create the directory if it doesn't already exist
                 stream = File.Open(filePath, FileMode.Create);
-                serializer.Serialize(stream, SettingsData);
+                serializer.Serialize(stream, runParams);
             }
             finally
             {
@@ -102,25 +97,6 @@ namespace RunescapeBot.FileIO
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Updates the settings for a single bot program
-        /// Saves to disk after updating
-        /// </summary>
-        /// <param name="runParams"></param>
-        public void SaveRunParams(RunParams runParams)
-        {
-            SettingsData.Save(runParams);
-        }
-
-        /// <summary>
-        /// Loads the settings data into RunParams
-        /// </summary>
-        /// <param name="runParams">runParams to store the settings</param>
-        public void LoadRunParams(ref RunParams runParams)
-        {
-            SettingsData.Load(ref runParams);
         }
     }
 }

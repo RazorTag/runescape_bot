@@ -120,9 +120,6 @@
     <Compile Include="Common\Numerical.cs" />
     <Compile Include="Common\Probability.cs" />
     <Compile Include="Common\UnitConversions.cs" />
-    <Compile Include="FileIO\PhasmatysBot.cs" />
-    <Compile Include="FileIO\PhasmatysSettings.cs" />
-    <Compile Include="FileIO\SoloBotSettings.cs" />
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
@@ -133,7 +130,6 @@
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\Inventory.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
-    <Compile Include="FileIO\SettingsData.cs" />
     <Compile Include="GMA\GlobalEventProvider.cs">
       <SubType>Component</SubType>
     </Compile>

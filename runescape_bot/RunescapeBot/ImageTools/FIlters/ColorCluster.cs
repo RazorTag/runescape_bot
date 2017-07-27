@@ -11,8 +11,10 @@ namespace RunescapeBot.ImageTools.FIlters
     {
         private List<RGBHSBRange> cluster;
 
-
-        public ColorCluster() { }
+        public ColorCluster()
+        {
+            cluster = new List<RGBHSBRange>();
+        }
 
 
         /// <summary>
@@ -25,7 +27,7 @@ namespace RunescapeBot.ImageTools.FIlters
         }
 
         /// <summary>
-        /// Determines if a pixel 
+        /// Determines if a pixel
         /// </summary>
         /// <param name="x">x-coordinate of the pixel to check</param>
         /// <param name="y">y-coordinate of the pixel to check</param>

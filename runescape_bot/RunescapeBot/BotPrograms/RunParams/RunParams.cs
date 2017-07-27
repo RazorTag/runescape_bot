@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 
 namespace RunescapeBot.BotPrograms
 {
+    [Serializable]
     public class RunParams
     {
         public RunParams()
@@ -59,7 +60,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Username of the bot account
         /// </summary>
-        public string BotName { get; set; }
+        public virtual string BotName { get; set; }
 
         /// <summary>
         /// Username to use when logging in
@@ -74,7 +75,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Time when the bot program should cease execution
         /// </summary>
-        private DateTime runUntil;
+        [XmlIgnore]
         public DateTime RunUntil
         {
             get { return runUntil; }
@@ -90,6 +91,7 @@ namespace RunescapeBot.BotPrograms
                 }
             }
         }
+        private DateTime runUntil;
 
         /// <summary>
         /// Number of iterations after which the bot program should cease execution
@@ -113,36 +115,42 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Set to true to run for infinitely many iterations
         /// </summary>
+        [XmlIgnore]
         public bool InfiniteIterations { get; set; }
 
         /// <summary>
         /// Bot program to run
         /// </summary>
-        public BotRegistry.BotActions BotAction { get; set; }
+        public virtual BotRegistry.BotActions BotAction { get; set; }
 
         /// <summary>
         /// Stores the bot's current position in its work cycle
         /// </summary>
+        [XmlIgnore]
         public BotProgram.BotState BotState { get; set; }
 
         /// <summary>
         /// Time when the current bot state began
         /// </summary>
+        [XmlIgnore]
         public DateTime CurrentStateStart { get; set; }
 
         /// <summary>
         /// TIme when the current bot state will end
         /// </summary>
+        [XmlIgnore]
         public DateTime CurrentStateEnd { get; set; }
 
         /// <summary>
         /// Average number of milliseconds between frames
         /// </summary>
+        [XmlIgnore]
         public int FrameTime { get; set; }
 
         /// <summary>
         /// Set to true to slightly vary the time between frames
         /// </summary>
+        [XmlIgnore]
         public bool RandomizeFrames { get; set; }
 
         /// <summary>
@@ -196,21 +204,25 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Specifies which client to use
         /// </summary>
+        [XmlIgnore]
         public ScreenScraper.Client ClientType { get; set; }
 
         /// <summary>
         /// Toggles run on when the player has run energy
         /// </summary>
+        [XmlIgnore]
         public bool Run { get; set; }
 
         /// <summary>
         /// Set to true when the bot is idle so that the start form knows it can show itself
         /// </summary>
+        [XmlIgnore]
         public bool BotIdle { get; set; }
 
         /// <summary>
         /// Set to true to run the bot without breaks until it fails or is stopped externally
         /// </summary>
+        [XmlIgnore]
         public bool SlaveDriver { get; set; }
 
         /// <summary>
@@ -222,6 +234,20 @@ namespace RunescapeBot.BotPrograms
         /// List of bots to run on the Phasmatys rotation
         /// </summary>
         public RunParamsList PhasmatysParams { get; set; }
+
+        #endregion
+
+        #region start form state info
+
+        /// <summary>
+        /// The tab selected on the start form
+        /// </summary>
+        public virtual int SelectedTab { get; set; }
+
+        /// <summary>
+        /// The Phasmatys bot selected from the dropdown
+        /// </summary>
+        public virtual int SelectedPhasmatysBot { get; set; }
 
         #endregion
 
@@ -239,6 +265,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Used by the bot to inform that is has completed its task
         /// </summary>
+        [XmlIgnore]
         public BotResponse TaskComplete;
 
         /// <summary>

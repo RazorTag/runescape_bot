@@ -16,6 +16,7 @@ namespace RunescapeBot.BotPrograms
         private Keyboard Keyboard;
         private Random RNG;
         private Process RSClient;
+        public bool StopFlag { get; set; }
 
         /// <summary>
         /// Inventory slots to be dropped when more space is needed
@@ -131,7 +132,7 @@ namespace RunescapeBot.BotPrograms
 
             while (!done && (watch.ElapsedMilliseconds < timeout))
             {
-                if (BotProgram.StopFlag) { return; }
+                if (StopFlag) { return; }
 
                 click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
                 Mouse.RightClick(click.X, click.Y, RSClient, 0);
@@ -184,7 +185,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     if ((!onlyDropPreviouslyEmptySlots || EmptySlots[x, y]) && !SlotIsEmpty(x, y, false, false))
                     {
-                        if (BotProgram.StopFlag) { return; }
+                        if (StopFlag) { return; }
                         DropItem(x, y, false);
                     }
                 }
@@ -284,7 +285,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             Telegrab(x, y);
-            if (BotProgram.StopFlag) { return false; }
+            if (StopFlag) { return false; }
             Alch(emptySlot.Value.X, emptySlot.Value.Y);
 
             return true;
@@ -367,7 +368,7 @@ namespace RunescapeBot.BotPrograms
                     return inventorySlot;
                 }
 
-                if (BotProgram.StopFlag) { return null; }
+                if (StopFlag) { return null; }
             }
 
             return null;

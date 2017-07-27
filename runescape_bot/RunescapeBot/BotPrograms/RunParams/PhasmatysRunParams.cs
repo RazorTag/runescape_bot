@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace RunescapeBot.BotPrograms
 {
+    [Serializable]
     public class PhasmatysRunParams : RunParams
     {
         public PhasmatysRunParams() : base(false) { }
@@ -38,6 +41,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// The resource being used by the active bot
         /// </summary>
+        [XmlIgnore]
         public ActiveProperty Resource { get; set; }
 
         /// <summary>

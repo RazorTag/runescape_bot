@@ -121,33 +121,36 @@ namespace RunescapeBot
             StartButtons.Add(StartButton);
             StartButtons.Add(PhasmatysStartButton);
 
-            //general form info
             Settings = new BotSettings();
-            Settings.LoadSettings();
-            BotManagerType.SelectedIndex = Settings.SettingsData.SelectedTab;
-            RunParams = new RunParams();
-            Settings.LoadRunParams(ref RunParams);
-
-            //standard bot manager
-            Login.Text = RunParams.Login;
-            Password.Text = RunParams.Password;
-            JagexClientLocation.Text = RunParams.JagexClient;
-            OSBuddyClientLocation.Text = RunParams.OSBuddyClient;
-            BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
-            Iterations.Value = RunParams.Iterations;
+            RunParams = Settings.LoadSettings();
+            BotManagerType.SelectedIndex = RunParams.SelectedTab;
+            SetSoloBotForm();
 
             //Phasmatys rotation bot manager
-            PhasmatysBotSelection = Settings.SettingsData.PhasmatysSettings.SelectedBot;
-            SetupPhasmatysBotSelector();
+            PhasmatysBotSelection = RunParams.SelectedPhasmatysBot;
+            SetPhasmatysBotSelector();
             WritePhasmatysSettings();
 
             SetIdleState();
         }
 
         /// <summary>
+        /// Sets field values for the solo bot form
+        /// </summary>
+        private void SetSoloBotForm()
+        {
+            Login.Text = RunParams.Login;
+            Password.Text = RunParams.Password;
+            JagexClientLocation.Text = RunParams.JagexClient;
+            OSBuddyClientLocation.Text = RunParams.OSBuddyClient;
+            BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
+            Iterations.Value = RunParams.Iterations;
+        }
+
+        /// <summary>
         /// Sets the list for the Phasmatys bot selector
         /// </summary>
-        private void SetupPhasmatysBotSelector()
+        private void SetPhasmatysBotSelector()
         {
             string[] botnames = new string[RunParams.PhasmatysParams.Count];
             for (int i = 0; i < botnames.Length; i++)
@@ -273,11 +276,9 @@ namespace RunescapeBot
         /// </summary>
         private void SaveBot()
         {
-            Settings.SettingsData.SelectedTab = BotManagerType.SelectedIndex;
-            Settings.SettingsData.PhasmatysSettings.SelectedBot = PhasmatysBotSelection;
-            CollectStartParams();
-            Settings.SaveRunParams(RunParams);
-            if (!Settings.SaveSettings())
+            RunParams.SelectedTab = BotManagerType.SelectedIndex;
+            RunParams.SelectedPhasmatysBot = PhasmatysBotSelection;
+            if (!Settings.SaveSettings(RunParams))
             {
                 MessageBox.Show("Unable to save bot settings");
             }
@@ -323,7 +324,6 @@ namespace RunescapeBot
             {
                 StartButton.Enabled = false;
                 SetTransitionalState();
-                SaveBot();
                 RunningBot.Stop();
                 UpdateTimer_Tick(null, null);
             }
@@ -526,7 +526,7 @@ namespace RunescapeBot
                 RunParams.PhasmatysParams[PhasmatysBotSelection] = CollectPhasmatysSettings();
             }
             PhasmatysBotSelection = PhasmatysBotSelector.SelectedIndex;
-            SetupPhasmatysBotSelector();
+            SetPhasmatysBotSelector();
         }
 
         /// <summary>
