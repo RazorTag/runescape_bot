@@ -3,6 +3,7 @@ using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace RunescapeBot.UITools
@@ -83,6 +84,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{BACKSPACE}");
+                    Thread.Sleep(1);
                 }
             }
         }
@@ -120,6 +122,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{UP}");
+                    Thread.Sleep(5);
                 }
             }
         }
@@ -135,6 +138,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{RIGHT}");
+                    Thread.Sleep(5);
                 }
             }
         }
@@ -150,6 +154,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{DOWN}");
+                    Thread.Sleep(5);
                 }
             }
         }
@@ -165,6 +170,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{LEFT}");
+                    Thread.Sleep(5);
                 }
             }
         }
