@@ -379,6 +379,9 @@ namespace RunescapeBot
                 button.BackColor = ColorTranslator.FromHtml("#527E3F");
                 button.Enabled = true;
             }
+
+            BringToFront();
+            WindowState = FormWindowState.Normal;
         }
 
         /// <summary>

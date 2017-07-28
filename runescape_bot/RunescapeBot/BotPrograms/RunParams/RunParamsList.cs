@@ -15,6 +15,7 @@ namespace RunescapeBot.BotPrograms
         public RunParamsList(int botCount)
         {
             ParamsList = new RunParams[botCount];
+            ActiveBot = -1;
         }
 
         /// <summary>
@@ -36,14 +37,43 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Reference to the currently active RunParams
         /// </summary>
-        public RunParams ActiveRunParams { get { return ParamsList[ActiveBot]; } }
+        public RunParams ActiveRunParams
+        {
+            get
+            {
+                if (ActiveBot >=0 && ActiveBot < ParamsList.Length)
+                {
+                    return ParamsList[ActiveBot];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         /// <summary>
         /// Index of the active bot
         /// </summary>
         public int ActiveBot { get; set; }
 
-
+        /// <summary>
+        /// The number of bots in this paramtere list
+        /// </summary>
         public int Count { get { return ParamsList.Length; } }
+
+        /// <summary>
+        /// Determines if the active bot is currently idle.
+        /// </summary>
+        /// <returns>true if the current bot is idle, false if active or unknown</returns>
+        public bool ActiveBotIsIdle()
+        {
+            RunParams activeRunParams = ActiveRunParams;
+            if (activeRunParams == null)
+            {
+                return false;
+            }
+            return activeRunParams.BotIdle;
+        }
     }
 }

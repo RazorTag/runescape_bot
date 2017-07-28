@@ -18,7 +18,9 @@ namespace RunescapeBot.BotPrograms
         protected RGBHSBRange BankBooth;
         protected FurnaceCrafting CraftPopup;
         protected Bank BankPopup;
+        protected const int BankFloorMinSize = 500;
         protected const int BankFloorMaxSize = 2500;
+        protected const int FurnaceFloorMinSize = 100;
         protected const int FurnaceFloorMaxSize = 1000;
 
 
@@ -33,12 +35,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the bank icon is found</returns>
         protected override bool MoveToBank(int minRunTimeToBank = 6500, bool readWindow = false)
         {
-            Point? bankIcon = BankIconLocation();
+            Point? bankIcon = BankClickLocation();
             Point clickLocation;
 
             if (bankIcon == null)
             {
-                bankIcon = FurnaceIconLocation();
+                bankIcon = FurnaceClickLocation();
                 if (bankIcon == null)
                 {
                     return false;
@@ -63,25 +65,26 @@ namespace RunescapeBot.BotPrograms
         /// Adjusts for the icon's tendency to float around
         /// </summary>
         /// <returns>true if the icon is probably found correctly, false otherwise</returns>
-        protected Point? BankIconLocation()
+        protected Point? BankClickLocation()
         {
             ReadWindow();
             Point offset;
-            bool[,] minimapBankIcon = MinimapFilter(BankIconDollar, out offset);
-            Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
-            if (bankBlob == null || bankBlob.Size < 10) { return null; }
-
+            Blob bankIcon, bankFloor;
             int bankX, bankY;
-            bool[,] minimapBankFloor = MinimapFilter(BuildingFloor, out offset);
-            Blob bankFloor = ImageProcessing.ClosestBlob(minimapBankFloor, bankBlob.Center, 100);
-            if (bankFloor == null || bankFloor.Size > BankFloorMaxSize)
+
+            if (!BankLocation(out bankIcon, out bankFloor, out offset))
             {
-                bankX = bankBlob.Center.X;
-                bankY = bankBlob.Center.Y + 4;
+                return null;
+            }
+
+            if ((bankFloor == null) || !BankFloorSizeCheck(bankFloor.Size))
+            {
+                bankX = bankIcon.Center.X;
+                bankY = bankIcon.Center.Y + 4;
             }
             else
             {
-                Geometry.AddMinimapIconToBlob(ref bankFloor, bankBlob.Center);
+                Geometry.AddMinimapIconToBlob(ref bankFloor, bankIcon.Center);
                 if (bankFloor.Width > 40)
                 {
                     bankX = ((bankFloor.Center.X + bankFloor.LeftBound) / 2) + 6;
@@ -100,30 +103,61 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Determines if the bank floor blob from the minimap is apropriately size
+        /// </summary>
+        /// <param name="bankFloorSize">number of pixels in the bank floor blob</param>
+        /// <returns>true if bank floor blob is within size bounds</returns>
+        protected bool BankFloorSizeCheck(int bankFloorSize)
+        {
+            return Numerical.WithinBounds(bankFloorSize, BankFloorMinSize, BankFloorMaxSize);
+        }
+
+        /// <summary>
+        /// Locates the bank icon and bank floor on the minimap.
+        /// Uses the most recent screenshot.
+        /// </summary>
+        /// <param name="bankIcon"></param>
+        /// <param name="bankFloor"></param>
+        /// <param name="offset"></param>
+        /// <returns>true if at least the bank icon is found</returns>
+        protected bool BankLocation(out Blob bankIcon, out Blob bankFloor, out Point offset)
+        {
+            bool[,] minimapBankIcon = MinimapFilter(BankIconDollar, out offset);
+            bankIcon = ImageProcessing.BiggestBlob(minimapBankIcon);
+            if (bankIcon == null || bankIcon.Size < 10)
+            {
+                bankFloor = null;
+                return false;
+            }
+
+            bool[,] minimapBankFloor = MinimapFilter(BuildingFloor);
+            bankFloor = ImageProcessing.ClosestBlob(minimapBankFloor, bankIcon.Center, 100);
+            return true;
+        }
+
+        /// <summary>
         /// Finds the furnace icon on the minimap
         /// </summary>
         /// <returns>true if the icon is probably found correctly, false otherwise</returns>
-        protected Point? FurnaceIconLocation()
+        protected Point? FurnaceClickLocation()
         {
             ReadWindow();
             Point offset;
-            bool[,] minimapFurnace = MinimapFilter(FurnaceIconOrange, out offset);
-            Blob furnaceBlob = ImageProcessing.BiggestBlob(minimapFurnace);
-            if (furnaceBlob == null || furnaceBlob.Size < 3) { return null; }
-
-            bool[,] minimapFurnaceFloor = MinimapFilter(BuildingFloor);
-            List<Blob> floors = ImageProcessing.BlobsWithinRange(minimapFurnaceFloor, furnaceBlob.Center, 20, true);
-            Blob furnaceFloor = Blob.Combine(floors);
+            Blob furnaceIcon, furnaceFloor;
+            if (!FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset))
+            {
+                return null;
+            }
 
             int furnaceX, furnaceY;
-            if (furnaceFloor == null || furnaceFloor.Size > FurnaceFloorMaxSize)
+            if ((furnaceFloor == null) || !FurnaceFloorSizeCheck(furnaceFloor.Size))
             {
-                furnaceX = furnaceBlob.Center.X;
-                furnaceY = furnaceBlob.Center.Y;
+                furnaceX = furnaceIcon.Center.X;
+                furnaceY = furnaceIcon.Center.Y;
             }
             else
             {
-                Geometry.AddMinimapIconToBlob(ref furnaceFloor, furnaceBlob.Center);
+                Geometry.AddMinimapIconToBlob(ref furnaceFloor, furnaceIcon.Center);
                 furnaceX = furnaceFloor.Center.X + 8;
                 furnaceY = furnaceFloor.Center.Y;
             }
@@ -131,6 +165,40 @@ namespace RunescapeBot.BotPrograms
             int x = furnaceX + offset.X;
             int y = furnaceY + offset.Y;
             return new Point(x, y);
+        }
+
+        /// <summary>
+        /// Determines if the furnace floor blob from the minimap is appropriately size
+        /// </summary>
+        /// <param name="furnaceFloorSize">number of pixels in the furnace floor blob</param>
+        /// <returns>true if size is within bounds</returns>
+        protected bool FurnaceFloorSizeCheck(int furnaceFloorSize)
+        {
+            return Numerical.WithinBounds(furnaceFloorSize, FurnaceFloorMinSize, FurnaceFloorMaxSize);
+        }
+
+        /// <summary>
+        /// Locates the funace icon and floor on the minimap.
+        /// Uses the most recent screenshot.
+        /// </summary>
+        /// <param name="furnaceIcon"></param>
+        /// <param name="furnaceFloor"></param>
+        /// <param name="offset"></param>
+        /// <returns>true if at least the furnace icon is found</returns>
+        protected bool FurnaceLocation(out Blob furnaceIcon, out Blob furnaceFloor, out Point offset)
+        {
+            bool[,] minimapFurnace = MinimapFilter(FurnaceIconOrange, out offset);
+            furnaceIcon = ImageProcessing.BiggestBlob(minimapFurnace);
+            if (furnaceIcon == null || furnaceIcon.Size < 3)
+            {
+                furnaceFloor = null;
+                return false;
+            }
+
+            bool[,] minimapFurnaceFloor = MinimapFilter(BuildingFloor);
+            List<Blob> floors = ImageProcessing.BlobsWithinRange(minimapFurnaceFloor, furnaceIcon.Center, 20, true);
+            furnaceFloor = Blob.Combine(floors);
+            return true;
         }
 
         /// <summary>
@@ -161,12 +229,12 @@ namespace RunescapeBot.BotPrograms
             const int runTimeFromBankToFurnace = 5500;  //appproximate milliseconds needed to run from the bank to the furnace
             const int selectFirstItemTime = 800;
 
-            Point? furnaceIcon = FurnaceIconLocation();
+            Point? furnaceIcon = FurnaceClickLocation();
             Point clickLocation;
 
             if (furnaceIcon == null)
             {
-                furnaceIcon = BankIconLocation();
+                furnaceIcon = BankClickLocation();
                 if (furnaceIcon == null)
                 {
                     return false;
@@ -187,15 +255,35 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// 
+        /// Loads default color ranges
         /// </summary>
         private void GetReferenceColors()
         {
             FurnaceIconOrange = RGBHSBRanges.FurnaceIconOrange();
             BankIconDollar = RGBHSBRanges.BankIconDollar();
-            BuildingFloor = RGBHSBRanges.PhasmatysBuildingFloor();
+            BuildingFloor = RGBHSBRanges.PhasmatysBuildingFloorLight();
             Furnace = RGBHSBRanges.Furnace();
             BankBooth = RGBHSBRanges.BankBoothPhasmatys();
+        }
+
+        /// <summary>
+        /// Determines an appropriate value to use for building floor color range
+        /// </summary>
+        private bool ScanForBuildingFloor()
+        {
+            List<RGBHSBRange> colorRanges = new List<RGBHSBRange>() { RGBHSBRanges.PhasmatysBuildingFloorDark(), RGBHSBRanges.PhasmatysBuildingFloorLight() };
+            Blob bankIcon, bankFloor, furnaceIcon, furnaceFloor;
+            Point offset;
+            foreach (RGBHSBRange colorRange in colorRanges)
+            {
+                if (BankLocation(out bankIcon, out bankFloor, out offset) && BankFloorSizeCheck(bankFloor.Size)
+                    && FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset) && FurnaceFloorSizeCheck(furnaceFloor.Size))
+                {
+                    BuildingFloor = colorRange;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

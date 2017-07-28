@@ -53,7 +53,7 @@ namespace RunescapeBot.BotPrograms
             //crafting.MakeBracelets(FurnaceCrafting.Jewel.None, 27, 60000);
 
             //ReadWindow();
-            //ColorRange floor = RGBHSBRanges.PhasmatysBuildingFloor();
+            //RGBHSBRange floor = RGBHSBRanges.PhasmatysBuildingFloor();
             //bool[,] mask = ColorFilter(floor);
             //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
 
@@ -74,7 +74,6 @@ namespace RunescapeBot.BotPrograms
             WatchNetflix(0);
             CountDownItems(true);
             SafeWaitPlus(0, 2000);
-            RunParams.Iterations -= 27;
             return true;
         }
     }

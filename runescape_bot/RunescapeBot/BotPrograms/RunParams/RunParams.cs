@@ -217,7 +217,16 @@ namespace RunescapeBot.BotPrograms
         /// Set to true when the bot is idle so that the start form knows it can show itself
         /// </summary>
         [XmlIgnore]
-        public bool BotIdle { get; set; }
+        public bool BotIdle
+        {
+            get
+            {
+                return botIdle || (RotationParams != null && RotationParams.ActiveBotIsIdle()) || (PhasmatysParams != null && PhasmatysParams.ActiveBotIsIdle());
+            }
+            set { botIdle = value; }
+        }
+        private bool botIdle;
+            
 
         /// <summary>
         /// Set to true to run the bot without breaks until it fails or is stopped externally
