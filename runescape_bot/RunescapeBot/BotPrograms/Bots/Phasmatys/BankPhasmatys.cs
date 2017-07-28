@@ -81,6 +81,7 @@ namespace RunescapeBot.BotPrograms
             {
                 bankX = bankIcon.Center.X;
                 bankY = bankIcon.Center.Y + 4;
+                ScanForBuildingFloor();
             }
             else
             {
@@ -154,6 +155,7 @@ namespace RunescapeBot.BotPrograms
             {
                 furnaceX = furnaceIcon.Center.X;
                 furnaceY = furnaceIcon.Center.Y;
+                ScanForBuildingFloor();
             }
             else
             {
