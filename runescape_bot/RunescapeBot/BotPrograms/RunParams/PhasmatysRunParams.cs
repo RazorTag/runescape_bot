@@ -11,12 +11,52 @@ namespace RunescapeBot.BotPrograms
     [Serializable]
     public class PhasmatysRunParams : RunParams
     {
-        public PhasmatysRunParams() : base(false) { }
+        public PhasmatysRunParams() : base(false)
+        {
+            TaskComplete = new BotResponse(DoNothing);
+        }
+
+        /// <summary>
+        /// Modifies the property for the active resource instead of modifying iterations
+        /// </summary>
+        public override int Iterations
+        {
+            get
+            {
+                switch (Resource)
+                {
+                    case ActiveProperty.GoldBars:
+                        return GoldBars;
+                    case ActiveProperty.SteelBars:
+                        return SteelBars;
+                    case ActiveProperty.Bows:
+                        return Bows;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (Resource)
+                {
+                    case ActiveProperty.GoldBars:
+                        GoldBars = value;
+                        break;
+                    case ActiveProperty.SteelBars:
+                        SteelBars = value;
+                        break;
+                    case ActiveProperty.Bows:
+                        Bows = value;
+                        break;
+                }
+            }
+        }
 
         /// <summary>
         /// Number of gold bars remaining
         /// </summary>
-        public int GoldBars { get; set; }
+        public int GoldBars { get;
+            set; }
 
         /// <summary>
         /// Number of steel bars remaining
@@ -43,25 +83,5 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         [XmlIgnore]
         public ActiveProperty Resource { get; set; }
-
-        /// <summary>
-        /// Update the active property
-        /// </summary>
-        /// <param name="iterations"></param>
-        protected override void SetIterations(int iterations)
-        {
-            switch (Resource)
-            {
-                case ActiveProperty.GoldBars:
-                    GoldBars = iterations;
-                    break;
-                case ActiveProperty.SteelBars:
-                    SteelBars = iterations;
-                    break;
-                case ActiveProperty.Bows:
-                    Bows = iterations;
-                    break;
-            }
-        }
     }
 }

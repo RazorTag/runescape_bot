@@ -69,6 +69,7 @@ namespace RunescapeBot.BotPrograms.Popups
             //Wait for the "Enter amount:" prompt to appear
             if (WaitForEnterAmount(5000))
             {
+                Thread.Sleep(500);
                 BotUtilities.EnterAmount(RSClient, itemsToMake);
             }
         }

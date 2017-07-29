@@ -39,7 +39,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Specifies how the bot should be run
         /// </summary>
-        public RunParams RunParams;
+        public RunParams RunParams { get; set; }
 
         /// <summary>
         /// Process to which this bot program is attached
@@ -131,9 +131,14 @@ namespace RunescapeBot.BotPrograms
         public static bool StopFlag { get; set; }
 
         /// <summary>
+        /// Set to true to logout out of the game before stopping the bot
+        /// </summary>
+        public bool LogoutWhenDone { get; set; }
+
+        /// <summary>
         /// Set to true after the bot stops naturally
         /// </summary>
-        protected bool BotIsDone { get; set; }
+        public bool BotIsDone { get; set; }
 
         /// <summary>
         /// Center of the screen
@@ -211,7 +216,6 @@ namespace RunescapeBot.BotPrograms
         public void Start()
         {
             StopFlag = false;
-            StopFlag = false;
             BotIsDone = false;
             RunThread = new Thread(Process);
             RunThread.Start();
@@ -247,9 +251,9 @@ namespace RunescapeBot.BotPrograms
 
             if (RunParams.SlaveDriver)
             {
-                while (!StopFlag)
+                while (!StopFlag && Iterate())
                 {
-                    Iterate();
+                    continue;
                 }
                 return;
             }
@@ -264,7 +268,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
                 {
-                    Logout();    //80% chance to log out normally
+                    Logout();
                     done = Break();
                 }
                 else  //get a good night's sleep before resuming
@@ -338,7 +342,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             RunParams.BotState = BotState.Running;
-            long workInterval = RandomWorkTime();
+            long workInterval = RunParams.SlaveDriver ? (int)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds : RandomWorkTime();
             RunParams.SetNewState(workInterval);
             Stopwatch iterationWatch = new Stopwatch();
             Stopwatch workIntervalWatch = new Stopwatch();
@@ -402,6 +406,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void Done()
         {
+            if (LogoutWhenDone)
+            {
+                Logout();
+            }
+
             BotIsDone = true;
             if (Bitmap != null)
             {
@@ -413,8 +422,9 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Forcefully stops execution of a bot program
         /// </summary>
-        public void Stop()
+        public void Stop(bool logoutWhenDone)
         {
+            LogoutWhenDone = logoutWhenDone;
             StopFlag = true;
         }
 
@@ -450,6 +460,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             double workTime = Probability.BoundedGaussian(mean, stdDev, 1.0, double.MaxValue);
+            workTime = Math.Min(workTime, (RunParams.RunUntil - DateTime.Now).TotalMilliseconds);
             return UnitConversions.MinutesToMilliseconds(workTime);
         }
 
@@ -1249,7 +1260,7 @@ namespace RunescapeBot.BotPrograms
         /// Determines if the client is logged out
         /// </summary>
         /// <returns>true if we are verifiably logged out</returns>
-        private bool IsLoggedOut(bool readWindow = false)
+        protected bool IsLoggedOut(bool readWindow = false)
         {
             if (readWindow && !ReadWindow()) { return false; }
 
@@ -1304,14 +1315,13 @@ namespace RunescapeBot.BotPrograms
             const int maxLogoutAttempts = 10;
             int logoutAttempts = 0;
 
-            do
+            while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts))
             {
                 LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5); //logout tab
                 LeftClick(ScreenWidth - 38, ScreenHeight - 286);    //close out of world switcher
                 LeftClick(ScreenWidth - 120, ScreenHeight - 86, 3); //click here to logout
                 SafeWait(2000);
             }
-            while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts));
 
             BroadcastLogout();
         }
@@ -1432,13 +1442,16 @@ namespace RunescapeBot.BotPrograms
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            while ((watch.ElapsedMilliseconds < waitTime) && (DateTime.Now < RunParams.RunUntil))
+            while ((watch.ElapsedMilliseconds < waitTime))
             {
-                if (StopFlag) { return true; }
+                if (StopFlag)
+                {
+                    return true;
+                }
                 nextWaitTime = Math.Min(waitInterval, (int)(waitTime - watch.ElapsedMilliseconds));
                 Thread.Sleep(nextWaitTime);
             }
-            return StopFlag || (DateTime.Now >= RunParams.RunUntil);
+            return StopFlag;
         }
 
         /// <summary>
@@ -1487,7 +1500,7 @@ namespace RunescapeBot.BotPrograms
             int compassX = ScreenWidth - 159;
             int compassY = 21;
             LeftClick(compassX, compassY);
-            Keyboard.UpArrow(1000);
+            Keyboard.UpArrow(1500);
         }
 
         /// <summary>

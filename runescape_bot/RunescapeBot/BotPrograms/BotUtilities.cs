@@ -59,7 +59,7 @@ namespace RunescapeBot.BotPrograms
         {
             Keyboard keyboard = new Keyboard(rsClient);
             keyboard.WriteNumber(amount);
-            Thread.Sleep(200);
+            Thread.Sleep(500);
             keyboard.Enter();
         }
 

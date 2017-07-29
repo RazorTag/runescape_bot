@@ -10,6 +10,7 @@ namespace RunescapeBot.UITools
 {
     public class Keyboard
     {
+        private const int KEY_SPAM_INTERVAL = 1;
         private Process RSClient;
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{BACKSPACE}");
-                    Thread.Sleep(1);
+                    Thread.Sleep(KEY_SPAM_INTERVAL);
                 }
             }
         }
@@ -122,7 +123,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{UP}");
-                    Thread.Sleep(5);
+                    Thread.Sleep(KEY_SPAM_INTERVAL);
                 }
             }
         }
@@ -138,7 +139,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{RIGHT}");
-                    Thread.Sleep(5);
+                    Thread.Sleep(KEY_SPAM_INTERVAL);
                 }
             }
         }
@@ -154,7 +155,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{DOWN}");
-                    Thread.Sleep(5);
+                    Thread.Sleep(KEY_SPAM_INTERVAL);
                 }
             }
         }
@@ -170,7 +171,7 @@ namespace RunescapeBot.UITools
                 {
                     if (BotProgram.StopFlag) { return; }
                     SendKeys.SendWait("{LEFT}");
-                    Thread.Sleep(5);
+                    Thread.Sleep(KEY_SPAM_INTERVAL);
                 }
             }
         }

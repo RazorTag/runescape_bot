@@ -56,12 +56,15 @@ namespace RunescapeBot.BotPrograms
             //RGBHSBRange floor = RGBHSBRanges.PhasmatysBuildingFloor();
             //bool[,] mask = ColorFilter(floor);
             //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
-
+            
             return true;
         }
 
         protected override bool FurnaceActions()
         {
+            ReadWindow();
+            ScanForBuildingFloor();
+
             //make 27 bars and wait
             if (StopFlag) { return false; }
             CraftPopup = new FurnaceCrafting(RSClient);

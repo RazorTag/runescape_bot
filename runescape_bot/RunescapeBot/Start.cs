@@ -45,10 +45,9 @@ namespace RunescapeBot
         private bool BotIsRunning;
 
         /// <summary>
-        /// Indicates which tab is currently running a bot
-        /// Set to -1 if not bot is running
+        /// The Start form's status for the bot idling
         /// </summary>
-        private BotRegistry.BotManager BotManager;
+        private bool BotIdle;
 
         /// <summary>
         /// Start button for each bot manager
@@ -99,7 +98,7 @@ namespace RunescapeBot
                 return string.Empty;
             }
 
-            return GetDescription(RunningBot.RunParams.BotAction);
+            return GetDescription(RunParams.ActiveBot.BotAction);
         }
 
         /// <summary>
@@ -127,8 +126,7 @@ namespace RunescapeBot
             SetSoloBotForm();
 
             //Phasmatys rotation bot manager
-            PhasmatysBotSelection = RunParams.SelectedPhasmatysBot;
-            SetPhasmatysBotSelector();
+            SetPhasmatysBotSelector(RunParams.SelectedPhasmatysBot);
             WritePhasmatysSettings();
 
             SetIdleState();
@@ -150,7 +148,7 @@ namespace RunescapeBot
         /// <summary>
         /// Sets the list for the Phasmatys bot selector
         /// </summary>
-        private void SetPhasmatysBotSelector()
+        private void SetPhasmatysBotSelector(int selection)
         {
             string[] botnames = new string[RunParams.PhasmatysParams.Count];
             for (int i = 0; i < botnames.Length; i++)
@@ -158,6 +156,7 @@ namespace RunescapeBot
                 botnames[i] = ((PhasmatysRunParams)RunParams.PhasmatysParams[i]).BotName;
             }
             PhasmatysBotSelector.DataSource = botnames;
+            PhasmatysBotSelection = selection;
             PhasmatysBotSelector.SelectedIndex = PhasmatysBotSelection;
         }
 
@@ -169,7 +168,8 @@ namespace RunescapeBot
         /// <param name="e">not used</param>
         private void StartButton_Click(object sender, EventArgs e)
         {
-            StartButtonClicked((Button)sender, BotRegistry.BotManager.Standard);
+            RunParams.BotManager = BotRegistry.BotManager.Standard;
+            StartButtonClicked((Button)sender);
         }
 
         /// <summary>
@@ -179,7 +179,8 @@ namespace RunescapeBot
         /// <param name="e">not used</param>
         private void PhasmatysStartButton_Click(object sender, EventArgs e)
         {
-            StartButtonClicked((Button)sender, BotRegistry.BotManager.Phasmatys);
+            RunParams.BotManager = BotRegistry.BotManager.Phasmatys;
+            StartButtonClicked((Button)sender);
         }
 
         /// <summary>
@@ -187,14 +188,13 @@ namespace RunescapeBot
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="botManager"></param>
-        private void StartButtonClicked(Button sender, BotRegistry.BotManager botManager)
+        private void StartButtonClicked(Button sender)
         {
             if (BotIsRunning)
             {
                 StopBot(sender);
                 return;
             }
-            BotManager = botManager;
             RunBotProgram(sender);
         }
 
@@ -264,7 +264,7 @@ namespace RunescapeBot
         private void RunBotProgram(Button startButton)
         {
             CollectStartParams();
-            RunningBot = BotRegistry.GetSelectedBot(RunParams, BotManager, (BotRegistry.BotActions)BotActionSelect.SelectedIndex);
+            RunningBot = BotRegistry.GetSelectedBot(RunParams, RunParams.BotManager, (BotRegistry.BotActions)BotActionSelect.SelectedIndex);
             SetActiveState(startButton);
             RunningBot.Start();
             UpdateTimer.Enabled = true;
@@ -293,7 +293,7 @@ namespace RunescapeBot
         {
             if (RunningBot != null)
             {
-                RunningBot.Stop();
+                RunningBot.Stop(false);
             }
         }
 
@@ -308,6 +308,7 @@ namespace RunescapeBot
                 {
                     SetIdleState();
                     StartButton.Enabled = true;
+                    SaveBot();
                 }));
             }
         }
@@ -324,7 +325,7 @@ namespace RunescapeBot
             {
                 StartButton.Enabled = false;
                 SetTransitionalState();
-                RunningBot.Stop();
+                RunningBot.Stop(false);
                 UpdateTimer_Tick(null, null);
             }
             else
@@ -369,7 +370,7 @@ namespace RunescapeBot
             RunningBot = null;
             BotIsRunning = false;
             Text = FORM_NAME;
-            BotManager = BotRegistry.BotManager.None;
+            RunParams.BotManager = BotRegistry.BotManager.None;
             StatusMessage.Text = "";
             PhasmatysStatus.Text = "";
 
@@ -385,12 +386,12 @@ namespace RunescapeBot
         }
 
         /// <summary>
-        /// Sets up the Start for for a transitional state
+        /// Sets up the Start form for a transitional state
         /// </summary>
         private void SetTransitionalState()
         {
             Text = GetBotName() + " " + BOT_STOPPING;
-            BotManager = BotRegistry.BotManager.None;
+            RunParams.BotManager = BotRegistry.BotManager.None;
             StatusMessage.Text = "";
             PhasmatysStatus.Text = "";
 
@@ -461,13 +462,85 @@ namespace RunescapeBot
         /// <param name="e"></param>
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            if (RunningBot == null) { return; }
+            if (RunningBot == null || RunParams.ActiveBot == null) { return; }
 
-            //Show the start form for periods when the bot is idling
-            if (TopMost != RunParams.BotIdle)
+            //make sure that the date for the RunUntil field doesn't exceed the max value for that field
+            RunUntil.Value = RunParams.ActiveBot.RunUntil < RunUntil.MaxDate ? RunParams.ActiveBot.RunUntil : RunUntil.MaxDate;
+                        
+            string currentState, nextState;
+            SetRotationFormData();
+            GetBotStates(out currentState, out nextState);
+            UpdateStatusMessage(GetActiveTextBox(), currentState, nextState);
+            HideShowStartForm();
+        }
+
+        /// <summary>
+        /// Sets any new dropdown values for the bot selection dropdowns
+        /// </summary>
+        private void SetRotationFormData()
+        {
+            switch (RunParams.BotManager)
             {
-                TopMost = RunParams.BotIdle;
-                if (TopMost)
+                case BotRegistry.BotManager.Rotation:
+                    //TODO set bot selector
+                    break;
+                case BotRegistry.BotManager.Phasmatys:
+                    SetPhasmatysBotSelector(RunParams.PhasmatysParams.ActiveBot);
+                    WritePhasmatysSettings();
+                    break;
+                default:
+                    Iterations.Value = RunParams.ActiveBot.Iterations;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Determines which TextBox should have its status message updated the the state of the running bot
+        /// </summary>
+        /// <returns>the TextBox to update</returns>
+        private TextBox GetActiveTextBox()
+        {
+            switch (RunParams.BotManager)
+            {
+                case BotRegistry.BotManager.Rotation:
+                    return StatusMessage;  //TODO change to the text bow for the standard rotation manager tab
+                case BotRegistry.BotManager.Phasmatys:
+                    return PhasmatysStatus;
+                default:
+                    return StatusMessage;
+            }
+        }
+
+        /// <summary>
+        /// Updates the status message in the specified text box
+        /// </summary>
+        /// <param name="activeTextBox">the text box to write in</param>
+        /// <param name="currentState">the running, brea or sleep state off the bot</param>
+        /// <param name="nextState">the state that the bot will hit after completing th current state</param>
+        private void UpdateStatusMessage(TextBox activeTextBox, string currentState, string nextState)
+        {
+            Text = GetBotName();
+            Text += " " + currentState;
+            TimeSpan timeRemaining = (DateTime.Now < RunParams.ActiveBot.CurrentStateEnd) ? (RunParams.ActiveBot.CurrentStateEnd - DateTime.Now) : TimeSpan.Zero;
+            string stateTimeRemaining = timeRemaining.ToString(@"hh\:mm\:ss");
+            Text += " (" + stateTimeRemaining + ")";
+
+            string stateStartTime = RunParams.ActiveBot.CurrentStateStart.ToString("MM/dd/yyyy h:mm tt");
+            string stateEndTime = RunParams.ActiveBot.CurrentStateEnd.ToString("MM/dd/yyyy h:mm tt");
+            activeTextBox.Text = GetBotName() + " " + currentState + "." + " It has " + stateTimeRemaining + " left before " + nextState + ".";
+            activeTextBox.Text += " It entered this state at " + stateStartTime + " and will complete this state at " + stateEndTime + ".";
+        }
+
+        /// <summary>
+        /// Shows or hides the start from base on whether the current bot is idling
+        /// </summary>
+        private void HideShowStartForm()
+        {
+            //Show the start form for periods when the bot is idling
+            if (BotIdle != RunParams.ActiveBot.BotIdle)
+            {
+                BotIdle = RunParams.ActiveBot.BotIdle;
+                if (BotIdle)
                 {
                     BringToFront();
                     WindowState = FormWindowState.Normal;
@@ -478,45 +551,37 @@ namespace RunescapeBot
                     WindowState = FormWindowState.Minimized;
                 }
             }
+        }
 
-            //make sure that the date for the RunUntil field doesn't exceed the max value for that field
-            RunUntil.Value = RunningBot.RunParams.RunUntil < RunUntil.MaxDate ? RunningBot.RunParams.RunUntil : RunUntil.MaxDate;
-            Iterations.Value = RunningBot.RunParams.Iterations;
-
-            Text = GetBotName();
-            string botState = "";
-            string nextState = "";
-            switch (RunningBot.RunParams.BotState)
+        /// <summary>
+        /// Gets the status strings for the current next states of the running bot
+        /// </summary>
+        /// <param name="currentState"></param>
+        /// <param name="nextState"></param>
+        private void GetBotStates(out string currentState, out string nextState)
+        {
+            switch (RunParams.ActiveBot.BotState)
             {
                 case BotProgram.BotState.Running:
-                    botState = BOT_RUNNING;
+                    currentState = BOT_RUNNING;
                     nextState = STOPPING;
                     break;
 
                 case BotProgram.BotState.Break:
-                    botState = BOT_TAKING_A_BREAK;
+                    currentState = BOT_TAKING_A_BREAK;
                     nextState = RESUMING;
                     break;
 
                 case BotProgram.BotState.Sleep:
-                    botState = BOT_SLEEPING;
+                    currentState = BOT_SLEEPING;
                     nextState = RESUMING;
                     break;
 
                 default:
-                    botState = BOT_RUNNING;
+                    currentState = BOT_RUNNING;
                     nextState = STOPPING;
                     break;
             }
-            Text += " " + botState;
-            TimeSpan timeRemaining = (DateTime.Now < RunningBot.RunParams.CurrentStateEnd) ? (RunningBot.RunParams.CurrentStateEnd - DateTime.Now) : TimeSpan.Zero;
-            string stateTimeRemaining = timeRemaining.ToString(@"hh\:mm\:ss");
-            Text += " (" + stateTimeRemaining + ")";
-
-            string stateStartTime = RunningBot.RunParams.CurrentStateStart.ToString("MM/dd/yyyy h:mm tt");
-            string stateEndTime = RunningBot.RunParams.CurrentStateEnd.ToString("MM/dd/yyyy h:mm tt"); 
-            StatusMessage.Text = GetBotName() + " " + botState + "." + " It has " + stateTimeRemaining + " left before " + nextState + ".";
-            StatusMessage.Text += " It entered this state at " + stateStartTime + " and will complete this state at " + stateEndTime + ".";
         }
 
         /// <summary>
@@ -528,8 +593,7 @@ namespace RunescapeBot
             {
                 RunParams.PhasmatysParams[PhasmatysBotSelection] = CollectPhasmatysSettings();
             }
-            PhasmatysBotSelection = PhasmatysBotSelector.SelectedIndex;
-            SetPhasmatysBotSelector();
+            SetPhasmatysBotSelector(PhasmatysBotSelector.SelectedIndex);
         }
 
         /// <summary>

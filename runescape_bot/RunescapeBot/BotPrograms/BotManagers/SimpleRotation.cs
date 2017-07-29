@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,19 +9,19 @@ namespace RunescapeBot.BotPrograms
 {
     public class SimpleRotation : BotProgram
     {
+        private const int LOGOUT_CHECK_INTERVAL = 2500;
         public const int NUMBER_OF_BOTS = 3;
-        protected RunParamsList BotParams;
-        private int CurrentBotIndex;
+        protected RunParamsList BotParamsList;
         public BotProgram CurrentBot;
-        public RunParams CurrentBotParams { get { return BotParams[CurrentBotIndex]; } }
+        public RunParams CurrentRunParams { get { return BotParamsList[BotParamsList.ActiveBot]; } }
 
         public SimpleRotation(RunParams runParams, RunParamsList botList) : base(runParams)
         {
-            CurrentBotIndex = -1;
-            BotParams = botList;
-            for (int i = 0; i < BotParams.Count; i++)
+            BotParamsList = botList;
+            BotParamsList.ActiveBot = 0;
+            for (int i = 0; i < BotParamsList.Count; i++)
             {
-                BotParams[i].SlaveDriver = true;
+                BotParamsList[i].SlaveDriver = true;
             }
         }
 
@@ -35,9 +36,13 @@ namespace RunescapeBot.BotPrograms
             {
                 if (!NextBot()) { return; }
                 timeToRun = CurrentBot.RandomWorkTime();
+                CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
                 CurrentBot.Start();
                 SafeWait(timeToRun);
-                CurrentBot.Stop();
+                while (!CurrentBot.BotIsDone && !StopFlag)
+                {
+                    SafeWait(LOGOUT_CHECK_INTERVAL);
+                }
             }
         }
 
@@ -47,23 +52,24 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected virtual bool NextBot()
         {
-            if (BotParams.Count <= 1)
+            if (BotParamsList.Count <= 1)
             {
                 return false;
             }
 
-            int nextBot = CurrentBotIndex;
-            while (nextBot == CurrentBotIndex)
+            int nextBot = BotParamsList.ActiveBot;
+            while (nextBot == BotParamsList.ActiveBot)
             {
-                nextBot = RNG.Next(0, BotParams.Count);
+                nextBot = RNG.Next(0, BotParamsList.Count);
             }
 
-            CurrentBotIndex = nextBot;
+            BotParamsList.ActiveBot = nextBot;
             if (!SelectBotAction())
             {
                 return false;
             }
-            CurrentBot = BotRegistry.GetSelectedBot(CurrentBotParams);
+            CurrentBot = BotRegistry.GetSelectedBot(CurrentRunParams);
+            CurrentBot.LogoutWhenDone = true;
             return true;
         }
 

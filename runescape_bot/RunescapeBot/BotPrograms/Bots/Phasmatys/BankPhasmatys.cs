@@ -72,7 +72,7 @@ namespace RunescapeBot.BotPrograms
             Blob bankIcon, bankFloor;
             int bankX, bankY;
 
-            if (!BankLocation(out bankIcon, out bankFloor, out offset))
+            if (!BankLocation(out bankIcon, out bankFloor, out offset, BuildingFloor))
             {
                 return null;
             }
@@ -121,8 +121,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bankFloor"></param>
         /// <param name="offset"></param>
         /// <returns>true if at least the bank icon is found</returns>
-        protected bool BankLocation(out Blob bankIcon, out Blob bankFloor, out Point offset)
+        protected bool BankLocation(out Blob bankIcon, out Blob bankFloor, out Point offset, RGBHSBRange floorColor)
         {
+            floorColor = floorColor ?? BuildingFloor;
             bool[,] minimapBankIcon = MinimapFilter(BankIconDollar, out offset);
             bankIcon = ImageProcessing.BiggestBlob(minimapBankIcon);
             if (bankIcon == null || bankIcon.Size < 10)
@@ -131,7 +132,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            bool[,] minimapBankFloor = MinimapFilter(BuildingFloor);
+            bool[,] minimapBankFloor = MinimapFilter(floorColor);
             bankFloor = ImageProcessing.ClosestBlob(minimapBankFloor, bankIcon.Center, 100);
             return true;
         }
@@ -145,7 +146,7 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             Point offset;
             Blob furnaceIcon, furnaceFloor;
-            if (!FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset))
+            if (!FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset, BuildingFloor))
             {
                 return null;
             }
@@ -187,8 +188,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="furnaceFloor"></param>
         /// <param name="offset"></param>
         /// <returns>true if at least the furnace icon is found</returns>
-        protected bool FurnaceLocation(out Blob furnaceIcon, out Blob furnaceFloor, out Point offset)
+        protected bool FurnaceLocation(out Blob furnaceIcon, out Blob furnaceFloor, out Point offset, RGBHSBRange floorColor)
         {
+            floorColor = floorColor ?? BuildingFloor;
             bool[,] minimapFurnace = MinimapFilter(FurnaceIconOrange, out offset);
             furnaceIcon = ImageProcessing.BiggestBlob(minimapFurnace);
             if (furnaceIcon == null || furnaceIcon.Size < 3)
@@ -197,7 +199,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            bool[,] minimapFurnaceFloor = MinimapFilter(BuildingFloor);
+            bool[,] minimapFurnaceFloor = MinimapFilter(floorColor);
             List<Blob> floors = ImageProcessing.BlobsWithinRange(minimapFurnaceFloor, furnaceIcon.Center, 20, true);
             furnaceFloor = Blob.Combine(floors);
             return true;
@@ -271,15 +273,15 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Determines an appropriate value to use for building floor color range
         /// </summary>
-        private bool ScanForBuildingFloor()
+        protected bool ScanForBuildingFloor()
         {
             List<RGBHSBRange> colorRanges = new List<RGBHSBRange>() { RGBHSBRanges.PhasmatysBuildingFloorDark(), RGBHSBRanges.PhasmatysBuildingFloorLight() };
             Blob bankIcon, bankFloor, furnaceIcon, furnaceFloor;
             Point offset;
             foreach (RGBHSBRange colorRange in colorRanges)
             {
-                if (BankLocation(out bankIcon, out bankFloor, out offset) && BankFloorSizeCheck(bankFloor.Size)
-                    && FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset) && FurnaceFloorSizeCheck(furnaceFloor.Size))
+                if (BankLocation(out bankIcon, out bankFloor, out offset, colorRange) && (bankFloor != null) && BankFloorSizeCheck(bankFloor.Size)
+                    && FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset, colorRange) && (furnaceFloor != null) && FurnaceFloorSizeCheck(furnaceFloor.Size))
                 {
                     BuildingFloor = colorRange;
                     return true;

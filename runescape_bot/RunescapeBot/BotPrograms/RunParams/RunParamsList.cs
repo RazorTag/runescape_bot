@@ -12,7 +12,7 @@ namespace RunescapeBot.BotPrograms
     {
         public RunParamsList() { }
 
-        public RunParamsList(int botCount)
+        public RunParamsList(int botCount, DateTime runUntil)
         {
             ParamsList = new RunParams[botCount];
             ActiveBot = -1;

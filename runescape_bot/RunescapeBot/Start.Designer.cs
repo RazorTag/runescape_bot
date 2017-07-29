@@ -168,6 +168,7 @@ namespace RunescapeBot
             this.StatusMessage.Location = new System.Drawing.Point(6, 363);
             this.StatusMessage.Multiline = true;
             this.StatusMessage.Name = "StatusMessage";
+            this.StatusMessage.ReadOnly = true;
             this.StatusMessage.Size = new System.Drawing.Size(455, 81);
             this.StatusMessage.TabIndex = 30;
             // 
@@ -369,7 +370,7 @@ namespace RunescapeBot
             // PhasmatysStartButton
             // 
             this.PhasmatysStartButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PhasmatysStartButton.Location = new System.Drawing.Point(167, 287);
+            this.PhasmatysStartButton.Location = new System.Drawing.Point(168, 287);
             this.PhasmatysStartButton.Name = "PhasmatysStartButton";
             this.PhasmatysStartButton.Size = new System.Drawing.Size(125, 55);
             this.PhasmatysStartButton.TabIndex = 15;
@@ -439,6 +440,7 @@ namespace RunescapeBot
             this.PhasmatysStatus.Location = new System.Drawing.Point(6, 362);
             this.PhasmatysStatus.Multiline = true;
             this.PhasmatysStatus.Name = "PhasmatysStatus";
+            this.PhasmatysStatus.ReadOnly = true;
             this.PhasmatysStatus.Size = new System.Drawing.Size(455, 81);
             this.PhasmatysStatus.TabIndex = 45;
             // 

@@ -58,7 +58,7 @@ namespace RunescapeBot.FileIO
             try
             {
                 Directory.CreateDirectory(directoryPath);   //create the directory if it doesn't already exist
-                stream = File.Open(filePath, FileMode.Open);
+                stream = File.Open(filePath, FileMode.OpenOrCreate);
                 runParams = (RunParams) serializer.Deserialize(stream);
             }
             catch
@@ -82,6 +82,7 @@ namespace RunescapeBot.FileIO
         /// <returns>true if the save is successful</returns>
         public bool SaveSettings(RunParams runParams)
         {
+            bool success = false;
             Stream stream = null;
             XmlDocument document = new XmlDocument();
 
@@ -90,13 +91,17 @@ namespace RunescapeBot.FileIO
                 Directory.CreateDirectory(directoryPath);   //create the directory if it doesn't already exist
                 stream = File.Open(filePath, FileMode.Create);
                 serializer.Serialize(stream, runParams);
+                success = true;
+            }
+            catch
+            {
+                //TODO
             }
             finally
             {
                 stream.Close();
             }
-
-            return true;
+            return success;
         }
     }
 }

@@ -17,24 +17,24 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool SelectBotAction()
         {
-            double goldBarTime = ((PhasmatysRunParams)CurrentBotParams).GoldBars * GoldBracelets.SINGLE_CRAFTING_TIME;
-            double steelBarTime = ((PhasmatysRunParams)CurrentBotParams).SteelBars * Cannonballs.SINGLE_SMITH_TIME;
-            double bowTime = ((PhasmatysRunParams)CurrentBotParams).Bows * GoldBracelets.SINGLE_CRAFTING_TIME;
+            double goldBarTime = ((PhasmatysRunParams)CurrentRunParams).GoldBars * GoldBracelets.SINGLE_CRAFTING_TIME;
+            double steelBarTime = ((PhasmatysRunParams)CurrentRunParams).SteelBars * Cannonballs.SINGLE_SMITH_TIME;
+            double bowTime = ((PhasmatysRunParams)CurrentRunParams).Bows * GoldBracelets.SINGLE_CRAFTING_TIME;
             List<double> weights = new List<double>() { goldBarTime, steelBarTime, bowTime };
             int botAction = Probability.ChooseFromWeights(weights);
             switch(botAction)
             {
                 case -1:
-                    CurrentBotParams.BotAction = BotRegistry.BotActions.DoNothing;
+                    CurrentRunParams.BotAction = BotRegistry.BotActions.DoNothing;
                     break;
                 case 0:
-                    CurrentBotParams.BotAction = BotRegistry.BotActions.GoldBracelets;
+                    CurrentRunParams.BotAction = BotRegistry.BotActions.GoldBracelets;
                     break;
                 case 1:
-                    CurrentBotParams.BotAction = BotRegistry.BotActions.Cannonballs;
+                    CurrentRunParams.BotAction = BotRegistry.BotActions.Cannonballs;
                     break;
                 case 2:
-                    CurrentBotParams.BotAction = BotRegistry.BotActions.StringBows;
+                    CurrentRunParams.BotAction = BotRegistry.BotActions.StringBows;
                     break;
                 default:
                     return false;
