@@ -27,7 +27,6 @@ namespace RunescapeBot.BotPrograms.Popups
         protected override void SetSize()
         {
             Height = 95;
-            TitleHeight = 16;
             Width = 154;
         }
 
@@ -69,7 +68,7 @@ namespace RunescapeBot.BotPrograms.Popups
             //Wait for the "Enter amount:" prompt to appear
             if (WaitForEnterAmount(5000))
             {
-                Thread.Sleep(500);
+                BotProgram.SafeWaitPlus(200, 50);
                 BotUtilities.EnterAmount(RSClient, itemsToMake);
             }
         }

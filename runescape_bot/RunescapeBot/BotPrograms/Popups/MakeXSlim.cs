@@ -22,7 +22,6 @@ namespace RunescapeBot.BotPrograms.Popups
         protected override void SetSize()
         {
             Height = 95;
-            TitleHeight = 15;
             Width = 100;
         }
     }

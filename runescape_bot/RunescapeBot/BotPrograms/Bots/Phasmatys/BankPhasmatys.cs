@@ -230,7 +230,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the furnace icon is found</returns>
         protected bool MoveToFurnace()
         {
-            const int runTimeFromBankToFurnace = 5500;  //appproximate milliseconds needed to run from the bank to the furnace
+            const int runTimeFromBankToFurnace = 6500;  //appproximate milliseconds needed to run from the bank to the furnace
             const int selectFirstItemTime = 800;
 
             Point? furnaceIcon = FurnaceClickLocation();

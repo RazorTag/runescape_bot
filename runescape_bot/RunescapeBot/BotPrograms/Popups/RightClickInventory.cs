@@ -26,8 +26,7 @@ namespace RunescapeBot.BotPrograms.Popups
         protected override void SetSize()
         {
             Height = 82;
-            if (ExtraOptions != null) { Height += (RowHeight * ExtraOptions.Length); }
-            TitleHeight = 16;
+            if (ExtraOptions != null) { Height += (ROW_HEIGHT * ExtraOptions.Length); }
             Width = 136;    //TODO dynamically calculate width since different items produce different widths
         }
 
@@ -37,7 +36,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void Use()
         {
             const int normalIndex = 0;
-            int yOffset = 25 + (OptionsAbove(normalIndex) * RowHeight);
+            int yOffset = 25 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
             SelectOption(yOffset, 15);
         }
 
@@ -47,7 +46,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void DropItem()
         {
             const int normalIndex = 1;
-            int yOffset = 40 + (OptionsAbove(normalIndex) * RowHeight);
+            int yOffset = 40 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
             SelectOption(yOffset, 15);
         }
 
@@ -57,7 +56,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void Examine()
         {
             const int normalIndex = 2;
-            int yOffset = 55 + (OptionsAbove(normalIndex) * RowHeight);
+            int yOffset = 55 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
             SelectOption(yOffset, 15);
         }
 

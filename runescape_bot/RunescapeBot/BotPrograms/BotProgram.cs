@@ -1056,7 +1056,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return true;    //already logged in
             }
-            if (SafeWait(5000)) { return false; }
+            if (SafeWait(2000)) { return false; }
             if (!IsLoggedOut())
             {
                 return true;
@@ -1435,7 +1435,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="waitTime"></param>
         /// <returns>true if the StopFlag has been raised</returns>
-        protected bool SafeWait(long waitTime)
+        public static bool SafeWait(long waitTime)
         {
             int nextWaitTime;
             int waitInterval = 100;
@@ -1460,7 +1460,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="meanWaitTime">average wait time</param>
         /// <param name="standardDeviation">standard deviation froom the mean</param>
         /// <returns>true if the StopFlag has been raised</returns>
-        protected bool SafeWait(long meanWaitTime, double standardDeviation)
+        public static bool SafeWait(long meanWaitTime, double standardDeviation)
         {
             if (meanWaitTime <= 0)
             {
@@ -1479,7 +1479,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minWaitTime"></param>
         /// <param name="stdDev"></param>
         /// <returns></returns>
-        protected bool SafeWaitPlus(long minWaitTime, double stdDev)
+        public static bool SafeWaitPlus(long minWaitTime, double stdDev)
         {
             if (minWaitTime <= 0)
             {

@@ -41,7 +41,7 @@ namespace RunescapeBot.BotPrograms
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(rsClient));
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 asteriskHash = ImageProcessing.ColorSum(screen);
-                if (Numerical.CloseEnough(asterisk, asteriskHash, 0.05))
+                if (Numerical.CloseEnough(asterisk, asteriskHash, 0.01))
                 {
                     return true;
                 }

@@ -10,13 +10,14 @@ namespace RunescapeBot.BotPrograms.Popups
 {
     public class RightClick
     {
-        protected const int RowHeight = 15;
+        protected const int MAX_ROWS = 20;
+        protected const int TITLE_HEIGHT = 16;
+        protected const int ROW_HEIGHT = 15;
         protected Process RSClient;
         protected int XClick;
         protected int YClick;
         protected int Height;
         protected int Width;
-        protected int TitleHeight;
 
         public int GetHeight() { return Height; }
         public int GetWidth() { return Width; }
@@ -37,13 +38,44 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
+        /// Create a record of a basic popup
+        /// </summary>
+        /// <param name="xClick">the x-coordinate of the click that opened the Make-X popup</param>
+        /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
+        /// <param name="rsClient"></param>
+        public RightClick(int xClick, int yClick, Process rsClient, int rows)
+        {
+            this.RSClient = rsClient;
+            this.XClick = xClick;
+            this.YClick = yClick;
+            SetSize();
+            this.Height = TITLE_HEIGHT * (rows * ROW_HEIGHT);
+            AdjustPosition();
+        }
+
+        /// <summary>
+        /// Create a record of a basic popup
+        /// </summary>
+        /// <param name="xClick">the x-coordinate of the click that opened the Make-X popup</param>
+        /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
+        /// <param name="rsClient"></param>
+        public RightClick(int xClick, int yClick, Process rsClient, int width, int height)
+        {
+            this.RSClient = rsClient;
+            this.XClick = xClick;
+            this.YClick = yClick;
+            this.Width = width;
+            this.Height = height;
+            AdjustPosition();
+        }
+
+        /// <summary>
         /// Sets the dimensions of the popup
         /// </summary>
         protected virtual void SetSize()
         {
-            Height = 96;
-            TitleHeight = 16;
-            Width = 154;
+            Width = 100;
+            Height = 50;
         }
 
         /// <summary>
@@ -78,10 +110,9 @@ namespace RunescapeBot.BotPrograms.Popups
             while (watch.ElapsedMilliseconds < timeout)
             {
                 if (BotProgram.StopFlag) { return false; }
-
+                BotProgram.SafeWait(200);
                 screen = ScreenScraper.CaptureWindow(RSClient);
-
-                if (PopupIsCorrectSize(screen))
+                if (PopupExists(screen))
                 {
                     screen.Dispose();
                     return true;
@@ -93,18 +124,48 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Verifies that the pop-up is roughly the expected size
+        /// 
         /// </summary>
+        /// <param name="screen"></param>
         /// <returns></returns>
-        protected virtual bool PopupIsCorrectSize(Bitmap screen)
+        protected virtual bool PopupExists(Bitmap screen)
         {
             const int xPadding = 20;
             const int yPadding = 6;
-            int x = XClick + Width / 2 - xPadding;
-            int y = YClick + Height - yPadding;
+            const int xOffset = 20;
+
+            //Check title bar
+            int x = XClick + xOffset;
+            int y = YClick + (TITLE_HEIGHT / 2);
+            Color blackBarCheck = screen.GetPixel(x, y);
+
+            //Check the bottom-right of the popup
+            x = XClick + Width / 2 - xPadding;
+            y = YClick + Height - yPadding;
             Color bottomRight = screen.GetPixel(x, y);
             RGBHSBRange rightClickColor = RGBHSBRanges.RightClickPopup();
-            return rightClickColor.ColorInRange(bottomRight);
+
+            return ImageProcessing.ColorsAreEqual(blackBarCheck, Color.Black) && rightClickColor.ColorInRange(bottomRight);
+
+        }
+
+        /// <summary>
+        /// Verifies that the pop-up is roughly the expected size
+        /// </summary>
+        /// <returns></returns>
+        protected virtual void GetPopupHeight(Bitmap screen)
+        {
+            int yOffset;
+            for (int row = 0; row < MAX_ROWS; row++)
+            {
+                yOffset = RowOffset(row);
+                Color background = screen.GetPixel(XClick, YClick + yOffset);
+                RGBHSBRange rightClickColor = RGBHSBRanges.RightClickPopup();
+                if (rightClickColor.ColorInRange(background))
+                {
+                    Height = TITLE_HEIGHT + ((row + 1) * ROW_HEIGHT);
+                }
+            }
         }
 
         /// <summary>
@@ -134,10 +195,20 @@ namespace RunescapeBot.BotPrograms.Popups
         /// Select an option from the right-click menu in terms of order in the list of options
         /// </summary>
         /// <param name="whichOption">the row number (starting from 0) of the option to click</param>
-        public void CustomOption(int whichOption)
+        public void CustomOption(int rowNumber)
         {
-            int yOffset = 25 + (RowHeight * whichOption);
+            int yOffset = RowOffset(rowNumber);
             SelectOption(yOffset);
+        }
+
+        /// <summary>
+        /// Gets the y-offset of the middle of a row indexed from top to bottom
+        /// </summary>
+        /// <param name="rowNumber">row numbering starts at 0</param>
+        /// <returns></returns>
+        protected int RowOffset(int rowNumber)
+        {
+            return 25 + (ROW_HEIGHT * rowNumber);
         }
     }
 }

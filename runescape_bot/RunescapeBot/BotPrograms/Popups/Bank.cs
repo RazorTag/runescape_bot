@@ -237,12 +237,13 @@ namespace RunescapeBot.BotPrograms.Popups
             //open the withdraw right-click menu
             Point click = Probability.GaussianCircle(new Point(itemSlot.Value.X, itemSlot.Value.Y), 4, 0, 360, 11);
             Mouse.RightClick(click.X, click.Y, RSClient);
-            Thread.Sleep(200 + (int)Probability.HalfGaussian(0, 10, true));
+            BotProgram.SafeWaitPlus(200, 100);
+            RightClick menu = new RightClick(click.X, click.Y, RSClient, 9);
 
             //click on Withdraw-All
             click = Probability.GaussianRectangle(click.X - 90, click.X + 90, click.Y + yOffset - 2, click.Y + yOffset + 2);
             Mouse.LeftClick(click.X, click.Y, RSClient);
-            Thread.Sleep(200 + (int)Probability.HalfGaussian(0, 10, true));
+            BotProgram.SafeWaitPlus(200, 100);
         }
 
         /// <summary>

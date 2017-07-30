@@ -73,10 +73,10 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             CraftPopup.MakeBracelets(FurnaceCrafting.Jewel.None, 27, WAIT_FOR_MAKEX_POPUP_TIMEOUT);
-            SafeWait(300);
+            SafeWait(200, 150);
             WatchNetflix(0);
             CountDownItems(true);
-            SafeWaitPlus(0, 2000);
+            SafeWaitPlus(0, 1000);
             return true;
         }
     }
