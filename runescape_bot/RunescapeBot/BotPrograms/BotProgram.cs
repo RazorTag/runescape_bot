@@ -578,7 +578,6 @@ namespace RunescapeBot.BotPrograms
             foundObject = null;
             Point? lastPosition = null;
             int passes = 0;
-            Stopwatch intervalWatch = new Stopwatch();
             Stopwatch giveUpWatch = new Stopwatch();
             giveUpWatch.Start();
 
@@ -586,7 +585,6 @@ namespace RunescapeBot.BotPrograms
             {
                 if (StopFlag) { return false; }
 
-                intervalWatch.Restart();
                 Blob objectBlob = null;
                 findObject(stationaryObject, out objectBlob, minimumSize);
 
@@ -611,8 +609,6 @@ namespace RunescapeBot.BotPrograms
                 {
                     lastPosition = null;
                 }
-
-                if (StopFlag) { return false; }
             }
 
             return false;
@@ -711,7 +707,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Wrapper for ScreenScraper.CaptureWindow
         /// </summary>
-        protected bool ReadWindow(bool checkClient = true)
+        protected bool ReadWindow(bool checkClient = true, bool fastCapture = false)
         {
             if (checkClient && !PrepareClient()) { return false; }
 
@@ -723,7 +719,7 @@ namespace RunescapeBot.BotPrograms
             try
             {
                 LastScreenShot = DateTime.Now;
-                Bitmap = ScreenScraper.CaptureWindow(RSClient);
+                Bitmap = ScreenScraper.CaptureWindow(RSClient, fastCapture);
                 ColorArray = ScreenScraper.GetRGB(Bitmap);
             }
             catch
@@ -1005,6 +1001,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (!ScreenScraper.RestartClient(ref client, RunParams.RuneScapeClient, RunParams.ClientFlags))
                 {
+                    SafeWait(5000);
                     continue;
                 }
                 RSClient = client;

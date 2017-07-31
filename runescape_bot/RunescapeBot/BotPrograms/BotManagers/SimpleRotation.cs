@@ -22,6 +22,8 @@ namespace RunescapeBot.BotPrograms
             for (int i = 0; i < BotParamsList.Count; i++)
             {
                 BotParamsList[i].SlaveDriver = true;
+                BotParamsList[i].JagexClient = runParams.JagexClient;
+                BotParamsList[i].OSBuddyClient = runParams.OSBuddyClient;
             }
         }
 
@@ -35,7 +37,7 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag)
             {
                 if (!NextBot()) { return; }
-                timeToRun = 120000;// CurrentBot.RandomWorkTime();
+                timeToRun = CurrentBot.RandomWorkTime();
                 CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
                 CurrentBot.Start();
                 SafeWait(timeToRun);

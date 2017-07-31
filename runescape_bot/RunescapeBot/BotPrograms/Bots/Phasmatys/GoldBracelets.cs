@@ -63,7 +63,6 @@ namespace RunescapeBot.BotPrograms
         protected override bool FurnaceActions()
         {
             ReadWindow();
-            ScanForBuildingFloor();
 
             //make 27 bars and wait
             if (StopFlag) { return false; }
