@@ -45,6 +45,8 @@ namespace RunescapeBot.BotPrograms
             MakePotionsFull,
             [Description("Magic - Enchant Level 2")]
             EnchantLevel2,
+            [Description("Mining - Iron Ore")]
+            IronOre,
             [Description("Smithing - Cannonballs")]
             Cannonballs,
             [Description("Thieving - Tea Stall")]
@@ -96,6 +98,8 @@ namespace RunescapeBot.BotPrograms
                     return new Enchant(runParams, 2);
                 case BotActions.DoNothing:
                     return new DoNothing(runParams);
+                case BotActions.IronOre:
+                    return new IronPowerMining(runParams);
             }
             return bot;
         }
