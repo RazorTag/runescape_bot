@@ -446,9 +446,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static RGBHSBRange IronRock()
         {
-            Color dark = Color.FromArgb(0, 189, 188);
-            Color light = Color.FromArgb(39, 246, 245);
-            HSBRange hsbRange = new HSBRange(175.8f, 182.0f, 0.717f, 1.000f, 0.352f, 0.542f); ;
+            Color dark = Color.FromArgb(40, 25, 20);
+            Color light = Color.FromArgb(95, 60, 45);
+            HSBRange hsbRange = new HSBRange(14f, 20f, 0.35f, 0.43f, 0.09f, 0.27f) ;
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
