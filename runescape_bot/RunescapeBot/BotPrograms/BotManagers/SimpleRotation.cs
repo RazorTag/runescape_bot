@@ -37,7 +37,7 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag)
             {
                 if (!NextBot()) { return; }
-                timeToRun = CurrentBot.RandomWorkTime();
+                timeToRun = RandomWorkTime();
                 CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
                 CurrentBot.Start();
                 SafeWait(timeToRun);
