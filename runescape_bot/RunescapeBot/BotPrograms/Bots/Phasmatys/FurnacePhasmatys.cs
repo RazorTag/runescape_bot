@@ -48,7 +48,7 @@ namespace RunescapeBot.BotPrograms
 
             //Move to the furnace and use a gold bar on it
             if (StopFlag) { return false; }
-            if (!MoveToFurnace())
+            if (!MoveToFurnace(6000))
             {
                 failedRuns++;
                 return true;

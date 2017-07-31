@@ -162,7 +162,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Geometry.AddMinimapIconToBlob(ref furnaceFloor, furnaceIcon.Center);
                 furnaceX = furnaceFloor.Center.X + 8;
-                furnaceY = furnaceFloor.Center.Y;
+                furnaceY = furnaceFloor.Center.Y + 1;
             }
 
             int x = furnaceX + offset.X;
@@ -228,9 +228,8 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to the Port Phasmatys furnace
         /// </summary>
         /// <returns>true if the furnace icon is found</returns>
-        protected bool MoveToFurnace()
+        protected bool MoveToFurnace(int runTimeFromBankToFurnace = 6500)
         {
-            const int runTimeFromBankToFurnace = 6500;  //appproximate milliseconds needed to run from the bank to the furnace
             const int selectFirstItemTime = 800;
 
             Point? furnaceIcon = FurnaceClickLocation();

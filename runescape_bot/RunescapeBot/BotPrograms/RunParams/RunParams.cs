@@ -236,7 +236,7 @@ namespace RunescapeBot.BotPrograms
 
         /// <summary>
         /// Indicates which tab is currently running a bot
-        /// Set to -1 if not bot is running
+        /// Set to -1 if no bot is running
         /// </summary>
         public BotRegistry.BotManager BotManager { get; set; }
 

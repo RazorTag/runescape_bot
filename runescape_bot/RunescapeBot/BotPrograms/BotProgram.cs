@@ -251,7 +251,7 @@ namespace RunescapeBot.BotPrograms
 
             if (RunParams.SlaveDriver)
             {
-                while (!StopFlag && Iterate())
+                while (!StopFlag && !Iterate())
                 {
                     continue;
                 }
@@ -386,7 +386,7 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return true; }
                 if (workIntervalWatch.ElapsedMilliseconds > workInterval)
                 {
-                    return false;    //stop execution so that the bot can take a break and resume later
+                    return RunParams.SlaveDriver;
                 } 
             }
 
@@ -459,7 +459,7 @@ namespace RunescapeBot.BotPrograms
                 stdDev = 56;
             }
 
-            double workTime = Probability.BoundedGaussian(mean, stdDev, 1.0, double.MaxValue);
+            double workTime = Probability.BoundedGaussian(mean, stdDev, 1, 600);
             workTime = Math.Min(workTime, (RunParams.RunUntil - DateTime.Now).TotalMilliseconds);
             return UnitConversions.MinutesToMilliseconds(workTime);
         }

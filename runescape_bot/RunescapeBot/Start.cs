@@ -542,8 +542,8 @@ namespace RunescapeBot
                 BotIdle = RunParams.ActiveBot.BotIdle;
                 if (BotIdle)
                 {
-                    BringToFront();
                     WindowState = FormWindowState.Normal;
+                    BringToFront();
                 }
                 else
                 {
