@@ -49,7 +49,7 @@ namespace RunescapeBot.BotPrograms.Popups
             this.XClick = xClick;
             this.YClick = yClick;
             SetSize();
-            this.Height = TITLE_HEIGHT * (rows * ROW_HEIGHT);
+            this.Height = TITLE_HEIGHT + (rows * ROW_HEIGHT);
             AdjustPosition();
         }
 

@@ -1312,7 +1312,7 @@ namespace RunescapeBot.BotPrograms
             const int maxLogoutAttempts = 10;
             int logoutAttempts = 0;
 
-            while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts))
+            while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts) && !StopFlag)
             {
                 LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5); //logout tab
                 LeftClick(ScreenWidth - 38, ScreenHeight - 286);    //close out of world switcher
@@ -1322,6 +1322,19 @@ namespace RunescapeBot.BotPrograms
 
             BroadcastLogout();
         }
+        #endregion
+
+        #region bot world check
+
+        /// <summary>
+        /// Determines if the client is logged into world 385 (F2P) or world 386 (P2P)
+        /// </summary>
+        /// <returns>true if the client is logged into world 385 or 386</returns>
+        protected bool IsLoggedIntoBotWorld()
+        {
+            return false;
+        }
+
         #endregion
 
         #region banking

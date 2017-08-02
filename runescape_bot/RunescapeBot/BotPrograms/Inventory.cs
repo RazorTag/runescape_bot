@@ -64,8 +64,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            int x = Screen.GetLength(0) - INVENTORY_TAB_OFFSET_LEFT;
-            int y = Screen.GetLength(1) - INVENTORY_TAB_OFFSET_TOP;
+            int x = Screen.GetLength(0) - INVENTORY_TAB_OFFSET_RIGHT;
+            int y = Screen.GetLength(1) - INVENTORY_TAB_OFFSET_BOTTOM;
             Mouse.LeftClick(x, y, RSClient, 6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Inventory;
@@ -83,8 +83,23 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            int x = Screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_LEFT;
-            int y = Screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_TOP;
+            int x = Screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_RIGHT;
+            int y = Screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_BOTTOM;
+            Mouse.LeftClick(x, y, RSClient, 6);
+            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
+            SelectedTab = TabSelect.Spellbook;
+            return true;
+        }
+
+
+        public bool OpenLogout(bool safeTab = true)
+        {
+            if (!safeTab && SelectedTab == TabSelect.Logout)
+            {
+                return false;
+            }
+            int x = Screen.GetLength(0) - LOGOUT_TAB_OFFSET_RIGHT;
+            int y = Screen.GetLength(1) - LOGOUT_TAB_OFFSET_BOTTOM;
             Mouse.LeftClick(x, y, RSClient, 6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Spellbook;
@@ -471,8 +486,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private const int TAB_SWITCH_WAIT = 200;
 
-        private const int INVENTORY_TAB_OFFSET_LEFT = 118;
-        private const int INVENTORY_TAB_OFFSET_TOP = 320;
+        private const int INVENTORY_TAB_OFFSET_RIGHT = 118;
+        private const int INVENTORY_TAB_OFFSET_BOTTOM = 320;
         private const int INVENTORY_OFFSET_LEFT = 185;
         private const int INVENTORY_OFFSET_TOP = 275;
         private const int INVENTORY_GAP_X = 42;
@@ -481,8 +496,8 @@ namespace RunescapeBot.BotPrograms
         public const int INVENTORY_COLUMNS = 4;
         public const int INVENTORY_ROWS = 7;
 
-        private const int SPELLBOOK_TAB_OFFSET_LEFT = 19;
-        private const int SPELLBOOK_TAB_OFFSET_TOP = 320;
+        private const int SPELLBOOK_TAB_OFFSET_RIGHT = 19;
+        private const int SPELLBOOK_TAB_OFFSET_BOTTOM = 320;
         private const int SPELLBOOK_OFFSET_LEFT = 191;
         private const int SPELLBOOK_OFFSET_TOP = 272;
         private const int SPELLBOOK_GAP_X = 24;
@@ -490,12 +505,16 @@ namespace RunescapeBot.BotPrograms
         public const int SPELLBOOK_COLUMNS = 7;
         public const int SPELLBOOK_ROWS = 10;
 
+        private const int LOGOUT_TAB_OFFSET_RIGHT = 120;
+        private const int LOGOUT_TAB_OFFSET_BOTTOM = 18;
+
         public TabSelect SelectedTab { get; set; }
         public enum TabSelect : int
         {
             Unknown,
             Inventory,
-            Spellbook
+            Spellbook,
+            Logout
         }
 
         public enum Item : int

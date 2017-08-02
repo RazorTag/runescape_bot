@@ -9,7 +9,7 @@ namespace RunescapeBot.BotPrograms
 {
     public class SimpleRotation : BotProgram
     {
-        private const int LOGOUT_CHECK_INTERVAL = 2500;
+        private const int LOGOUT_CHECK_INTERVAL = 500;
         public const int NUMBER_OF_BOTS = 3;
         protected RunParamsList BotParamsList;
         public BotProgram CurrentBot;
@@ -18,7 +18,7 @@ namespace RunescapeBot.BotPrograms
         public SimpleRotation(RunParams runParams, RunParamsList botList) : base(runParams)
         {
             BotParamsList = botList;
-            BotParamsList.ActiveBot = 0;
+            BotParamsList.ActiveBot = -1;
             for (int i = 0; i < BotParamsList.Count; i++)
             {
                 BotParamsList[i].SlaveDriver = true;
@@ -37,9 +37,13 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag)
             {
                 if (!NextBot()) { return; }
+
                 timeToRun = RandomWorkTime();
-                CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
-                CurrentBot.Start();
+                if (!string.IsNullOrEmpty(CurrentRunParams.Login) && !string.IsNullOrEmpty(CurrentRunParams.Password))
+                {
+                    CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
+                    CurrentBot.Start();
+                }
                 SafeWait(timeToRun);
                 while (!CurrentBot.BotIsDone)
                 {
@@ -60,10 +64,9 @@ namespace RunescapeBot.BotPrograms
             }
 
             int nextBot = BotParamsList.ActiveBot;
-            while (nextBot == BotParamsList.ActiveBot)
-            {
+            do {
                 nextBot = RNG.Next(0, BotParamsList.Count);
-            }
+            } while (nextBot == BotParamsList.ActiveBot);
 
             BotParamsList.ActiveBot = nextBot;
             if (!SelectBotAction())

@@ -209,7 +209,7 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Withdraw X items using Withdraw-X
+        /// Withdraw all items using Withdraw-All
         /// </summary>
         /// <param name="column">bank item slots from left slot (0-7)</param>
         /// <param name="row">bank item slots from top slot (0-n)</param>
@@ -239,6 +239,7 @@ namespace RunescapeBot.BotPrograms.Popups
             Mouse.RightClick(click.X, click.Y, RSClient);
             BotProgram.SafeWaitPlus(200, 100);
             RightClick menu = new RightClick(click.X, click.Y, RSClient, 9);
+            menu.WaitForPopup();
 
             //click on Withdraw-All
             click = Probability.GaussianRectangle(click.X - 90, click.X + 90, click.Y + yOffset - 2, click.Y + yOffset + 2);

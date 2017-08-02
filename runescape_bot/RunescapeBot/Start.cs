@@ -93,7 +93,7 @@ namespace RunescapeBot
         /// <returns>The bot's display name and current status</returns>
         private string GetBotName()
         {
-            if (RunningBot == null)
+            if (RunningBot == null || RunParams.ActiveBot == null)
             {
                 return string.Empty;
             }

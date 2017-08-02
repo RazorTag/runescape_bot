@@ -228,7 +228,7 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to the Port Phasmatys furnace
         /// </summary>
         /// <returns>true if the furnace icon is found</returns>
-        protected bool MoveToFurnace(int runTimeFromBankToFurnace = 6500)
+        protected bool MoveToFurnace(int runTimeFromBankToFurnace = 6200)
         {
             const int selectFirstItemTime = 800;
 
