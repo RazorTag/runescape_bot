@@ -1,4 +1,5 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -9,6 +10,8 @@ namespace RunescapeBot.BotPrograms
     [Serializable]
     public class RunParams
     {
+        #region constructors
+
         public RunParams()
         {
             InitializeBaseParams();
@@ -22,7 +25,6 @@ namespace RunescapeBot.BotPrograms
         public RunParams(bool baseParams)
         {
             InitializeBaseParams();
-
             if (baseParams)
             {
                 InitializePhasmatys();
@@ -39,6 +41,7 @@ namespace RunescapeBot.BotPrograms
             RandomizeFrames = true;
             BotState = BotProgram.BotState.Running;
             RunUntil = DateTime.Now;
+            BotWorldCheckInterval = UnitConversions.MinutesToMilliseconds(5);
         }
 
         /// <summary>
@@ -53,6 +56,8 @@ namespace RunescapeBot.BotPrograms
                 PhasmatysParams.ParamsList[i] = new PhasmatysRunParams();
             }
         }
+
+        #endregion
 
         #region settings
 
@@ -141,6 +146,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         [XmlIgnore]
         public bool RandomizeFrames { get; set; }
+
+        /// <summary>
+        /// Minimum number of milliseconds between bot world checks
+        /// </summary>
+        [XmlIgnore]
+        public int BotWorldCheckInterval { get; set; }
 
         /// <summary>
         /// File path of the standard Jagex OSRS client

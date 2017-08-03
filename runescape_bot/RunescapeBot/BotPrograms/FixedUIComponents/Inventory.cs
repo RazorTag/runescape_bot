@@ -91,7 +91,11 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
-
+        /// <summary>
+        /// Opens the logout tab if it isn't already open
+        /// </summary>
+        /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
+        /// <returns>true if the logout tab is not assumes to already be open</returns>
         public bool OpenLogout(bool safeTab = true)
         {
             if (!safeTab && SelectedTab == TabSelect.Logout)
@@ -102,7 +106,7 @@ namespace RunescapeBot.BotPrograms
             int y = Screen.GetLength(1) - LOGOUT_TAB_OFFSET_BOTTOM;
             Mouse.LeftClick(x, y, RSClient, 6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
-            SelectedTab = TabSelect.Spellbook;
+            SelectedTab = TabSelect.Logout;
             return true;
         }
 
@@ -412,7 +416,7 @@ namespace RunescapeBot.BotPrograms
             int bottom = y + yOffset;
 
             Color[,] itemIcon = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
-            double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRanges.EmptyInventorySlot());
+            double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRangeFactory.EmptyInventorySlot());
             return emptyMatch > 0.99; //99% match needed to pass
         }
 

@@ -143,7 +143,7 @@ namespace RunescapeBot.BotPrograms.Popups
             x = XClick + Width / 2 - xPadding;
             y = YClick + Height - yPadding;
             Color bottomRight = screen.GetPixel(x, y);
-            RGBHSBRange rightClickColor = RGBHSBRanges.RightClickPopup();
+            RGBHSBRange rightClickColor = RGBHSBRangeFactory.RightClickPopup();
 
             return ImageProcessing.ColorsAreEqual(blackBarCheck, Color.Black) && rightClickColor.ColorInRange(bottomRight);
 
@@ -160,7 +160,7 @@ namespace RunescapeBot.BotPrograms.Popups
             {
                 yOffset = RowOffset(row);
                 Color background = screen.GetPixel(XClick, YClick + yOffset);
-                RGBHSBRange rightClickColor = RGBHSBRanges.RightClickPopup();
+                RGBHSBRange rightClickColor = RGBHSBRangeFactory.RightClickPopup();
                 if (rightClickColor.ColorInRange(background))
                 {
                     Height = TITLE_HEIGHT + ((row + 1) * ROW_HEIGHT);

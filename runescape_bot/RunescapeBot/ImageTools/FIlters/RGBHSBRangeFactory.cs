@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
-    public static class RGBHSBRanges
+    public static class RGBHSBRangeFactory
     {
         #region login
         /// <summary>
@@ -283,7 +283,7 @@ namespace RunescapeBot.BotPrograms
         public static RGBHSBRange PhasmatysBuildingFloorLight()
         {
             Color dark = Color.FromArgb(25, 31, 19);
-            Color light = Color.FromArgb(92, 103, 82);
+            Color light = Color.FromArgb(99, 103, 82);
             HSBRange hsbRange = new HSBRange(334, 95, 0.083f, 0.191f, 0.117f, 0.363f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
@@ -295,7 +295,7 @@ namespace RunescapeBot.BotPrograms
         public static RGBHSBRange PhasmatysBuildingFloorDark()
         {
             Color dark = Color.FromArgb(25, 31, 19);
-            Color light = Color.FromArgb(92, 103, 82);
+            Color light = Color.FromArgb(99, 103, 82);
             HSBRange hsbRange = new HSBRange(334, 80, 0.083f, 0.191f, 0.117f, 0.363f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
@@ -303,6 +303,7 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region Inventory
+
         /// <summary>
         /// Catches most of the colors found in the opaque background of the inventory
         /// </summary>
@@ -314,6 +315,19 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(28, 40, 0.15f, 0.25f, 0.15f, 0.25f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
+
+        /// <summary>
+        /// The orange current world text
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange CurrentWorldText()
+        {
+            Color dark = Color.FromArgb(245, 142, 21);
+            Color light = Color.FromArgb(255, 162, 41);
+            HSBRange hsbRange = new HSBRange(29.4f, 35.4f, 0.975f, 1.000f, 0.535f, 0.586f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region textBoxes

@@ -522,13 +522,13 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            LogBalance = RGBHSBRanges.LogBalance();
-            CargoNet = RGBHSBRanges.CargoNetFrameTop();
-            TreeBranch = RGBHSBRanges.GnomeTreeBranch();
-            TreeTrunk = RGBHSBRanges.GnomeTreeTrunk();
-            Tightrope = RGBHSBRanges.Tightrope();
-            DrainPipe = RGBHSBRanges.DrainPipe();
-            Black = RGBHSBRanges.Black();
+            LogBalance = RGBHSBRangeFactory.LogBalance();
+            CargoNet = RGBHSBRangeFactory.CargoNetFrameTop();
+            TreeBranch = RGBHSBRangeFactory.GnomeTreeBranch();
+            TreeTrunk = RGBHSBRangeFactory.GnomeTreeTrunk();
+            Tightrope = RGBHSBRangeFactory.Tightrope();
+            DrainPipe = RGBHSBRangeFactory.DrainPipe();
+            Black = RGBHSBRangeFactory.Black();
         }
 
         /// <summary>

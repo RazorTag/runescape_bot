@@ -298,13 +298,13 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            LesserDemonSkin = RGBHSBRanges.LesserDemonSkin();
-            LesserDemonHorn = RGBHSBRanges.LesserDemonHorn();
-            RuneMedHelm = RGBHSBRanges.RuneMedHelm();
-            MithrilArmor = RGBHSBRanges.MithrilArmor();
-            ChaosRune = RGBHSBRanges.ChaosRuneOrange();
-            DeathRune = RGBHSBRanges.DeathRuneWhite();
-            MouseoverTextNPC = RGBHSBRanges.MouseoverTextNPC();
+            LesserDemonSkin = RGBHSBRangeFactory.LesserDemonSkin();
+            LesserDemonHorn = RGBHSBRangeFactory.LesserDemonHorn();
+            RuneMedHelm = RGBHSBRangeFactory.RuneMedHelm();
+            MithrilArmor = RGBHSBRangeFactory.MithrilArmor();
+            ChaosRune = RGBHSBRangeFactory.ChaosRuneOrange();
+            DeathRune = RGBHSBRangeFactory.DeathRuneWhite();
+            MouseoverTextNPC = RGBHSBRangeFactory.MouseoverTextNPC();
         }
     }
 }

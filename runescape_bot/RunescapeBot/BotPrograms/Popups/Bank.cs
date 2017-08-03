@@ -96,7 +96,7 @@ namespace RunescapeBot.BotPrograms.Popups
             Color[,] screen;
             screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
-            titleMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRanges.BankTitle());
+            titleMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRangeFactory.BankTitle());
             
             return titleMatch > minTitleMatch;
         }

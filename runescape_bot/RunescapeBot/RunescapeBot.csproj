@@ -127,9 +127,9 @@
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
     <Compile Include="ImageTools\FIlters\ClusterFilters.cs" />
     <Compile Include="ImageTools\FIlters\ColorCluster.cs" />
-    <Compile Include="ImageTools\FIlters\RGBHSBRanges.cs" />
+    <Compile Include="ImageTools\FIlters\RGBHSBRangeFactory.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
-    <Compile Include="BotPrograms\Inventory.cs" />
+    <Compile Include="BotPrograms\FixedUIComponents\Inventory.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
     <Compile Include="GMA\GlobalEventProvider.cs">
       <SubType>Component</SubType>

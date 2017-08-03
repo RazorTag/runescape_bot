@@ -89,8 +89,8 @@ namespace RunescapeBot.BotPrograms
 
         private void GetReferenceColors()
         {
-            TeaStallRoof = RGBHSBRanges.TeaStallRoof();
-            MouseOverText = RGBHSBRanges.MouseoverTextStationaryObject();
+            TeaStallRoof = RGBHSBRangeFactory.TeaStallRoof();
+            MouseOverText = RGBHSBRangeFactory.MouseoverTextStationaryObject();
         }
     }
 }

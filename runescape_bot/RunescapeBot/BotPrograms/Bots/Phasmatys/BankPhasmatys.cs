@@ -262,11 +262,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void GetReferenceColors()
         {
-            FurnaceIconOrange = RGBHSBRanges.FurnaceIconOrange();
-            BankIconDollar = RGBHSBRanges.BankIconDollar();
-            BuildingFloor = RGBHSBRanges.PhasmatysBuildingFloorLight();
-            Furnace = RGBHSBRanges.Furnace();
-            BankBooth = RGBHSBRanges.BankBoothPhasmatys();
+            FurnaceIconOrange = RGBHSBRangeFactory.FurnaceIconOrange();
+            BankIconDollar = RGBHSBRangeFactory.BankIconDollar();
+            BuildingFloor = RGBHSBRangeFactory.PhasmatysBuildingFloorLight();
+            Furnace = RGBHSBRangeFactory.Furnace();
+            BankBooth = RGBHSBRangeFactory.BankBoothPhasmatys();
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected bool ScanForBuildingFloor()
         {
-            List<RGBHSBRange> colorRanges = new List<RGBHSBRange>() { RGBHSBRanges.PhasmatysBuildingFloorDark(), RGBHSBRanges.PhasmatysBuildingFloorLight() };
+            List<RGBHSBRange> colorRanges = new List<RGBHSBRange>() { RGBHSBRangeFactory.PhasmatysBuildingFloorDark(), RGBHSBRangeFactory.PhasmatysBuildingFloorLight() };
             Blob bankIcon, bankFloor, furnaceIcon, furnaceFloor;
             Point offset;
             foreach (RGBHSBRange colorRange in colorRanges)

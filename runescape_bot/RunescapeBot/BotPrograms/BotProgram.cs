@@ -106,6 +106,11 @@ namespace RunescapeBot.BotPrograms
         protected DateTime LastScreenShot { get; set; }
 
         /// <summary>
+        /// The last time that we checked if we are in a bot world
+        /// </summary>
+        protected DateTime LastBotWorldCheck { get; set; }
+
+        /// <summary>
         /// The sidebar including the inventory and spellbook
         /// </summary>
         protected Inventory Inventory { get; set; }
@@ -353,6 +358,7 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
                 iterationWatch.Restart();
                 if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
+                if (BotWorldCheck()) { continue; }   //We had to switch out of a bot world
 
                 //Only do the actual botting if we are logged in
                 if (CheckLogIn())
@@ -360,7 +366,6 @@ namespace RunescapeBot.BotPrograms
                     if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                     {
                         RunCharacter(); //Turn on run if the player has run energy
-
                         if (!Execute()) //quit by an override Execute method
                         {
                             return true;
@@ -991,7 +996,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
         /// <returns>true if client is successfully prepared</returns>
-        private bool PrepareClient(bool forceRestart = false)
+        protected bool PrepareClient(bool forceRestart = false)
         {
             if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
 
@@ -1157,7 +1162,7 @@ namespace RunescapeBot.BotPrograms
             int totalSize = width * height;
             int redBlobSize;
 
-            RGBHSBRange red = RGBHSBRanges.WelcomeScreenClickHere();
+            RGBHSBRange red = RGBHSBRangeFactory.WelcomeScreenClickHere();
             bool[,] clickHere = ColorFilterPiece(red, left, right, top, bottom);
             Blob enterGame = ImageProcessing.BiggestBlob(clickHere);
             redBlobSize = enterGame.Size;
@@ -1322,18 +1327,134 @@ namespace RunescapeBot.BotPrograms
 
             BroadcastLogout();
         }
-        #endregion
-
-        #region bot world check
 
         /// <summary>
-        /// Determines if the client is logged into world 385 (F2P) or world 386 (P2P)
+        /// Changes world if logged into a bot world
         /// </summary>
-        /// <returns>true if the client is logged into world 385 or 386</returns>
-        protected bool IsLoggedIntoBotWorld()
+        /// <returns>true if we attempt to change worlds</returns>
+        protected bool BotWorldCheck(bool readWindow = false)
         {
+            if (LastBotWorldCheck > DateTime.Now) { LastBotWorldCheck = DateTime.Now; }
+            long timeSinceLastBotWorldCheck = (long) (DateTime.Now - LastBotWorldCheck).TotalMilliseconds;
+            if (timeSinceLastBotWorldCheck < RunParams.BotWorldCheckInterval)
+            {
+                return false;
+            }
+            else
+            {
+                LastBotWorldCheck = DateTime.Now;
+            }
+
+            if (IsLoggedOut(readWindow))
+            {
+                if (LoginSetForBotWorld(false))
+                {
+                    PrepareClient(true);
+                    return true;
+                }
+            }
+            else
+            {
+                if (LoggedIntoBotWorld(false))
+                {
+                    Logout();
+                    PrepareClient(true);
+                    return true;
+                }
+            }
             return false;
         }
+
+        /// <summary>
+        /// Determines if the client is logged into world 385 (F2P) or world 386 (P2P).
+        /// Also identifies worlds 358 and 368 as bot worlds.
+        /// Assumes that the client is logged into the game.
+        /// </summary>
+        /// /// <param name="readWindow">Set to true to force a new screen read</param>
+        /// <returns>true if the client is logged into world 385 or 386</returns>
+        protected bool LoggedIntoBotWorld(bool readWindow = false)
+        {
+            MakeSureWindowHasBeenRead(readWindow);
+            Inventory.OpenLogout();
+            SafeWaitPlus(1000, 150);
+            ReadWindow();
+            if (!WorldSwitcherIsOpen())
+            {
+                ClickWorldSwitcher();
+                SafeWaitPlus(1500, 500);
+                ReadWindow();
+            }
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            while (!WorldSwitcherIsOpen() && (watch.ElapsedMilliseconds < 3000) && !StopFlag)
+            {
+                ClickWorldSwitcher();
+                SafeWait(600, 200);
+                ReadWindow();
+            }
+
+            int left = ScreenWidth - 84;
+            int right = left + 30;
+            int top = ScreenHeight - 297;
+            int bottom = top + 20;
+            long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
+            bool freeBotWorld = Numerical.CloseEnough(120452, colorSum, 0.00001);
+            bool memberBotWorld = Numerical.CloseEnough(121998, colorSum, 0.00001);
+            return memberBotWorld || freeBotWorld;
+        }
+
+        /// <summary>
+        /// Left clicks on the world switcher option in the logout tab to open the world switcher.
+        /// Assumes that the logout tab is already open.
+        /// </summary>
+        protected void ClickWorldSwitcher()
+        {
+            int left = ScreenWidth - 180;
+            int right = left + 110;
+            int top = ScreenHeight - 150;
+            int bottom = top + 15;
+            Point click = Probability.GaussianRectangle(left, right, top, bottom);
+            LeftClick(click.X, click.Y);
+        }
+
+        /// <summary>
+        /// Determines if the world switcher is open
+        /// </summary>
+        /// <returns>true if the world switcher is open</returns>
+        protected bool WorldSwitcherIsOpen()
+        {
+            int left = ScreenWidth - 200;
+            int right = left + 150;
+            int top = ScreenHeight - 297;
+            int bottom = top + 20;
+            Color[,] currentWorldTitle = ScreenPiece(left, right, top, bottom);
+            double worldTextMatch = ImageProcessing.FractionalMatch(currentWorldTitle, RGBHSBRangeFactory.CurrentWorldText());
+            const double worldTextMinimumMatch = 0.05;
+            return worldTextMatch > worldTextMinimumMatch;
+        }
+
+        /// <summary>
+        /// Determines if one of the two bot worlds is selected on the login screen.
+        /// Assumes that the client is on the login screen.
+        /// </summary>
+        /// <param name="readWindow">Set to true to force a new screen read</param>
+        /// <returns>true if the world is set to 385 or 386. May also hit on 358 and 368</returns>
+        protected bool LoginSetForBotWorld(bool readWindow = false)
+        {
+            MakeSureWindowHasBeenRead(readWindow);
+            Point loginOffset = LoginScreenOffset();
+            int left = Center.X - 323 + loginOffset.X;
+            int right = left + 30;
+            int top = 466 + loginOffset.Y;
+            int bottom = top + 14;
+            long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
+            bool freeBotWorld = Numerical.CloseEnough(LOGIN_BOT_WORLD_385, colorSum, 0.0005);
+            bool memberBotWorld = Numerical.CloseEnough(LOGIN_BOT_WORLD_386, colorSum, 0.00005);
+            return memberBotWorld || freeBotWorld;
+        }
+        private const int LOGIN_BOT_WORLD_385 = 130228;
+        private const int LOGIN_BOT_WORLD_386 = 133468;
 
         #endregion
 
@@ -1377,7 +1498,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool LocateBankBoothVarrock(out Blob bankBooth)
         {
-            return LocateBankBooth(RGBHSBRanges.BankBoothVarrockWest(), out bankBooth);
+            return LocateBankBooth(RGBHSBRangeFactory.BankBoothVarrockWest(), out bankBooth);
         }
 
         /// <summary>
@@ -1391,7 +1512,7 @@ namespace RunescapeBot.BotPrograms
             const double maxBoothWidthToHeightRatio = 3.3;
 
             ReadWindow();
-            bool[,] bankBooths = ColorFilter(RGBHSBRanges.BankBoothPhasmatys());
+            bool[,] bankBooths = ColorFilter(RGBHSBRangeFactory.BankBoothPhasmatys());
             List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, MinBankBoothSize, MaxBankBoothSize);  //list of blobs from biggest to smallest
             Blob blob;
             int blobIndex = 0;
@@ -1561,7 +1682,7 @@ namespace RunescapeBot.BotPrograms
 
             Point runOrb = RunOrbSamplePoint();
             Color runColor = GetPixel(runOrb.X, runOrb.Y);
-            RGBHSBRange runEnergyFoot = RGBHSBRanges.RunEnergyFoot();
+            RGBHSBRange runEnergyFoot = RGBHSBRangeFactory.RunEnergyFoot();
             return runEnergyFoot.ColorInRange(runColor);
         }
 
@@ -1625,7 +1746,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the gauge is low, false otherwise</returns>
         protected bool MinimapGaugeIsHigh(Color[,] gaugePercentage, double threshold)
         {
-            RGBHSBRange highGauge = RGBHSBRanges.MinimapGaugeYellowGreen();
+            RGBHSBRange highGauge = RGBHSBRangeFactory.MinimapGaugeYellowGreen();
             double highMatch = ImageProcessing.FractionalMatch(gaugePercentage, highGauge);
             return highMatch >= threshold;
         }
@@ -1639,7 +1760,7 @@ namespace RunescapeBot.BotPrograms
             if (readWindow) { ReadWindow(); }
             
             Point offset;
-            bool[,] minimapBankIcon = MinimapFilter(RGBHSBRanges.BankIconDollar(), out offset);
+            bool[,] minimapBankIcon = MinimapFilter(RGBHSBRangeFactory.BankIconDollar(), out offset);
             Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
             if (bankBlob == null || bankBlob.Size < 10) { return false; }
 

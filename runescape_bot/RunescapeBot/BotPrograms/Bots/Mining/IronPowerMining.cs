@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms
         //protected int TreeTextChars;
         //protected int TreeTextWidth;
         //protected List<Blob> Trees;
-        RGBHSBRange ironFilter = RGBHSBRanges.IronRock();
+        RGBHSBRange ironFilter = RGBHSBRangeFactory.IronRock();
 
 
         public IronPowerMining(RunParams startParams) : base(startParams)

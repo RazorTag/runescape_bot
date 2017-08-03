@@ -53,7 +53,7 @@ namespace RunescapeBot.BotPrograms
             //crafting.MakeBracelets(FurnaceCrafting.Jewel.None, 27, 60000);
 
             //ReadWindow();
-            //RGBHSBRange floor = RGBHSBRanges.PhasmatysBuildingFloorLight();
+            //RGBHSBRange floor = RGBHSBRangeFactory.PhasmatysBuildingFloorLight();
             //bool[,] mask = ColorFilter(floor);
             //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
 

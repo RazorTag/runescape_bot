@@ -37,7 +37,7 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag)
             {
                 if (!NextBot()) { return; }
-
+                
                 timeToRun = RandomWorkTime();
                 if (!string.IsNullOrEmpty(CurrentRunParams.Login) && !string.IsNullOrEmpty(CurrentRunParams.Password))
                 {
@@ -48,6 +48,11 @@ namespace RunescapeBot.BotPrograms
                 while (!CurrentBot.BotIsDone)
                 {
                     SafeWait(LOGOUT_CHECK_INTERVAL);
+                }
+
+                if (!StopFlag)
+                {
+                    PrepareClient(true);    //restart the client to get a random new world
                 }
             }
         }
