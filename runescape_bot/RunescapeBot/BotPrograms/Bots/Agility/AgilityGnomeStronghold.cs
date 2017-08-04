@@ -22,13 +22,14 @@ namespace RunescapeBot.BotPrograms
         private RGBHSBRange DrainPipe;
         private RGBHSBRange Black;
 
-        private int MinLogSize;
-        private int MinCargoNetSize;
-        private int MinTreeBranchSize;
-        private int MinTreeTrunkSize;
-        private int MaxTreeTrunkSize;
-        private int MinTightropeSize;
-        private int MinDrainPipeSize;        
+        private int MinLogSize { get { return ArtifactSize(0.00049); } }
+        private int MinCargoNetSize { get { return ArtifactSize(0.0002); } }
+        private int MinTreeBranchSize { get { return ArtifactSize(0.00113); } }
+        private int MinTreeTrunkSize { get { return ArtifactSize(0.000189); } }
+        private int MaxTreeTrunkSize { get { return ArtifactSize(0.000378); } }
+        private int MinTightropeSize { get { return ArtifactSize(0.000189); } }
+        private int MinDrainPipeSize { get { return ArtifactSize(0.000566); } }
+
 
         public AgilityGnomeStronghold(RunParams startParams) : base(startParams)
         {
@@ -37,17 +38,6 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Run()
         {
-            //PassLogBalance();
-            //PassCargoNet();
-            //PassTreeBranch();
-            //PassTightRope();
-            //PassTreeTrunk();
-            //PassCargoNet();
-            //PassDrainPipe();
-
-            //VerifyClimbedUpTree();
-            //VerifyClimbedDownTree();
-
             //ReadWindow();
             //bool[,] logBalance = ColorFilter(LogBalance);
             //DebugUtilities.TestMask(Bitmap, ColorArray, LogBalance, logBalance, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "logBalance");
@@ -74,7 +64,17 @@ namespace RunescapeBot.BotPrograms
             //bool[,] drainPipe = ColorFilter(DrainPipe);
             //DebugUtilities.TestMask(Bitmap, ColorArray, DrainPipe, drainPipe, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "drainPipe");
 
-            SetObjectSizes();
+            //PassLogBalance();
+            //PassCargoNet();
+            //PassTreeBranch();
+            //PassTightRope();
+            //PassTreeTrunk();
+            //PassCargoNet();
+            //PassDrainPipe();
+
+            //VerifyClimbedUpTree();
+            //VerifyClimbedDownTree();
+
             return true;
         }
 
@@ -401,9 +401,9 @@ namespace RunescapeBot.BotPrograms
             Line tightropeAxis = new Line(tightrope.GetLeft(), tightrope.GetRight());
             Point click = tightropeAxis.OffsetFromStart(25);
             LeftClick(click.X, click.Y, 10);
-
+            SafeWait(500);
             Mouse.RadialOffset(150, 500, 0, 360);
-            SafeWait(5200);
+            SafeWait(4700);
             return true;
         }
 
@@ -439,10 +439,9 @@ namespace RunescapeBot.BotPrograms
                 return false;   //unable to locate a tree trunk
             }
 
-            Point branchOffset = new Point(-93, 18);
+            Point branchOffset = new Point(-ArtifactLength(0.0914), ArtifactLength(0.0177));
             Point click = Geometry.AddPoints(treeTrunk.Center, branchOffset);   //~45 pixels in from the end of the branch on a full HD screen
             LeftClick(click.X, click.Y, 6);
-
             SafeWait(1500); //wait for the player to climb the tree
             return true;
         }
@@ -530,20 +529,5 @@ namespace RunescapeBot.BotPrograms
             DrainPipe = RGBHSBRangeFactory.DrainPipe();
             Black = RGBHSBRangeFactory.Black();
         }
-
-        /// <summary>
-        /// Sets the minimum required number of pixels for object blobs
-        /// </summary>
-        private void SetObjectSizes()
-        {
-            ReadWindow();
-            MinLogSize = ArtifactSize(0.00049);
-            MinCargoNetSize = ArtifactSize(0.0002);
-            MinTreeBranchSize = ArtifactSize(0.00113);
-            MinTreeTrunkSize = ArtifactSize(0.000189);
-            MaxTreeTrunkSize = ArtifactSize(0.000378);
-            MinTightropeSize = ArtifactSize(0.000189);
-            MinDrainPipeSize = ArtifactSize(0.000566);
-    }
     }
 }

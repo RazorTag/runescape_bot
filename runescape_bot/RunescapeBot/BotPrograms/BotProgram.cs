@@ -222,6 +222,7 @@ namespace RunescapeBot.BotPrograms
         {
             StopFlag = false;
             BotIsDone = false;
+            LastBotWorldCheck = DateTime.Now;
             RunThread = new Thread(Process);
             RunThread.Start();
         }
@@ -263,7 +264,7 @@ namespace RunescapeBot.BotPrograms
                 return;
             }
 
-            int awakeTime = UnitConversions.HoursToMilliseconds(12);
+            int awakeTime = UnitConversions.HoursToMilliseconds(11);
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
             sleepWatch.Start();
@@ -932,13 +933,25 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Determines the pixels on the screen taken up by an artifact of a known fraction of the screen
         /// </summary>
-        /// <param name="artifactSize">the size of an artifact in terms of fraction of the screen</param>
+        /// <param name="artifactSize">the size of an artifact in terms of fraction of the square of the screen height</param>
         /// <returns>the number of pixels taken up by an artifact</returns>
         protected int ArtifactSize(double artifactSize)
         {
             if (!MakeSureWindowHasBeenRead()) { return 0; }
             double pixels = artifactSize * ScreenHeight * ScreenHeight;
             return (int) Math.Round(pixels);
+        }
+
+        /// <summary>
+        /// Determines the pixel length of an artifact of a known fraction of the screen's height
+        /// </summary>
+        /// <param name="artifactLength">the fraction of the screen height taken up by the artifact</param>
+        /// <returns>the pixel length of the artifact</returns>
+        protected int ArtifactLength(double artifactLength)
+        {
+            if (!MakeSureWindowHasBeenRead()) { return 0; }
+            double length = artifactLength * ScreenHeight;
+            return (int)Math.Round(length);
         }
 
         /// <summary>
@@ -1320,7 +1333,9 @@ namespace RunescapeBot.BotPrograms
             while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts) && !StopFlag)
             {
                 LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5); //logout tab
+                SafeWait(1000);
                 LeftClick(ScreenWidth - 38, ScreenHeight - 286);    //close out of world switcher
+                SafeWait(2000);
                 LeftClick(ScreenWidth - 120, ScreenHeight - 86, 3); //click here to logout
                 SafeWait(2000);
             }
