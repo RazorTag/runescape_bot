@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.Common;
 using RunescapeBot.FileIO;
 using RunescapeBot.UITools;
 using System;
@@ -60,6 +61,12 @@ namespace RunescapeBot
         /// </summary>
         private int PhasmatysBotSelection;
 
+        /// <summary>
+        /// The most recently selected simple rotation bot.
+        /// Used to save for data to the bot before selecting a new bot.
+        /// </summary>
+        private int RotationBotSelection;
+
 
         /// <summary>
         /// Gets the display name for an enum
@@ -115,9 +122,11 @@ namespace RunescapeBot
                 names[i] = GetDescription((Enum)actions.GetValue(i));
             }
             BotActionSelect.DataSource = names;
+            RotationBotActionSelect.DataSource = names;
 
             StartButtons = new List<Button>();
             StartButtons.Add(StartButton);
+            StartButtons.Add(RotationStart);
             StartButtons.Add(PhasmatysStartButton);
 
             Settings = new BotSettings();
@@ -125,7 +134,11 @@ namespace RunescapeBot
             BotManagerType.SelectedIndex = RunParams.SelectedTab;
             SetSoloBotForm();
 
-            //Phasmatys rotation bot manager
+            //simple rotation
+            SetRotationBotSelector(RunParams.SelectedRotationBot);
+            WriteRotationSettings();
+
+            //Phasmatys rotation
             SetPhasmatysBotSelector(RunParams.SelectedPhasmatysBot);
             WritePhasmatysSettings();
 
@@ -143,6 +156,21 @@ namespace RunescapeBot
             OSBuddyClientLocation.Text = RunParams.OSBuddyClient;
             BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
             Iterations.Value = RunParams.Iterations;
+        }
+
+        /// <summary>
+        /// Sets the list for the Phasmatys bot selector
+        /// </summary>
+        private void SetRotationBotSelector(int selection)
+        {
+            string[] botnames = new string[RunParams.RotationParams.Count];
+            for (int i = 0; i < botnames.Length; i++)
+            {
+                botnames[i] = (RunParams.RotationParams[i]).BotName;
+            }
+            RotationBotSelector.DataSource = botnames;
+            RotationBotSelection = selection;
+            RotationBotSelector.SelectedIndex = RotationBotSelection;
         }
 
         /// <summary>
@@ -173,7 +201,22 @@ namespace RunescapeBot
         }
 
         /// <summary>
-        /// Starts a bot program when the user presses Start
+        /// Starts a simple rotation bot program when the user presses Start
+        /// </summary>
+        /// <param name="sender">not used</param>
+        /// <param name="e">not used</param>
+        private void RotationStart_Click(object sender, EventArgs e)
+        {
+            RunParams.BotManager = BotRegistry.BotManager.Rotation;
+            foreach (RunParams runParams in RunParams.RotationParams.ParamsList)
+            {
+                runParams.TaskComplete = new BotResponse(BotDone);
+            }
+            StartButtonClicked((Button)sender);
+        }
+
+        /// <summary>
+        /// Starts a Phasmatys rotation bot program when the user presses Start
         /// </summary>
         /// <param name="sender">not used</param>
         /// <param name="e">not used</param>
@@ -205,7 +248,11 @@ namespace RunescapeBot
         private void CollectStartParams()
         {
             CollectGeneralSettings();
-            if (PhasmatysBotSelection >= 0 && PhasmatysBotSelection < RunParams.PhasmatysParams.Count)
+            if (Numerical.WithinBounds(RotationBotSelection, 0, RunParams.RotationParams.Count - 1))
+            {
+                RunParams.RotationParams[RotationBotSelection] = CollectRotationSettings();
+            }
+            if (Numerical.WithinBounds(PhasmatysBotSelection, 0, RunParams.PhasmatysParams.Count - 1))
             {
                 RunParams.PhasmatysParams[PhasmatysBotSelection] = CollectPhasmatysSettings();
             }
@@ -222,10 +269,25 @@ namespace RunescapeBot
             RunParams.Password = Password.Text;
             RunParams.Iterations = (int)Iterations.Value;
             RunParams.RunUntil = RunUntil.Value;
-            RunParams.TaskComplete = new BotResponse(BotDone);
             RunParams.BotAction = (BotRegistry.BotActions)BotActionSelect.SelectedIndex;
             RunParams.JagexClient = JagexClientLocation.Text;
             RunParams.OSBuddyClient = OSBuddyClientLocation.Text;
+            RunParams.TaskComplete = new BotResponse(BotDone);
+        }
+
+        /// <summary>
+        /// Collects the start parameters for the Phasmatys rotation manager form
+        /// </summary>
+        /// <returns></returns>
+        private RunParams CollectRotationSettings()
+        {
+            RunParams rotationParams = new RunParams();
+            rotationParams.BotName = RotationBotSelector.Text;
+            rotationParams.Login = RotationLogin.Text;
+            rotationParams.Password = RotationPassword.Text;
+            rotationParams.BotAction = (BotRegistry.BotActions)RotationBotActionSelect.SelectedIndex;
+            rotationParams.Iterations = (int)RotationIterations.Value;
+            return rotationParams;
         }
 
         /// <summary>
@@ -242,6 +304,18 @@ namespace RunescapeBot
             phasmatysParams.SteelBars = (int)SteelBars.Value;
             phasmatysParams.Bows = (int)Bows.Value;
             return phasmatysParams;
+        }
+
+        /// <summary>
+        /// Populates the simple rotation manager form with the values of the selected bot
+        /// </summary>
+        private void WriteRotationSettings()
+        {
+            RunParams settings = RunParams.RotationParams[RotationBotSelection];
+            RotationLogin.Text = settings.Login;
+            RotationPassword.Text = settings.Password;
+            RotationBotActionSelect.SelectedIndex = (int)settings.BotAction;
+            RotationIterations.Value = settings.Iterations;
         }
 
         /// <summary>
@@ -264,7 +338,7 @@ namespace RunescapeBot
         private void RunBotProgram(Button startButton)
         {
             CollectStartParams();
-            RunningBot = BotRegistry.GetSelectedBot(RunParams, RunParams.BotManager, (BotRegistry.BotActions)BotActionSelect.SelectedIndex);
+            RunningBot = BotRegistry.GetSelectedBot(RunParams, RunParams.BotManager);
             SetActiveState(startButton);
             RunningBot.Start();
             UpdateTimer.Enabled = true;
@@ -278,6 +352,7 @@ namespace RunescapeBot
         {
             RunParams.SelectedTab = BotManagerType.SelectedIndex;
             RunParams.SelectedPhasmatysBot = PhasmatysBotSelection;
+            RunParams.SelectedRotationBot = RotationBotSelection;
             if (!Settings.SaveSettings(RunParams))
             {
                 MessageBox.Show("Unable to save bot settings");
@@ -399,6 +474,7 @@ namespace RunescapeBot
             {
                 button.Text = "";
                 button.BackColor = ColorTranslator.FromHtml("#7E7E37");
+                button.Enabled = false;
             }
         }
 
@@ -482,7 +558,8 @@ namespace RunescapeBot
             switch (RunParams.BotManager)
             {
                 case BotRegistry.BotManager.Rotation:
-                    //TODO set bot selector
+                    SetRotationBotSelector(RunParams.RotationParams.ActiveBot);
+                    WriteRotationSettings();
                     break;
                 case BotRegistry.BotManager.Phasmatys:
                     SetPhasmatysBotSelector(RunParams.PhasmatysParams.ActiveBot);
@@ -587,6 +664,18 @@ namespace RunescapeBot
         /// <summary>
         /// Saves the currently selected Phasmatys bot
         /// </summary>
+        private void SaveRotationBot()
+        {
+            if (RotationBotSelection >= 0)
+            {
+                RunParams.RotationParams[RotationBotSelection] = CollectRotationSettings();
+            }
+            SetRotationBotSelector(RotationBotSelector.SelectedIndex);
+        }
+
+        /// <summary>
+        /// Saves the currently selected Phasmatys bot
+        /// </summary>
         private void SavePhasmatysBot()
         {
             if (PhasmatysBotSelection >= 0)
@@ -605,6 +694,12 @@ namespace RunescapeBot
         {
             SavePhasmatysBot();
             WritePhasmatysSettings();
+        }
+
+        private void RotationBotSelector_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            SaveRotationBot();
+            WriteRotationSettings();
         }
     }
 }

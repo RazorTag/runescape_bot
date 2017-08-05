@@ -11,10 +11,7 @@ namespace RunescapeBot.BotPrograms
     [Serializable]
     public class PhasmatysRunParams : RunParams
     {
-        public PhasmatysRunParams() : base(false)
-        {
-            TaskComplete = new BotResponse(DoNothing);
-        }
+        public PhasmatysRunParams() : base(false) { }
 
         /// <summary>
         /// Modifies the property for the active resource instead of modifying iterations

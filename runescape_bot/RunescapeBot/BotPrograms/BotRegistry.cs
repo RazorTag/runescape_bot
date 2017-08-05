@@ -120,9 +120,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="runParams"></param>
         /// <param name="botManager"></param>
-        /// <param name="selectedBot"></param>
         /// <returns></returns>
-        public static BotProgram GetSelectedBot(RunParams runParams, BotManager botManager, BotActions selectedBot)
+        public static BotProgram GetSelectedBot(RunParams runParams, BotManager botManager)
         {
             switch (botManager)
             {

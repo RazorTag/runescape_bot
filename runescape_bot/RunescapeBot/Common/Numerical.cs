@@ -31,7 +31,7 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
-        /// Determines if a value is within specified bounds
+        /// Determines if a value is within specified bounds inclusive
         /// </summary>
         /// <param name="test">the value to check if it is within the upper and lower bounds</param>
         /// <param name="lowerBound">minimum allowed value (inclusive)</param>

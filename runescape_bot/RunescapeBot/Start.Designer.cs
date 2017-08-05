@@ -58,6 +58,19 @@ namespace RunescapeBot
             this.Login = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.RotationManager = new System.Windows.Forms.TabPage();
+            this.RotationBotSelector = new System.Windows.Forms.ComboBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.RotationStart = new System.Windows.Forms.Button();
+            this.RotationBotActionSelect = new System.Windows.Forms.ComboBox();
+            this.RotationIterations = new System.Windows.Forms.NumericUpDown();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.RotationPassword = new System.Windows.Forms.TextBox();
+            this.RotationLogin = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
             this.PhasmatysManager = new System.Windows.Forms.TabPage();
             this.PhasmatysLogin = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -77,6 +90,8 @@ namespace RunescapeBot
             this.BotManagerType.SuspendLayout();
             this.SoloBot.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).BeginInit();
+            this.RotationManager.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RotationIterations)).BeginInit();
             this.PhasmatysManager.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Bows)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.GoldBars)).BeginInit();
@@ -96,6 +111,7 @@ namespace RunescapeBot
             // BotManagerType
             // 
             this.BotManagerType.Controls.Add(this.SoloBot);
+            this.BotManagerType.Controls.Add(this.RotationManager);
             this.BotManagerType.Controls.Add(this.PhasmatysManager);
             this.BotManagerType.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BotManagerType.Location = new System.Drawing.Point(6, 0);
@@ -138,7 +154,7 @@ namespace RunescapeBot
             this.JagexClientLocation.Location = new System.Drawing.Point(84, 6);
             this.JagexClientLocation.Name = "JagexClientLocation";
             this.JagexClientLocation.Size = new System.Drawing.Size(339, 26);
-            this.JagexClientLocation.TabIndex = 31;
+            this.JagexClientLocation.TabIndex = 1;
             // 
             // JagexClientSelect
             // 
@@ -147,7 +163,7 @@ namespace RunescapeBot
             this.JagexClientSelect.Location = new System.Drawing.Point(423, 5);
             this.JagexClientSelect.Name = "JagexClientSelect";
             this.JagexClientSelect.Size = new System.Drawing.Size(35, 28);
-            this.JagexClientSelect.TabIndex = 32;
+            this.JagexClientSelect.TabIndex = 2;
             this.JagexClientSelect.Text = ". . .";
             this.JagexClientSelect.UseVisualStyleBackColor = true;
             this.JagexClientSelect.Click += new System.EventHandler(this.JagexClientSelect_Click);
@@ -178,7 +194,7 @@ namespace RunescapeBot
             this.StartButton.Location = new System.Drawing.Point(169, 302);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(125, 55);
-            this.StartButton.TabIndex = 8;
+            this.StartButton.TabIndex = 10;
             this.StartButton.Text = "&Start";
             this.StartButton.UseVisualStyleBackColor = true;
             this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
@@ -189,7 +205,7 @@ namespace RunescapeBot
             this.OSBuddyClientLocation.Location = new System.Drawing.Point(84, 45);
             this.OSBuddyClientLocation.Name = "OSBuddyClientLocation";
             this.OSBuddyClientLocation.Size = new System.Drawing.Size(339, 26);
-            this.OSBuddyClientLocation.TabIndex = 1;
+            this.OSBuddyClientLocation.TabIndex = 3;
             // 
             // OSBuddySelect
             // 
@@ -198,7 +214,7 @@ namespace RunescapeBot
             this.OSBuddySelect.Location = new System.Drawing.Point(423, 44);
             this.OSBuddySelect.Name = "OSBuddySelect";
             this.OSBuddySelect.Size = new System.Drawing.Size(35, 28);
-            this.OSBuddySelect.TabIndex = 2;
+            this.OSBuddySelect.TabIndex = 4;
             this.OSBuddySelect.Text = ". . .";
             this.OSBuddySelect.UseVisualStyleBackColor = true;
             this.OSBuddySelect.Click += new System.EventHandler(this.OSBuddySelect_Click);
@@ -221,7 +237,7 @@ namespace RunescapeBot
             this.BotActionSelect.MaxDropDownItems = 12;
             this.BotActionSelect.Name = "BotActionSelect";
             this.BotActionSelect.Size = new System.Drawing.Size(374, 28);
-            this.BotActionSelect.TabIndex = 5;
+            this.BotActionSelect.TabIndex = 7;
             // 
             // Iterations
             // 
@@ -234,7 +250,7 @@ namespace RunescapeBot
             0});
             this.Iterations.Name = "Iterations";
             this.Iterations.Size = new System.Drawing.Size(374, 26);
-            this.Iterations.TabIndex = 7;
+            this.Iterations.TabIndex = 9;
             // 
             // label6
             // 
@@ -253,7 +269,7 @@ namespace RunescapeBot
             this.RunUntil.Location = new System.Drawing.Point(84, 212);
             this.RunUntil.Name = "RunUntil";
             this.RunUntil.Size = new System.Drawing.Size(374, 26);
-            this.RunUntil.TabIndex = 6;
+            this.RunUntil.TabIndex = 8;
             // 
             // label1
             // 
@@ -282,7 +298,7 @@ namespace RunescapeBot
             this.Password.Name = "Password";
             this.Password.PasswordChar = '*';
             this.Password.Size = new System.Drawing.Size(374, 26);
-            this.Password.TabIndex = 4;
+            this.Password.TabIndex = 6;
             // 
             // Login
             // 
@@ -290,7 +306,7 @@ namespace RunescapeBot
             this.Login.Location = new System.Drawing.Point(84, 86);
             this.Login.Name = "Login";
             this.Login.Size = new System.Drawing.Size(374, 26);
-            this.Login.TabIndex = 3;
+            this.Login.TabIndex = 5;
             // 
             // label2
             // 
@@ -311,6 +327,148 @@ namespace RunescapeBot
             this.label5.Size = new System.Drawing.Size(82, 18);
             this.label5.TabIndex = 18;
             this.label5.Text = "Password:";
+            // 
+            // RotationManager
+            // 
+            this.RotationManager.Controls.Add(this.RotationBotSelector);
+            this.RotationManager.Controls.Add(this.label19);
+            this.RotationManager.Controls.Add(this.textBox1);
+            this.RotationManager.Controls.Add(this.RotationStart);
+            this.RotationManager.Controls.Add(this.RotationBotActionSelect);
+            this.RotationManager.Controls.Add(this.RotationIterations);
+            this.RotationManager.Controls.Add(this.label15);
+            this.RotationManager.Controls.Add(this.label16);
+            this.RotationManager.Controls.Add(this.RotationPassword);
+            this.RotationManager.Controls.Add(this.RotationLogin);
+            this.RotationManager.Controls.Add(this.label17);
+            this.RotationManager.Controls.Add(this.label18);
+            this.RotationManager.Location = new System.Drawing.Point(4, 29);
+            this.RotationManager.Name = "RotationManager";
+            this.RotationManager.Size = new System.Drawing.Size(467, 449);
+            this.RotationManager.TabIndex = 2;
+            this.RotationManager.Text = "Rotation";
+            this.RotationManager.UseVisualStyleBackColor = true;
+            // 
+            // RotationBotSelector
+            // 
+            this.RotationBotSelector.FormattingEnabled = true;
+            this.RotationBotSelector.Location = new System.Drawing.Point(89, 31);
+            this.RotationBotSelector.MaxDropDownItems = 3;
+            this.RotationBotSelector.Name = "RotationBotSelector";
+            this.RotationBotSelector.Size = new System.Drawing.Size(373, 28);
+            this.RotationBotSelector.TabIndex = 11;
+            this.RotationBotSelector.SelectionChangeCommitted += new System.EventHandler(this.RotationBotSelector_SelectionChangeCommitted);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(7, 35);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(36, 18);
+            this.label19.TabIndex = 44;
+            this.label19.Text = "Bot:";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(7, 363);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(455, 81);
+            this.textBox1.TabIndex = 42;
+            // 
+            // RotationStart
+            // 
+            this.RotationStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RotationStart.Location = new System.Drawing.Point(171, 292);
+            this.RotationStart.Name = "RotationStart";
+            this.RotationStart.Size = new System.Drawing.Size(125, 55);
+            this.RotationStart.TabIndex = 16;
+            this.RotationStart.Text = "&Start";
+            this.RotationStart.UseVisualStyleBackColor = true;
+            this.RotationStart.Click += new System.EventHandler(this.RotationStart_Click);
+            // 
+            // RotationBotActionSelect
+            // 
+            this.RotationBotActionSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RotationBotActionSelect.FormattingEnabled = true;
+            this.RotationBotActionSelect.Location = new System.Drawing.Point(88, 188);
+            this.RotationBotActionSelect.MaxDropDownItems = 12;
+            this.RotationBotActionSelect.Name = "RotationBotActionSelect";
+            this.RotationBotActionSelect.Size = new System.Drawing.Size(374, 28);
+            this.RotationBotActionSelect.TabIndex = 14;
+            // 
+            // RotationIterations
+            // 
+            this.RotationIterations.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RotationIterations.Location = new System.Drawing.Point(88, 238);
+            this.RotationIterations.Maximum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            0});
+            this.RotationIterations.Name = "RotationIterations";
+            this.RotationIterations.Size = new System.Drawing.Size(374, 26);
+            this.RotationIterations.TabIndex = 15;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label15.Location = new System.Drawing.Point(7, 194);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(56, 18);
+            this.label15.TabIndex = 39;
+            this.label15.Text = "Action:";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Location = new System.Drawing.Point(7, 240);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(75, 18);
+            this.label16.TabIndex = 41;
+            this.label16.Text = "Iterations:";
+            // 
+            // RotationPassword
+            // 
+            this.RotationPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RotationPassword.Location = new System.Drawing.Point(88, 142);
+            this.RotationPassword.Name = "RotationPassword";
+            this.RotationPassword.PasswordChar = '*';
+            this.RotationPassword.Size = new System.Drawing.Size(374, 26);
+            this.RotationPassword.TabIndex = 13;
+            // 
+            // RotationLogin
+            // 
+            this.RotationLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RotationLogin.Location = new System.Drawing.Point(88, 93);
+            this.RotationLogin.Name = "RotationLogin";
+            this.RotationLogin.Size = new System.Drawing.Size(374, 26);
+            this.RotationLogin.TabIndex = 12;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label17.Location = new System.Drawing.Point(7, 99);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(51, 18);
+            this.label17.TabIndex = 37;
+            this.label17.Text = "Login:";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(7, 148);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(82, 18);
+            this.label18.TabIndex = 38;
+            this.label18.Text = "Password:";
             // 
             // PhasmatysManager
             // 
@@ -342,7 +500,7 @@ namespace RunescapeBot
             this.PhasmatysLogin.Location = new System.Drawing.Point(88, 67);
             this.PhasmatysLogin.Name = "PhasmatysLogin";
             this.PhasmatysLogin.Size = new System.Drawing.Size(373, 26);
-            this.PhasmatysLogin.TabIndex = 10;
+            this.PhasmatysLogin.TabIndex = 18;
             // 
             // label10
             // 
@@ -365,7 +523,7 @@ namespace RunescapeBot
             0});
             this.Bows.Name = "Bows";
             this.Bows.Size = new System.Drawing.Size(373, 26);
-            this.Bows.TabIndex = 14;
+            this.Bows.TabIndex = 22;
             // 
             // PhasmatysStartButton
             // 
@@ -373,7 +531,7 @@ namespace RunescapeBot
             this.PhasmatysStartButton.Location = new System.Drawing.Point(168, 287);
             this.PhasmatysStartButton.Name = "PhasmatysStartButton";
             this.PhasmatysStartButton.Size = new System.Drawing.Size(125, 55);
-            this.PhasmatysStartButton.TabIndex = 15;
+            this.PhasmatysStartButton.TabIndex = 23;
             this.PhasmatysStartButton.Text = "&Start";
             this.PhasmatysStartButton.UseVisualStyleBackColor = true;
             this.PhasmatysStartButton.Click += new System.EventHandler(this.PhasmatysStartButton_Click);
@@ -389,7 +547,7 @@ namespace RunescapeBot
             0});
             this.GoldBars.Name = "GoldBars";
             this.GoldBars.Size = new System.Drawing.Size(373, 26);
-            this.GoldBars.TabIndex = 12;
+            this.GoldBars.TabIndex = 20;
             // 
             // SteelBars
             // 
@@ -402,7 +560,7 @@ namespace RunescapeBot
             0});
             this.SteelBars.Name = "SteelBars";
             this.SteelBars.Size = new System.Drawing.Size(373, 26);
-            this.SteelBars.TabIndex = 13;
+            this.SteelBars.TabIndex = 21;
             // 
             // label9
             // 
@@ -451,7 +609,7 @@ namespace RunescapeBot
             this.PhasmatysBotSelector.MaxDropDownItems = 3;
             this.PhasmatysBotSelector.Name = "PhasmatysBotSelector";
             this.PhasmatysBotSelector.Size = new System.Drawing.Size(373, 28);
-            this.PhasmatysBotSelector.TabIndex = 9;
+            this.PhasmatysBotSelector.TabIndex = 17;
             this.PhasmatysBotSelector.SelectionChangeCommitted += new System.EventHandler(this.PhasmatysBotSelector_SelectionChangeCommitted);
             // 
             // label11
@@ -471,7 +629,7 @@ namespace RunescapeBot
             this.PhasmatysPassword.Name = "PhasmatysPassword";
             this.PhasmatysPassword.PasswordChar = '*';
             this.PhasmatysPassword.Size = new System.Drawing.Size(373, 26);
-            this.PhasmatysPassword.TabIndex = 11;
+            this.PhasmatysPassword.TabIndex = 19;
             // 
             // label12
             // 
@@ -506,6 +664,9 @@ namespace RunescapeBot
             this.SoloBot.ResumeLayout(false);
             this.SoloBot.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Iterations)).EndInit();
+            this.RotationManager.ResumeLayout(false);
+            this.RotationManager.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.RotationIterations)).EndInit();
             this.PhasmatysManager.ResumeLayout(false);
             this.PhasmatysManager.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Bows)).EndInit();
@@ -556,6 +717,19 @@ namespace RunescapeBot
         private System.Windows.Forms.TextBox JagexClientLocation;
         private System.Windows.Forms.Button JagexClientSelect;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TabPage RotationManager;
+        private System.Windows.Forms.ComboBox RotationBotSelector;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button RotationStart;
+        private System.Windows.Forms.ComboBox RotationBotActionSelect;
+        private System.Windows.Forms.NumericUpDown RotationIterations;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox RotationPassword;
+        private System.Windows.Forms.TextBox RotationLogin;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label18;
     }
 }
 

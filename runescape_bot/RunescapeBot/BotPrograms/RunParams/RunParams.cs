@@ -15,6 +15,7 @@ namespace RunescapeBot.BotPrograms
         public RunParams()
         {
             InitializeBaseParams();
+            InitializeRotation();
             InitializePhasmatys();
         }
 
@@ -27,6 +28,7 @@ namespace RunescapeBot.BotPrograms
             InitializeBaseParams();
             if (baseParams)
             {
+                InitializeRotation();
                 InitializePhasmatys();
             }
         }
@@ -42,6 +44,20 @@ namespace RunescapeBot.BotPrograms
             BotState = BotProgram.BotState.Running;
             RunUntil = DateTime.Now;
             BotWorldCheckInterval = UnitConversions.MinutesToMilliseconds(5);
+            TaskComplete = new BotResponse(DoNothing);
+        }
+
+        /// <summary>
+        /// Initializes the rotation bot list.
+        /// This should only be called to initialize the base RunParams.
+        /// </summary>
+        private void InitializeRotation()
+        {
+            RotationParams = new RunParamsList(SimpleRotation.NUMBER_OF_BOTS, RunUntil);
+            for (int i = 0; i < RotationParams.Count; i++)
+            {
+                RotationParams.ParamsList[i] = new RunParams(false);
+            }
         }
 
         /// <summary>
@@ -50,7 +66,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void InitializePhasmatys()
         {
-            PhasmatysParams = new RunParamsList(SimpleRotation.NUMBER_OF_BOTS, RunUntil);
+            PhasmatysParams = new RunParamsList(PhasmatysRotation.NUMBER_OF_BOTS, RunUntil);
             for (int i = 0; i < PhasmatysParams.Count; i++)
             {
                 PhasmatysParams.ParamsList[i] = new PhasmatysRunParams();
@@ -274,6 +290,11 @@ namespace RunescapeBot.BotPrograms
         /// The Phasmatys bot selected from the dropdown
         /// </summary>
         public virtual int SelectedPhasmatysBot { get; set; }
+
+        /// <summary>
+        /// The simple rotation bot selected from the dropdown
+        /// </summary>
+        public virtual int SelectedRotationBot { get; set; }
 
         #endregion
 

@@ -125,7 +125,7 @@ namespace RunescapeBot.BotPrograms
             }
             else
             {
-                MissedDemon();
+                return MissedDemon();
             }
 
             RunParams.Iterations--;
@@ -135,7 +135,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Called when a demon is not found
         /// </summary>
-        private void MissedDemon()
+        private bool MissedDemon()
         {
             MissedDemons++;
 
@@ -156,8 +156,10 @@ namespace RunescapeBot.BotPrograms
             if ((MissedDemons * RunParams.FrameTime) > (3 * MAX_DEMON_SPAWN_TIME))
             {
                 Logout();
-                StopFlag = true;
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>

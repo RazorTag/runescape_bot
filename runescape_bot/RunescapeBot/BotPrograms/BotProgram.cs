@@ -443,7 +443,7 @@ namespace RunescapeBot.BotPrograms
             double workType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
-            //average of 98.55 minutes
+            //average of 93.9 minutes
             if (workType < 0.25)   //25%
             {
                 mean = 45;
@@ -461,11 +461,11 @@ namespace RunescapeBot.BotPrograms
             }
             else  //5%
             {
-                mean = 308;
+                mean = 215;
                 stdDev = 56;
             }
 
-            double workTime = Probability.BoundedGaussian(mean, stdDev, 1, 600);
+            double workTime = Probability.BoundedGaussian(mean, stdDev, 1, 345);
             workTime = Math.Min(workTime, (RunParams.RunUntil - DateTime.Now).TotalMilliseconds);
             return UnitConversions.MinutesToMilliseconds(workTime);
         }
@@ -507,7 +507,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of milliseconds for the bot to sleep</returns>
         private int RandomSleepTime()
         {
-            double avgSleepLength = UnitConversions.HoursToMilliseconds(10.6);
+            double avgSleepLength = UnitConversions.HoursToMilliseconds(14);
             double standardDeviation = UnitConversions.MinutesToMilliseconds(30);
             int breakLength = (int) Probability.RandomGaussian(avgSleepLength, standardDeviation);
             return breakLength;
@@ -1604,9 +1604,9 @@ namespace RunescapeBot.BotPrograms
         /// Waits for a random time from a Gaussian distribution
         /// </summary>
         /// <param name="meanWaitTime">average wait time</param>
-        /// <param name="standardDeviation">standard deviation froom the mean</param>
+        /// <param name="stdDev">standard deviation froom the mean</param>
         /// <returns>true if the StopFlag has been raised</returns>
-        public static bool SafeWait(long meanWaitTime, double standardDeviation)
+        public static bool SafeWait(long meanWaitTime, double stdDev)
         {
             if (meanWaitTime <= 0)
             {
@@ -1614,7 +1614,7 @@ namespace RunescapeBot.BotPrograms
             }
             else
             {
-                int waitTime = (int)Probability.BoundedGaussian(meanWaitTime, standardDeviation, 0.0, double.MaxValue);
+                int waitTime = (int)Probability.BoundedGaussian(meanWaitTime, stdDev, 0.0, double.MaxValue);
                 return SafeWait(waitTime);
             }
         }
