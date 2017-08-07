@@ -402,6 +402,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// A single iteration. Return false to stop execution.
         /// </summary>
+        /// <returns>false if execution should be stopped</returns>
         protected virtual bool Execute()
         {
             return false;

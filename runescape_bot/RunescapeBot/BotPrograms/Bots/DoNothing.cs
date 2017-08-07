@@ -21,13 +21,9 @@ namespace RunescapeBot.BotPrograms
         /// Wait until the bot is stopped
         /// </summary>
         /// <returns></returns>
-        protected override bool Run()
+        protected override bool Execute()
         {
-            while (!StopFlag && (DateTime.Now < RunParams.RunUntil))
-            {
-                SafeWait(ArbitraryWaitTime);
-            }
-            return !StopFlag;
+            return !SafeWait(ArbitraryWaitTime);
         }
     }
 }
