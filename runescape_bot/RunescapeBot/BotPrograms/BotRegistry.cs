@@ -52,9 +52,7 @@ namespace RunescapeBot.BotPrograms
             [Description("Thieving - Tea Stall")]
             TeaStall,
             [Description("Woodcutting - Willows (drop)")]
-            WillowTrees,
-            [Description("Other - Do Nothing")]
-            DoNothing
+            WillowTrees
         };
 
 
@@ -96,8 +94,6 @@ namespace RunescapeBot.BotPrograms
                     return new Use1On27(runParams, Use1On27.CUT_GEM_TIME);
                 case BotActions.EnchantLevel2:
                     return new Enchant(runParams, 2);
-                case BotActions.DoNothing:
-                    return new DoNothing(runParams);
                 case BotActions.IronOre:
                     return new IronPowerMining(runParams);
             }
