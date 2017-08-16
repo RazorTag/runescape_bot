@@ -1596,7 +1596,7 @@ namespace RunescapeBot.BotPrograms
                     return true;
                 }
                 nextWaitTime = Math.Min(waitInterval, (int)(waitTime - watch.ElapsedMilliseconds));
-                Thread.Sleep(nextWaitTime);
+                Thread.Sleep(Math.Max(0, nextWaitTime));
             }
             return StopFlag;
         }

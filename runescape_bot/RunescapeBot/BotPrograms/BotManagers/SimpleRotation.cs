@@ -37,14 +37,18 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag)
             {
                 if (!NextBot()) { return; }
-                
+
                 timeToRun = RandomWorkTime();
                 CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
 
                 //Don't actually run a bot without login info
                 if (string.IsNullOrEmpty(CurrentRunParams.Login) || string.IsNullOrEmpty(CurrentRunParams.Password))
                 {
+                    CurrentRunParams.ActiveBot.BotState = BotState.Running;
+                    CurrentRunParams.SetNewState(timeToRun);
+                    CurrentRunParams.BotIdle = true;
                     SafeWait(timeToRun);
+                    CurrentRunParams.BotIdle = false;
                 }
                 else
                 {
