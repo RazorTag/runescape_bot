@@ -16,7 +16,6 @@ namespace RunescapeBot.BotPrograms
         private Keyboard Keyboard;
         private Random RNG;
         private Process RSClient;
-        public bool StopFlag { get; set; }
 
         /// <summary>
         /// Inventory slots to be dropped when more space is needed
@@ -64,8 +63,14 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            int x = Screen.GetLength(0) - INVENTORY_TAB_OFFSET_RIGHT;
-            int y = Screen.GetLength(1) - INVENTORY_TAB_OFFSET_BOTTOM;
+            Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
+            
+            if (screenSize == null )
+            {
+                return false;
+            } 
+            int x = screenSize.Value.X - INVENTORY_TAB_OFFSET_RIGHT;
+            int y = screenSize.Value.Y - INVENTORY_TAB_OFFSET_BOTTOM;
             Mouse.LeftClick(x, y, RSClient, 6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Inventory;
@@ -143,7 +148,7 @@ namespace RunescapeBot.BotPrograms
             InventoryToScreen(ref x, ref y);
 
             Point click;
-            const int timeout = 8000;
+            const int timeout = 3000;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             bool done = false;
@@ -151,7 +156,7 @@ namespace RunescapeBot.BotPrograms
 
             while (!done && (watch.ElapsedMilliseconds < timeout))
             {
-                if (StopFlag) { return; }
+                if (BotProgram.StopFlag) { return; }
 
                 click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
                 Mouse.RightClick(click.X, click.Y, RSClient, 0);
@@ -204,7 +209,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     if ((!onlyDropPreviouslyEmptySlots || EmptySlots[x, y]) && !SlotIsEmpty(x, y, false, false))
                     {
-                        if (StopFlag) { return; }
+                        if (BotProgram.StopFlag) { return; }
                         DropItem(x, y, false);
                     }
                 }
@@ -304,7 +309,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             Telegrab(x, y);
-            if (StopFlag) { return false; }
+            if (BotProgram.StopFlag) { return false; }
             Alch(emptySlot.Value.X, emptySlot.Value.Y);
 
             return true;
@@ -387,7 +392,7 @@ namespace RunescapeBot.BotPrograms
                     return inventorySlot;
                 }
 
-                if (StopFlag) { return null; }
+                if (BotProgram.StopFlag) { return null; }
             }
 
             return null;
