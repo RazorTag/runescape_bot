@@ -26,6 +26,9 @@ namespace RunescapeBot.BotPrograms
         protected override bool Run()
         {
             //ReadWindow();
+            //DebugUtilities.SaveImageToFile(Bitmap);
+
+            //ReadWindow();
             //bool[,] furnaceIcon = ColorFilter(FurnaceIconOrange);
             //DebugUtilities.TestMask(Bitmap, ColorArray, FurnaceIconOrange, furnaceIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnaceIcon");
 

@@ -41,7 +41,7 @@ namespace RunescapeBot.FileIO
         public BotSettings()
         {
             directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Roboport";
-            serializer = new XmlSerializer(typeof(RunParams), new Type[] { typeof(PhasmatysRunParams) });
+            serializer = new XmlSerializer(typeof(RunParams), new Type[] { typeof(RotationRunParams), typeof(PhasmatysRunParams) });
         }
 
         /// <summary>
@@ -85,6 +85,7 @@ namespace RunescapeBot.FileIO
             bool success = false;
             Stream stream = null;
             XmlDocument document = new XmlDocument();
+            SanitizeRunParams(runParams);
 
             try
             {
@@ -102,6 +103,34 @@ namespace RunescapeBot.FileIO
                 stream.Close();
             }
             return success;
+        }
+
+        /// <summary>
+        /// Removes data that should not be serialized
+        /// </summary>
+        /// <param name="runParams"></param>
+        private void SanitizeRunParams(RunParams runParams)
+        {
+            if (runParams != null)
+            {
+                if (runParams.RotationParams != null)
+                {
+                    for (int i = 0; i < runParams.RotationParams.Count; i++)
+                    {
+                        runParams.RotationParams.ParamsList[i].RotationParams = null;
+                        runParams.RotationParams.ParamsList[i].PhasmatysParams = null;
+                    }
+                }
+
+                if (runParams.PhasmatysParams != null)
+                {
+                    for (int i = 0; i < runParams.PhasmatysParams.Count; i++)
+                    {
+                        runParams.PhasmatysParams.ParamsList[i].RotationParams = null;
+                        runParams.PhasmatysParams.ParamsList[i].PhasmatysParams = null;
+                    }
+                }
+            }
         }
     }
 }

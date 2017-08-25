@@ -155,7 +155,7 @@ namespace RunescapeBot
             JagexClientLocation.Text = RunParams.JagexClient;
             OSBuddyClientLocation.Text = RunParams.OSBuddyClient;
             BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
-            Iterations.Value = RunParams.Iterations;
+            Iterations.Value = Math.Max(0, RunParams.Iterations);
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace RunescapeBot
         /// <returns></returns>
         private RunParams CollectRotationSettings()
         {
-            RunParams rotationParams = new RunParams();
+            RunParams rotationParams = new RotationRunParams();
             rotationParams.BotName = RotationBotSelector.Text;
             rotationParams.Login = RotationLogin.Text;
             rotationParams.Password = RotationPassword.Text;
@@ -315,7 +315,7 @@ namespace RunescapeBot
             RotationLogin.Text = settings.Login;
             RotationPassword.Text = settings.Password;
             RotationBotActionSelect.SelectedIndex = (int)settings.BotAction;
-            RotationIterations.Value = settings.Iterations;
+            RotationIterations.Value = Math.Max(0, settings.Iterations);
         }
 
         /// <summary>
@@ -328,7 +328,7 @@ namespace RunescapeBot
             PhasmatysPassword.Text = settings.Password;
             GoldBars.Value = settings.GoldBars;
             SteelBars.Value = settings.SteelBars;
-            Bows.Value = settings.Bows;
+            Bows.Value = Math.Max(0, settings.Bows);
         }
 
         /// <summary>
@@ -662,7 +662,7 @@ namespace RunescapeBot
         }
 
         /// <summary>
-        /// Saves the currently selected Phasmatys bot
+        /// Saves the currently selected rotation bot
         /// </summary>
         private void SaveRotationBot()
         {

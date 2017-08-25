@@ -56,7 +56,7 @@ namespace RunescapeBot.BotPrograms
             RotationParams = new RunParamsList(SimpleRotation.NUMBER_OF_BOTS, RunUntil);
             for (int i = 0; i < RotationParams.Count; i++)
             {
-                RotationParams.ParamsList[i] = new RunParams(false);
+                RotationParams.ParamsList[i] = new RotationRunParams();
             }
         }
 

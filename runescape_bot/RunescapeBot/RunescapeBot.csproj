@@ -115,6 +115,7 @@
     <Compile Include="BotPrograms\Popups\RightClick.cs" />
     <Compile Include="BotPrograms\BotUtilities.cs" />
     <Compile Include="BotPrograms\RunParams\PhasmatysRunParams.cs" />
+    <Compile Include="BotPrograms\RunParams\RotationRunParams.cs" />
     <Compile Include="BotPrograms\RunParams\RunParamsList.cs" />
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Line.cs" />

@@ -222,7 +222,7 @@ namespace RunescapeBot.BotPrograms
         {
             StopFlag = false;
             BotIsDone = false;
-            LastBotWorldCheck = DateTime.Now;
+            LastBotWorldCheck = DateTime.MinValue;
             RunThread = new Thread(Process);
             RunThread.Start();
         }
@@ -358,8 +358,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
                 iterationWatch.Restart();
-                if (!ReadWindow()) { continue; }   //Read the game window color values into Bitmap and ColorArray
-                if (BotWorldCheck()) { continue; }   //We had to switch out of a bot world
+                if (!ReadWindow() || BotWorldCheck()) { continue; }   //We had to switch out of a bot world
 
                 //Only do the actual botting if we are logged in
                 if (CheckLogIn())
@@ -1121,7 +1120,7 @@ namespace RunescapeBot.BotPrograms
                 LeftClick(center + 16 + loginOffset.X, 288 + loginOffset.Y);
 
                 //fill in login
-                LeftClick(center + 137 + loginOffset.X, 255 + loginOffset.Y);
+                LeftClick(center + 137 + loginOffset.X, 249 + loginOffset.Y);
                 Keyboard.Backspace(350);
                 Keyboard.WriteLine(RunParams.Login);
 
@@ -1350,7 +1349,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we attempt to change worlds</returns>
         protected bool BotWorldCheck(bool readWindow = false)
         {
-            if (LastBotWorldCheck > DateTime.Now) { LastBotWorldCheck = DateTime.Now; }
+            if (LastBotWorldCheck > DateTime.Now)
+            {
+                LastBotWorldCheck = DateTime.MinValue;
+            }
+
             long timeSinceLastBotWorldCheck = (long) (DateTime.Now - LastBotWorldCheck).TotalMilliseconds;
             if (timeSinceLastBotWorldCheck < RunParams.BotWorldCheckInterval)
             {

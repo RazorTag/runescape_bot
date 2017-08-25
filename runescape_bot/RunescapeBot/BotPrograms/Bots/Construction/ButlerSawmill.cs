@@ -10,7 +10,13 @@ namespace RunescapeBot.BotPrograms.Bots.Construction
     {
         public ButlerSawmill(RunParams startParams) : base(startParams)
         {
+            RunParams.Run = true;
+        }
 
+
+        protected override bool Execute()
+        {
+            return true;
         }
     }
 }
