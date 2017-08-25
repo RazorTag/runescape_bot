@@ -13,13 +13,15 @@ namespace RunescapeBot.BotPrograms
         //protected int TreeTextChars;
         //protected int TreeTextWidth;
         //protected List<Blob> Trees;
-        RGBHSBRange ironFilter = RGBHSBRangeFactory.IronRock();
+        RGBHSBRange IronFilter = RGBHSBRangeFactory.IronRock();
+        int minIronBlobPxSize; 
 
 
         public IronPowerMining(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
             RunParams.FrameTime = 1000;
+            minIronBlobPxSize = ArtifactSize(0.00025);
         }
 
         /// <summary>
@@ -27,9 +29,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected override bool Run()
         {
-            ReadWindow();
-            bool[,] bankBooth = ColorFilter(ironFilter);
-            DebugUtilities.TestMask(Bitmap, ColorArray, ironFilter, bankBooth, "C:\\Users\\markq\\Documents\\runescape_bot\\training_pictures\\ironore\\", "ironRockPic");
+            //ReadWindow();
+            //bool[,] bankBooth = ColorFilter(ironFilter);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, ironFilter, bankBooth, "C:\\Users\\markq\\Documents\\runescape_bot\\training_pictures\\ironore\\", "ironRockPic");
 
             Inventory.SetEmptySlots(); // this tells the inv to record which spots are empty
             return true;
@@ -42,15 +44,16 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             ReadWindow();
-            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 1))
+            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 2))
             {
                 Inventory.DropInventory();
             }
             else {
-                Blob rockLocation = LocateUnminedOre();
+                Blob rockLocation = StationaryLocateUnminedOre();
                 if (rockLocation != null) {
                     Point rockPoint = (Point)rockLocation.RandomBlobPixel();
                     LeftClick(rockPoint.X, rockPoint.Y);
+                    SafeWaitPlus(700, 500);
                 }
             }
             return true;
@@ -60,12 +63,28 @@ namespace RunescapeBot.BotPrograms
         /// Find all of the unmined iron ores on the screen and sorts them by proximity to the player
         /// </summary>
         /// <returns>true if any ores are located</returns>
-        protected Blob LocateUnminedOre()
+        protected Blob StationaryLocateUnminedOre()
+        {
+            Blob rockLocation;
+            if (LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, LocateUnminedOre))
+            {
+
+            }
+            //Blob rockLocation = ImageProcessing.ClosestBlob(ironBoolArray, Center, 3);
+            // 51 px 
+            // 692 height 
+            // (51/692)^2 
+            // 0.00010650205
+            return rockLocation;
+        }
+
+                    
+        protected bool LocateUnminedOre(RGBHSBRange ironFilter, out Blob foundObject, int minimumSize)
         {
             ReadWindow();
             bool[,] ironBoolArray = ColorFilter(ironFilter);
-            Blob rockLocation = ImageProcessing.ClosestBlob(ironBoolArray, Center, 3);
-            return rockLocation;
+            foundObject = ImageProcessing.ClosestBlob(ironBoolArray, Center, minimumSize);
+            return foundObject != null;
         }
     }
 }

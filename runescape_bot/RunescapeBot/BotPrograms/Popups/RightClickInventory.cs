@@ -27,7 +27,7 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             Height = 82;
             if (ExtraOptions != null) { Height += (ROW_HEIGHT * ExtraOptions.Length); }
-            Width = 136;    //TODO dynamically calculate width since different items produce different widths
+            Width = 100;    //TODO dynamically calculate width since different items produce different widths
         }
 
         /// <summary>
