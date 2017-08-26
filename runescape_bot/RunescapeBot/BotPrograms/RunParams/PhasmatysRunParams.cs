@@ -52,8 +52,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Number of gold bars remaining
         /// </summary>
-        public int GoldBars { get;
-            set; }
+        public int GoldBars { get; set; }
 
         /// <summary>
         /// Number of steel bars remaining
@@ -70,6 +69,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public enum ActiveProperty : int
         {
+            None,
             GoldBars,
             SteelBars,
             Bows
@@ -79,6 +79,18 @@ namespace RunescapeBot.BotPrograms
         /// The resource being used by the active bot
         /// </summary>
         [XmlIgnore]
-        public ActiveProperty Resource { get; set; }
+        public ActiveProperty Resource
+        {
+            get
+            {
+                switch (BotAction)
+                {
+                    case BotRegistry.BotActions.GoldBracelets: return ActiveProperty.GoldBars;
+                    case BotRegistry.BotActions.Cannonballs: return ActiveProperty.SteelBars;
+                    case BotRegistry.BotActions.StringBows: return ActiveProperty.Bows;
+                    default: return ActiveProperty.None;
+                }
+            }
+        }
     }
 }

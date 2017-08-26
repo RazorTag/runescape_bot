@@ -342,7 +342,6 @@ namespace RunescapeBot
             SetActiveState(startButton);
             RunningBot.Start();
             UpdateTimer.Enabled = true;
-            SaveBot();
         }
 
         /// <summary>
