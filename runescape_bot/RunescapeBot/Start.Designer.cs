@@ -35,7 +35,6 @@ namespace RunescapeBot
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Start));
-            this.GlobalEventProvider = new RunescapeBot.GMA.GlobalEventProvider();
             this.FileSelect = new System.Windows.Forms.OpenFileDialog();
             this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.BotManagerType = new System.Windows.Forms.TabControl();
@@ -59,6 +58,7 @@ namespace RunescapeBot
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.RotationManager = new System.Windows.Forms.TabPage();
+            this.QuickLogin = new System.Windows.Forms.Button();
             this.RotationBotSelector = new System.Windows.Forms.ComboBox();
             this.label19 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -72,6 +72,7 @@ namespace RunescapeBot
             this.label17 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
             this.PhasmatysManager = new System.Windows.Forms.TabPage();
+            this.QuickLogInPhasmatys = new System.Windows.Forms.Button();
             this.PhasmatysLogin = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.Bows = new System.Windows.Forms.NumericUpDown();
@@ -86,6 +87,7 @@ namespace RunescapeBot
             this.label11 = new System.Windows.Forms.Label();
             this.PhasmatysPassword = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
+            this.GlobalEventProvider = new RunescapeBot.GMA.GlobalEventProvider();
             this.runParamsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.BotManagerType.SuspendLayout();
             this.SoloBot.SuspendLayout();
@@ -98,10 +100,6 @@ namespace RunescapeBot
             ((System.ComponentModel.ISupportInitialize)(this.SteelBars)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.runParamsBindingSource)).BeginInit();
             this.SuspendLayout();
-            // 
-            // GlobalEventProvider
-            // 
-            this.GlobalEventProvider.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GlobalEventProvider_KeyPress);
             // 
             // UpdateTimer
             // 
@@ -330,6 +328,7 @@ namespace RunescapeBot
             // 
             // RotationManager
             // 
+            this.RotationManager.Controls.Add(this.QuickLogin);
             this.RotationManager.Controls.Add(this.RotationBotSelector);
             this.RotationManager.Controls.Add(this.label19);
             this.RotationManager.Controls.Add(this.textBox1);
@@ -349,13 +348,24 @@ namespace RunescapeBot
             this.RotationManager.Text = "Rotation";
             this.RotationManager.UseVisualStyleBackColor = true;
             // 
+            // QuickLogin
+            // 
+            this.QuickLogin.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.QuickLogin.Location = new System.Drawing.Point(404, 31);
+            this.QuickLogin.Name = "QuickLogin";
+            this.QuickLogin.Size = new System.Drawing.Size(58, 28);
+            this.QuickLogin.TabIndex = 12;
+            this.QuickLogin.Text = "Log In";
+            this.QuickLogin.UseVisualStyleBackColor = true;
+            this.QuickLogin.Click += new System.EventHandler(this.QuickLogin_Click);
+            // 
             // RotationBotSelector
             // 
             this.RotationBotSelector.FormattingEnabled = true;
             this.RotationBotSelector.Location = new System.Drawing.Point(89, 31);
             this.RotationBotSelector.MaxDropDownItems = 3;
             this.RotationBotSelector.Name = "RotationBotSelector";
-            this.RotationBotSelector.Size = new System.Drawing.Size(373, 28);
+            this.RotationBotSelector.Size = new System.Drawing.Size(309, 28);
             this.RotationBotSelector.TabIndex = 11;
             this.RotationBotSelector.SelectionChangeCommitted += new System.EventHandler(this.RotationBotSelector_SelectionChangeCommitted);
             // 
@@ -381,7 +391,7 @@ namespace RunescapeBot
             // 
             // RotationStart
             // 
-            this.RotationStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RotationStart.Font = new System.Drawing.Font("Arial Narrow", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RotationStart.Location = new System.Drawing.Point(171, 292);
             this.RotationStart.Name = "RotationStart";
             this.RotationStart.Size = new System.Drawing.Size(125, 55);
@@ -472,6 +482,7 @@ namespace RunescapeBot
             // 
             // PhasmatysManager
             // 
+            this.PhasmatysManager.Controls.Add(this.QuickLogInPhasmatys);
             this.PhasmatysManager.Controls.Add(this.PhasmatysLogin);
             this.PhasmatysManager.Controls.Add(this.label10);
             this.PhasmatysManager.Controls.Add(this.Bows);
@@ -493,6 +504,17 @@ namespace RunescapeBot
             this.PhasmatysManager.TabIndex = 1;
             this.PhasmatysManager.Text = "Phasmatys";
             this.PhasmatysManager.UseVisualStyleBackColor = true;
+            // 
+            // QuickLogInPhasmatys
+            // 
+            this.QuickLogInPhasmatys.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.QuickLogInPhasmatys.Location = new System.Drawing.Point(400, 16);
+            this.QuickLogInPhasmatys.Name = "QuickLogInPhasmatys";
+            this.QuickLogInPhasmatys.Size = new System.Drawing.Size(61, 28);
+            this.QuickLogInPhasmatys.TabIndex = 18;
+            this.QuickLogInPhasmatys.Text = "Log In";
+            this.QuickLogInPhasmatys.UseVisualStyleBackColor = true;
+            this.QuickLogInPhasmatys.Click += new System.EventHandler(this.QuickLogInPhasmatys_Click);
             // 
             // PhasmatysLogin
             // 
@@ -605,10 +627,10 @@ namespace RunescapeBot
             // PhasmatysBotSelector
             // 
             this.PhasmatysBotSelector.FormattingEnabled = true;
-            this.PhasmatysBotSelector.Location = new System.Drawing.Point(88, 12);
+            this.PhasmatysBotSelector.Location = new System.Drawing.Point(88, 16);
             this.PhasmatysBotSelector.MaxDropDownItems = 3;
             this.PhasmatysBotSelector.Name = "PhasmatysBotSelector";
-            this.PhasmatysBotSelector.Size = new System.Drawing.Size(373, 28);
+            this.PhasmatysBotSelector.Size = new System.Drawing.Size(306, 28);
             this.PhasmatysBotSelector.TabIndex = 17;
             this.PhasmatysBotSelector.SelectionChangeCommitted += new System.EventHandler(this.PhasmatysBotSelector_SelectionChangeCommitted);
             // 
@@ -640,6 +662,10 @@ namespace RunescapeBot
             this.label12.Size = new System.Drawing.Size(82, 18);
             this.label12.TabIndex = 33;
             this.label12.Text = "Password:";
+            // 
+            // GlobalEventProvider
+            // 
+            this.GlobalEventProvider.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.GlobalEventProvider_KeyPress);
             // 
             // runParamsBindingSource
             // 
@@ -730,6 +756,8 @@ namespace RunescapeBot
         private System.Windows.Forms.TextBox RotationLogin;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Button QuickLogin;
+        private System.Windows.Forms.Button QuickLogInPhasmatys;
     }
 }
 

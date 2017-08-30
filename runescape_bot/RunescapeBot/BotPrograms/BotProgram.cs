@@ -213,6 +213,7 @@ namespace RunescapeBot.BotPrograms
             Keyboard = new Keyboard(RSClient);
             Inventory = new Inventory(RSClient, ColorArray, Keyboard);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
+            RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
         }
        
         /// <summary>
@@ -1065,7 +1066,7 @@ namespace RunescapeBot.BotPrograms
         /// If the bot does not have valid login information, then it will quit.
         /// </summary>
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
-        private bool CheckLogIn()
+        protected virtual bool CheckLogIn()
         { 
             if (!IsLoggedOut())
             {
@@ -1107,7 +1108,7 @@ namespace RunescapeBot.BotPrograms
         /// Tries to log in.
         /// </summary>
         /// <returns>true if login is successful, false if login fails</returns>
-        private bool LogIn()
+        protected bool LogIn()
         {
             Point? clickLocation;
             Point loginOffset = LoginScreenOffset();
@@ -1649,8 +1650,16 @@ namespace RunescapeBot.BotPrograms
         {
             int compassX = ScreenWidth - 159;
             int compassY = 21;
-            LeftClick(compassX, compassY);
-            Keyboard.UpArrow(1500);
+
+            switch (RunParams.DefaultCameraPosition)
+            {
+                case RunParams.CameraPosition.AsIs:
+                    break;
+                case RunParams.CameraPosition.NorthAerial:
+                    LeftClick(compassX, compassY);
+                    Keyboard.UpArrow(1500);
+                    break;
+            }
         }
 
         /// <summary>

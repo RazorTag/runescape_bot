@@ -52,17 +52,32 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Number of gold bars remaining
         /// </summary>
-        public int GoldBars { get; set; }
+        public int GoldBars
+        {
+            get { return goldBars; }
+            set { goldBars = Math.Max(0, value); }
+        }
+        private int goldBars;
 
         /// <summary>
         /// Number of steel bars remaining
         /// </summary>
-        public int SteelBars { get; set; }
+        public int SteelBars
+        {
+            get { return steelBars; }
+            set { steelBars = Math.Max(0, value); }
+        }
+        private int steelBars;
 
         /// <summary>
         /// Number of unstrung bows remaining
         /// </summary>
-        public int Bows { get; set; }
+        public int Bows
+        {
+            get { return bows; }
+            set { bows = Math.Max(0, value); }
+        }
+        private int bows;
 
         /// <summary>
         /// List of resources that Phasmatys bots can use

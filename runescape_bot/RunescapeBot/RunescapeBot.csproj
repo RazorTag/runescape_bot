@@ -95,6 +95,7 @@
     <Compile Include="BotPrograms\Bots\BankStanding\UnfinishedPotions.cs" />
     <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
     <Compile Include="BotPrograms\Bots\Construction\ButlerSawmill.cs" />
+    <Compile Include="BotPrograms\Bots\LogIn.cs" />
     <Compile Include="BotPrograms\Bots\Mining\IronPowerMining.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use1On27.cs" />

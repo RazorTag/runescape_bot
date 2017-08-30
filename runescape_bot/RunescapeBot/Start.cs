@@ -565,7 +565,7 @@ namespace RunescapeBot
                     WritePhasmatysSettings();
                     break;
                 default:
-                    Iterations.Value = RunParams.ActiveBot.Iterations;
+                    Iterations.Value = Math.Max(0, RunParams.ActiveBot.Iterations);
                     break;
             }
         }
@@ -699,6 +699,47 @@ namespace RunescapeBot
         {
             SaveRotationBot();
             WriteRotationSettings();
+        }
+
+        /// <summary>
+        /// Logs into the game using the current login details from the standard rotation form
+        /// </summary>
+        /// <param name="sender">not used</param>
+        /// <param name="e">not used</param>
+        private void QuickLogin_Click(object sender, EventArgs e)
+        {
+            RotationLogIn(RunParams.RotationParams, RotationBotSelection, RotationStart);
+        }
+
+        /// <summary>
+        /// Logs into the game using the current login details from the Phasmatys rotation form
+        /// </summary>
+        /// <param name="sender">not used</param>
+        /// <param name="e">not used</param>
+        private void QuickLogInPhasmatys_Click(object sender, EventArgs e)
+        {
+            RotationLogIn(RunParams.PhasmatysParams, PhasmatysBotSelection, PhasmatysStartButton);
+        }
+
+        /// <summary>
+        /// Logs in to for the selected bot on a rotation tab
+        /// </summary>
+        /// <param name="rotationList">rotation tab to use</param>
+        /// <param name="botSelection">selected bot on the rotation tab</param>
+        /// <param name="startButton">reference to the start button used for this tab</param>
+        private void RotationLogIn(RunParamsList rotationList, int botSelection, Button startButton)
+        {
+            CollectStartParams();
+            if (rotationList == null || !Numerical.WithinBounds(botSelection, 0, RunParams.PhasmatysParams.Count - 1))
+            {
+                return;
+            }
+
+            rotationList[botSelection].TaskComplete = new BotResponse(BotDone);
+            RunningBot = new LogInToGame(rotationList[botSelection]);
+            RunningBot.Start();
+            SetActiveState(startButton);
+            UpdateTimer.Enabled = true;
         }
     }
 }

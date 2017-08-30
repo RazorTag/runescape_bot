@@ -19,6 +19,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public enum BotActions : int
         {
+            [Description("Log In")]
+            Login,
             [Description("Agility - Gnome Stronghold")]
             AgilityGnomeStronghold,
             [Description("Agility - Seers' Village")]
@@ -62,6 +64,8 @@ namespace RunescapeBot.BotPrograms
 
             switch (runParams.BotAction)
             {
+                case BotActions.Login:
+                    return new LogInToGame(runParams);
                 case BotActions.LesserDemon:
                     return new LesserDemon(runParams);
                 case BotActions.LesserDemonSimple:

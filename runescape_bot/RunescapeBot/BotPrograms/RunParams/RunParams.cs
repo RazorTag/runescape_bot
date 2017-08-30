@@ -262,6 +262,18 @@ namespace RunescapeBot.BotPrograms
         public bool SlaveDriver { get; set; }
 
         /// <summary>
+        /// How to set the camera after logging in
+        /// </summary>
+        [XmlIgnore]
+        public CameraPosition DefaultCameraPosition { get; set; }
+
+        public enum CameraPosition : int
+        {
+            AsIs,
+            NorthAerial
+        }
+
+        /// <summary>
         /// Indicates which tab is currently running a bot
         /// Set to -1 if no bot is running
         /// </summary>
