@@ -182,7 +182,7 @@ namespace RunescapeBot.Common
                     return i;
                 }
             }
-            return -1;   //Should never be hit.
+            return -1;   //All of the weights are 0
         }
     }
 }

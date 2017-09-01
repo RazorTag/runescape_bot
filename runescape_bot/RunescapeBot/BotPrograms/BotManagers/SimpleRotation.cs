@@ -36,7 +36,10 @@ namespace RunescapeBot.BotPrograms
 
             while (!StopFlag)
             {
-                if (!NextBot()) { return; }
+                if (!NextBot())
+                {
+                    return;
+                }
 
                 timeToRun = RandomWorkTime();
                 CurrentRunParams.RunUntil = DateTime.Now.AddMilliseconds(timeToRun);
@@ -82,14 +85,18 @@ namespace RunescapeBot.BotPrograms
             do {
                 nextBot = RNG.Next(0, BotParamsList.Count);
             } while (nextBot == BotParamsList.ActiveBot);
-
             BotParamsList.ActiveBot = nextBot;
-            if (!SelectBotAction())
+
+            if (SelectBotAction())
             {
-                return false;
+                CurrentBot = BotRegistry.GetSelectedBot(CurrentRunParams);
+                CurrentBot.LogoutWhenDone = true;
             }
-            CurrentBot = BotRegistry.GetSelectedBot(CurrentRunParams);
-            CurrentBot.LogoutWhenDone = true;
+            else
+            {
+                CurrentBot = null;
+            }
+            
             return true;
         }
 

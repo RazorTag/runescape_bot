@@ -254,7 +254,10 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void ManageBot()
         {
-            Run();
+            if (!Run())
+            {
+                return;
+            }
 
             if (RunParams.SlaveDriver)
             {

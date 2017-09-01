@@ -24,6 +24,9 @@ namespace RunescapeBot.BotPrograms
             int botAction = Probability.ChooseFromWeights(weights);
             switch(botAction)
             {
+                case -1:
+                    CurrentRunParams.BotAction = BotRegistry.BotActions.DoNothing;
+                    break;
                 case 0:
                     CurrentRunParams.BotAction = BotRegistry.BotActions.GoldBracelets;
                     break;
