@@ -16,12 +16,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>returns false to stop the bot program</returns>
         protected override bool Run()
         {
-            const int arbitraryWaitTime = 5000; //5000 ms
-
-            while (!StopFlag && (DateTime.Now < RunParams.RunUntil))
-            {
-                SafeWait(arbitraryWaitTime);
-            }
+            RunParams.ActiveBot.BotState = BotState.Running;
+            int timeToRun = (int)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds;
+            RunParams.SetNewState(timeToRun);
+            RunParams.BotIdle = true;
+            SafeWait(timeToRun);
+            RunParams.BotIdle = false;
 
             return false;
         }

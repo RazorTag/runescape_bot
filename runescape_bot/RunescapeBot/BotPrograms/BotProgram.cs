@@ -1313,7 +1313,7 @@ namespace RunescapeBot.BotPrograms
                 totalPixels++;
             }
             //assume we are logged out if a majority off the border pixels are perfectly black
-            if ((blackPixels / ((double)totalPixels)) < 0.5)
+            if ((blackPixels / ((double)totalPixels)) < 0.25)
             {
                 return false;
             }
@@ -1323,8 +1323,9 @@ namespace RunescapeBot.BotPrograms
             int right = left + 444;
             int bottom = top + 160;
             long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
-            return Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01);
+            return Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01) || Numerical.CloseEnough(LOGIN_LOGO_ALT, colorSum, 0.01);
         }
+        const int LOGIN_LOGO_ALT = 15821488;
 
         /// <summary>
         /// Logs out of the game

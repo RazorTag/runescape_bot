@@ -331,7 +331,9 @@ namespace RunescapeBot.ImageTools
         /// <returns>true if successful</returns>
         public static bool RestartClient(ref Process client, string clientFilePath, string arguments)
         {
-            return CloseClient(ref client) && StartClient(ref client, clientFilePath, arguments);
+            CloseClient(ref client);
+            CloseErrorWindows();
+            return StartClient(ref client, clientFilePath, arguments);
         }
 
         /// <summary>
@@ -343,10 +345,7 @@ namespace RunescapeBot.ImageTools
         {
             if (ProcessExists(client))
             {
-                if (!client.CloseMainWindow())
-                {
-                    return false;   //unable to close the current instance of the RuneScape client
-                }
+                client.Close();
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
@@ -364,6 +363,25 @@ namespace RunescapeBot.ImageTools
             client = null;
             ClientType = Client.None;
             return true;
+        }
+
+        /// <summary>
+        /// Closes error windows
+        /// </summary>
+        private static void CloseErrorWindows()
+        {
+            const string windowName = "ERROR";
+            string mainWindowTitle;
+            Process[] processlist = Process.GetProcesses();
+
+            foreach (Process process in processlist)
+            {
+                mainWindowTitle = process.MainWindowTitle.ToUpper();
+                if (mainWindowTitle.Contains(windowName))
+                {
+                    process.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -411,8 +429,7 @@ namespace RunescapeBot.ImageTools
 
             foreach (Process process in processlist)
             {
-                if (IsJagex(process)
-                    || IsOSBuddy(process))
+                if (IsJagex(process) || IsOSBuddy(process))
                 {
                     return process;
                 }

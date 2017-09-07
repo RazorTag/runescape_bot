@@ -22,6 +22,7 @@ namespace RunescapeBot.BotPrograms
             double bowTime = ((PhasmatysRunParams)CurrentRunParams).Bows * GoldBracelets.SINGLE_CRAFTING_TIME;
             List<double> weights = new List<double>() { goldBarTime, steelBarTime, bowTime };
             int botAction = Probability.ChooseFromWeights(weights);
+
             switch(botAction)
             {
                 case -1:
