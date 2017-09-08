@@ -351,6 +351,8 @@ namespace RunescapeBot.BotPrograms
                 randomFrameOffset = 0;
             }
 
+            ScreenScraper.BringToForeGround(RSClient);
+            SafeWait(1000); //give the client time to show up on screen
             RunParams.BotState = BotState.Running;
             long workInterval = RunParams.SlaveDriver ? (int)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds : RandomWorkTime();
             RunParams.SetNewState(workInterval);
@@ -1318,11 +1320,24 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
+            //check for "Welcome to RuneScape" yellow text
+            int topWelcome = top + 241;
+            int bottomWelcome = topWelcome + 13;
+            int leftWelcome = Center.X - 75;
+            int rightWelcome = leftWelcome + 146;
+            bool[,] welcomeText = ColorFilterPiece(RGBHSBRangeFactory.Yellow(), leftWelcome, rightWelcome, topWelcome, bottomWelcome);
+            double welcomeMatch = ImageProcessing.FractionalMatch(welcomeText);
+            if (welcomeMatch > 0.2)
+            {
+                return true;
+            }
+
             //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
-            int left = Center.X - 224 + loginOffset.X;
-            int right = left + 444;
-            int bottom = top + 160;
-            long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
+            int topLogo = top;
+            int leftLogo = Center.X - 224 + loginOffset.X;
+            int rightLogo = leftLogo + 444;
+            int bottomLogo = topLogo + 160;
+            long colorSum = ImageProcessing.ColorSum(ScreenPiece(leftLogo, rightLogo, topLogo, bottomLogo));
             return Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01) || Numerical.CloseEnough(LOGIN_LOGO_ALT, colorSum, 0.01);
         }
         const int LOGIN_LOGO_ALT = 15821488;
@@ -1351,24 +1366,23 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Changes world if logged into a bot world
         /// </summary>
-        /// <returns>true if we attempt to change worlds</returns>
+        /// <returns>true if we detect a bot world and attempt to change worlds</returns>
         protected bool BotWorldCheck(bool readWindow = false)
         {
+            //just in case the last bot world check time is erroneously set to some future date
             if (LastBotWorldCheck > DateTime.Now)
             {
                 LastBotWorldCheck = DateTime.MinValue;
             }
 
+            //only check the bot world if we haven't checked recently
             long timeSinceLastBotWorldCheck = (long) (DateTime.Now - LastBotWorldCheck).TotalMilliseconds;
             if (timeSinceLastBotWorldCheck < RunParams.BotWorldCheckInterval)
             {
                 return false;
             }
-            else
-            {
-                LastBotWorldCheck = DateTime.Now;
-            }
 
+            //restart client if set to a bot world
             if (IsLoggedOut(readWindow))
             {
                 if (LoginSetForBotWorld(false))
@@ -1386,6 +1400,10 @@ namespace RunescapeBot.BotPrograms
                     return true;
                 }
             }
+
+            //update the last bot world check time only if we verify that we aren't on a bot world
+            //This ensures that restarting the client to a bot world does not allow you to log into a bot world.
+            LastBotWorldCheck = DateTime.Now;
             return false;
         }
 

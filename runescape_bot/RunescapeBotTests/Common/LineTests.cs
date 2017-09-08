@@ -74,8 +74,8 @@ namespace RunescapeBot.Common.Tests
 
         [TestMethod()]
         [DataRow(0, 0, 0, 0, 0, 0, 0)]
-        [DataRow(0, 0, 2, 0, 0.5, 1, 0)]
-        [DataRow(524, 30, -34, 509, 0.1, 468, 78)]
+        [DataRow(0, 0, 2, 0, 1, 1, 0)]
+        [DataRow(524, 30, -34, 509, 10, 516, 37)]
         public void OffsetFromStartTest(int ax, int ay, int bx, int by, double offset, int cx, int cy)
         {
             Point expected = new Point(cx, cy);
@@ -86,8 +86,8 @@ namespace RunescapeBot.Common.Tests
 
         [TestMethod()]
         [DataRow(0, 0, 0, 0, 0, 0, 0)]
-        [DataRow(0, 0, 2, 0, 0.5, 1, 0)]
-        [DataRow(524, 30, -34, 509, 0.1, 22, 461)]
+        [DataRow(0, 0, 2, 0, 1, 1, 0)]
+        [DataRow(524, 30, -34, 509, 10, -26, 502)]
         public void OffsetFromEndTest(int ax, int ay, int bx, int by, double offset, int cx, int cy)
         {
             Point expected = new Point(cx, cy);
@@ -98,8 +98,8 @@ namespace RunescapeBot.Common.Tests
 
         [TestMethod()]
         [DataRow(0, 0, 0, 0, 0, 0, 0)]
-        [DataRow(0, 0, 2, 0, 0.5, 1, 0)]
-        [DataRow(524, 30, -34, 509, 0.1, 468, 78)]
+        [DataRow(0, 0, 2, 0, 1, 1, 0)]
+        [DataRow(524, 30, -34, 509, 10, 516, 37)]
         public void DirectionalOffsetTest(int ax, int ay, int bx, int by, double offset, int cx, int cy)
         {
             Point start = new Point(ax, ay);

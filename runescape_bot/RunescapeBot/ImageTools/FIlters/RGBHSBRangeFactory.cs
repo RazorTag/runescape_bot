@@ -418,8 +418,18 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(0, 0, 0);
-            HSBRange hsbRange = null;
-            return new RGBHSBRange(dark, light, hsbRange);
+            return new RGBHSBRange(dark, light, null);
+        }
+
+        /// <summary>
+        /// Perfect yellow
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange Yellow()
+        {
+            Color dark = Color.FromArgb(255, 255, 0);
+            Color light = Color.FromArgb(255, 255, 0);
+            return new RGBHSBRange(dark, light, null);
         }
 
         #endregion

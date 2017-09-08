@@ -71,14 +71,15 @@ namespace RunescapeBot.Common
         /// <param name="startPoint">the point to begin moving from</param>
         /// <param name="endPoint">defines the direction to move in</param>
         /// <returns>the point we ended up at after moving a specified distance from the start point toward the end point</returns>
-        public Point DirectionalOffset(double offset, Point startPoint, Point endPoint)
+        public static Point DirectionalOffset(double offset, Point startPoint, Point endPoint)
         {
             if (startPoint.Equals(endPoint)) { return startPoint; }
 
             double rise = endPoint.Y - startPoint.Y;
             double run = endPoint.X - startPoint.X;
-            double x = startPoint.X + (offset * (run / Length));
-            double y = startPoint.Y + (offset * (rise / Length));
+            double length = Geometry.DistanceBetweenPoints(startPoint, endPoint);
+            double x = startPoint.X + (offset * (run / length));
+            double y = startPoint.Y + (offset * (rise / length));
             return new Point((int)Math.Round(x), (int)Math.Round(y));
         }
 
