@@ -317,6 +317,18 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Catches most of the colors found in the opaque background of the inventory
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange InventorySlotWindows10Watermark()
+        {
+            Color dark = Color.FromArgb(56, 48, 35);
+            Color light = Color.FromArgb(151, 149, 146);
+            HSBRange hsbRange = new HSBRange(18, 42, 0.000f, 0.25f, 0.15f, 0.700f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// The orange current world text
         /// </summary>
         /// <returns></returns>

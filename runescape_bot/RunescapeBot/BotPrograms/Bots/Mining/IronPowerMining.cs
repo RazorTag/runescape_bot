@@ -32,6 +32,10 @@ namespace RunescapeBot.BotPrograms
             //bool[,] bankBooth = ColorFilter(ironFilter);
             //DebugUtilities.TestMask(Bitmap, ColorArray, ironFilter, bankBooth, "C:\\Users\\markq\\Documents\\runescape_bot\\training_pictures\\ironore\\", "ironRockPic");
 
+            //ReadWindow();
+            //bool[,] bankBooth = ColorFilter(RGBHSBRangeFactory.EmptyInventorySlot());
+            //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.EmptyInventorySlot(), bankBooth);
+
             return true;
         }
 
@@ -82,7 +86,13 @@ namespace RunescapeBot.BotPrograms
             return rockLocation;
         }
 
-                    
+        /// <summary>
+        /// Locates the closest unmined iron ore
+        /// </summary>
+        /// <param name="ironFilter"></param>
+        /// <param name="foundObject"></param>
+        /// <param name="minimumSize"></param>
+        /// <returns>true if an ore rock is found</returns>
         protected bool LocateUnminedOre(RGBHSBRange ironFilter, out Blob foundObject, int minimumSize)
         {
             ReadWindow();

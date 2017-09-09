@@ -187,10 +187,7 @@ namespace RunescapeBot.BotPrograms
             {
                 for (int y = 0; y < INVENTORY_ROWS; y++)
                 {
-                    if (SlotIsEmpty(x, y))
-                    {
-                        EmptySlots[x, y] = true;
-                    }
+                    EmptySlots[x, y] = SlotIsEmpty(x, y);
                 }
             }
         }
@@ -436,22 +433,10 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the slot matches the expected value for an empty inventory slot on the bottom row when the Windows 10 watermark is present</returns>
         private bool Windows10WatermarkEmpty(Color[,] itemIcon, int xSlot, int ySlot)
         {
-            if (ySlot == (INVENTORY_ROWS - 1))  //special handling for the bottom row Windows 10 watermark
+            if (ySlot >= (INVENTORY_ROWS - 2))  //special handling for the bottom 2 rows Windows 10 watermark
             {
-                long slotHash = ImageProcessing.ColorSum(itemIcon);
-                switch (xSlot)
-                {
-                    case 0:
-                        return Numerical.CloseEnough(224082, slotHash, 0.01);
-                    case 1:
-                        return Numerical.CloseEnough(224112, slotHash, 0.01);
-                    case 2:
-                        return Numerical.CloseEnough(224202, slotHash, 0.01);
-                    case 3:
-                        return Numerical.CloseEnough(224112, slotHash, 0.01);
-                    default:
-                        return false;
-                }
+                double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRangeFactory.InventorySlotWindows10Watermark());
+                return emptyMatch > 0.99;
             }
             return false;   //handling not implementing for rows 0-5
         }
