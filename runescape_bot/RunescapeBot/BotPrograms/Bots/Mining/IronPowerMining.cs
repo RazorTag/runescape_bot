@@ -10,9 +10,7 @@ namespace RunescapeBot.BotPrograms
 {
     public class IronPowerMining : BotProgram
     {
-        //protected int TreeTextChars;
-        //protected int TreeTextWidth;
-        //protected List<Blob> Trees;
+        bool emptySlotsSet;
         RGBHSBRange IronFilter = RGBHSBRangeFactory.IronRock();
         int minIronBlobPxSize; 
 
@@ -22,6 +20,7 @@ namespace RunescapeBot.BotPrograms
             RunParams.Run = true;
             RunParams.FrameTime = 1000;
             minIronBlobPxSize = ArtifactSize(0.00025);
+            emptySlotsSet = false;
         }
 
         /// <summary>
@@ -33,7 +32,6 @@ namespace RunescapeBot.BotPrograms
             //bool[,] bankBooth = ColorFilter(ironFilter);
             //DebugUtilities.TestMask(Bitmap, ColorArray, ironFilter, bankBooth, "C:\\Users\\markq\\Documents\\runescape_bot\\training_pictures\\ironore\\", "ironRockPic");
 
-            Inventory.SetEmptySlots(); // this tells the inv to record which spots are empty
             return true;
         }
 
@@ -43,10 +41,16 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool Execute()
         {
-            ReadWindow();
-            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 2))
+            if (!emptySlotsSet)
             {
-                Inventory.DropInventory();
+                Inventory.SetEmptySlots(); // this tells the inventory to record which spots are empty
+                emptySlotsSet = true;
+            }
+
+            ReadWindow();
+            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 1))
+            {
+                Inventory.DropInventory(false, true);
             }
             else {
                 Blob rockLocation = StationaryLocateUnminedOre();

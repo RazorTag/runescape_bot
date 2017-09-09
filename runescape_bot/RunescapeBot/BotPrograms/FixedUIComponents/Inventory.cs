@@ -403,10 +403,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
         /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
-        /// <returns>Item enum value</returns>
-        public bool SlotIsEmpty(int x, int y, bool readScreen = false, bool safeTab = false)
+        /// <returns>true if a slot is empty</returns>
+        public bool SlotIsEmpty(int xSlot, int ySlot, bool readScreen = false, bool safeTab = false)
         {
             OpenInventory(safeTab);
+            int x = xSlot;
+            int y = ySlot;
             InventoryToScreen(ref x, ref y);
             if (readScreen)
             {
@@ -422,7 +424,36 @@ namespace RunescapeBot.BotPrograms
 
             Color[,] itemIcon = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
             double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRangeFactory.EmptyInventorySlot());
-            return emptyMatch > 0.99; //99% match needed to pass
+            return (emptyMatch > 0.99) || Windows10WatermarkEmpty(itemIcon, xSlot, ySlot);
+        }
+
+        /// <summary>
+        /// Checks an inventory slot against the expected value when the Windows 10 unregistered watermark is present
+        /// </summary>
+        /// <param name="itemIcon">image of the inventory slot</param>
+        /// <param name="xSlot">0-3</param>
+        /// <param name="ySlot">0-6</param>
+        /// <returns>true if the slot matches the expected value for an empty inventory slot on the bottom row when the Windows 10 watermark is present</returns>
+        private bool Windows10WatermarkEmpty(Color[,] itemIcon, int xSlot, int ySlot)
+        {
+            if (ySlot == (INVENTORY_ROWS - 1))  //special handling for the bottom row Windows 10 watermark
+            {
+                long slotHash = ImageProcessing.ColorSum(itemIcon);
+                switch (xSlot)
+                {
+                    case 0:
+                        return Numerical.CloseEnough(224082, slotHash, 0.01);
+                    case 1:
+                        return Numerical.CloseEnough(224112, slotHash, 0.01);
+                    case 2:
+                        return Numerical.CloseEnough(224202, slotHash, 0.01);
+                    case 3:
+                        return Numerical.CloseEnough(224112, slotHash, 0.01);
+                    default:
+                        return false;
+                }
+            }
+            return false;   //handling not implementing for rows 0-5
         }
 
         /// <summary>

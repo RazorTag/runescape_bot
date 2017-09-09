@@ -351,11 +351,12 @@ namespace RunescapeBot.BotPrograms
                 randomFrameOffset = 0;
             }
 
-            ScreenScraper.BringToForeGround(RSClient);
-            SafeWait(1000); //give the client time to show up on screen
             RunParams.BotState = BotState.Running;
             long workInterval = RunParams.SlaveDriver ? (int)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds : RandomWorkTime();
             RunParams.SetNewState(workInterval);
+            ScreenScraper.BringToForeGround(RSClient);
+            SafeWait(1000); //give the client time to show up on screen
+
             Stopwatch iterationWatch = new Stopwatch();
             Stopwatch workIntervalWatch = new Stopwatch();
             workIntervalWatch.Start();
