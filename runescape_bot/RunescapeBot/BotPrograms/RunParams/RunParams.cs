@@ -262,6 +262,12 @@ namespace RunescapeBot.BotPrograms
         public bool SlaveDriver { get; set; }
 
         /// <summary>
+        /// Default world to use when logging in. Keep as 0 to avoid choosing a world.
+        /// </summary>
+        [XmlIgnore]
+        public int LoginWorld { get; set; }
+
+        /// <summary>
         /// How to set the camera after logging in
         /// </summary>
         [XmlIgnore]

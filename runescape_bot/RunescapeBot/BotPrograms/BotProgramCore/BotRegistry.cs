@@ -31,6 +31,8 @@ namespace RunescapeBot.BotPrograms
             LesserDemonSimple,
             [Description("Combat - Nightmare Zone")]
             NightmareZoneD,
+            [Description("Construction - Butler Sawmill")]
+            ButlerSawmill,
             [Description("Crafting - Cut Gems")]
             CutGems,
             [Description("Crafting - Gold Bracelets")]
@@ -66,8 +68,6 @@ namespace RunescapeBot.BotPrograms
 
             switch (runParams.BotAction)
             {
-                case BotActions.Login:
-                    return new LogInToGame(runParams);
                 case BotActions.LesserDemon:
                     return new LesserDemon(runParams);
                 case BotActions.LesserDemonSimple:
@@ -102,8 +102,12 @@ namespace RunescapeBot.BotPrograms
                     return new Enchant(runParams, 2);
                 case BotActions.IronOre:
                     return new IronPowerMining(runParams);
+                case BotActions.Login:
+                    return new LogInToGame(runParams);
                 case BotActions.DoNothing:
                     return new DoNothing(runParams);
+                case BotActions.ButlerSawmill:
+                    return new ButlerSawmill(runParams);
             }
             return bot;
         }

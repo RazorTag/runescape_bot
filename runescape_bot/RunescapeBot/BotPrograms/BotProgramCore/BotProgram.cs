@@ -214,6 +214,7 @@ namespace RunescapeBot.BotPrograms
             Inventory = new Inventory(RSClient, ColorArray, Keyboard);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
             RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
+            RunParams.LoginWorld = 0;
         }
        
         /// <summary>
@@ -1111,6 +1112,55 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Opens the world selector on the login screen
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool OpenWorldSelector(Point loginOffset)
+        {
+            int x = loginOffset.X + (Center.X - 326);
+            int y = loginOffset.Y + 481;
+            LeftClick(x, y);
+            SafeWait(500);
+            return true;
+        }
+
+        /// <summary>
+        /// Switch to a world on the login screen
+        /// </summary>
+        private bool SelectLoginWorld(int world, Point? loginOffset)
+        {
+            const int rowCount = 18;
+            const int lowestWorld = 301;
+            const int highestWorld = 394;
+            const int rowHeight = 24;
+            const int columnWidth = 94;
+
+            if (world < lowestWorld || world > highestWorld)
+            {
+                RunParams.LoginWorld = 0;
+                return true;
+            }
+
+            Point offset = (loginOffset ?? LoginScreenOffset());
+            if (!OpenWorldSelector(offset)) { return false; }
+            int worldIndex = world - lowestWorld;
+
+            //adjust for missing worlds
+            if (world > 362) { worldIndex -= 2; }
+            if (world > 370) { worldIndex -= 2; }
+            if (world > 378) { worldIndex -= 2; }
+
+            int column = worldIndex / rowCount;
+            int row = worldIndex % rowCount;
+            int x = offset.X + (Center.X - 182) + (column * columnWidth);
+            int y = offset.Y + 58 + (row * rowHeight);
+            LeftClick(x, y, 5);
+            SafeWait(500);
+
+            return true;
+        }
+
+        /// <summary>
         /// Tries to log in.
         /// </summary>
         /// <returns>true if login is successful, false if login fails</returns>
@@ -1118,16 +1168,26 @@ namespace RunescapeBot.BotPrograms
         {
             Point? clickLocation;
             Point loginOffset = LoginScreenOffset();
-            int center = ScreenWidth / 2;
 
             //log in at the login screen
             if (!IsWelcomeScreen(out clickLocation))
             {
+                if (!SelectLoginWorld(RunParams.LoginWorld, loginOffset))
+                {
+                    return false;
+                }
+
                 //Click existing account. Clicks in a dead space if we are already on the login screen.
-                LeftClick(center + 16 + loginOffset.X, 288 + loginOffset.Y);
+                LeftClick(Center.X + 16 + loginOffset.X, 288 + loginOffset.Y);
+
+                if (RunParams.LoginWorld > 0)
+                {
+                    LeftClick(Center.X - 78 + loginOffset.X, 320 + loginOffset.Y);
+                    SafeWait(500);
+                }
 
                 //fill in login
-                LeftClick(center + 137 + loginOffset.X, 249 + loginOffset.Y);
+                LeftClick(Center.X + 137 + loginOffset.X, 249 + loginOffset.Y);
                 Keyboard.Backspace(350);
                 Keyboard.WriteLine(RunParams.Login);
 
@@ -1384,11 +1444,12 @@ namespace RunescapeBot.BotPrograms
             }
 
             //restart client if set to a bot world
+            int loginWorld = (RunParams.LoginWorld > 0) ? RunParams.LoginWorld : 340;
             if (IsLoggedOut(readWindow))
             {
                 if (LoginSetForBotWorld(false))
                 {
-                    PrepareClient(true);
+                    SelectLoginWorld(loginWorld, null);
                     return true;
                 }
             }
@@ -1397,7 +1458,7 @@ namespace RunescapeBot.BotPrograms
                 if (LoggedIntoBotWorld(false))
                 {
                     Logout();
-                    PrepareClient(true);
+                    SelectLoginWorld(loginWorld, null);
                     return true;
                 }
             }

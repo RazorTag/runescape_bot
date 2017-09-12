@@ -84,8 +84,8 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotManagers\PhasmatysRotation.cs" />
     <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
-    <Compile Include="BotPrograms\BotProgram.cs" />
-    <Compile Include="BotPrograms\BotRegistry.cs" />
+    <Compile Include="BotPrograms\BotProgramCore\BotProgram.cs" />
+    <Compile Include="BotPrograms\BotProgramCore\BotRegistry.cs" />
     <Compile Include="BotPrograms\Bots\Agility\Agility.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilityGnomeStronghold.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilitySeersVillage.cs" />
@@ -115,7 +115,7 @@
     <Compile Include="BotPrograms\Popups\MakeX.cs" />
     <Compile Include="BotPrograms\Popups\MakeXSlim.cs" />
     <Compile Include="BotPrograms\Popups\RightClick.cs" />
-    <Compile Include="BotPrograms\BotUtilities.cs" />
+    <Compile Include="BotPrograms\BotProgramCore\BotUtilities.cs" />
     <Compile Include="BotPrograms\RunParams\PhasmatysRunParams.cs" />
     <Compile Include="BotPrograms\RunParams\RotationRunParams.cs" />
     <Compile Include="BotPrograms\RunParams\RunParamsList.cs" />
