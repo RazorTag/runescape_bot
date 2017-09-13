@@ -6,24 +6,15 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
-    public class ButlerSawmill : BotProgram
+    public class ButlerSawmill : CamelotHouse
     {
-        public ButlerSawmill(RunParams startParams) : base(startParams)
-        {
-            RunParams.Run = true;
-            RunParams.LoginWorld = 337;
-        }
+        public ButlerSawmill(RunParams startParams) : base(startParams) { }
 
 
-        protected override bool Run()
+        protected override bool Construct()
         {
-            //ReadWindow();
-            //DebugUtilities.SaveImageToFile(Bitmap);
-            return true;
-        }
-
-        protected override bool Execute()
-        {
+            CallServant();
+            //TODO send oak logs to the lumber mill
             return true;
         }
     }

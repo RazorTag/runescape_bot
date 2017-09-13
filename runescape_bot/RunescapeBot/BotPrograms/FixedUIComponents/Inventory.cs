@@ -52,6 +52,18 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Takes a screenshot of the game
+        /// </summary>
+        /// <param name="overwrite">set to true to take a screenshot even if one already exists</param>
+        private void ManuallySetScreen(bool overwrite)
+        {
+            if (overwrite || Screen == null)
+            {
+                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient, true));
+            }
+        }
+
+        /// <summary>
         /// Opens the inventory if it isn't open already
         /// </summary>
         /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
@@ -63,15 +75,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
-            
-            if (screenSize == null )
-            {
-                return false;
-            } 
-            int x = screenSize.Value.X - INVENTORY_TAB_OFFSET_RIGHT;
-            int y = screenSize.Value.Y - INVENTORY_TAB_OFFSET_BOTTOM;
-            Mouse.LeftClick(x, y, RSClient, 6);
+            Keyboard.Escape();
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Inventory;
             return true;
@@ -88,9 +92,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            int x = Screen.GetLength(0) - SPELLBOOK_TAB_OFFSET_RIGHT;
-            int y = Screen.GetLength(1) - SPELLBOOK_TAB_OFFSET_BOTTOM;
-            Mouse.LeftClick(x, y, RSClient, 6);
+            Keyboard.FKey(6);
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Spellbook;
             return true;
@@ -110,8 +112,26 @@ namespace RunescapeBot.BotPrograms
             int x = Screen.GetLength(0) - LOGOUT_TAB_OFFSET_RIGHT;
             int y = Screen.GetLength(1) - LOGOUT_TAB_OFFSET_BOTTOM;
             Mouse.LeftClick(x, y, RSClient, 6);
+
             Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
             SelectedTab = TabSelect.Logout;
+            return true;
+        }
+
+        /// <summary>
+        /// Opens the options tab if it isn't open already
+        /// </summary>
+        /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
+        /// <returns>True if the options tab is not assumed to already be open</returns>
+        public bool OpenOptions(bool safeTab = true)
+        {
+            if (!safeTab && SelectedTab == TabSelect.Options)
+            {
+                return false;
+            }
+            Keyboard.FKey(10);
+            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
+            SelectedTab = TabSelect.Options;
             return true;
         }
 
@@ -234,8 +254,8 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y">slots away from the topmost column (0-6)</param>
         private void ClickSpellbook(int x, int y, bool safeTab = true)
         {
-            SpellbookToScreen(ref x, ref y);
             OpenSpellbook(safeTab);
+            SpellbookToScreen(ref x, ref y);
             Mouse.LeftClick(x, y, RSClient, 5);
         }
 
@@ -480,7 +500,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-
+            ManuallySetScreen(false);
             x = Screen.GetLength(0) - SPELLBOOK_OFFSET_LEFT + (x * SPELLBOOK_GAP_X);
             y = Screen.GetLength(1) - SPELLBOOK_OFFSET_TOP + (y * SPELLBOOK_GAP_Y);
             return true;
@@ -505,11 +525,105 @@ namespace RunescapeBot.BotPrograms
             return true;
         }
 
+        #region teleports
+
+        /// <summary>
+        /// Attempts to teleport to the specified location
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns>False if the player doesn't have the runes to teleport</returns>
+        public bool StandardTeleport(StandardTeleports location)
+        {
+            Point spellbookSlot = TeleportToSpellBookSlot(location);
+            if (!TeleportHasRunes(spellbookSlot.X, spellbookSlot.Y))
+            {
+                return false;
+            }
+            ClickSpellbook(spellbookSlot.X, spellbookSlot.Y, false);
+            return true;
+        }
+
+        /// <summary>
+        /// Converts a standard spellbook teleport location to inventory slot coordinates
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public Point TeleportToSpellBookSlot(StandardTeleports location)
+        {
+            switch (location)
+            {
+                case StandardTeleports.Home:
+                    return new Point(0, 0);
+                case StandardTeleports.Varrock:
+                    return new Point(1, 2);
+                case StandardTeleports.Lumbridge:
+                    return new Point(4, 2);
+                case StandardTeleports.Falador:
+                    return new Point(0, 3);
+                case StandardTeleports.House:
+                    return new Point(2, 3);
+                case StandardTeleports.Camelot:
+                    return new Point(5, 3);
+                case StandardTeleports.Ardougne:
+                    return new Point(4, 4);
+                case StandardTeleports.Watchtower:
+                    return new Point(2, 5);
+                case StandardTeleports.Trollheim:
+                    return new Point(2, 6);
+                case StandardTeleports.ApeAtoll:
+                    return new Point(5, 6);
+                case StandardTeleports.Kourend:
+                    return new Point(3, 7);
+                default:
+                    throw new Exception("Selected teleport not implemented");
+            }
+        }
+
+        /// <summary>
+        /// Determines if the player is carrying the required runes for the selected spell
+        /// </summary>
+        /// <param name="x">inventory column (0-6)</param>
+        /// <param name="y">inventory row (0-9)</param>
+        /// <returns></returns>
+        public bool TeleportHasRunes(StandardTeleports location)
+        {
+            Point inventorySlot = TeleportToSpellBookSlot(location);
+            int x = inventorySlot.X;
+            int y = inventorySlot.Y;
+            if (!SpellbookToScreen(ref x, ref y))
+            {
+                return false;
+            }
+            OpenSpellbook(false);
+            int radius = 5;
+            Color[,] icon = ImageProcessing.ScreenPiece(Screen, x - radius, x + radius, y - radius, y + radius);
+            Color colorAverage = ImageProcessing.ColorAverage(icon);
+            float brightness = colorAverage.GetBrightness();
+            return brightness > 0.2f;
+        }
+
+        public enum StandardTeleports : int
+        {
+            Home,
+            Varrock,
+            Lumbridge,
+            Falador,
+            House,
+            Camelot,
+            Ardougne,
+            Watchtower,
+            Trollheim,
+            ApeAtoll,
+            Kourend
+        }
+
+        #endregion
+
         #region constants
         /// <summary>
         /// Milliseconds to wait after switching tabs
         /// </summary>
-        private const int TAB_SWITCH_WAIT = 200;
+        private const int TAB_SWITCH_WAIT = 20;
 
         private const int INVENTORY_TAB_OFFSET_RIGHT = 118;
         private const int INVENTORY_TAB_OFFSET_BOTTOM = 320;
@@ -539,7 +653,8 @@ namespace RunescapeBot.BotPrograms
             Unknown,
             Inventory,
             Spellbook,
-            Logout
+            Logout,
+            Options
         }
 
         public enum Item : int

@@ -37,6 +37,7 @@ namespace RunescapeBot.UITools
         /// <returns></returns>
         private bool PrepareClientForInput()
         {
+            if (BotProgram.StopFlag) { return false; }
             if (ScreenScraper.ProcessExists(RSClient))
             {
                 ScreenScraper.BringToForeGround(RSClient);
@@ -173,6 +174,34 @@ namespace RunescapeBot.UITools
                     SendKeys.SendWait("{LEFT}");
                     Thread.Sleep(KEY_SPAM_INTERVAL);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Sends the specified F-key to the client
+        /// </summary>
+        /// <param name="fKey">number of F-key to send. 6 send F6, etc.</param>
+        public void FKey(int fKey)
+        {
+            const int minF = 1;
+            const int maxF = 16;
+            if (fKey < minF || fKey > maxF) { throw new System.Exception("F" + fKey + " is not in the valid range of " + minF + "-" + maxF); }
+
+            if (PrepareClientForInput())
+            {
+                string fKeyCode = "{F" + fKey + "}";
+                SendKeys.SendWait(fKeyCode);
+            }
+        }
+
+        /// <summary>
+        /// Presses the escape key
+        /// </summary>
+        public void Escape()
+        {
+            if (PrepareClientForInput())
+            {
+                SendKeys.SendWait("{ESC}");
             }
         }
     }

@@ -101,8 +101,11 @@ namespace RunescapeBot.UITools
             ScreenScraper.GameScreenToWindow(ref x, ref y, rsClient);
             NaturalMove(x, y);
             Thread.Sleep(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
-            mouse_event(clickTypeDown, x, y, 0, 0);
-            mouse_event(clickTypeUp, x, y, 0, 0);
+            if (!BotProgram.StopFlag)
+            {
+                mouse_event(clickTypeDown, x, y, 0, 0);
+                mouse_event(clickTypeUp, x, y, 0, 0);
+            }
         }
 
         /// <summary>
@@ -113,8 +116,11 @@ namespace RunescapeBot.UITools
         public static void RawClick(int x, int y)
         {
             NaturalMove(x, y);
-            mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+            if (!BotProgram.StopFlag)
+            {
+                mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+                mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+            }
         }
 
         /// <summary>

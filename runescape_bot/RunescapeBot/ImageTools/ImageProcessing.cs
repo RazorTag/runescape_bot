@@ -329,7 +329,6 @@ namespace RunescapeBot.ImageTools
         public static long ColorSum(Color[,] rgbImage)
         {
             if (rgbImage == null) { return 0; }
-
             Color pixel;
             long colorSum = 0;
 
@@ -342,6 +341,34 @@ namespace RunescapeBot.ImageTools
                 }
             }
             return colorSum;
+        }
+
+        /// <summary>
+        /// Finds the average color of all of the pixels in an image
+        /// </summary>
+        /// <param name="rgbImage">image to average</param>
+        /// <returns>the average pixel color</returns>
+        public static Color ColorAverage(Color[,] rgbImage)
+        {
+            if (rgbImage == null) { return Color.Black; }
+            int red = 0;
+            int green = 0;
+            int blue = 0;
+            Color pixel;
+
+            for (int x = 0; x < rgbImage.GetLength(0); x++)
+            {
+                for (int y = 0; y < rgbImage.GetLength(1); y++)
+                {
+                    pixel = rgbImage[x, y];
+                    red += pixel.R;
+                    green += pixel.G;
+                    blue += pixel.B;
+                }
+            }
+
+            int pixels = rgbImage.GetLength(0) * rgbImage.GetLength(1);
+            return Color.FromArgb(red / pixels, green / pixels, blue / pixels);
         }
 
         /// <summary>
