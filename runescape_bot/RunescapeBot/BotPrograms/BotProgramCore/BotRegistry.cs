@@ -57,6 +57,8 @@ namespace RunescapeBot.BotPrograms
             TeaStall,
             [Description("Woodcutting - Willows (drop)")]
             WillowTrees,
+            [Description("Fishing - Barbarian Fishing (drop)")]
+            BarbarianFishing,
             [Description("Do Nothing")]
             DoNothing
         };
@@ -108,6 +110,8 @@ namespace RunescapeBot.BotPrograms
                     return new DoNothing(runParams);
                 case BotActions.ButlerSawmill:
                     return new ButlerSawmill(runParams);
+                case BotActions.BarbarianFishing:
+                    return new BarbarianFishing(runParams);
             }
             return bot;
         }

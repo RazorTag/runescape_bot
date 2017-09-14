@@ -97,6 +97,7 @@
     <Compile Include="BotPrograms\Bots\Construction\ButlerSawmill.cs" />
     <Compile Include="BotPrograms\Bots\Construction\CamelotHouse.cs" />
     <Compile Include="BotPrograms\Bots\DoNothing.cs" />
+    <Compile Include="BotPrograms\Bots\Fishing\BarbarianFishing.cs" />
     <Compile Include="BotPrograms\Bots\LogIn.cs" />
     <Compile Include="BotPrograms\Bots\Mining\IronPowerMining.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
