@@ -37,7 +37,10 @@ namespace RunescapeBot.UITools
         /// <returns></returns>
         private bool PrepareClientForInput()
         {
-            if (BotProgram.StopFlag) { return false; }
+            if (BotProgram.StopFlag)
+            {
+                return false;
+            }
             if (ScreenScraper.ProcessExists(RSClient))
             {
                 ScreenScraper.BringToForeGround(RSClient);
@@ -197,11 +200,11 @@ namespace RunescapeBot.UITools
         /// <summary>
         /// Presses the escape key
         /// </summary>
-        public void Escape()
+        public void Space()
         {
             if (PrepareClientForInput())
             {
-                SendKeys.SendWait("{ESC}");
+                SendKeys.SendWait(" ");
             }
         }
     }

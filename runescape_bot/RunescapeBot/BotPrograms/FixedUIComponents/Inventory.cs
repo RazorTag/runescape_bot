@@ -75,8 +75,15 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            Keyboard.Escape();
-            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
+            Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
+            if (screenSize == null)
+            {
+                return false;
+            }
+            int x = screenSize.Value.X - INVENTORY_TAB_OFFSET_RIGHT;
+            int y = screenSize.Value.Y - INVENTORY_TAB_OFFSET_BOTTOM;
+            Mouse.LeftClick(x, y, RSClient, 6);
+            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
             SelectedTab = TabSelect.Inventory;
             return true;
         }
@@ -93,7 +100,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             Keyboard.FKey(6);
-            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
+            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
             SelectedTab = TabSelect.Spellbook;
             return true;
         }
@@ -112,8 +119,7 @@ namespace RunescapeBot.BotPrograms
             int x = Screen.GetLength(0) - LOGOUT_TAB_OFFSET_RIGHT;
             int y = Screen.GetLength(1) - LOGOUT_TAB_OFFSET_BOTTOM;
             Mouse.LeftClick(x, y, RSClient, 6);
-
-            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
+            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
             SelectedTab = TabSelect.Logout;
             return true;
         }
@@ -130,7 +136,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             Keyboard.FKey(10);
-            Thread.Sleep((int)Probability.HalfGaussian(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT, true));
+            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
             SelectedTab = TabSelect.Options;
             return true;
         }
@@ -145,6 +151,15 @@ namespace RunescapeBot.BotPrograms
             InventoryToScreen(ref x, ref y);
             OpenInventory(safeTab);
             Mouse.LeftClick(x, y, RSClient, 5);
+        }
+
+        /// <summary>
+        /// Opens the inventory and clicks on an inventory slot
+        /// </summary>
+        /// <param name="slot">inventory slot</param>
+        public void ClickInventory(Point slot)
+        {
+            ClickInventory(slot.X, slot.Y);
         }
 
         /// <summary>
@@ -269,7 +284,10 @@ namespace RunescapeBot.BotPrograms
         {
             ClickSpellbook(5, 2, safeTab);
             Mouse.LeftClick(x, y, RSClient, 1);
-            if (autoWait) { Thread.Sleep((int)Probability.HalfGaussian(5000, 300, true)); } //telegrab takes about 5 seconds
+            if (autoWait)
+            {
+                BotProgram.SafeWait(5000, 300); //telegrab takes about 5 seconds
+            }
         }
 
         /// <summary>
@@ -291,7 +309,10 @@ namespace RunescapeBot.BotPrograms
                 SelectedTab = TabSelect.Inventory;
                 ClickInventory(x, y, false);
                 SelectedTab = TabSelect.Spellbook;
-                if (autoWait) { Thread.Sleep((int)Probability.HalfGaussian(castTime, 100, true)); }
+                if (autoWait)
+                {
+                    BotProgram.SafeWaitPlus(castTime, 100);
+                }
                 return true;
             }
             return false;
@@ -385,7 +406,7 @@ namespace RunescapeBot.BotPrograms
         public void UseItemOnItem(Point subjectItem, Point objectItem, bool safeTab = true)
         {
             ClickInventory(subjectItem.X, subjectItem.Y, safeTab);
-            Thread.Sleep((int)Probability.HalfGaussian(200, 30, true));
+            BotProgram.SafeWaitPlus(200, 30);
             ClickInventory(objectItem.X, objectItem.Y, safeTab);
         }
 
@@ -442,6 +463,18 @@ namespace RunescapeBot.BotPrograms
             Color[,] itemIcon = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
             double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRangeFactory.EmptyInventorySlot());
             return (emptyMatch > 0.99) || Windows10WatermarkEmpty(itemIcon, xSlot, ySlot);
+        }
+
+        /// <summary>
+        /// Determines if the given inventory slot contains any item
+        /// </summary>
+        /// <param name="slot">inventor coordinates of the slot to check</param>
+        /// <param name="readScreen">set to true to reread the game screen before checking</param>
+        /// <param name="safeTab"></param>
+        /// <returns>true if a slot is empty</returns>
+        public bool SlotIsEmpty(Point slot, bool readScreen = false, bool safeTab = false)
+        {
+            return SlotIsEmpty(slot.X, slot.Y);
         }
 
         /// <summary>
@@ -535,11 +568,12 @@ namespace RunescapeBot.BotPrograms
         public bool StandardTeleport(StandardTeleports location)
         {
             Point spellbookSlot = TeleportToSpellBookSlot(location);
-            if (!TeleportHasRunes(spellbookSlot.X, spellbookSlot.Y))
+            if (!TeleportHasRunes(location))
             {
                 return false;
             }
             ClickSpellbook(spellbookSlot.X, spellbookSlot.Y, false);
+            BotProgram.SafeWait(3000);
             return true;
         }
 

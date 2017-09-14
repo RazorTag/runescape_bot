@@ -96,6 +96,31 @@ namespace RunescapeBot.BotPrograms
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// Neutral purple from a house portal.
+        /// Does not cover all of the purple shades seen in the portal
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange HousePortalPurple()
+        {
+            Color dark = Color.FromArgb(59, 15, 78);
+            Color light = Color.FromArgb(141, 78, 176);
+            HSBRange hsbRange = new HSBRange(273.6f, 288.7f, 0.293f, 0.724f, 0.152f, 0.529f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Brown wood from a bank chest (like at castle wars)
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange BankChest()
+        {
+            Color dark = Color.FromArgb(30, 21, 14);
+            Color light = Color.FromArgb(156, 118, 87);
+            HSBRange hsbRange = new HSBRange(23.0f, 29.2f, 0.270f, 0.322f, 0.050f, 0.507f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region agility obstacles
@@ -328,18 +353,6 @@ namespace RunescapeBot.BotPrograms
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
-        /// <summary>
-        /// The orange current world text
-        /// </summary>
-        /// <returns></returns>
-        public static RGBHSBRange CurrentWorldText()
-        {
-            Color dark = Color.FromArgb(245, 142, 21);
-            Color light = Color.FromArgb(255, 162, 41);
-            HSBRange hsbRange = new HSBRange(29.4f, 35.4f, 0.975f, 1.000f, 0.535f, 0.586f);
-            return new RGBHSBRange(dark, light, hsbRange);
-        }
-
         #endregion
 
         #region textBoxes
@@ -358,6 +371,7 @@ namespace RunescapeBot.BotPrograms
 
         /// <summary>
         /// The orange title text in the bank screen
+        /// Also applies to lots of inventory text
         /// </summary>
         /// <returns></returns>
         public static RGBHSBRange BankTitle()
@@ -377,6 +391,18 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(245, 139, 59);
             Color light = Color.FromArgb(255, 149, 69);
             HSBRange hsbRange = new HSBRange(23, 27, 0.990f, 1.000f, 0.615f, 0.635f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The red text for a dialog box title
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange DialogBoxTitle()
+        {
+            Color dark = Color.FromArgb(127, 0, 0);
+            Color light = Color.FromArgb(129, 1, 0);
+            HSBRange hsbRange = new HSBRange(359.0f, 1.0f, 0.995f, 1.000f, 0.246f, 0.256f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 

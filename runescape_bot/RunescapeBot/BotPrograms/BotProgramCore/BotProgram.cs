@@ -1533,7 +1533,7 @@ namespace RunescapeBot.BotPrograms
             int top = ScreenHeight - 297;
             int bottom = top + 20;
             Color[,] currentWorldTitle = ScreenPiece(left, right, top, bottom);
-            double worldTextMatch = ImageProcessing.FractionalMatch(currentWorldTitle, RGBHSBRangeFactory.CurrentWorldText());
+            double worldTextMatch = ImageProcessing.FractionalMatch(currentWorldTitle, RGBHSBRangeFactory.BankTitle());
             const double worldTextMinimumMatch = 0.05;
             return worldTextMatch > worldTextMinimumMatch;
         }

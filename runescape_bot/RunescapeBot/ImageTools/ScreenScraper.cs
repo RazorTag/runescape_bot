@@ -24,7 +24,7 @@ namespace RunescapeBot.ImageTools
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
 
-        private const int MULTIPLE_SCREEN_READ_INTERVAL = 500;
+        private const int MULTIPLE_SCREEN_READ_INTERVAL = 200;
         private static DateTime LastScan;
 
         /// <summary>
@@ -345,7 +345,7 @@ namespace RunescapeBot.ImageTools
         {
             if (ProcessExists(client))
             {
-                client.Close();
+                client.CloseMainWindow();
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
@@ -379,7 +379,7 @@ namespace RunescapeBot.ImageTools
                 mainWindowTitle = process.MainWindowTitle.ToUpper();
                 if (mainWindowTitle.Contains(windowName))
                 {
-                    process.Close();
+                    process.CloseMainWindow();
                 }
             }
         }
