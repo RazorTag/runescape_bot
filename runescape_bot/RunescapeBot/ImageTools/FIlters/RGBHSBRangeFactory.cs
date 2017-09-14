@@ -489,5 +489,16 @@ namespace RunescapeBot.BotPrograms
         }
 
         #endregion
+
+        #region fishing tile
+        public static RGBHSBRange FishingTile()
+        {
+            Color dark = Color.FromArgb(116, 156, 213);
+            Color light = Color.FromArgb(163, 190, 232);
+            HSBRange hsbRange = new HSBRange(205f, 216f, 0.48f, 0.62f, 0.64f, 0.77f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+        #endregion
+
     }
 }

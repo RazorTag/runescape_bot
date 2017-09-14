@@ -535,7 +535,7 @@ namespace RunescapeBot.BotPrograms
         public bool StandardTeleport(StandardTeleports location)
         {
             Point spellbookSlot = TeleportToSpellBookSlot(location);
-            if (!TeleportHasRunes(spellbookSlot.X, spellbookSlot.Y))
+            if (!TeleportHasRunes(location))
             {
                 return false;
             }
