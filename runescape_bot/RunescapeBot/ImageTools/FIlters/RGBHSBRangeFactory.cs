@@ -528,7 +528,11 @@ namespace RunescapeBot.BotPrograms
 
         #endregion
 
-        #region fishing tile
+        #region fishing
+        /// <summary>
+        /// classic blue color of fish sprinkles
+        /// </summary>
+        /// <returns></returns>
         public static RGBHSBRange FishingTile()
         {
             Color dark = Color.FromArgb(116, 156, 213);
@@ -536,6 +540,15 @@ namespace RunescapeBot.BotPrograms
             HSBRange hsbRange = new HSBRange(205f, 216f, 0.48f, 0.62f, 0.64f, 0.77f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
+
+        public static RGBHSBRange FishingPole()
+        {
+            Color dark = Color.FromArgb(45, 31, 0);
+            Color light = Color.FromArgb(61, 41, 0);
+            HSBRange hsbRange = new HSBRange(40f, 43f, 0.98f, 1.02f, 0.089f, 0.119f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
     }
