@@ -126,6 +126,7 @@
     <Compile Include="Common\Numerical.cs" />
     <Compile Include="Common\Probability.cs" />
     <Compile Include="Common\UnitConversions.cs" />
+    <Compile Include="FileIO\LogError.cs" />
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />

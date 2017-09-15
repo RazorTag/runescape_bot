@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using System.Linq;
+using RunescapeBot.FileIO;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -233,6 +234,30 @@ namespace RunescapeBot.BotPrograms
         /// Handles the sequential calling of the methods used to do bot work
         /// </summary>
         private void Process()
+        {
+            if (Debugger.IsAttached)
+            {
+                BotProcess();
+            }
+            else
+            {
+                try
+                {
+                    BotProcess();
+                }
+                catch (Exception e)
+                {
+                    LogError.SimpleLog(e);  //log an error raised during a bot's execution
+                    MessageBox.Show("See " + LogError.FilePath + " for details.", "Critical Error");
+                    throw e;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the start, running, and end of a bot
+        /// </summary>
+        private void BotProcess()
         {
             //don't limit by iterations unless the user has specified a positive number of iterations
             if (RunParams.Iterations <= 0)

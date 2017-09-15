@@ -45,7 +45,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Run()
         {
-            ReadWindow();
+            //ReadWindow();
             //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\construction\\test.png");
 
             //ReadWindow();
@@ -68,7 +68,7 @@ namespace RunescapeBot.BotPrograms
             //RepeatLastTaskDialog();
             //SelectAnOptionDialog();
             //WaitingForCommand();
-            UnNoteTheBanknotes();
+            //UnNoteTheBanknotes();
 
             return true;
         }
