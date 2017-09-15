@@ -100,7 +100,7 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             bool[,] fishBoolArray = ColorFilter(fishFilter);
             List<Blob> allMatches = ImageProcessing.FindBlobs(fishBoolArray);
-            Blob closestBlob = ImageProcessing.ClosestBlob(fishBoolArray, Center, minimumSize)
+            Blob closestBlob = ImageProcessing.ClosestBlob(fishBoolArray, Center, minimumSize);
             foundObject = closestBlob;
             foreach (Blob currentBlob in allMatches)
             {

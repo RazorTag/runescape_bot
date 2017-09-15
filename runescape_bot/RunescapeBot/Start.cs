@@ -380,6 +380,7 @@ namespace RunescapeBot
             {
                 Invoke((MethodInvoker)(() =>
                 {
+                    UpdateTimer_Tick(null, null);
                     SetIdleState();
                     StartButton.Enabled = true;
                     SaveBot();
@@ -400,7 +401,6 @@ namespace RunescapeBot
                 StartButton.Enabled = false;
                 SetTransitionalState();
                 RunningBot.Stop(false);
-                UpdateTimer_Tick(null, null);
             }
             else
             {
