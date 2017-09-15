@@ -124,6 +124,28 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
+        /// Returns the Blob in the supplied list that is the closest to the supplied point
+        /// </summary>
+        /// <param name="allMatches"></param>
+        /// <param name="center"></param>
+        /// <returns></returns>
+        public static Blob ClosestBlobToPoint(List<Blob> allMatches, Point matchPoint)
+        {
+            if (allMatches == null || allMatches.Count == 0) {
+                return null;
+            }
+            Blob foundBlob = allMatches[0];
+            foreach (Blob currentBlob in allMatches)
+            {
+                if (DistanceBetweenPoints(matchPoint,foundBlob.Center) >= DistanceBetweenPoints(matchPoint,currentBlob.Center))
+                {
+                    foundBlob = currentBlob;
+                }
+            }
+            return foundBlob;
+        }
+
+        /// <summary>
         /// Adds all of the points within a circle definition to an existing blob
         /// </summary>
         /// <param name="blob"></param>

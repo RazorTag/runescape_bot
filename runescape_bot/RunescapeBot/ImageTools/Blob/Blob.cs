@@ -420,7 +420,10 @@ namespace RunescapeBot.ImageTools
         /// <returns>a random blob pixel's coordinates in terms of the game screen</returns>
         public Point? RandomBlobPixel()
         {
-            if (Pixels.Count == 0) { return null; }
+            if (Pixels.Count == 0)
+            {
+                return null;
+            }
 
             Random rng = new Random();
             return Pixels.ElementAt(rng.Next(0, Pixels.Count)).Value;

@@ -110,7 +110,7 @@ namespace RunescapeBot.ImageTools
                     if (image[x, y])
                     {
                         blob = new Blob();
-                        AddPixelToBlob(x, y, image, blob);
+                        MovePixelToBlob(x, y, image, blob);
 
                         while (blob.HasPixelsToProcess())
                         {
@@ -149,7 +149,7 @@ namespace RunescapeBot.ImageTools
             {
                 if (image[x, y - 1])
                 {
-                    AddPixelToBlob(x, y - 1, image, blob);
+                    MovePixelToBlob(x, y - 1, image, blob);
                 }
             }
 
@@ -158,7 +158,7 @@ namespace RunescapeBot.ImageTools
             {
                 if (image[x - 1, y])
                 {
-                    AddPixelToBlob(x - 1, y, image, blob);
+                    MovePixelToBlob(x - 1, y, image, blob);
                 }
             }
 
@@ -167,7 +167,7 @@ namespace RunescapeBot.ImageTools
             {
                 if (image[x + 1, y])
                 {
-                    AddPixelToBlob(x + 1, y, image, blob);
+                    MovePixelToBlob(x + 1, y, image, blob);
                 }
             }
 
@@ -176,7 +176,7 @@ namespace RunescapeBot.ImageTools
             {
                 if (image[x, y + 1])
                 {
-                    AddPixelToBlob(x, y + 1, image, blob);
+                    MovePixelToBlob(x, y + 1, image, blob);
                 }
             }
         }
@@ -303,7 +303,7 @@ namespace RunescapeBot.ImageTools
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="image"></param>
-        private static void AddPixelToBlob(int x, int y, bool[,] image, Blob blob)
+        private static void MovePixelToBlob(int x, int y, bool[,] image, Blob blob)
         {
             blob.AddPixel(new Point(x, y));
             image[x, y] = false;
