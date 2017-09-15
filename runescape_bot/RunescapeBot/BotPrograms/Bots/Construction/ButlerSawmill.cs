@@ -1,4 +1,5 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.Common;
+using RunescapeBot.ImageTools;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -10,18 +11,31 @@ namespace RunescapeBot.BotPrograms
 {
     public class ButlerSawmill : CamelotHouse
     {
-        protected Point InventoryCashSlot, InventoryLogSlot;
+        protected Point InventoryCashSlot, InventoryLogSlot, FirstLogSlot;
         protected Point BankCashSlot, BankLogSlot, BankPlankSlot;
+
+        int DemonHeadSize { get { return ArtifactSize(0.0001); } }
 
         public ButlerSawmill(RunParams startParams) : base(startParams)
         {
             InventoryCashSlot = new Point(2, 0);
             InventoryLawRuneSlot = new Point(1, 0);
             InventoryLogSlot = new Point(0, 0);
+            FirstLogSlot = new Point(3, 0);
             BankCashSlot = new Point(0, 7);
             BankLawRuneSlot = new Point(0, 6);
             BankLogSlot = new Point(0, 5);
             BankPlankSlot = new Point(0, 4);
+        }
+
+        protected override bool Run()
+        {
+            base.Run();
+
+            //ConvertPlanksDialog();
+            //PayButler();
+
+            return true;
         }
 
         /// <summary>
@@ -35,39 +49,54 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            if (StopFlag || !InitiateDemonDialog())
+            bool skipRepeatLastDialog;
+            if (StopFlag || !InitiateDemonDialog(out skipRepeatLastDialog))
             {
                 return false;
             }
-            
-            SafeWait(1000); //TODO detect repeat-last-task
-            if (StopFlag) { return false; }
-            Keyboard.WriteNumber(1);
 
-            SafeWait(1000); //TODO detect sawmill-cost
-            if (StopFlag) { return false; }
+            if (!skipRepeatLastDialog)
+            {
+                if (StopFlag || !WaitForDialog(RepeatLastTaskDialog))
+                {
+                    return false;
+                }
+                Keyboard.WriteNumber(1);
+            }
+
+            if (StopFlag || !WaitForDialog(DemonButlerDialog))   //detect sawmill cost foresight
+            {
+                return false;
+            }
             Keyboard.Space();
 
-            
-            SafeWait(1000); //TODO detect convert-planks-accept
-            if (StopFlag) { return false; }
+            if (StopFlag || !WaitForDialog(ConvertPlanksDialog))
+            {
+                return false;
+            }
             Keyboard.WriteNumber(1);
 
-            SafeWait(1000); //TODO detect demon-aggrandizement
-            if (StopFlag) { return false; }
+            if (StopFlag || !WaitForDialog(DemonButlerDialog))   //detect demon-aggrandizement
+            {
+                return false;
+            }
             Keyboard.Space();
 
             return true;
         }
 
-
-        protected bool InitiateDemonDialog()
+        /// <summary>
+        /// After calling the demon, gets the point where you can choose to send 25 logs
+        /// </summary>
+        /// <returns></returns>
+        protected bool InitiateDemonDialog(out bool skipRepeatLastDialog)
         {
+            skipRepeatLastDialog = false;
             int demonTries = 0;
             while (!StopFlag && !WaitForDialog(AnyDialog, 1500))
             {
                 Blob demon;
-                if (LocateObject(DemonHead, out demon, 100))
+                if (LocateObject(DemonHead, out demon, 1))
                 {
                     LeftClick(demon.Center.X, demon.Center.Y);
                     SafeWaitPlus(1000, 100);
@@ -83,7 +112,18 @@ namespace RunescapeBot.BotPrograms
 
             if (DemonButlerDialog())
             {
-                if (!PayDemonButler())
+                if (WaitingForCommand())
+                {
+                    if (StartSawmillTask())
+                    {
+                        skipRepeatLastDialog = true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (!PayButler())
                 {
                     return false;
                 }
@@ -93,12 +133,36 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Goes through the dialog to pay the demon butler
+        /// Sets up a sawmill task for the butler
+        /// Assumes that the butler is already waiting on a command
         /// </summary>
         /// <returns>true if successful</returns>
-        protected bool PayDemonButler()
+        protected bool StartSawmillTask()
         {
-            return true;    //TODO pay the demon butler
+            Inventory.ClickInventory(FirstLogSlot);
+            Blob demon;
+            if (!LocateObject(DemonHead, out demon, 100))
+            {
+                return false;
+            }
+            LeftClick(demon.Center.X, demon.Center.Y);
+
+            if (!WaitForDialog(DemonButlerDialog))
+            {
+                return false;
+            }
+            Keyboard.Space();
+
+            if (!WaitForDialog(SelectAnOptionDialog))
+            {
+                return false;
+            }
+            Keyboard.WriteNumber(1);
+
+            BotUtilities.WaitForEnterAmount(RSClient, 5000);
+            Keyboard.WriteNumber(25);
+
+            return true;
         }
 
         /// <summary>
@@ -112,6 +176,16 @@ namespace RunescapeBot.BotPrograms
                 return false;   //TODO restock at the GE
             }
             return UnNoteBankChest(InventoryLogSlot);
+        }
+
+        /// <summary>
+        /// Determines if the dialog box is showing the "Repeat last task?" title
+        /// </summary>
+        /// <returns>true if the last task dialog is showing</returns>
+        protected bool ConvertPlanksDialog()
+        {
+            long titleHash = DialogTitleHash();
+            return Numerical.CloseEnough(4033845, titleHash, _titleHashPrecision);
         }
     }
 }

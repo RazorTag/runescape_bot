@@ -113,6 +113,7 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             bool[,] fishBoolArray = ColorFilter(fishFilter);
             List<Blob> allMatches = ImageProcessing.FindBlobs(fishBoolArray);
+
             if (allMatches == null || allMatches.Count == 0)
             {
                 return false;

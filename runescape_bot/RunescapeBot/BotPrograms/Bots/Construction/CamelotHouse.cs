@@ -13,13 +13,20 @@ namespace RunescapeBot.BotPrograms
 {
     public class CamelotHouse : BotProgram
     {
+        protected const double _titleHashPrecision = 0.0001;
+
         protected Point InventoryLawRuneSlot, BankLawRuneSlot;
-        protected RGBHSBRange HousePortalPurple, BankChest, BlueMouseOverText, DemonHead, DialogTitle;
+        protected RGBHSBRange HousePortalPurple, BankChest, BlueMouseOverText, DemonHead, DialogTitle, DialogBody;
 
         protected int DialogTitleLeft { get { return 128; } }
         protected int DialogTitleRight { get { return DialogTitleLeft + 370; } }
         protected int DialogTitleTop { get { return ScreenHeight - 142; } }
         protected int DialogTitleBottom { get { return DialogTitleTop + 21; } }
+
+        protected int DialogTextLeft { get { return 128; } }
+        protected int DialogTextRight { get { return DialogTextLeft + 370; } }
+        protected int DialogTextTop { get { return ScreenHeight - 123; } }
+        protected int DialogTextBottom { get { return DialogTextTop + 60; } }
 
 
         public CamelotHouse(RunParams startParams) : base(startParams)
@@ -33,6 +40,7 @@ namespace RunescapeBot.BotPrograms
             BlueMouseOverText = RGBHSBRangeFactory.MouseoverTextStationaryObject();
             DemonHead = RGBHSBRangeFactory.LesserDemonSkin();
             DialogTitle = RGBHSBRangeFactory.DialogBoxTitle();
+            DialogBody = RGBHSBRangeFactory.DialogBoxBody();
         }
 
         protected override bool Run()
@@ -55,9 +63,14 @@ namespace RunescapeBot.BotPrograms
             //IsAtHouse();
             //Construct();
 
-            AnyDialog();
+            //AnyDialog();
+            //DemonButlerDialog();
+            //RepeatLastTaskDialog();
+            //SelectAnOptionDialog();
+            //WaitingForCommand();
+            UnNoteTheBanknotes();
 
-            return false;
+            return true;
         }
 
 
@@ -79,6 +92,8 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;   //TODO restock at the GE
             }
+
+            RunParams.Iterations--;
             return true;
         }
 
@@ -176,7 +191,10 @@ namespace RunescapeBot.BotPrograms
                 if (WaitForMouseOverText(BlueMouseOverText))
                 {
                     Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient, 0);
-                    SafeWait(1000); //TODO detect un-note dialog
+                    if (!WaitForDialog(UnNoteTheBanknotes))
+                    {
+                        return false;
+                    }
                     Keyboard.WriteNumber(1);
                     return true;
                 }
@@ -203,6 +221,30 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Goes through the dialog to pay the butler
+        /// Assumes you are already on the dialog of the butler asking for money
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool PayButler()
+        {
+            Keyboard.Space();   //you owe me money
+
+            if (StopFlag || !WaitForDialog(SelectAnOptionDialog))
+            {
+                return false;
+            }
+            Keyboard.WriteNumber(1);
+
+            if (StopFlag || !WaitForDialog(DemonButlerDialog))   //thank you for money
+            {
+                return false;
+            }
+            Keyboard.Space();
+
+            return true;
+        }
+
+        /// <summary>
         /// Waits for the specified dialog to appear
         /// </summary>
         /// <param name="dialog">dialog check delegate</param>
@@ -217,6 +259,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     return true;
                 }
+                SafeWait(200);
             }
             return false;
         }
@@ -232,6 +275,17 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             Color[,] dialogTitle = ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
             return ImageProcessing.ColorSum(dialogTitle);
+        }
+
+        /// <summary>
+        /// Calculates the number of text pixels in the dialog body
+        /// </summary>
+        /// <returns>the number of pixels of text in the dialog body</returns>
+        protected int DialogBodyText()
+        {
+            ReadWindow();
+            bool[,] dialogTitle = ColorFilterPiece(DialogBody, DialogTextLeft, DialogTextRight, DialogTextTop, DialogTextBottom);
+            return ImageProcessing.MatchCount(dialogTitle);
         }
 
         /// <summary>
@@ -253,17 +307,49 @@ namespace RunescapeBot.BotPrograms
         protected bool RepeatLastTaskDialog()
         {
             long titleHash = DialogTitleHash();
-            return Numerical.CloseEnough(100000, titleHash, 0.001);
+            return Numerical.CloseEnough(4107517, titleHash, _titleHashPrecision);
         }
 
         /// <summary>
         /// Determines if the dialog box is showing the "Demon Butler" title
         /// </summary>
-        /// <returns>true if the salar dialog is showing</returns>
+        /// <returns>true if the salary dialog is showing</returns>
         protected bool DemonButlerDialog()
         {
             long titleHash = DialogTitleHash();
-            return Numerical.CloseEnough(100000, titleHash, 0.001);
+            return Numerical.CloseEnough(4193761, titleHash, _titleHashPrecision);
+        }
+
+        /// <summary>
+        /// Determines if the dialog box is showing the "Select an Option" title
+        /// </summary>
+        /// <returns>true if the select an option dialog is showing</returns>
+        protected bool SelectAnOptionDialog()
+        {
+            long titleHash = DialogTitleHash();
+            return Numerical.CloseEnough(4114072, titleHash, _titleHashPrecision);
+        }
+
+        /// <summary>
+        /// Determines if the dialog box is showing the "What is thy bidding" text or "I am at thy command"
+        /// </summary>
+        /// <returns>true if one of the waiting for command dialogs is showing</returns>
+        protected bool WaitingForCommand()
+        {
+            int bodyTextCount = DialogBodyText();
+            bool maleTextMatch = Numerical.CloseEnough(474, bodyTextCount, 0.01) || Numerical.CloseEnough(439, bodyTextCount, 0.01);    //click or call servant respectively
+            bool femaleTextMatch = Numerical.CloseEnough(493, bodyTextCount, 0.01) || Numerical.CloseEnough(458, bodyTextCount, 0.01);
+            return maleTextMatch || femaleTextMatch;
+        }
+
+        /// <summary>
+        /// Determines if the dialog box is showing for the "Un-note the banknotes?" title
+        /// </summary>
+        /// <returns></returns>
+        protected bool UnNoteTheBanknotes()
+        {
+            long titleHash = DialogTitleHash();
+            return Numerical.CloseEnough(4090128, titleHash, _titleHashPrecision);
         }
     }
 }

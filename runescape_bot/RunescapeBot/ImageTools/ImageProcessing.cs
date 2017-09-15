@@ -410,6 +410,33 @@ namespace RunescapeBot.ImageTools
         {
             if (image == null) { return 0.0; }
 
+            int width = image.GetLength(0);
+            int height = image.GetLength(1);
+
+            return MatchCount(image) / ((double) (width * height));
+        }
+
+        /// <summary>
+        /// Calculates the number of matching pixels in an image
+        /// </summary>
+        /// <param name="rgbImage">image to match on</param>
+        /// <param name="filter">filter to use for matching</param>
+        /// <returns>the number of positive pixels</returns>
+        public static int MatchCount(Color[,] rgbImage, RGBHSBRange filter)
+        {
+            bool[,] binaryImage = ColorFilter(rgbImage, filter);
+            return MatchCount(binaryImage);
+        }
+
+        /// <summary>
+        /// Calculates the number of matching pixels in an image
+        /// </summary>
+        /// <param name="image">binary image to check</param>
+        /// <returns>the number of positive pixels</returns>
+        public static int MatchCount(bool[,] image)
+        {
+            if (image == null) { return 0; }
+
             int matches = 0;
             int width = image.GetLength(0);
             int height = image.GetLength(1);
@@ -425,7 +452,7 @@ namespace RunescapeBot.ImageTools
                 }
             }
 
-            return matches / ((double) (width * height));
+            return matches;
         }
 
         /// <summary>

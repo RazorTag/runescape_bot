@@ -400,9 +400,21 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static RGBHSBRange DialogBoxTitle()
         {
-            Color dark = Color.FromArgb(127, 0, 0);
-            Color light = Color.FromArgb(129, 1, 0);
+            Color dark = Color.FromArgb(128, 0, 0);
+            Color light = Color.FromArgb(128, 0, 0);
             HSBRange hsbRange = new HSBRange(359.0f, 1.0f, 0.995f, 1.000f, 0.246f, 0.256f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The blue text for a dialog box body
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange DialogBoxBody()
+        {
+            Color dark = Color.FromArgb(0, 0, 128);
+            Color light = Color.FromArgb(0, 0, 128);
+            HSBRange hsbRange = new HSBRange(239.0f, 241.0f, 0.995f, 1.000f, 0.246f, 0.256f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
