@@ -78,7 +78,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (!Bank())
             {
-                return false;
+                return false;   //TODO teleport to camelot / relog
             }
             if (!TeleportToHouse())
             {
@@ -111,6 +111,7 @@ namespace RunescapeBot.BotPrograms
             watch.Start();
             while (!IsAtHouse())
             {
+                SafeWait(200);
                 if (watch.ElapsedMilliseconds > 10000)
                 {
                     return false;
@@ -181,7 +182,7 @@ namespace RunescapeBot.BotPrograms
         protected bool UnNoteBankChest(Point inventorySlot)
         {
             Blob bankChest;
-            if (LocateObject(BankChest, out bankChest, 1))
+            if (LocateStationaryObject(BankChest, out bankChest, 0, 5000, ArtifactSize(0.0004), ArtifactSize(0.0013), LocateObject, 0))
             {
                 Inventory.ClickInventory(inventorySlot);
                 Point clickOffset = new Point(-ArtifactLength(0.012), 0);

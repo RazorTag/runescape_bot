@@ -74,7 +74,7 @@ namespace RunescapeBot.BotPrograms
         protected Blob StationaryLocateUnminedOre()
         {
             Blob rockLocation;
-            if (LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, LocateUnminedOre))
+            if (LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, int.MaxValue, LocateUnminedOre))
             {
 
             }
@@ -93,7 +93,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
         /// <returns>true if an ore rock is found</returns>
-        protected bool LocateUnminedOre(RGBHSBRange ironFilter, out Blob foundObject, int minimumSize)
+        protected bool LocateUnminedOre(RGBHSBRange ironFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] ironBoolArray = ColorFilter(ironFilter);

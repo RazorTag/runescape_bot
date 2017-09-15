@@ -92,7 +92,7 @@ namespace RunescapeBot.BotPrograms
         protected Blob StationaryLocateFishingSpot()
         {
             Blob fishLocation;
-            if (LocateStationaryObject(FishTileFilter, out fishLocation, 50, 5000, 1, LocateFishingTile))
+            if (LocateStationaryObject(FishTileFilter, out fishLocation, 50, 5000, 1, int.MaxValue, LocateFishingTile))
             {
 
             }
@@ -107,7 +107,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
         /// <returns>true if an ore rock is found</returns>
-        protected bool LocateFishingTile(RGBHSBRange fishFilter, out Blob foundObject, int minimumSize)
+        protected bool LocateFishingTile(RGBHSBRange fishFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
         {
             foundObject = new Blob();
             ReadWindow();

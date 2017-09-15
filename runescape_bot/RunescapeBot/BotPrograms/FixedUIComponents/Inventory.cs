@@ -444,13 +444,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a slot is empty</returns>
         public bool SlotIsEmpty(int xSlot, int ySlot, bool readScreen = false, bool safeTab = false)
         {
-            OpenInventory(safeTab);
             int x = xSlot;
             int y = ySlot;
             InventoryToScreen(ref x, ref y);
-            if (readScreen)
+            if (OpenInventory(safeTab) || readScreen)
             {
-                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient, true));
             }
 
             int xOffset = (INVENTORY_GAP_X / 2) - 1;
@@ -474,7 +473,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a slot is empty</returns>
         public bool SlotIsEmpty(Point slot, bool readScreen = false, bool safeTab = false)
         {
-            return SlotIsEmpty(slot.X, slot.Y);
+            return SlotIsEmpty(slot.X, slot.Y, readScreen, safeTab);
         }
 
         /// <summary>
@@ -657,7 +656,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Milliseconds to wait after switching tabs
         /// </summary>
-        private const int TAB_SWITCH_WAIT = 20;
+        private const int TAB_SWITCH_WAIT = 200;
 
         private const int INVENTORY_TAB_OFFSET_RIGHT = 118;
         private const int INVENTORY_TAB_OFFSET_BOTTOM = 320;

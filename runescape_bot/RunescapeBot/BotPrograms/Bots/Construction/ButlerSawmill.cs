@@ -171,6 +171,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool Bank()
         {
+            Inventory.OpenInventory();
+            SafeWait(100);
             if (Inventory.SlotIsEmpty(InventoryLogSlot, true) || Inventory.SlotIsEmpty(InventoryLawRuneSlot) || Inventory.SlotIsEmpty(InventoryCashSlot))
             {
                 return false;   //TODO restock at the GE
