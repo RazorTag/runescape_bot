@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
@@ -28,9 +29,12 @@ namespace RunescapeBot.BotPrograms
         protected int DialogTextTop { get { return ScreenHeight - 123; } }
         protected int DialogTextBottom { get { return DialogTextTop + 60; } }
 
+        protected int FailedRuns;
+
 
         public CamelotHouse(RunParams startParams) : base(startParams)
         {
+            FailedRuns = 0;
             RunParams.Run = true;
             RunParams.LoginWorld = 392;
             InventoryLawRuneSlot = new Point(0, 0);
@@ -45,9 +49,11 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Run()
         {
-            ReadWindow();
+            //ReadWindow();
             //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\construction\\test.png");
 
+            //ScreenScraper.BringToForeGround(RSClient);
+            //Thread.Sleep(1000);
             //ReadWindow();
             //bool[,] furnaceIcon = ColorFilter(BankChest);
             //DebugUtilities.TestMask(Bitmap, ColorArray, BankChest, furnaceIcon);
@@ -68,7 +74,7 @@ namespace RunescapeBot.BotPrograms
             //RepeatLastTaskDialog();
             //SelectAnOptionDialog();
             //WaitingForCommand();
-            UnNoteTheBanknotes();
+            //UnNoteTheBanknotes();
 
             return true;
         }
@@ -76,9 +82,14 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            if (!Bank())
+            if (FailedRuns >= 5)
             {
                 return false;
+            }
+
+            if (!Bank())
+            {
+                return false;   //TODO teleport to camelot / refresh bank / relog / visit GE
             }
             if (!TeleportToHouse())
             {
@@ -86,7 +97,7 @@ namespace RunescapeBot.BotPrograms
             }
             if (!Construct())
             {
-                return false;
+                FailedRuns++;
             }
             if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot))
             {
@@ -94,6 +105,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             RunParams.Iterations--;
+            FailedRuns = 0;
             return true;
         }
 
@@ -111,6 +123,7 @@ namespace RunescapeBot.BotPrograms
             watch.Start();
             while (!IsAtHouse())
             {
+                SafeWait(200);
                 if (watch.ElapsedMilliseconds > 10000)
                 {
                     return false;
@@ -157,17 +170,11 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.OpenOptions(false);
             int x = ScreenWidth - 97;
-            LeftClick(x, ScreenHeight - 58, 12);    //click on house options
+            LeftClick(x, ScreenHeight - 58, 10);    //click on house options
 
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            while (!HouseOptionsIsOpen() && !StopFlag)
+            if (!WaitForDialog(HouseOptionsIsOpen))
             {
-                SafeWait(200);
-                if (watch.ElapsedMilliseconds > 5000)
-                {
-                    return false;
-                }
+                return false;
             }
             LeftClick(x, ScreenHeight - 76, 12);    //click on call servant
             return true;
@@ -181,22 +188,26 @@ namespace RunescapeBot.BotPrograms
         protected bool UnNoteBankChest(Point inventorySlot)
         {
             Blob bankChest;
-            if (LocateObject(BankChest, out bankChest, 1))
+            if (LocateStationaryObject(BankChest, out bankChest, 0, 5000, ArtifactSize(0.0004), ArtifactSize(0.0015), LocateObject))
             {
                 Inventory.ClickInventory(inventorySlot);
                 Point clickOffset = new Point(-ArtifactLength(0.012), 0);
                 Point bankChestClick = Geometry.AddPoints(bankChest.Center, clickOffset);
-                bankChestClick = Probability.GaussianCircle(bankChestClick, 5, 0, 360, 10);
+                bankChestClick = Probability.GaussianCircle(bankChestClick, 1, 0, 360, 3);
                 Mouse.MoveMouse(bankChestClick.X, bankChestClick.Y, RSClient);
                 if (WaitForMouseOverText(BlueMouseOverText))
                 {
-                    Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient, 0);
+                    Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient);
                     if (!WaitForDialog(UnNoteTheBanknotes))
                     {
                         return false;
                     }
                     Keyboard.WriteNumber(1);
                     return true;
+                }
+                else
+                {
+                    Inventory.ClickInventory(inventorySlot);
                 }
             }
             return false;

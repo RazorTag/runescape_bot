@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using System.Linq;
+using RunescapeBot.FileIO;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -233,6 +234,30 @@ namespace RunescapeBot.BotPrograms
         /// Handles the sequential calling of the methods used to do bot work
         /// </summary>
         private void Process()
+        {
+            if (Debugger.IsAttached)
+            {
+                BotProcess();
+            }
+            else
+            {
+                try
+                {
+                    BotProcess();
+                }
+                catch (Exception e)
+                {
+                    LogError.SimpleLog(e);  //log an error raised during a bot's execution
+                    MessageBox.Show("See " + LogError.FilePath + " for details.", "Critical Error");
+                    throw e;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the start, running, and end of a bot
+        /// </summary>
+        private void BotProcess()
         {
             //don't limit by iterations unless the user has specified a positive number of iterations
             if (RunParams.Iterations <= 0)
@@ -585,7 +610,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="findObject">custom method to locate the object</param>
         /// <param name="verificationPasses">number of times to verify the position of the object after finding it</param>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(RGBHSBRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize, FindObject findObject = null, int verificationPasses = 1)
+        protected bool LocateStationaryObject(RGBHSBRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize = 1, int maximumSize = int.MaxValue, FindObject findObject = null, int verificationPasses = 1)
         {
             findObject = findObject ?? LocateObject;
 
@@ -600,23 +625,24 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return false; }
 
                 Blob objectBlob = null;
-                findObject(stationaryObject, out objectBlob, minimumSize);
+                findObject(stationaryObject, out objectBlob, minimumSize, maximumSize);
 
                 if (objectBlob != null)
                 {
                     if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
                     {
                         passes++;
-                        if (passes >= verificationPasses)
-                        {
-                            foundObject = objectBlob;
-                            return true;
-                        }
                     }
                     else
                     {
                         passes = 0;
                         lastPosition = objectBlob.Center;
+                    }
+
+                    if (passes >= verificationPasses)
+                    {
+                        foundObject = objectBlob;
+                        return true;
                     }
                 }
                 else
@@ -627,7 +653,7 @@ namespace RunescapeBot.BotPrograms
 
             return false;
         }
-        protected delegate bool FindObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1);
+        protected delegate bool FindObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue);
 
         /// <summary>
         /// Looks for an object that matches a filter
@@ -637,12 +663,12 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWaitTime"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1)
+        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilter(stationaryObject);
             EraseClientUIFromMask(ref objectPixels);
-            return LocateObject(objectPixels, out foundObject, minimumSize);
+            return LocateObject(objectPixels, out foundObject, minimumSize, maximumSize);
         }
 
         /// <summary>
@@ -656,11 +682,11 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bottom"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1)
+        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
-            return LocateObject(objectPixels, out foundObject, minimumSize);
+            return LocateObject(objectPixels, out foundObject, minimumSize, maximumSize);
         }
 
         /// <summary>
@@ -670,20 +696,27 @@ namespace RunescapeBot.BotPrograms
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(bool[,] objectPixels, out Blob foundObject, int minimumSize = 1)
+        protected bool LocateObject(bool[,] objectPixels, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
-            Blob objectBlob = ImageProcessing.BiggestBlob(objectPixels);
+            foundObject = null;
+            List<Blob> objectBlobs = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
 
-            if (objectBlob != null && objectBlob.Size >= minimumSize)
+            if (objectBlobs != null && objectBlobs.Count > 0)
             {
-                foundObject = objectBlob;
-                return true;
+                foreach (Blob blob in objectBlobs)
+                {
+                    if (blob.Size < minimumSize)
+                    {
+                        return false;
+                    }
+                    if (blob.Size <= maximumSize)
+                    {
+                        foundObject = blob;
+                        return true;
+                    }
+                }
             }
-            else
-            {
-                foundObject = null;
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
@@ -1201,14 +1234,17 @@ namespace RunescapeBot.BotPrograms
                 if (SafeWait(5000)) { return false; }
             }
 
-            //click the "CLICK HERE TO PLAY" button on the welcome screen
-            if (ConfirmWelcomeScreen(out clickLocation))
+            if (!PvPWorldSet())
             {
-                LeftClick(clickLocation.Value.X, clickLocation.Value.Y);
-            }
-            else
-            {
-                return false;
+                //click the "CLICK HERE TO PLAY" button on the welcome screen
+                if (ConfirmWelcomeScreen(out clickLocation))
+                {
+                    LeftClick(clickLocation.Value.X, clickLocation.Value.Y);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             //verify the log in
@@ -1285,6 +1321,16 @@ namespace RunescapeBot.BotPrograms
                 }
             }
             return false;   //We timed out waiting.
+        }
+
+        /// <summary>
+        /// Determines if RunParams specifies a PvP world to log into
+        /// </summary>
+        /// <returns></returns>
+        protected bool PvPWorldSet()
+        {
+            int world = RunParams.LoginWorld;
+            return (world == 325) || (world == 337) || (world == 392);
         }
 
         /// <summary>
@@ -1430,6 +1476,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we detect a bot world and attempt to change worlds</returns>
         protected bool BotWorldCheck(bool readWindow = false)
         {
+            if (PvPWorldSet())
+            {
+                return false;
+            }
+
             //just in case the last bot world check time is erroneously set to some future date
             if (LastBotWorldCheck > DateTime.Now)
             {
@@ -1657,7 +1708,7 @@ namespace RunescapeBot.BotPrograms
         /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if the bank booths are found</returns>
-        protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1)
+        protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             return LocateBankBoothPhasmatys(out bankBooth);
         }

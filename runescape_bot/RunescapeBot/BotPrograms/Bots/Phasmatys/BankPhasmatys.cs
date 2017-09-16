@@ -215,7 +215,7 @@ namespace RunescapeBot.BotPrograms
         {
             Blob bankBooth;
             const int maxWaitTime = 12000;
-            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, MinBankBoothSize, LocateBankBoothPhasmatys))
+            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, MinBankBoothSize, int.MaxValue, LocateBankBoothPhasmatys))
             {
                 return false;
             }

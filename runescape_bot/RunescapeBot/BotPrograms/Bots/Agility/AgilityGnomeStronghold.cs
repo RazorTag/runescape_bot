@@ -103,7 +103,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassLogBalance()
         {
             Blob log;
-            if (!LocateStationaryObject(LogBalance, out log, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinLogSize, null, 2))
+            if (!LocateStationaryObject(LogBalance, out log, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinLogSize, int.MaxValue, null, 2))
             {
                 return false;   //unable to locate the log balance
             }
@@ -145,7 +145,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassCargoNet()
         {
             Blob cargoNet;
-            if (!LocateStationaryObject(CargoNet, out cargoNet, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinCargoNetSize, LocateMiddleCargoNet))
+            if (!LocateStationaryObject(CargoNet, out cargoNet, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinCargoNetSize, int.MaxValue, LocateMiddleCargoNet))
             {
                 return false;   //unable to locate a set of cargo net frames
             }
@@ -203,7 +203,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="cargoNet">returns the top of the middle cargo net</param>
         /// <param name="minimumSize">conservative size floor</param>
         /// <returns>true if a set of cargo nets is found</returns>
-        private bool LocateMiddleCargoNet(RGBHSBRange cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1)
+        private bool LocateMiddleCargoNet(RGBHSBRange cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             cargoNet = null;
             ReadWindow();
@@ -256,7 +256,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassTreeBranch()
         {
             Blob treeTrunk;
-            if (!LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, FindTreeTrunk))
+            if (!LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, int.MaxValue, FindTreeTrunk))
             {
                 return false;   //unable to locate a tree trunk
             }
@@ -330,7 +330,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="trunk">returns a climbable tree trunk if found</param>
         /// <param name="minimumSize">not used</param>
         /// <returns>true if a climbable tree trunk is found</returns>
-        private bool FindTreeTrunk(RGBHSBRange trunkColor, out Blob trunk, int minimumSize = 1)
+        private bool FindTreeTrunk(RGBHSBRange trunkColor, out Blob trunk, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             trunk = null;
             ReadWindow();
@@ -434,7 +434,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassTreeTrunk()
         {
             Blob treeTrunk;
-            if (!LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, FindTreeTrunk))
+            if (!LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, int.MaxValue, FindTreeTrunk))
             {
                 return false;   //unable to locate a tree trunk
             }
@@ -453,7 +453,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassDrainPipe()
         {
             Blob drainPipe;
-            if (!LocateStationaryObject(DrainPipe, out drainPipe, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinDrainPipeSize, LocateDrainPipe, 2))
+            if (!LocateStationaryObject(DrainPipe, out drainPipe, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinDrainPipeSize, int.MaxValue, LocateDrainPipe, 2))
             {
                 return false;
             }
@@ -470,7 +470,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="drainPipe"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        private bool LocateDrainPipe(RGBHSBRange drainPipeColor, out Blob drainPipe, int minimumSize = 1)
+        private bool LocateDrainPipe(RGBHSBRange drainPipeColor, out Blob drainPipe, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             drainPipe = null;
             ReadWindow();
