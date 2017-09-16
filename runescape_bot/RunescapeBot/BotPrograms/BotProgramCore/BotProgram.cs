@@ -1234,14 +1234,17 @@ namespace RunescapeBot.BotPrograms
                 if (SafeWait(5000)) { return false; }
             }
 
-            //click the "CLICK HERE TO PLAY" button on the welcome screen
-            if (ConfirmWelcomeScreen(out clickLocation))
+            if (!PvPWorldSet())
             {
-                LeftClick(clickLocation.Value.X, clickLocation.Value.Y);
-            }
-            else
-            {
-                return false;
+                //click the "CLICK HERE TO PLAY" button on the welcome screen
+                if (ConfirmWelcomeScreen(out clickLocation))
+                {
+                    LeftClick(clickLocation.Value.X, clickLocation.Value.Y);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             //verify the log in
@@ -1318,6 +1321,16 @@ namespace RunescapeBot.BotPrograms
                 }
             }
             return false;   //We timed out waiting.
+        }
+
+        /// <summary>
+        /// Determines if RunParams specifies a PvP world to log into
+        /// </summary>
+        /// <returns></returns>
+        protected bool PvPWorldSet()
+        {
+            int world = RunParams.LoginWorld;
+            return (world == 325) || (world == 337) || (world == 392);
         }
 
         /// <summary>
@@ -1463,6 +1476,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we detect a bot world and attempt to change worlds</returns>
         protected bool BotWorldCheck(bool readWindow = false)
         {
+            if (PvPWorldSet())
+            {
+                return false;
+            }
+
             //just in case the last bot world check time is erroneously set to some future date
             if (LastBotWorldCheck > DateTime.Now)
             {

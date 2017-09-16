@@ -1,5 +1,6 @@
 ﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,6 +15,8 @@ namespace RunescapeBot.BotPrograms
         protected Point InventoryCashSlot, InventoryLogSlot, FirstLogSlot;
         protected Point BankCashSlot, BankLogSlot, BankPlankSlot;
 
+        RGBHSBRange YellowMouseOverText;
+
         int DemonHeadSize { get { return ArtifactSize(0.0001); } }
 
         public ButlerSawmill(RunParams startParams) : base(startParams)
@@ -26,6 +29,7 @@ namespace RunescapeBot.BotPrograms
             BankLawRuneSlot = new Point(0, 6);
             BankLogSlot = new Point(0, 5);
             BankPlankSlot = new Point(0, 4);
+            YellowMouseOverText = RGBHSBRangeFactory.MouseoverTextNPC();
         }
 
         protected override bool Run()
@@ -93,13 +97,17 @@ namespace RunescapeBot.BotPrograms
         {
             skipRepeatLastDialog = false;
             int demonTries = 0;
-            while (!StopFlag && !WaitForDialog(AnyDialog, 1500))
+            while (!StopFlag && !WaitForDialog(AnyDialog, 2000))
             {
                 Blob demon;
-                if (LocateObject(DemonHead, out demon, 1))
+                if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000))
                 {
-                    LeftClick(demon.Center.X, demon.Center.Y);
-                    SafeWaitPlus(1000, 100);
+                    Mouse.MoveMouse(demon.Center.X, demon.Center.Y, RSClient);
+                    if (WaitForMouseOverText(YellowMouseOverText))
+                    {
+                        LeftClick(demon.Center.X, demon.Center.Y);
+                        SafeWait(500);
+                    }
                 }
                 else
                 {
@@ -177,7 +185,16 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;   //TODO restock at the GE
             }
-            return UnNoteBankChest(InventoryLogSlot);
+
+            const int maxUnNoteTries = 5;
+            for (int i = 0; i < maxUnNoteTries; i++)
+            {
+                if (UnNoteBankChest(InventoryLogSlot))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
