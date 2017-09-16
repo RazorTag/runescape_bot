@@ -72,7 +72,7 @@ namespace RunescapeBot.BotPrograms
                     Blob fishLocation = StationaryLocateFishingSpot();
                     if (fishLocation != null)
                     {
-                        if (fishLocation.Size > 0)
+                        if (fishLocation.Center.X != 0 && fishLocation.Center.Y != 0)
                         {
                             Point fishPoint = (Point)fishLocation.RandomBlobPixel();
                             LeftClick(fishPoint.X, fishPoint.Y);
