@@ -441,7 +441,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
         /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
-        /// <returns>true if a slot is empty</returns>
+        /// <param name="readScreen">set to true to reread the game screen before checking</param>
+        /// <param name="safeTab">set to true to switch to the inventory tab even if it already thinks that it is selected</param>
+        /// <returns>true if the slot is empty</returns>
         public bool SlotIsEmpty(int xSlot, int ySlot, bool readScreen = false, bool safeTab = false)
         {
             int x = xSlot;
@@ -469,11 +471,24 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="slot">inventor coordinates of the slot to check</param>
         /// <param name="readScreen">set to true to reread the game screen before checking</param>
-        /// <param name="safeTab"></param>
-        /// <returns>true if a slot is empty</returns>
+        /// <param name="safeTab">set to true to switch to the inventory tab even if it already thinks that it is selected</param>
+        /// <returns>true if the slot is empty</returns>
         public bool SlotIsEmpty(Point slot, bool readScreen = false, bool safeTab = false)
         {
             return SlotIsEmpty(slot.X, slot.Y, readScreen, safeTab);
+        }
+
+        /// <summary>
+        /// Determines if the given inventory slot contains any item
+        /// </summary>
+        /// <param name="slot">index of the slot iin the inventory</param>
+        /// <param name="readScreen">set to true to reread the game screen before checking</param>
+        /// <param name="safeTab">set to true to switch to the inventory tab even if it already thinks that it is selected</param>
+        /// <returns>true if the slot is empty</returns>
+        public bool SlotIsEmpty(int slot, bool readScreen = false, bool safeTab = false)
+        {
+            Point slotCoordinates = InventoryIndexToCoordinates(slot);
+            return SlotIsEmpty(slotCoordinates);
         }
 
         /// <summary>
@@ -562,9 +577,10 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Attempts to teleport to the specified location
         /// </summary>
-        /// <param name="location"></param>
+        /// <param name="location">location to teleport to</param>
+        /// <param name="wait">whether to wait for expected teleport duration</param>
         /// <returns>False if the player doesn't have the runes to teleport</returns>
-        public bool StandardTeleport(StandardTeleports location)
+        public bool StandardTeleport(StandardTeleports location, bool wait)
         {
             Point spellbookSlot = TeleportToSpellBookSlot(location);
             if (!TeleportHasRunes(location))
@@ -572,7 +588,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             ClickSpellbook(spellbookSlot.X, spellbookSlot.Y, false);
-            BotProgram.SafeWait(3000);
+            if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
             return true;
         }
 
@@ -658,8 +674,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private const int TAB_SWITCH_WAIT = 200;
 
-        private const int INVENTORY_TAB_OFFSET_RIGHT = 118;
-        private const int INVENTORY_TAB_OFFSET_BOTTOM = 320;
+        public const int INVENTORY_TAB_OFFSET_RIGHT = 118;
+        public const int INVENTORY_TAB_OFFSET_BOTTOM = 320;
         private const int INVENTORY_OFFSET_LEFT = 185;
         private const int INVENTORY_OFFSET_TOP = 275;
         private const int INVENTORY_GAP_X = 42;
@@ -676,6 +692,7 @@ namespace RunescapeBot.BotPrograms
         private const int SPELLBOOK_GAP_Y = 24;
         public const int SPELLBOOK_COLUMNS = 7;
         public const int SPELLBOOK_ROWS = 10;
+        public const int TELEPORT_DURATION = 4 * BotRegistry.GAME_TICK;
 
         private const int LOGOUT_TAB_OFFSET_RIGHT = 120;
         private const int LOGOUT_TAB_OFFSET_BOTTOM = 18;

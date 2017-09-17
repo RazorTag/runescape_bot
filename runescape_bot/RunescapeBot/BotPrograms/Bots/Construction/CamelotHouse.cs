@@ -17,7 +17,7 @@ namespace RunescapeBot.BotPrograms
         protected const double _titleHashPrecision = 0.0001;
 
         protected Point InventoryLawRuneSlot, BankLawRuneSlot;
-        protected RGBHSBRange HousePortalPurple, BankChest, BlueMouseOverText, DemonHead, DialogTitle, DialogBody;
+        protected RGBHSBRange HousePortalPurple, BankChest, BlueMouseOverText, DemonHead, DialogTitle, DialogBody, ContinueBarBlue, BackpackBrown;
 
         protected int DialogTitleLeft { get { return 128; } }
         protected int DialogTitleRight { get { return DialogTitleLeft + 370; } }
@@ -29,7 +29,13 @@ namespace RunescapeBot.BotPrograms
         protected int DialogTextTop { get { return ScreenHeight - 123; } }
         protected int DialogTextBottom { get { return DialogTextTop + 60; } }
 
+        protected int DialogLeft { get { return 128; } }
+        protected int DialogRight { get { return DialogLeft + 370; } }
+        protected int DialogTop { get { return ScreenHeight - 142; } }
+        protected int DialogBottom { get { return DialogTop + 82; } }
+
         protected int FailedRuns;
+        protected Stopwatch teleportWatch;
 
 
         public CamelotHouse(RunParams startParams) : base(startParams)
@@ -39,18 +45,27 @@ namespace RunescapeBot.BotPrograms
             RunParams.LoginWorld = 392;
             InventoryLawRuneSlot = new Point(0, 0);
             BankLawRuneSlot = new Point(0, 7);
+            SetColors();
+            teleportWatch = new Stopwatch();
+        }
+
+        private void SetColors()
+        {
             BankChest = RGBHSBRangeFactory.BankChest();
             HousePortalPurple = RGBHSBRangeFactory.HousePortalPurple();
             BlueMouseOverText = RGBHSBRangeFactory.MouseoverTextStationaryObject();
             DemonHead = RGBHSBRangeFactory.LesserDemonSkin();
             DialogTitle = RGBHSBRangeFactory.DialogBoxTitle();
-            DialogBody = RGBHSBRangeFactory.DialogBoxBody();
+            DialogBody = RGBHSBRangeFactory.Black();
+            ContinueBarBlue = RGBHSBRangeFactory.GenericColor(Color.Blue);
+            BackpackBrown = RGBHSBRangeFactory.BackpackBrown();
         }
 
         protected override bool Run()
         {
             //ReadWindow();
-            //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\construction\\test.png");
+            //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\construction\\enter-amount.png");
+            //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\test.png");
 
             //ScreenScraper.BringToForeGround(RSClient);
             //Thread.Sleep(1000);
@@ -69,12 +84,21 @@ namespace RunescapeBot.BotPrograms
             //IsAtHouse();
             //Construct();
 
+            //long titleHash = DialogTitleHash();
+            //long dialogHash = DialogHash();
             //AnyDialog();
             //DemonButlerDialog();
             //RepeatLastTaskDialog();
             //SelectAnOptionDialog();
             //WaitingForCommand();
             //UnNoteTheBanknotes();
+            //ContinueBar();
+
+            //ReadWindow();
+            //Color[,] image = DebugUtilities.LoadImageFromFile("C:\\Projects\\Roboport\\test_pictures\\construction\\select-sawmill.png");
+            //Color[,] dialogBody = ImageProcessing.ScreenPiece(image, DialogTextLeft, DialogTextRight, DialogTextTop, DialogTextBottom);
+            //bool[,] dialogBodyBinary = ImageProcessing.ColorFilter(dialogBody, RGBHSBRangeFactory.Black());
+            //int bodyHash = ImageProcessing.MatchCount(dialogBodyBinary);
 
             return true;
         }
@@ -91,20 +115,24 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;   //TODO teleport to camelot / refresh bank / relog / visit GE
             }
+
             if (!TeleportToHouse())
             {
                 return false;
             }
+            teleportWatch.Restart();
+
             if (!Construct())
             {
                 FailedRuns++;
             }
-            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot))
+
+            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot, false))
             {
                 return false;   //TODO restock at the GE
             }
+            teleportWatch.Restart();
 
-            RunParams.Iterations--;
             FailedRuns = 0;
             return true;
         }
@@ -115,21 +143,25 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool TeleportToHouse()
         {
-            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.House))
+            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.House, false))
             {
                 return false;
             }
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            while (!IsAtHouse())
-            {
-                SafeWait(200);
-                if (watch.ElapsedMilliseconds > 10000)
-                {
-                    return false;
-                }
-            }
             return true;
+        }
+
+        /// <summary>
+        /// Waits until an ongoing teleport is completed
+        /// </summary>
+        /// <returns>true if the stopflag is raised</returns>
+        protected bool WaitForTeleport()
+        {
+            if (teleportWatch.IsRunning)
+            {
+                teleportWatch.Stop();
+                return (SafeWait(Inventory.TELEPORT_DURATION - teleportWatch.ElapsedMilliseconds));
+            }
+            return false;
         }
 
         /// <summary>
@@ -168,16 +200,24 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool CallServant()
         {
-            Inventory.OpenOptions(false);
-            int x = ScreenWidth - 97;
-            LeftClick(x, ScreenHeight - 58, 10);    //click on house options
+            Point houseOptions = HouseOptionsLocation();
+            LeftClick(houseOptions.X, houseOptions.Y, 10);    //click on house options
 
             if (!WaitForDialog(HouseOptionsIsOpen))
             {
                 return false;
             }
-            LeftClick(x, ScreenHeight - 76, 12);    //click on call servant
+            LeftClick(houseOptions.X, ScreenHeight - 76, 12);    //click on call servant
             return true;
+        }
+
+        /// <summary>
+        /// Gets the location of the House Options button within the Options tab
+        /// </summary>
+        /// <returns>the location of the middle of House Options</returns>
+        protected Point HouseOptionsLocation()
+        {
+            return new Point(ScreenWidth - 97, ScreenHeight - 58);
         }
 
         /// <summary>
@@ -185,32 +225,91 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="inventorySlot"></param>
         /// <returns></returns>
-        protected bool UnNoteBankChest(Point inventorySlot)
+        protected bool UnNoteBankChest(Point inventorySlot, bool noteSelected)
         {
-            Blob bankChest;
-            if (LocateStationaryObject(BankChest, out bankChest, 0, 5000, ArtifactSize(0.0004), ArtifactSize(0.0015), LocateObject))
+            if (!noteSelected)
             {
                 Inventory.ClickInventory(inventorySlot);
-                Point clickOffset = new Point(-ArtifactLength(0.012), 0);
-                Point bankChestClick = Geometry.AddPoints(bankChest.Center, clickOffset);
-                bankChestClick = Probability.GaussianCircle(bankChestClick, 1, 0, 360, 3);
+            }
+
+            Point bankChestClick;
+            if (BankChestClickLocation(out bankChestClick))
+            {
                 Mouse.MoveMouse(bankChestClick.X, bankChestClick.Y, RSClient);
                 if (WaitForMouseOverText(BlueMouseOverText))
                 {
                     Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient);
-                    if (!WaitForDialog(UnNoteTheBanknotes))
+                    if (WaitForDialog(UnNoteTheBanknotes))
                     {
+                        Keyboard.WriteNumber(1);
+                        return true;
+                    }
+                    else
+                    {
+                        RefreshInventory();
                         return false;
                     }
-                    Keyboard.WriteNumber(1);
-                    return true;
-                }
-                else
-                {
-                    Inventory.ClickInventory(inventorySlot);
                 }
             }
+
+            Inventory.ClickInventory(inventorySlot);
             return false;
+        }
+
+        /// <summary>
+        /// Refreshes the player's inventory to a working state
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected virtual bool RefreshInventory()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Determines if the inventory look like it is ready
+        /// </summary>
+        /// <returns>true if the inventory appears to be set up correctly</returns>
+        protected virtual bool InventoryIsReady()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Finds the location of the bank chest to click on
+        /// </summary>
+        /// <param name="clickLocation"></param>
+        /// <returns></returns>
+        protected bool BankChestClickLocation(out Point clickLocation)
+        {
+            Blob bankChest;
+            if (LocateStationaryObject(BankChest, out bankChest, 0, 5000, 1, int.MaxValue, FindBankChest))
+            {
+                Point clickOffset = new Point(-ArtifactLength(0.012), -ArtifactLength(0.006));
+                clickLocation = Geometry.AddPoints(bankChest.Center, clickOffset);
+                clickLocation = Probability.GaussianCircle(clickLocation, 1, 0, 360, 3);
+                return true;
+            }
+            clickLocation = new Point(0, 0);
+            return false;
+        }
+
+        /// <summary>
+        /// Searches for the bank chest in an area around the player
+        /// </summary>
+        /// <param name="stationaryObject">color filter for the bank chest brown wood</param>
+        /// <param name="foundObject">bank chest blob return value</param>
+        /// <param name="minimumSize">not used</param>
+        /// <param name="maximumSize">not used</param>
+        /// <returns></returns>
+        protected bool FindBankChest(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize, int maximumSize)
+        {
+            int widthRadius = ArtifactLength(0.35);
+            int heightRadius = ArtifactLength(0.25);
+            int left = Center.X - widthRadius;
+            int right = Center.X + widthRadius;
+            int top = Center.Y - heightRadius;
+            int bottom = Center.Y + heightRadius;
+            return LocateObject(BankChest, out foundObject, left, right, top, bottom, ArtifactSize(0.0004), ArtifactSize(0.0015));
         }
 
         /// <summary>
@@ -229,30 +328,6 @@ namespace RunescapeBot.BotPrograms
             double houseOptionsMatch = ImageProcessing.FractionalMatch(houseOptionsTitle, RGBHSBRangeFactory.BankTitle());
             const double houseOptionsMinimumMatch = 0.05;
             return houseOptionsMatch > houseOptionsMinimumMatch;
-        }
-
-        /// <summary>
-        /// Goes through the dialog to pay the butler
-        /// Assumes you are already on the dialog of the butler asking for money
-        /// </summary>
-        /// <returns>true if successful</returns>
-        protected bool PayButler()
-        {
-            Keyboard.Space();   //you owe me money
-
-            if (StopFlag || !WaitForDialog(SelectAnOptionDialog))
-            {
-                return false;
-            }
-            Keyboard.WriteNumber(1);
-
-            if (StopFlag || !WaitForDialog(DemonButlerDialog))   //thank you for money
-            {
-                return false;
-            }
-            Keyboard.Space();
-
-            return true;
         }
 
         /// <summary>
@@ -295,8 +370,34 @@ namespace RunescapeBot.BotPrograms
         protected int DialogBodyText()
         {
             ReadWindow();
-            bool[,] dialogTitle = ColorFilterPiece(DialogBody, DialogTextLeft, DialogTextRight, DialogTextTop, DialogTextBottom);
-            return ImageProcessing.MatchCount(dialogTitle);
+            bool[,] dialogBody = ColorFilterPiece(DialogBody, DialogTextLeft, DialogTextRight, DialogTextTop, DialogTextBottom);
+            return ImageProcessing.MatchCount(dialogBody);
+        }
+
+        /// <summary>
+        /// Calculates a hash of the dialog title and body sections
+        /// </summary>
+        /// <returns></returns>
+        protected long DialogHash()
+        {
+            ReadWindow();
+            Color[,] dialogTitle = ScreenPiece(DialogLeft, DialogRight, DialogTop, DialogBottom);
+            return ImageProcessing.ColorSum(dialogTitle);
+        }
+
+        /// <summary>
+        /// Determines if "Click here to continue is showing"
+        /// </summary>
+        /// <returns>true if the player can push space to continue a dialog</returns>
+        protected bool ContinueBar()
+        {
+            int left = 233;
+            int right = left + 144;
+            int top = ScreenHeight - 59;
+            int bottom = top + 10;
+            bool[,] continueBar = ColorFilterPiece(ContinueBarBlue, left, right, top, bottom);
+            int textSize = ImageProcessing.MatchCount(continueBar);
+            return Numerical.CloseEnough(285, textSize, 0.01);
         }
 
         /// <summary>
@@ -309,48 +410,6 @@ namespace RunescapeBot.BotPrograms
             Color[,] dialogTitle = ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
             double dialogMatch = ImageProcessing.FractionalMatch(dialogTitle, DialogTitle);
             return dialogMatch > 0.005;
-        }
-
-        /// <summary>
-        /// Determines if the dialog box is showing the "Repeat last task?" title
-        /// </summary>
-        /// <returns>true if the last task dialog is showing</returns>
-        protected bool RepeatLastTaskDialog()
-        {
-            long titleHash = DialogTitleHash();
-            return Numerical.CloseEnough(4107517, titleHash, _titleHashPrecision);
-        }
-
-        /// <summary>
-        /// Determines if the dialog box is showing the "Demon Butler" title
-        /// </summary>
-        /// <returns>true if the salary dialog is showing</returns>
-        protected bool DemonButlerDialog()
-        {
-            long titleHash = DialogTitleHash();
-            return Numerical.CloseEnough(4193761, titleHash, _titleHashPrecision);
-        }
-
-        /// <summary>
-        /// Determines if the dialog box is showing the "Select an Option" title
-        /// </summary>
-        /// <returns>true if the select an option dialog is showing</returns>
-        protected bool SelectAnOptionDialog()
-        {
-            long titleHash = DialogTitleHash();
-            return Numerical.CloseEnough(4114072, titleHash, _titleHashPrecision);
-        }
-
-        /// <summary>
-        /// Determines if the dialog box is showing the "What is thy bidding" text or "I am at thy command"
-        /// </summary>
-        /// <returns>true if one of the waiting for command dialogs is showing</returns>
-        protected bool WaitingForCommand()
-        {
-            int bodyTextCount = DialogBodyText();
-            bool maleTextMatch = Numerical.CloseEnough(474, bodyTextCount, 0.01) || Numerical.CloseEnough(439, bodyTextCount, 0.01);    //click or call servant respectively
-            bool femaleTextMatch = Numerical.CloseEnough(493, bodyTextCount, 0.01) || Numerical.CloseEnough(458, bodyTextCount, 0.01);
-            return maleTextMatch || femaleTextMatch;
         }
 
         /// <summary>

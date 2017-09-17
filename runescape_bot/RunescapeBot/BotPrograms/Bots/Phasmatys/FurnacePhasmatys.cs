@@ -9,7 +9,6 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class FurnacePhasmatys : BankPhasmatys
     {
-        private const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 8000;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 5;
         private int failedRuns;
 
@@ -34,7 +33,7 @@ namespace RunescapeBot.BotPrograms
             //Refresh inventory to a bracelet mould and 27 gold bars
             if (StopFlag) { return false; }
             BankPopup = new Bank(RSClient);
-            if (!BankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
+            if (!BankPopup.WaitForPopup(BotUtilities.WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
                 failedRuns++;
                 return true;

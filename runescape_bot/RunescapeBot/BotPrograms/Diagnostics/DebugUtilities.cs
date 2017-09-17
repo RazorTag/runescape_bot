@@ -45,6 +45,25 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Loads an image from disk
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns>a color array of an image</returns>
+        public static Color[,] LoadImageFromFile(string filePath = "C:\\Projects\\Roboport\\test_pictures\\test.png")
+        {
+            Bitmap bitmap = (Bitmap)Image.FromFile(filePath);
+            Color[,] image = new Color[bitmap.Width, bitmap.Height];
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    image[x, y] = bitmap.GetPixel(x, y);
+                }
+            }
+            return image;
+        }
+
+        /// <summary>
         /// Colors the pixels where the given feature was found in Bitmap.
         /// Does not modify Bitmap. Creates a copy and returns the copy with masking applied.
         /// </summary>

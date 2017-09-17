@@ -686,7 +686,12 @@ namespace RunescapeBot.BotPrograms
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
-            return LocateObject(objectPixels, out foundObject, minimumSize, maximumSize);
+            if (LocateObject(objectPixels, out foundObject, minimumSize, maximumSize))
+            {
+                foundObject.ShiftPixels(left, top);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -1176,6 +1181,7 @@ namespace RunescapeBot.BotPrograms
 
             Point offset = (loginOffset ?? LoginScreenOffset());
             if (!OpenWorldSelector(offset)) { return false; }
+            SafeWait(2000);
             int worldIndex = world - lowestWorld;
 
             //adjust for missing worlds

@@ -115,14 +115,6 @@ namespace RunescapeBot.ImageTools.Tests
         }
 
         [TestMethod()]
-        public void GetTopLeftTest()
-        {
-            Blob blob = GenerateTestBlobRectangle(9, 5);
-            Point topLeft = blob.GetTopLeft();
-            Assert.IsTrue(topLeft.Equals(new Point(0, 0)));
-        }
-
-        [TestMethod()]
         [DataRow(0, 0, 4.472136)]
         [DataRow(54, 67, 82.006097)]
         public void DistanceToTest(int x, int y, double expectedDistance)
@@ -130,6 +122,16 @@ namespace RunescapeBot.ImageTools.Tests
             Blob blob = GenerateTestBlobRectangle(9, 5);
             double distance = blob.DistanceTo(new Point(x, y));
             Assert.AreEqual(expectedDistance, distance, 0.001);
+        }
+
+        [TestMethod()]
+        public void ShiftPixelsTest()
+        {
+            Blob blob = new Blob();
+            blob.AddPixel(5, 0);
+            blob.AddPixel(0, 5);
+            blob.ShiftPixels(10, 10);
+            Assert.IsTrue((blob.Size == 2) && blob.ContainsPixel(new Point(15, 10)) && blob.ContainsPixel(new Point(10, 15)));
         }
     }
 }

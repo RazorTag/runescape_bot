@@ -11,6 +11,8 @@ namespace RunescapeBot.BotPrograms
 {
     public static class BotUtilities
     {
+        public const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 8000;
+
         private const int WAIT_FOR_MAKEALL_POPUP_TIMEOUT = 1000;
         private const int CHATBOX_OPTION_RIGHT_CLICK_MAX_TRIES = 5;
         private const int CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY = 500;

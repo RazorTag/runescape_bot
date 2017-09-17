@@ -131,11 +131,17 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="screenHeight">height of the game screen in pixels</param>
         public void DepositInventory()
         {
-            const int xOffset = 427;
-            const int yOffset = 22; //offset from bottom
-            Point click = Probability.GaussianCircle(new Point(Left + xOffset, Bottom - yOffset), 2, 0, 360, 5);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
-            Thread.Sleep(200 + (int)Probability.HalfGaussian(0, 10, true));
+            Mouse.LeftClick(Left + 427, Bottom - 22, RSClient, 10);
+            BotProgram.SafeWaitPlus(200, 20);
+        }
+
+        /// <summary>
+        /// Sets the bank to withdraw items as notes
+        /// </summary>
+        public void WithdrawAsNotes()
+        {
+            Mouse.LeftClick(Left + 279, Bottom - 15, RSClient, 5);
+            BotProgram.SafeWaitPlus(200, 20);
         }
 
         /// <summary>

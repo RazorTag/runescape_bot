@@ -353,6 +353,18 @@ namespace RunescapeBot.BotPrograms
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// Catches most of the colors found in the opaque background of the inventory
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange BackpackBrown()
+        {
+            Color dark = Color.FromArgb(101, 55, 9);
+            Color light = Color.FromArgb(152, 94, 47);
+            HSBRange hsbRange = new HSBRange(21.9f, 35.0f, 0.521f, 0.758f, 0.174f, 0.432f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region textBoxes
@@ -482,6 +494,15 @@ namespace RunescapeBot.BotPrograms
             return new RGBHSBRange(dark, light, null);
         }
 
+        /// <summary>
+        /// Makes a color filter that perfectly fits the provided color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static RGBHSBRange GenericColor(Color color)
+        {
+            return new RGBHSBRange(color, color, null);
+        }
         #endregion
 
         #region mouseover description

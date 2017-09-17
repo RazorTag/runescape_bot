@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace RunescapeBot.Common
@@ -16,6 +17,25 @@ namespace RunescapeBot.Common
         {
             long miss = Math.Abs(test - target);
             return miss <= Math.Abs(target * tolerance);
+        }
+
+        /// <summary>
+        /// Compares a value against a list of values to see if any of them are close enough
+        /// </summary>
+        /// <param name="targets">list of values for comparison</param>
+        /// <param name="test">single value to compare against each target value</param>
+        /// <param name="tolerance">fraction of the target value by which the test value is allowed to diviate from the target value</param>
+        /// <returns>true if a match is found</returns>
+        public static bool CloseEnough(List<long> targets, long test, double tolerance)
+        {
+            foreach (long target in targets)
+            {
+                if (CloseEnough(target, test, tolerance))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>

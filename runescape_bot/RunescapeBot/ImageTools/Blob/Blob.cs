@@ -264,36 +264,6 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Gets the top-left most pixel
-        /// </summary>
-        /// <returns>the point from the blob with the greatest combination of leftness and topness</returns>
-        public Point GetTopLeft()
-        {
-            if (Pixels.Count == 0) {  return new Point();}
-
-            int left = -1;
-            int top = -1;
-
-            foreach (KeyValuePair<Point, Point> pixel in Pixels)
-            {
-                if (left == -1)
-                {
-                    left = pixel.Value.X;
-                    top = pixel.Value.Y;
-                }
-                else
-                {
-                    if ((left - pixel.Value.X) + (top - pixel.Value.Y) > 0)
-                    {
-                        left = pixel.Value.X;
-                        top = pixel.Value.Y;
-                    }
-                }
-            }
-            return new Point(left, top);
-        }
-
-        /// <summary>
         /// Calculates the distance to another point
         /// </summary>
         /// <param name="point">reference point</param>
@@ -303,6 +273,24 @@ namespace RunescapeBot.ImageTools
             int rise = Center.Y - point.Y;
             int run = Center.X - point.X;
             return Math.Sqrt((rise * rise) + (run * run));
+        }
+
+        /// <summary>
+        /// Shifts all of the pixels in a blob
+        /// </summary>
+        /// <param name="rightShift">distance to move rightward (increasing X)</param>
+        /// <param name="downShift">distance to move downward (increasing Y)</param>
+        public void ShiftPixels(int rightShift, int downShift)
+        {
+            Dictionary<Point, Point> shiftedPixels = new Dictionary<Point, Point>();
+            Point shiftedPixel;
+
+            foreach(KeyValuePair<Point, Point> pixel in Pixels)
+            {
+                shiftedPixel = new Point(pixel.Value.X + rightShift, pixel.Value.Y + downShift);
+                shiftedPixels.Add(shiftedPixel, shiftedPixel);
+            }
+            Pixels = shiftedPixels;
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using RunescapeBot.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace RunescapeBot.Common.Tests
 {
@@ -15,6 +16,20 @@ namespace RunescapeBot.Common.Tests
         public void CloseEnoughTest(long target, long test, double tolerance, bool close)
         {
             Assert.AreEqual(Numerical.CloseEnough(target, test, tolerance), close);
+        }
+
+        [TestMethod()]
+        [DataRow(new long[] { 0, 0 }, 0, 0, true)]
+        [DataRow(new long[] { 224, 507 }, 500, 0.02, true)]
+        [DataRow(new long[] { 224, 507 }, 500, 0.01, false)]
+        public void CloseEnoughTest1(long[] targets, long test, double tolerance, bool close)
+        {
+            List<long> targetList = new List<long>();
+            foreach (long target in targets)
+            {
+                targetList.Add(target);
+            }
+            Assert.AreEqual(Numerical.CloseEnough(targetList, test, tolerance), close);
         }
 
         [TestMethod()]
