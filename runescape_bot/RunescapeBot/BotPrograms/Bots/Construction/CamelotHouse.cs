@@ -201,11 +201,24 @@ namespace RunescapeBot.BotPrograms
         protected bool CallServant()
         {
             Point houseOptions = HouseOptionsLocation();
-            LeftClick(houseOptions.X, houseOptions.Y, 10);    //click on house options
-
-            if (!WaitForDialog(HouseOptionsIsOpen))
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            while (!HouseOptionsIsOpen())
             {
-                return false;
+                if (watch.ElapsedMilliseconds > 2000)
+                {
+                    SafeWait(500);
+                    if (HouseOptionsIsOpen())
+                    {
+                        LeftClick(houseOptions.X, ScreenHeight - 76, 12);    //click on call servant
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                LeftClick(houseOptions.X, houseOptions.Y, 10);    //click on house options
             }
             LeftClick(houseOptions.X, ScreenHeight - 76, 12);    //click on call servant
             return true;
@@ -239,7 +252,7 @@ namespace RunescapeBot.BotPrograms
                 if (WaitForMouseOverText(BlueMouseOverText))
                 {
                     Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient);
-                    if (WaitForDialog(UnNoteTheBanknotes))
+                    if (WaitFor(UnNoteTheBanknotes))
                     {
                         Keyboard.WriteNumber(1);
                         return true;
@@ -335,7 +348,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="dialog">dialog check delegate</param>
         /// <returns>true if the dialog is showing</returns>
-        protected bool WaitForDialog(DialogIsShowing dialog, int timeout = 5000)
+        protected bool WaitFor(IsTrue dialog, int timeout = 5000)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
@@ -349,7 +362,7 @@ namespace RunescapeBot.BotPrograms
             }
             return false;
         }
-        protected delegate bool DialogIsShowing();
+        protected delegate bool IsTrue();
 
 
         /// <summary>

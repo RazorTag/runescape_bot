@@ -58,7 +58,7 @@ namespace RunescapeBot.BotPrograms
             Point houseOptions = Probability.GaussianCircle(HouseOptionsLocation(), 5, 0, 360, 12);
             Mouse.MoveMouse(houseOptions.X, houseOptions.Y, RSClient);
             if (WaitForTeleport()) { return false; }
-            if (!WaitForDialog(IsAtHouse))
+            if (!WaitFor(IsAtHouse))
             {
                 return false;
             }
@@ -66,10 +66,6 @@ namespace RunescapeBot.BotPrograms
             if (StopFlag || !CallServant())
             {
                 return false;
-            }
-            if (WaitForDialog(InventoryActive, 1000))
-            {
-                Inventory.OpenInventory();
             }
 
             if (StopFlag || !InitiateDemonDialog())
@@ -81,7 +77,8 @@ namespace RunescapeBot.BotPrograms
             long dialogBody = 0;
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            while (!StopFlag && (watch.ElapsedMilliseconds < 30000) && !Inventory.SlotIsEmpty(Inventory.INVENTORY_CAPACITY - 1))
+            while (!StopFlag && (watch.ElapsedMilliseconds < 30000) 
+                && ((watch.ElapsedMilliseconds < 1500) || !Inventory.SlotIsEmpty(Inventory.INVENTORY_CAPACITY - 1)))
             {
                 dialogBody = DialogHash();
 
@@ -194,7 +191,7 @@ namespace RunescapeBot.BotPrograms
         protected bool InitiateDemonDialog()
         {
             int demonTries = 0;
-            while (!StopFlag && !WaitForDialog(AnyDialog, 1000))
+            while (!StopFlag && !WaitFor(AnyDialog, 1000))
             {
                 Blob demon;
                 if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000, ArtifactSize(0.00005), ArtifactSize(0.0005)))
@@ -243,13 +240,20 @@ namespace RunescapeBot.BotPrograms
             Inventory.OpenInventory();
             Inventory.ClickInventory(InventoryLogSlot);
             Mouse.MoveMouse(Center.X, Center.Y, RSClient);
+            SafeWait(500);
+            ReadWindow();
             if (WaitForTeleport()) { return false; }
 
-            if (!InventoryIsReady())
+            if (InventoryIsReady())
+            {
+                return true;
+            }
+
+            if (!ItemsAreReady())   //reset the inventory to its correct starting configuration
             {
                 RefreshInventory();
                 if (SafeWait(1000)) { return false; }
-                if (!InventoryIsReady())
+                if (!ItemsAreReady())
                 {
                     return false;   //TODO restock at the GE
                 }
@@ -264,29 +268,39 @@ namespace RunescapeBot.BotPrograms
                     return true;
                 }
             }
+
             return false;
         }
 
         /// <summary>
-        /// Determines if the inventory look like it is ready
+        /// Determines if the inventory looks like it is ready
         /// </summary>
         /// <returns>true if the inventory appears to be set up correctly</returns>
         protected override bool InventoryIsReady()
         {
-            if (Inventory.SlotIsEmpty(InventoryLogSlot, true) || Inventory.SlotIsEmpty(InventoryLawRuneSlot) || Inventory.SlotIsEmpty(InventoryCashSlot))
+            if (Inventory.SlotIsEmpty(InventoryLogSlot) || Inventory.SlotIsEmpty(InventoryLawRuneSlot) || Inventory.SlotIsEmpty(InventoryCashSlot))
             {
                 return false;   //TODO restock at the GE
             }
 
             for (int i = 3; i < Inventory.INVENTORY_CAPACITY; i++)
             {
-                if (!Inventory.SlotIsEmpty(i))
+                if (Inventory.SlotIsEmpty(i))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Determines if the logs, law runes, and coins are in te inventory
+        /// </summary>
+        /// <returns>true if the first 3 inventory slots are not empty</returns>
+        protected bool ItemsAreReady()
+        {
+            return (!Inventory.SlotIsEmpty(InventoryLogSlot) && !Inventory.SlotIsEmpty(InventoryLawRuneSlot) && !Inventory.SlotIsEmpty(InventoryCashSlot));
         }
 
         /// <summary>
@@ -318,7 +332,7 @@ namespace RunescapeBot.BotPrograms
             bankPopup.WithdrawAll(BankCashSlot.X, BankCashSlot.Y);
             bankPopup.CloseBank();
 
-            return InventoryIsReady();
+            return ItemsAreReady();
         }
     }
 }
