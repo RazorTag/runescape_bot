@@ -1,4 +1,5 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -111,30 +112,58 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            if (!Bank())
+            if (Bank() && TeleportToHouse() && Construct())
             {
-                return false;   //TODO teleport to camelot / refresh bank / relog / visit GE
+                FailedRuns = 0;
             }
-
-            if (!TeleportToHouse())
+            else
             {
-                return false;
+                FailedRuns++;   //TODO teleport to camelot / refresh bank / relog / visit GE
+                GeneralTroubleShoot();
             }
-            teleportWatch.Restart();
+            if (StopFlag) { return false; }
 
-            if (!Construct())
-            {
-                FailedRuns++;
-            }
-
-            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot, false))
+            if (!Reset())
             {
                 return false;   //TODO restock at the GE
             }
-            teleportWatch.Restart();
-
-            FailedRuns = 0;
+            
             return true;
+        }
+
+        /// <summary>
+        /// Looks for and fixes common issues
+        /// </summary>
+        protected virtual void GeneralTroubleShoot()
+        {
+            ReadWindow();
+
+            Bank bank = new Bank(RSClient);
+            if (bank.BankIsOpen())
+            {
+                bank.CloseBank();
+                if (SafeWait(1000)) { return; }
+            }
+
+            if (HouseOptionsIsOpen())
+            {
+                LeftClick(ScreenWidth - 40, ScreenHeight - 282);    //close out of House Options
+                if (SafeWait(1000)) { return; }
+            }
+        }
+
+        /// <summary>
+        /// Moves the bot back to its Camelot starting position
+        /// </summary>
+        /// <returns></returns>
+        protected bool Reset()
+        {
+            if (Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot, false))
+            {
+                teleportWatch.Restart();
+                return true;
+            }
+            return false;   //TODO restock at the GE
         }
 
         /// <summary>
@@ -143,11 +172,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool TeleportToHouse()
         {
-            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.House, false))
+            if (Inventory.StandardTeleport(Inventory.StandardTeleports.House, false))
             {
-                return false;
+                teleportWatch.Restart();
+                return true;
             }
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -203,11 +233,11 @@ namespace RunescapeBot.BotPrograms
             Point houseOptions = HouseOptionsLocation();
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            while (!HouseOptionsIsOpen())
+            while (!StopFlag && !HouseOptionsIsOpen())
             {
                 if (watch.ElapsedMilliseconds > 2000)
                 {
-                    SafeWait(500);
+                    if (SafeWait(500)) { return false; }
                     if (HouseOptionsIsOpen())
                     {
                         LeftClick(houseOptions.X, ScreenHeight - 76, 12);    //click on call servant
@@ -391,9 +421,12 @@ namespace RunescapeBot.BotPrograms
         /// Calculates a hash of the dialog title and body sections
         /// </summary>
         /// <returns></returns>
-        protected long DialogHash()
+        protected long DialogHash(bool readWindow = true)
         {
-            ReadWindow();
+            if (readWindow)
+            {
+                ReadWindow();
+            }
             Color[,] dialogTitle = ScreenPiece(DialogLeft, DialogRight, DialogTop, DialogBottom);
             return ImageProcessing.ColorSum(dialogTitle);
         }
@@ -417,12 +450,24 @@ namespace RunescapeBot.BotPrograms
         /// Determines if an NPC dialog is in the dialog box
         /// </summary>
         /// <returns>true if an NPC dialog shows up</returns>
-        protected bool AnyDialog()
+        protected bool AnyDialog(bool readWindow = true)
         {
-            ReadWindow();
+            if (readWindow && !ReadWindow())
+            {
+                return false;
+            }
             Color[,] dialogTitle = ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
             double dialogMatch = ImageProcessing.FractionalMatch(dialogTitle, DialogTitle);
             return dialogMatch > 0.005;
+        }
+
+        /// <summary>
+        /// Determines if an NPC dialog is in the dialog box
+        /// </summary>
+        /// <returns>true if an NPC dialog shows up</returns>
+        protected bool AnyDialog()
+        {
+            return AnyDialog(true);
         }
 
         /// <summary>

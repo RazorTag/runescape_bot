@@ -14,6 +14,8 @@ namespace RunescapeBot.BotPrograms
 {
     public class ButlerSawmill : CamelotHouse
     {
+        const double _hashPrecision = 0.00001;
+
         protected Point InventoryCashSlot, InventoryLogSlot, FirstLogSlot;
         protected Point BankCashSlot, BankLogSlot, BankPlankSlot;
 
@@ -58,17 +60,7 @@ namespace RunescapeBot.BotPrograms
             Point houseOptions = Probability.GaussianCircle(HouseOptionsLocation(), 5, 0, 360, 12);
             Mouse.MoveMouse(houseOptions.X, houseOptions.Y, RSClient);
             if (WaitForTeleport()) { return false; }
-            if (!WaitFor(IsAtHouse))
-            {
-                return false;
-            }
-
-            if (StopFlag || !CallServant())
-            {
-                return false;
-            }
-
-            if (StopFlag || !InitiateDemonDialog())
+            if (!WaitFor(IsAtHouse) || !CallServant() || !InitiateDemonDialog())
             {
                 return false;
             }
@@ -77,12 +69,11 @@ namespace RunescapeBot.BotPrograms
             long dialogBody = 0;
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            while (!StopFlag && (watch.ElapsedMilliseconds < 30000) 
-                && ((watch.ElapsedMilliseconds < 1500) || !Inventory.SlotIsEmpty(Inventory.INVENTORY_CAPACITY - 1)))
+            while (!StopFlag && (watch.ElapsedMilliseconds < 30000) && AnyDialog(true))
             {
-                dialogBody = DialogHash();
+                dialogBody = DialogHash(false);
 
-                if (dialogBody != lastBody)
+                if (!Numerical.CloseEnough(dialogBody, lastBody, _hashPrecision))
                 {
                     if (ContinueBar())
                     {
@@ -98,7 +89,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 SafeWait(200);
             }
-            return Inventory.SlotIsEmpty(Inventory.INVENTORY_CAPACITY - 1, true);
+            return !AnyDialog(false);
         }
 
         /// <summary>
@@ -107,55 +98,53 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bodyHash">total number of text pixels in a dialog box body</param>
         protected bool ProcessDialog(long bodyCount)
         {
-            const double hashPrecision = 0.00001;
-
-            if (Numerical.CloseEnough(16029632, bodyCount, hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 2500 coins?"
+            if (Numerical.CloseEnough(16029632, bodyCount, _hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 2500 coins?"
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(16029168, bodyCount, hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 6250 coins?"
+            else if (Numerical.CloseEnough(16029168, bodyCount, _hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 6250 coins?"
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(16023580, bodyCount, hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 12500 coins?"
+            else if (Numerical.CloseEnough(16023580, bodyCount, _hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 12500 coins?"
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(16021762, bodyCount, hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 37500 coins?"
+            else if (Numerical.CloseEnough(16021762, bodyCount, _hashPrecision))   //"Yes<br>No" - title:"Convert the planks for 37500 coins?"
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(15831076, bodyCount, hashPrecision))  //"Take to sawmill: 25 x logs<br>"Something else..."
+            else if (Numerical.CloseEnough(15831076, bodyCount, _hashPrecision))  //"Take to sawmill: 25 x logs<br>"Something else..."
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(15801599, bodyCount, hashPrecision))   //"Take to sawmill: 25 x Oak logs<br>"Something else..."
+            else if (Numerical.CloseEnough(15801599, bodyCount, _hashPrecision))   //"Take to sawmill: 25 x Oak logs<br>"Something else..."
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(15790514, bodyCount, hashPrecision))   //"Take to sawmill: 25 x Teak logs<br>"Something else..."
+            else if (Numerical.CloseEnough(15790514, bodyCount, _hashPrecision))   //"Take to sawmill: 25 x Teak logs<br>"Something else..."
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(15741143, bodyCount, hashPrecision))   //"Take to sawmill: 25 x Mahogany logs<br>"Something else..."
+            else if (Numerical.CloseEnough(15741143, bodyCount, _hashPrecision))   //"Take to sawmill: 25 x Mahogany logs<br>"Something else..."
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(15774502, bodyCount, hashPrecision))   //"Serve...<br>Go to the bank...<br>Go to the sawmill<br>Greet guests<br>You're fired"
+            else if (Numerical.CloseEnough(15774502, bodyCount, _hashPrecision))   //"Serve...<br>Go to the bank...<br>Go to the sawmill<br>Greet guests<br>You're fired"
             {
                 StartSawmillTask();
             }
-            else if (Numerical.CloseEnough(15989089, bodyCount, hashPrecision))   //"Sawmill<br>Bank<br>Never mind"
+            else if (Numerical.CloseEnough(15989089, bodyCount, _hashPrecision))   //"Sawmill<br>Bank<br>Never mind"
             {
                 Keyboard.WriteNumber(1);
             }
-            else if (Numerical.CloseEnough(15959844, bodyCount, hashPrecision) || Numerical.CloseEnough(16167022, bodyCount, hashPrecision))  //"Enter amount:"
+            else if (Numerical.CloseEnough(15959844, bodyCount, _hashPrecision) || Numerical.CloseEnough(16167022, bodyCount, _hashPrecision))  //"Enter amount:"
             {
                 Keyboard.WriteNumber(25);
                 SafeWaitPlus(50, 25);
                 Keyboard.Enter();
             }
-            else if (Numerical.CloseEnough(15768332, bodyCount, hashPrecision))  //"Okay, here's 10,000 coins.<br>I'll pay you later.<br>You're fired!"
+            else if (Numerical.CloseEnough(15768332, bodyCount, _hashPrecision))  //"Okay, here's 10,000 coins.<br>I'll pay you later.<br>You're fired!"
             {
                 Keyboard.WriteNumber(1);
             }
@@ -191,7 +180,7 @@ namespace RunescapeBot.BotPrograms
         protected bool InitiateDemonDialog()
         {
             int demonTries = 0;
-            while (!StopFlag && !WaitFor(AnyDialog, 1000))
+            while (!StopFlag && !WaitFor(AnyDialog, 1500))
             {
                 Blob demon;
                 if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000, ArtifactSize(0.00005), ArtifactSize(0.0005)))
@@ -200,18 +189,18 @@ namespace RunescapeBot.BotPrograms
                     if (WaitForMouseOverText(YellowMouseOverText))
                     {
                         LeftClick(demon.Center.X, demon.Center.Y);
-                        SafeWait(500);
+                        if (SafeWait(500)) { return false; }
                     }
                 }
                 else
                 {
                     if (++demonTries > 2)
                     {
-                        return false;
+                        return AnyDialog(true);
                     }
                 }
             }
-            return true;
+            return WaitFor(AnyDialog);
         }
 
         /// <summary>
@@ -238,15 +227,18 @@ namespace RunescapeBot.BotPrograms
         protected override bool Bank()
         {
             Inventory.OpenInventory();
-            Inventory.ClickInventory(InventoryLogSlot);
-            Mouse.MoveMouse(Center.X, Center.Y, RSClient);
             SafeWait(500);
             ReadWindow();
-            if (WaitForTeleport()) { return false; }
-
             if (InventoryIsReady())
             {
                 return true;
+            }
+
+            Inventory.ClickInventory(InventoryLogSlot);
+            Mouse.MoveMouse(Center.X, Center.Y, RSClient);
+            if (WaitForTeleport())
+            {
+                return false;
             }
 
             if (!ItemsAreReady())   //reset the inventory to its correct starting configuration
@@ -278,17 +270,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the inventory appears to be set up correctly</returns>
         protected override bool InventoryIsReady()
         {
-            if (Inventory.SlotIsEmpty(InventoryLogSlot) || Inventory.SlotIsEmpty(InventoryLawRuneSlot) || Inventory.SlotIsEmpty(InventoryCashSlot))
+            if (!ItemsAreReady() || Inventory.SlotIsEmpty(Inventory.INVENTORY_CAPACITY - 1))
             {
                 return false;   //TODO restock at the GE
-            }
-
-            for (int i = 3; i < Inventory.INVENTORY_CAPACITY; i++)
-            {
-                if (Inventory.SlotIsEmpty(i))
-                {
-                    return false;
-                }
             }
 
             return true;
