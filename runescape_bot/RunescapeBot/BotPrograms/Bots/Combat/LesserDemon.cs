@@ -104,7 +104,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             Blob demon;
-            double cloveRange = 2.0 * Math.Sqrt(MinDemonSize);
+            double cloveRange = Math.Max(2.0 * Math.Sqrt(MinDemonSize), ArtifactLength(0.05));
 
             if (LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
             {
@@ -121,6 +121,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 MissedDemons = 0;
                 LastDemonLocation = demon.Center;
+                MinDemonSize = demon.Size / 2;
                 SafeWait(DEMON_ENGAGE_TIME);
             }
             else
@@ -153,7 +154,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             //Give up, log out of the game, go outside and play
-            if ((MissedDemons * RunParams.FrameTime) > (3 * MAX_DEMON_SPAWN_TIME))
+            if ((MissedDemons * RunParams.FrameTime) > (5 * MAX_DEMON_SPAWN_TIME))
             {
                 Logout();
                 return false;
@@ -267,7 +268,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         private bool ClovesWithinRange(Point demonCenter, double cloveRange)
         {
-            int requiredCloves = 3;
+            int requiredCloves = 1;
             int minCloveSize = MinDemonSize / 400;
             bool[,] cloves = ColorFilterPiece(LesserDemonHorn, demonCenter, (int)cloveRange);
             List<Blob> demonCloves = ImageProcessing.FindBlobs(cloves, true);

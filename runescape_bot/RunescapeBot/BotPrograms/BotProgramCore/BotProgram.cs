@@ -812,6 +812,10 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected Color GetPixel(int x, int y)
         {
+            if (x < 0 || x >= ScreenWidth || y < 0 || y >= ScreenHeight)
+            {
+                return Color.Black;
+            }
             return ColorArray[x, y];
         }
 
@@ -1142,7 +1146,7 @@ namespace RunescapeBot.BotPrograms
         private Point LoginScreenOffset()
         {
             int yOffset = 0;
-            while (ImageProcessing.ColorsAreEqual(GetPixel(Center.X, yOffset), Color.Black))
+            while (ImageProcessing.ColorsAreEqual(GetPixel(Center.X, yOffset), Color.Black) && (yOffset < ScreenHeight))
             {
                 yOffset++;
             }
