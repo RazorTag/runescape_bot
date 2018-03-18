@@ -78,32 +78,12 @@ namespace RunescapeBot.BotPrograms
             int top = screenSize.Y - 110;
             int bottom = screenSize.Y - 70;
             Random rng = new Random();
-            MakeAllSlim makeAllSlim = null;
-            Point rightClick;
 
-            //Try to right-click the chatbox option
-            for (int i = 0; i < CHATBOX_OPTION_RIGHT_CLICK_MAX_TRIES; i++)
-            {
-                if (BotProgram.StopFlag) { return false; }
+            Point leftClick = new Point(rng.Next(left, right), rng.Next(top, bottom));
+            Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
+            Mouse.LeftClick(leftClick.X, leftClick.Y, rsClient);
 
-                Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
-                rightClick = new Point(rng.Next(left, right), rng.Next(top, bottom));
-                Mouse.RightClick(rightClick.X, rightClick.Y, rsClient);
-                makeAllSlim = new MakeAllSlim(rightClick.X, rightClick.Y, rsClient);
-
-                if (makeAllSlim.WaitForPopup(WAIT_FOR_MAKEALL_POPUP_TIMEOUT))
-                {
-                    //Select Make All
-                    makeAllSlim.MakeAllItems();
-                    return true;
-                }
-                else
-                {
-                    Mouse.Offset(0, -300, 100);
-                }
-            }
-
-            return false;
+            return true;
         }
     }
 }
