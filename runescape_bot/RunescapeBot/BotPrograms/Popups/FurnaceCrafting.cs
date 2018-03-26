@@ -69,16 +69,16 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <returns>true if the popup is found</returns>
         public bool WaitForPopup(int timeout)
         {
-            const int popupTitleHash = 768146;
+            const int popupTitleHash = 842393;
             Color[,] screen;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             long titleHash;
 
-            int left = Left + 145;
-            int right = Left + 345;
-            int top = Top + 8;
-            int bottom = Top + 25;
+            int left = Left + 144;
+            int right = Left + 344;
+            int top = Top + 4;
+            int bottom = Top + 23;
 
             while (watch.ElapsedMilliseconds < timeout)
             {
@@ -87,6 +87,7 @@ namespace RunescapeBot.BotPrograms.Popups
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 titleHash = ImageProcessing.ColorSum(screen);
+                DebugUtilities.SaveImageToFile(screen);
                 if (Numerical.CloseEnough(popupTitleHash, titleHash, 0.001))
                 {
                     return true;
@@ -109,9 +110,9 @@ namespace RunescapeBot.BotPrograms.Popups
             int bottom = Top + BRACELET_Y_OFFSET + 4;
             Point click = Probability.GaussianRectangle(left, right, top, bottom);
             Mouse.RightClick(click.X, click.Y, RSClient);
-            MakeX makeX = new MakeX(click.X, click.Y, RSClient);
-            makeX.WaitForPopup(timeout);
-            makeX.MakeXItems(numberToMake);
+            MakeAll makeAll = new MakeAll(click.X, click.Y, RSClient);
+            makeAll.WaitForPopup(timeout);
+            makeAll.MakeAllItems();
         }
 
         /// <summary>

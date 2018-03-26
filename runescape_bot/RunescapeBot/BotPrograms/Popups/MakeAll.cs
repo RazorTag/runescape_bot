@@ -28,7 +28,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         protected override void SetSize()
         {
-            Height = 95;
+            Height = 110;
             Width = 154;
         }
 
@@ -53,9 +53,18 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <summary>
         /// Click the Make-10 option in a Make-X pop-up
         /// </summary>
-        public void MakeX(int itemsToMake)
+        public void MakeTen()
         {
             const int yOffset = 55;
+            SelectOption(yOffset);
+        }
+
+        /// <summary>
+        /// Click the Make-X option in a Make-X pop-up
+        /// </summary>
+        public void MakeX(int itemsToMake)
+        {
+            const int yOffset = 70;
             SelectOption(yOffset);
 
             //Wait for the "Enter amount:" prompt to appear
@@ -67,11 +76,11 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Use the Make-X option in a Make-X pop-up
+        /// Use the Make-All option in a Make-X pop-up
         /// </summary>
         public void MakeAllItems()
         {
-            const int yOffset = 70;
+            const int yOffset = 85;
             SelectOption(yOffset);
         }
     }

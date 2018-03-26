@@ -119,7 +119,7 @@ namespace RunescapeBot.BotPrograms.Popups
                 }
                 screen.Dispose();
             }
-
+            
             return false;
         }
 
@@ -146,7 +146,6 @@ namespace RunescapeBot.BotPrograms.Popups
             RGBHSBRange rightClickColor = RGBHSBRangeFactory.RightClickPopup();
 
             return ImageProcessing.ColorsAreEqual(blackBarCheck, Color.Black) && rightClickColor.ColorInRange(bottomRight);
-
         }
 
         /// <summary>

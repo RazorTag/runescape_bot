@@ -1196,7 +1196,7 @@ namespace RunescapeBot.BotPrograms
             int column = worldIndex / rowCount;
             int row = worldIndex % rowCount;
             int x = offset.X + (Center.X - 182) + (column * columnWidth);
-            int y = offset.Y + 58 + (row * rowHeight);
+            int y = offset.Y + 46 + (row * rowHeight);
             LeftClick(x, y, 5);
             SafeWait(500);
 
@@ -1469,12 +1469,12 @@ namespace RunescapeBot.BotPrograms
 
             while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts) && !StopFlag)
             {
-                LeftClick(ScreenWidth - 120, ScreenHeight - 18, 5); //logout tab
-                SafeWait(1000);
+                Inventory.OpenLogout();
+                SafeWait(800, 200);
                 LeftClick(ScreenWidth - 38, ScreenHeight - 286);    //close out of world switcher
-                SafeWait(2000);
-                LeftClick(ScreenWidth - 120, ScreenHeight - 86, 3); //click here to logout
-                SafeWait(2000);
+                SafeWait(2000, 400);
+                LeftClick(ScreenWidth - 120, ScreenHeight - 71, 5); //click here to logout
+                SafeWait(2000, 400);
             }
 
             BroadcastLogout();
@@ -1577,7 +1577,7 @@ namespace RunescapeBot.BotPrograms
         {
             int left = ScreenWidth - 180;
             int right = left + 110;
-            int top = ScreenHeight - 150;
+            int top = ScreenHeight - 123;
             int bottom = top + 15;
             Point click = Probability.GaussianRectangle(left, right, top, bottom);
             LeftClick(click.X, click.Y);
