@@ -89,9 +89,12 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Finds  all of the blobs in a binary image. Only considers right, left, up, down adjacency (not diagonal)
+        /// Finds all of the blobs in a binary image. Only considers right, left, up, down adjacency (not diagonal)
         /// </summary>
-        /// <param name="image"></param>
+        /// <param name="image">binary image to search</param>
+        /// <param name="sort">set to true to sort found blobs from biggest to smallest</param>
+        /// <param name="minSize">minimum required pixels</param>
+        /// <param name="maxSize">maximum allowed pixels</param>
         /// <returns>a list of blobs found from biggest to smallest</returns>
         public static List<Blob> FindBlobs(bool[,] image, bool sort = false, int minSize = 1, int maxSize = int.MaxValue)
         {
@@ -507,6 +510,59 @@ namespace RunescapeBot.ImageTools
         {
             Point empty;
             return ScreenPiece(image, left, right, top, bottom, out empty);
+        }
+
+        /// <summary>
+        /// Determines if two images are substantially equivalent. Two null images count as different.
+        /// </summary>
+        /// <param name="imageA">image to test</param>
+        /// <param name="imageB">image to test</param>
+        /// <param name="colorStrictness">strictness when comparing corresponding pixel colors (0-1)</param>
+        /// <param name="locationStrictness">Fraction of pixels which must match on color (0-1)</param>
+        /// <returns>true if images are sufficiently similar, false if they are too different</returns>
+        public static bool ImageMatch(Color[,] imageA, Color[,] imageB, double colorStrictness, double locationStrictness)
+        {
+            if (imageA == null || imageB == null)
+            {
+                return false;
+            }
+
+            int width = imageA.GetLength(0);
+            int height = imageA.GetLength(1);
+
+            //Make sure that the images have the same dimensions before proceeding
+            if (imageA.GetLength(0) != imageB.GetLength(0) || imageA.GetLength(1) != imageB.GetLength(1))
+            {
+                return false;
+            }
+
+            //Make sure the strictness values are possible
+            if (colorStrictness <= 0 || locationStrictness <= 0)
+            {
+                return true;    //Everything will pass in this case, so this test is pointless.
+            }
+            if (colorStrictness > 1 || locationStrictness > 1)
+            {
+                return false;   //Images cannot match more than 100%, so this doesn't make sense.
+            }
+
+            int colorMatches = 0;
+            int colorTolerance = (int) ((1.0 - colorStrictness) * 255.0);
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    if ((Math.Abs(imageA[i, j].R - imageB[i, j].R) <= colorTolerance)
+                        && (Math.Abs(imageA[i, j].G - imageB[i, j].G) <= colorTolerance)
+                        && (Math.Abs(imageA[i, j].B - imageB[i, j].B) <= colorTolerance))
+                    {
+                        colorMatches++;
+                    }
+                }
+            }
+
+            return colorMatches >= (locationStrictness * width * height);
         }
     }
 }

@@ -549,6 +549,22 @@ namespace RunescapeBot.BotPrograms
 
         #endregion
 
+        #region trees
+
+        /// <summary>
+        /// The dark brown trunk of a willow tree
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange WillowTrunk()
+        {
+            Color dark = Color.FromArgb(55, 50, 29);
+            Color light = Color.FromArgb(102, 95, 60);
+            HSBRange hsbRange = new HSBRange(45.3f, 55.9f, 0.256f, 0.312f, 0.164f, 0.318f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        #endregion
+
         #region fishing
         /// <summary>
         /// classic blue color of fish sprinkles

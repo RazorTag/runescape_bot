@@ -95,7 +95,7 @@ namespace RunescapeBot.BotPrograms
                 case BotActions.AgilitySeersVillage:
                     return new AgilitySeersVillage(runParams);
                 case BotActions.WillowTrees:
-                    return new Woodcutting(runParams);
+                    return new WillowChopping(runParams);
                 case BotActions.TeaStall:
                     return new TeaStall(runParams);
                 case BotActions.CutGems:

@@ -24,7 +24,7 @@ namespace RunescapeBot.ImageTools
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
 
-        private const int MULTIPLE_SCREEN_READ_INTERVAL = 200;
+        private const int MULTIPLE_SCREEN_READ_INTERVAL = 100;
         private static DateTime LastScan;
 
         /// <summary>

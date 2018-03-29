@@ -35,7 +35,6 @@ namespace RunescapeBot.BotPrograms
             //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.EmptyInventorySlot(), bankBooth);
 
             Inventory.SetEmptySlots(); // this tells the inventory to record which spots are empty
-
             return true;
         }
 
@@ -55,7 +54,7 @@ namespace RunescapeBot.BotPrograms
                 if (rockLocation != null) {
                     Point rockPoint = (Point)rockLocation.RandomBlobPixel();
                     LeftClick(rockPoint.X, rockPoint.Y);
-                    SafeWaitPlus(700, 500);
+                    SafeWaitPlus(1000, 300);
                 }
             }
             return true;

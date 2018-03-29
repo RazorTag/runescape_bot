@@ -28,7 +28,7 @@ namespace RunescapeBot.BotPrograms.Bots.Runecrafting
         protected override bool Run()
         {
             //ReadWindow();
-            //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\training_pictures\\nature rings\\test.png");
+            //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\nature rings\\test.png");
             return true;
         }
 

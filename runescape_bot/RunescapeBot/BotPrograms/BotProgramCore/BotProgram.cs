@@ -656,6 +656,22 @@ namespace RunescapeBot.BotPrograms
         protected delegate bool FindObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue);
 
         /// <summary>
+        /// Locates all of the matching objects on the game screen (minus UI) that fit within the given size constraints
+        /// </summary>
+        /// <param name="objectFilter">color filter for the object type to search for</param>
+        /// <param name="minSize">minimum required pixels</param>
+        /// <param name="maxSize">maximum allowed pixels</param>
+        /// <returns></returns>
+        protected List<Blob> LocateObjects(RGBHSBRange objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
+        {
+            ReadWindow();
+            bool[,] objectPixels = ColorFilter(objectFilter);
+            EraseClientUIFromMask(ref objectPixels);
+            List<Blob> objects = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
+            return objects;
+        }
+
+        /// <summary>
         /// Looks for an object that matches a filter
         /// </summary>
         /// <param name="stationaryObject"></param>
@@ -729,7 +745,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="textColor">the color of the mousover text to wait for</param>
         /// <param name="timeout">time to wait before giving up</param>
-        /// <returns></returns>
+        /// <returns>true if the specified type of mouseover text is found</returns>
         protected bool WaitForMouseOverText(RGBHSBRange textColor, int timeout = 5000)
         {
             const int left = 5;
@@ -1786,6 +1802,41 @@ namespace RunescapeBot.BotPrograms
                 int waitTime = (int)Probability.HalfGaussian(minWaitTime, stdDev, true);
                 return SafeWait(waitTime);
             }
+        }
+
+        /// <summary>
+        /// Waits until the player stops moving
+        /// </summary>
+        /// <param name="timeout">maximum time in milliseconds to wait</param>
+        /// <returns>true if player stops moving, false if we give up</returns>
+        protected bool WaitDuringPlayerAnimation(double colorStrictness = 0.95, double locationStrictness = 0.99, int timeout = 180000)
+        {
+            int xOffset = ArtifactLength(0.06);
+            int yOffset = ArtifactLength(0.06);
+            Color[,] pastImage = null;
+            Color[,] presentImage = null;
+            Color[,] futureImage = null;
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            while (!ImageProcessing.ImageMatch(pastImage, presentImage, colorStrictness, locationStrictness)
+                || !ImageProcessing.ImageMatch(presentImage, futureImage, colorStrictness, locationStrictness))
+            {
+                if (StopFlag || watch.ElapsedMilliseconds >= timeout)
+                {
+                    return false;   //timeout
+                }
+
+                ReadWindow();
+                pastImage = presentImage;
+                presentImage = futureImage;
+                futureImage = ScreenPiece(Center.X - xOffset, Center.X + xOffset, Center.Y - yOffset, Center.Y + yOffset);
+            }
+            DebugUtilities.SaveImageToFile(pastImage, "C:\\Projects\\Roboport\\debug_pictures\\player-before.png");
+            DebugUtilities.SaveImageToFile(presentImage, "C:\\Projects\\Roboport\\debug_pictures\\player-during.png");
+            DebugUtilities.SaveImageToFile(presentImage, "C:\\Projects\\Roboport\\debug_pictures\\player-after.png");
+            return true;
         }
 
         /// <summary>

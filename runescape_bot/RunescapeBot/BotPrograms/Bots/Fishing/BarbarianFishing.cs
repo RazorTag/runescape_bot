@@ -119,7 +119,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             allMatches.Sort(new BlobProximityComparer(Center));
-            foundObject = Geometry.ClosestBlobToPoint(allMatches,Center);
+            foundObject = Geometry.ClosestBlobToPoint(allMatches, Center);
             //foreach (Blob currentBlob in allMatches)
             //{
             //    if (WithinExpectedRange(currentBlob, foundObject))
