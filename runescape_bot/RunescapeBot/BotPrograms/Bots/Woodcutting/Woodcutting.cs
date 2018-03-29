@@ -45,6 +45,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if any trees are located</returns>
         protected bool LocateTrees()
         {
+            ReadWindow();
+            //TODO Get list of tree blobs
             return false;
         }
     }

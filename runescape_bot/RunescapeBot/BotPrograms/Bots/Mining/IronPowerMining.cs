@@ -10,7 +10,6 @@ namespace RunescapeBot.BotPrograms
 {
     public class IronPowerMining : BotProgram
     {
-        bool emptySlotsSet;
         RGBHSBRange IronFilter = RGBHSBRangeFactory.IronRock();
         int minIronBlobPxSize; 
 
@@ -20,7 +19,6 @@ namespace RunescapeBot.BotPrograms
             RunParams.Run = true;
             RunParams.FrameTime = 1000;
             minIronBlobPxSize = ArtifactSize(0.00025);
-            emptySlotsSet = false;
         }
 
         /// <summary>
@@ -36,6 +34,8 @@ namespace RunescapeBot.BotPrograms
             //bool[,] bankBooth = ColorFilter(RGBHSBRangeFactory.EmptyInventorySlot());
             //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.EmptyInventorySlot(), bankBooth);
 
+            Inventory.SetEmptySlots(); // this tells the inventory to record which spots are empty
+
             return true;
         }
 
@@ -45,12 +45,6 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool Execute()
         {
-            if (!emptySlotsSet)
-            {
-                Inventory.SetEmptySlots(); // this tells the inventory to record which spots are empty
-                emptySlotsSet = true;
-            }
-
             ReadWindow();
             if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 1))
             {

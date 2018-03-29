@@ -14,6 +14,7 @@ namespace RunescapeBot.BotPrograms.Bots.Runecrafting
         public NatureRings(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
+            RunParams.Run = true;
         }
 
         /// <summary>
