@@ -14,8 +14,6 @@ namespace RunescapeBot.BotPrograms
     {
         RGBHSBRange willowTrunk = RGBHSBRangeFactory.WillowTrunk();
         protected int minTreeSize;
-        protected int TreeTextChars;
-        protected int TreeTextWidth;
         protected List<Blob> Trees;
 
 
