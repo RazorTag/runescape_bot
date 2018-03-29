@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bitmap"></param>
         /// <param name="filePath"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(Bitmap bitmap, string filePath = "C:\\Projects\\Roboport\\test_pictures\\test.png")
+        public static void SaveImageToFile(Bitmap bitmap, string filePath = "C:\\Projects\\Roboport\\debug_pictures\\test.png")
         {
             if (System.IO.File.Exists(filePath))
             {
@@ -31,7 +31,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="rgbArray"></param>
         /// <param name="filePath"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(Color[,] rgbArray, string filePath = "C:\\Projects\\Roboport\\test_pictures\\test.png")
+        public static void SaveImageToFile(Color[,] rgbArray, string filePath = "C:\\Projects\\Roboport\\debug_pictures\\test.png")
         {
             Bitmap bitmap = new Bitmap(rgbArray.GetLength(0), rgbArray.GetLength(1));
             for (int x = 0; x < rgbArray.GetLength(0); x++)
@@ -49,7 +49,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>a color array of an image</returns>
-        public static Color[,] LoadImageFromFile(string filePath = "C:\\Projects\\Roboport\\test_pictures\\test.png")
+        public static Color[,] LoadImageFromFile(string filePath = "C:\\Projects\\Roboport\\debug_pictures\\test.png")
         {
             Bitmap bitmap = (Bitmap)Image.FromFile(filePath);
             Color[,] image = new Color[bitmap.Width, bitmap.Height];
@@ -73,7 +73,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="directory">e.x. "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\"</param>
         /// <param name="saveName"></param>
         /// <param name="mask"></param>
-        public static void TestMask(Bitmap bitmap, Color[,] colorArray, RGBHSBRange bodyPart, bool[,] mask, string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", string saveName = "test.png")
+        public static void TestMask(Bitmap bitmap, Color[,] colorArray, RGBHSBRange bodyPart, bool[,] mask, string directory = "C:\\Projects\\Roboport\\debug_pictures\\mask_tests\\", string saveName = "test.png")
         {
             Bitmap redBitmap = (Bitmap)bitmap.Clone();
             Bitmap greenBitmap = (Bitmap)bitmap.Clone();
