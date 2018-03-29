@@ -145,7 +145,7 @@ namespace RunescapeBot.BotPrograms.Popups
             Color bottomRight = screen.GetPixel(x, y);
             RGBHSBRange rightClickColor = RGBHSBRangeFactory.RightClickPopup();
 
-            return ImageProcessing.ColorsAreEqual(blackBarCheck, Color.Black) && rightClickColor.ColorInRange(bottomRight);
+            return ImageProcessing.ColorsAreEqual(blackBarCheck, Color.Black) || rightClickColor.ColorInRange(bottomRight);
         }
 
         /// <summary>
