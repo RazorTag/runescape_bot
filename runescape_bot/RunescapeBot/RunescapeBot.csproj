@@ -107,6 +107,7 @@
     <Compile Include="BotPrograms\Bots\Phasmatys\FurnacePhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\MakePotionFull.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use14On14.cs" />
+    <Compile Include="BotPrograms\Bots\Runecrafting\NatureRings.cs" />
     <Compile Include="BotPrograms\Bots\TeaStall.cs" />
     <Compile Include="BotPrograms\Bots\Woodcutting\Woodcutting.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />

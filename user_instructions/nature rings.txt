@@ -1,0 +1,33 @@
+-have the lunar magicks spellbook active
+
+-equip:
+	*dramen staff or lunar staff
+	*amulet of eternal glory
+	*nature tiara
+	*weight-reducing clothing
+
+-inventory:
+	*slot 1 -> small pouch
+	*slot 2 -> medium pouch
+	*slot 3 -> large pouch
+	*slot 4 -> huge pouch
+
+-bank going from top-right to top-left
+	*small pouch
+	*medium pouch
+	*large pouch
+	*huge pouch
+	*cosmic runes
+	*astral runes
+	*air runes
+
+
+
+
+
+-edgeville - > fairy ring = 19s
+-salve graveyard teleport = 9s (costs ~2k)
+-quest point cape teleport = 5s
+
+-edgeville teleport to bank = 4s
+-castle wars bank = 3s
