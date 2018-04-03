@@ -23,13 +23,12 @@ namespace RunescapeBot.BotPrograms
         protected bool[,] EmptySlots;
 
 
-        public Inventory(Process rsClient, Color[,] screen, Keyboard keyboard)
+        public Inventory(Process rsClient, Keyboard keyboard)
         {
             RNG = new Random();
-            this.RSClient = rsClient;
+            RSClient = rsClient;
             SelectedTab = TabSelect.Unknown;
-            this.Screen = screen;
-            this.Keyboard = keyboard;
+            Keyboard = keyboard;
             EmptySlots = new bool[INVENTORY_COLUMNS, INVENTORY_ROWS];
         }
 
@@ -48,7 +47,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         public void SetScreen(Color[,] screen)
         {
-            this.Screen = screen;
+            Screen = screen;
         }
 
         /// <summary>
@@ -157,7 +156,7 @@ namespace RunescapeBot.BotPrograms
         /// Opens the inventory and clicks on an inventory slot
         /// </summary>
         /// <param name="slot">inventory slot</param>
-        public void ClickInventory(Point slot)
+        public void ClickInventory(Point slot, bool safeTab = true)
         {
             ClickInventory(slot.X, slot.Y);
         }
@@ -231,7 +230,7 @@ namespace RunescapeBot.BotPrograms
         /// Drops all of the items in the inventory
         /// </summary>
         /// <param name="safeTab"></param>
-        public void DropInventory(bool safeTab = true, bool onlyDropPreviouslyEmptySlots = false)
+        public void DropInventory(bool safeTab = true, bool onlyDropPreviouslyEmptySlots = true)
         {
             Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             OpenInventory(safeTab);
@@ -411,10 +410,10 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Finds the next slot that a new picked up item would go into.
+        /// Finds the next slot that matches a single color filter
         /// </summary>
-        /// <returns>The first empty inventory slot scanning left to right then top to bottom. Returns null if inventory is full.</returns>
-        public Point? FirstEmptySlot(bool safeTab = true)
+        /// <returns>The first matching inventory slot scanning left to right then top to bottom. Returns null if no match is found.</returns>
+        public Point? FirstColorMatchingSlot(RGBHSBRange colorFilter, double matchStrictness = 0.1, bool safeTab = true)
         {
             if (OpenInventory(safeTab))
             {
@@ -425,7 +424,7 @@ namespace RunescapeBot.BotPrograms
             for (int slot = 0; slot < INVENTORY_CAPACITY; slot++)
             {
                 inventorySlot = InventoryIndexToCoordinates(slot);
-                if (SlotIsEmpty(inventorySlot.Value.X, inventorySlot.Value.Y))
+                if (SlotMatchesColorFilter(inventorySlot.Value.X, inventorySlot.Value.Y, colorFilter, matchStrictness, false, false))
                 {
                     return inventorySlot;
                 }
@@ -437,14 +436,25 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines if the given inventory slot contains any item
+        /// Finds the next slot that a new picked up item would go into.
+        /// </summary>
+        /// <param name="safeTab">set to false to rely on the Inventory's record of whether it is already on the inventory tab</param>
+        /// <returns>The first empty inventory slot scanning left to right then top to bottom. Returns null if inventory is full.</returns>
+        public Point? FirstEmptySlot(bool safeTab = true)
+        {
+            return FirstColorMatchingSlot(RGBHSBRangeFactory.EmptyInventorySlot(), 0.99, safeTab);
+        }
+
+        /// <summary>
+        /// Determines if the given inventory slot matches a color filter
         /// </summary>
         /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
         /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
+        /// <param name="colorFilter">color range to match on</param>
         /// <param name="readScreen">set to true to reread the game screen before checking</param>
         /// <param name="safeTab">set to true to switch to the inventory tab even if it already thinks that it is selected</param>
-        /// <returns>true if the slot is empty</returns>
-        public bool SlotIsEmpty(int xSlot, int ySlot, bool readScreen = false, bool safeTab = false)
+        /// <returns>true if the slot matches a color filter</returns>
+        public bool SlotMatchesColorFilter(int xSlot, int ySlot, RGBHSBRange colorFilter, double matchStrictness = 0.1, bool readScreen = false, bool safeTab = false)
         {
             int x = xSlot;
             int y = ySlot;
@@ -462,8 +472,21 @@ namespace RunescapeBot.BotPrograms
             int bottom = y + yOffset;
 
             Color[,] itemIcon = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
-            double emptyMatch = ImageProcessing.FractionalMatch(itemIcon, RGBHSBRangeFactory.EmptyInventorySlot());
-            return (emptyMatch > 0.99) || Windows10WatermarkEmpty(itemIcon, xSlot, ySlot);
+            double colorMatch = ImageProcessing.FractionalMatch(itemIcon, colorFilter);
+            return (colorMatch > matchStrictness);
+        }
+
+        /// <summary>
+        /// Determines if the given inventory slot contains any item
+        /// </summary>
+        /// <param name="x">slots away from the leftmost column (0-3) or screen x coordinate</param>
+        /// <param name="y">slots away from the topmost column (0-6) or screen y coordinate</param>
+        /// <param name="readScreen">set to true to reread the game screen before checking</param>
+        /// <param name="safeTab">set to true to switch to the inventory tab even if it already thinks that it is selected</param>
+        /// <returns>true if the slot is empty</returns>
+        public bool SlotIsEmpty(int xSlot, int ySlot, bool readScreen = false, bool safeTab = false)
+        {
+            return SlotMatchesColorFilter(xSlot, ySlot, RGBHSBRangeFactory.EmptyInventorySlot(), 0.95, readScreen, safeTab);
         }
 
         /// <summary>
@@ -669,6 +692,7 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region constants
+
         /// <summary>
         /// Milliseconds to wait after switching tabs
         /// </summary>
@@ -676,26 +700,26 @@ namespace RunescapeBot.BotPrograms
 
         public const int INVENTORY_TAB_OFFSET_RIGHT = 118;
         public const int INVENTORY_TAB_OFFSET_BOTTOM = 320;
-        private const int INVENTORY_OFFSET_LEFT = 185;
-        private const int INVENTORY_OFFSET_TOP = 275;
-        private const int INVENTORY_GAP_X = 42;
-        private const int INVENTORY_GAP_Y = 36;
+        public const int INVENTORY_OFFSET_LEFT = 185;
+        public const int INVENTORY_OFFSET_TOP = 275;
+        public const int INVENTORY_GAP_X = 42;
+        public const int INVENTORY_GAP_Y = 36;
         public const int INVENTORY_CAPACITY = 28;
         public const int INVENTORY_COLUMNS = 4;
         public const int INVENTORY_ROWS = 7;
 
-        private const int SPELLBOOK_TAB_OFFSET_RIGHT = 19;
-        private const int SPELLBOOK_TAB_OFFSET_BOTTOM = 320;
-        private const int SPELLBOOK_OFFSET_LEFT = 191;
-        private const int SPELLBOOK_OFFSET_TOP = 272;
-        private const int SPELLBOOK_GAP_X = 24;
-        private const int SPELLBOOK_GAP_Y = 24;
+        public const int SPELLBOOK_TAB_OFFSET_RIGHT = 19;
+        public const int SPELLBOOK_TAB_OFFSET_BOTTOM = 320;
+        public const int SPELLBOOK_OFFSET_LEFT = 191;
+        public const int SPELLBOOK_OFFSET_TOP = 272;
+        public const int SPELLBOOK_GAP_X = 24;
+        public const int SPELLBOOK_GAP_Y = 24;
         public const int SPELLBOOK_COLUMNS = 7;
         public const int SPELLBOOK_ROWS = 10;
         public const int TELEPORT_DURATION = 4 * BotRegistry.GAME_TICK;
 
-        private const int LOGOUT_TAB_OFFSET_RIGHT = 120;
-        private const int LOGOUT_TAB_OFFSET_BOTTOM = 18;
+        public const int LOGOUT_TAB_OFFSET_RIGHT = 120;
+        public const int LOGOUT_TAB_OFFSET_BOTTOM = 18;
 
         public TabSelect SelectedTab { get; set; }
         public enum TabSelect : int
@@ -713,6 +737,7 @@ namespace RunescapeBot.BotPrograms
             Empty = 0
         }
         private const int EMPTY_ITEM_HASH = 3423623;
+
         #endregion
     }
 }

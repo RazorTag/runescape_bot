@@ -1,0 +1,4 @@
+-use OSBuddy
+-turn off the monster hitpoints that show up in the top-left corner
+-turn off show stat changes
+Inventory: rock cake, 8 overloads, 19 absorptions

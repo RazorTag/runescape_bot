@@ -278,6 +278,30 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// The red color of the hitpoints digits by the minimap when low on health
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange HitpointsRed()
+        {
+            Color dark = Color.FromArgb(254, 10, 0);
+            Color light = Color.FromArgb(255, 12, 1);
+            HSBRange hsbRange = new HSBRange(2, 4, 0.995f, 1.000f, 0.495f, 0.505f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The green color of the hitpoints digits by the minimap when high on health
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange HitpointsGreen()
+        {
+            Color dark = Color.FromArgb(0, 250, 0);
+            Color light = Color.FromArgb(5, 255, 5);
+            HSBRange hsbRange = new HSBRange(119, 121, 0.995f, 1.000f, 0.495f, 0.505f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// The orange part of a furnace minimap icon
         /// </summary>
         /// <returns></returns>
@@ -362,6 +386,42 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(101, 55, 9);
             Color light = Color.FromArgb(152, 94, 47);
             HSBRange hsbRange = new HSBRange(21.9f, 35.0f, 0.521f, 0.758f, 0.174f, 0.432f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Inventory overload potion black
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange OverloadInventory()
+        {
+            Color dark = Color.FromArgb(16, 12, 12);
+            Color light = Color.FromArgb(20, 16, 16);
+            HSBRange hsbRange = new HSBRange(-5f, 5f, 0.115f, 0.135f, 0.053f, 0.073f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Timer overload potion black
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange OverloadTimer()
+        {
+            Color dark = Color.FromArgb(9, 8, 8);
+            Color light = Color.FromArgb(13, 12, 12);
+            HSBRange hsbRange = new HSBRange(-5f, 5f, 0.038f, 0.058f, 0.031f, 0.051f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Inventory apsorption potion light blue
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange Absorption()
+        {
+            Color dark = Color.FromArgb(76, 93, 100);
+            Color light = Color.FromArgb(205, 213, 217);
+            HSBRange hsbRange = new HSBRange(192.5f, 210.7f, 0.074f, 0.152f, 0.323f, 0.849f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
@@ -480,6 +540,17 @@ namespace RunescapeBot.BotPrograms
         {
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(0, 0, 0);
+            return new RGBHSBRange(dark, light, null);
+        }
+
+        /// <summary>
+        /// perfect white
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange White()
+        {
+            Color dark = Color.FromArgb(255, 255, 255);
+            Color light = Color.FromArgb(255, 255, 255);
             return new RGBHSBRange(dark, light, null);
         }
 

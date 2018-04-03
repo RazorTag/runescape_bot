@@ -53,8 +53,8 @@ namespace RunescapeBot.BotPrograms
             SafeWait(2000); //Give the player time to start the chopping animation
             WaitDuringPlayerAnimation();
 
-            //Drop logs when inventory fills up
-            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 1))
+            //Drop logs when inventory fills up. Use the second from bottom row to avoid looking at the Windows 10 watermark.
+            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 2))
             {
                 Inventory.DropInventory(false, true);
             }

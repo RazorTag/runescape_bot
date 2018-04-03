@@ -9,6 +9,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Linq;
 using RunescapeBot.FileIO;
+using RunescapeBot.BotPrograms.FixedUIComponents;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -98,6 +99,10 @@ namespace RunescapeBot.BotPrograms
                 {
                     Inventory.SetScreen(colorArray);
                 }
+                if (Minimap != null)
+                {
+                    Minimap.SetScreen(colorArray);
+                }
             }
         }
 
@@ -115,6 +120,9 @@ namespace RunescapeBot.BotPrograms
         /// The sidebar including the inventory and spellbook
         /// </summary>
         protected Inventory Inventory { get; set; }
+
+
+        protected Minimap Minimap { get; set; }
 
         /// <summary>
         /// Expected time to complete a single iteration
@@ -205,14 +213,15 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Initializes a bot program with a client matching startParams
         /// </summary>
-        /// <param name="startParams">specifies the username to search for</param>
+        /// <param name="startParams">specifies how to run the bot</param>
         protected BotProgram(RunParams startParams)
         {
             RSClient = ScreenScraper.GetClient();
             RunParams = startParams;
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);
-            Inventory = new Inventory(RSClient, ColorArray, Keyboard);
+            Inventory = new Inventory(RSClient, Keyboard);
+            Minimap = new Minimap(RSClient, Keyboard);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
             RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
             RunParams.LoginWorld = 0;
@@ -549,6 +558,22 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         #region user actions
+
+        /// <summary>
+        /// Moves the mouse to another position
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="randomize">radius within which to pick a random position</param>
+        protected void MoveMouse(int x, int y, int randomize = 0)
+        {
+            if (!StopFlag)
+            {
+                Point moveLocation = Probability.GaussianCircle(new Point(x, y), 0.35 * randomize, 0, 360, randomize);
+                Mouse.MoveMouse(moveLocation.X, moveLocation.Y, RSClient);
+            }
+        }
+
         /// <summary>
         /// Wrapper for MouseActions.LeftMouseClick
         /// </summary>
@@ -921,6 +946,21 @@ namespace RunescapeBot.BotPrograms
         {
             Point offset;
             return ColorFilterPiece(filter, center, radius, out offset);
+        }
+
+        /// <summary>
+        /// Determines the fraction of piece of an RGB image that matches a color filter
+        /// </summary>
+        /// <param name="filter">filter to use for matching</param>
+        /// <param name="left">left bound (inclusive)</param>
+        /// <param name="right">right bound (inclusive)</param>
+        /// <param name="top">top bound (inclusive)</param>
+        /// <param name="bottom">bottom bound (inclusive)</param>
+        /// <returns>The fraction (0-1) of the image that matches the filter</returns>
+        protected double FractionalMatchPiece(RGBHSBRange filter, int left, int right, int top, int bottom)
+        {
+            bool[,] binaryImage = ColorFilterPiece(filter, left, right, top, bottom);
+            return ImageProcessing.FractionalMatch(binaryImage);
         }
 
         /// <summary>

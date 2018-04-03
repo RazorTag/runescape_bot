@@ -110,6 +110,7 @@
     <Compile Include="BotPrograms\Bots\Runecrafting\NatureRings.cs" />
     <Compile Include="BotPrograms\Bots\TeaStall.cs" />
     <Compile Include="BotPrograms\Bots\Woodcutting\WillowChopping.cs" />
+    <Compile Include="BotPrograms\FixedUIComponents\Minimap.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />
     <Compile Include="BotPrograms\Popups\RightClickInventory.cs" />
     <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Common\Line.cs" />
     <Compile Include="Common\Numerical.cs" />
     <Compile Include="Common\Probability.cs" />
+    <Compile Include="Common\RectangleBounds.cs" />
     <Compile Include="Common\UnitConversions.cs" />
     <Compile Include="FileIO\LogError.cs" />
     <Compile Include="ImageTools\Blob\BlobHorizontalComparer.cs" />

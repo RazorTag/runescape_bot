@@ -393,6 +393,22 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Determines the fraction of piece of an RGB image that matches a color filter
+        /// </summary>
+        /// <param name="filter">filter to use for matching</param>
+        /// <param name="left">left bound (inclusive)</param>
+        /// <param name="right">right bound (inclusive)</param>
+        /// <param name="top">top bound (inclusive)</param>
+        /// <param name="bottom">bottom bound (inclusive)</param>
+        /// <returns>The fraction (0-1) of the image that matches the filter</returns>
+        public static double FractionalMatchPiece(Color[,] image, RGBHSBRange filter, int left, int right, int top, int bottom)
+        {
+            image = ScreenPiece(image, left, right, top, bottom);
+            bool[,] binaryImage = ColorFilter(image, filter);
+            return FractionalMatch(binaryImage);
+        }
+
+        /// <summary>
         /// Determines the fraction of an RGB image that matches a color filter
         /// </summary>
         /// <param name="rgbImage">image to match on</param>
