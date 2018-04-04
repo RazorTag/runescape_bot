@@ -1537,12 +1537,12 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Changes world if logged into a bot world
+        /// Changes world if logged into a bot world. Can be called while logged in or logged out.
         /// </summary>
         /// <returns>true if we detect a bot world and attempt to change worlds</returns>
         protected bool BotWorldCheck(bool readWindow = false)
         {
-            if (PvPWorldSet())
+            if (!RunParams.BotWorldCheckEnabled || PvPWorldSet())
             {
                 return false;
             }

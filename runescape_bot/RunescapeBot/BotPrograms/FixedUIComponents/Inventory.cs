@@ -158,7 +158,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="slot">inventory slot</param>
         public void ClickInventory(Point slot, bool safeTab = true)
         {
-            ClickInventory(slot.X, slot.Y);
+            ClickInventory(slot.X, slot.Y, safeTab);
         }
 
         /// <summary>

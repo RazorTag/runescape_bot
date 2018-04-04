@@ -43,6 +43,7 @@ namespace RunescapeBot.BotPrograms
             RandomizeFrames = true;
             BotState = BotProgram.BotState.Running;
             RunUntil = DateTime.Now;
+            BotWorldCheckEnabled = true;
             BotWorldCheckInterval = UnitConversions.MinutesToMilliseconds(5);
             TaskComplete = new BotResponse(DoNothing);
         }
@@ -162,6 +163,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         [XmlIgnore]
         public bool RandomizeFrames { get; set; }
+
+        /// <summary>
+        /// True by default to enable periodic bot world checks. Set to false to disable bot world checks.
+        /// </summary>
+        [XmlIgnore]
+        public bool BotWorldCheckEnabled { get; set; }
 
         /// <summary>
         /// Minimum number of milliseconds between bot world checks

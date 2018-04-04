@@ -402,6 +402,18 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Gray-brown background of the potion timer in OSBuddy
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange PotionTimerBackground()
+        {
+            Color dark = Color.FromArgb(66, 57, 48);
+            Color light = Color.FromArgb(80, 71, 62);
+            HSBRange hsbRange = new HSBRange(26.2f, 33.6f, 0.114f, 0.172f, 0.219f, 0.283f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// Timer overload potion black
         /// </summary>
         /// <returns></returns>

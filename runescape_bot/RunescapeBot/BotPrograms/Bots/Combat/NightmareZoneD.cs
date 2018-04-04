@@ -4,6 +4,7 @@ using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -18,19 +19,23 @@ namespace RunescapeBot.BotPrograms
         RGBHSBRange AbsorptionInventory = RGBHSBRangeFactory.Absorption();
         RGBHSBRange HitpointsRed = RGBHSBRangeFactory.HitpointsRed();
         RGBHSBRange HitpointsGreen = RGBHSBRangeFactory.HitpointsGreen();
+        RGBHSBRange PotionTimerBackground = RGBHSBRangeFactory.PotionTimerBackground();
 
         protected Point rockCake;   //location of the rock cake in the inventory
         protected bool hasOverloads;
         protected bool hasAbsorptions;
-        protected bool hitPointsFull;
+        protected DateTime lastOverload;
+        protected const int overloadDrainTime = 13000;  //time in milliseconds to wait for a dose of overload to take effect
 
         public NightmareZoneD(RunParams startParams) : base(startParams)
         {
             startParams.FrameTime = 5000;
+            startParams.ClientType = ScreenScraper.Client.OSBuddy;
+            startParams.BotWorldCheckEnabled = false;
             hasOverloads = true;
             hasAbsorptions = true;
-            hitPointsFull = false;
             rockCake = new Point(0, 0);
+            lastOverload = DateTime.MinValue;
         }
 
         protected override bool Run()
@@ -63,15 +68,22 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             ReadWindow();
-            if (Overload() || Absorption() || Hitpoints())
+
+            if (Minimap.HighHitpoints())
             {
+                return false;   //Assume that we died in the Nightmare Zone if hitpoints suddenly become full
+            }
+
+            if (Overload() || Hitpoints() || Absorption())
+            {
+                if (StopFlag) { return false; }
                 Point inventoryCorner = new Point(ScreenWidth - Inventory.INVENTORY_OFFSET_LEFT - Inventory.INVENTORY_GAP_X, ScreenHeight - Inventory.INVENTORY_OFFSET_TOP - Inventory.INVENTORY_GAP_Y);
                 int acceptableAreaRadius = (int) Geometry.DistanceBetweenPoints(Center, inventoryCorner);
                 MoveMouse(Center.X, Center.Y, acceptableAreaRadius);
                 SafeWait(3000);
             }
 
-            return !hitPointsFull;  //Assume that we died in the Nightmare Zone if hitpoints suddenly become full
+            return true;
         }
 
         /// <summary>
@@ -80,20 +92,18 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a bite of rock cake is taken</returns>
         protected bool Hitpoints()
         {
-            const double twoHitpointsMatch = 0.0487;
+            if ((DateTime.Now - lastOverload).TotalMilliseconds < overloadDrainTime)
+            {
+                return false;   //an overload might be taking effect
+            }
 
+            const double twoHitpointsMatch = 0.0487;
             RectangleBounds hitpoints = Minimap.HitpointsDigitsArea(ScreenWidth);
             double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
             if (Numerical.WithinRange(redHitpointsMatch, twoHitpointsMatch, 0.01*twoHitpointsMatch)) //something other than 2 hitpoints
             {
                 return false;   //hitpoints are already at 2
-            }
-
-            if ((redHitpointsMatch <= twoHitpointsMatch / 10) && Minimap.HighHitpoints())
-            {
-                hitPointsFull = true;
-                return false;
             }
 
             Inventory.ClickInventory(0, 0, false);
@@ -143,9 +153,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a dose of overload is consumed</returns>
         protected bool Overload()
         {
-            if (!hasOverloads || OverloadTimerExists())
+            if (!hasOverloads || OverloadTimerExists() || (DateTime.Now - lastOverload).TotalMilliseconds < overloadDrainTime)
             {
-                return false; ;   //An overload is active or we ran out of overloads to drink
+                return false;   //An overload is active or we ran out of overloads to drink
             }
 
             Point? firstOverload = Inventory.FirstColorMatchingSlot(OverloadInventory, 0.01, false);
@@ -156,17 +166,27 @@ namespace RunescapeBot.BotPrograms
             }
 
             Inventory.ClickInventory(firstOverload.Value, false);
+            lastOverload = DateTime.Now;
             return true;
         }
 
         /// <summary>
         /// Determines if an overload potion is active by looking for the timer above the chat box
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if the timer is found in the expected location above the right side of the chatbox</returns>
         protected bool OverloadTimerExists()
         {
-            bool[,] potionTimerSlot = ColorFilterPiece(OverloadTimer, new Point(503, ScreenHeight - 185), 5);
-            double overloadTimerMatch = ImageProcessing.FractionalMatch(potionTimerSlot);
+            //bool[,] potionTimerSlot = potionTimerSlot = ColorFilterPiece(OverloadTimer, new Point(503, ScreenHeight - 185), 5);
+            //double overloadTimerMatch = overloadTimerMatch = ImageProcessing.FractionalMatch(potionTimerSlot);
+            //return overloadTimerMatch > 0.5;
+
+            int left = 478;
+            int right = left + 37;
+            int top = ScreenHeight - 198;
+            int bottom = top + 29;
+
+            bool[,] potionTimerSlot = potionTimerSlot = ColorFilterPiece(PotionTimerBackground, left, right, top, bottom);
+            double overloadTimerMatch = overloadTimerMatch = ImageProcessing.FractionalMatch(potionTimerSlot);
             return overloadTimerMatch > 0.5;
         }
     }
