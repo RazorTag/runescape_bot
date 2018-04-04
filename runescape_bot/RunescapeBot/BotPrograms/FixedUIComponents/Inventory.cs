@@ -178,34 +178,42 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y">slots from the top row of the inventory (0-6)</param>
         public void DropItem(int x, int y, bool safeTab = true, int[] extraOptions = null)
         {
+            int dropOptions = RightClickInventory.OptionsAbove(1, extraOptions);
+            RightClickInventoryOption(x, y, dropOptions, safeTab, extraOptions);
+        }
+
+        /// <summary>
+        /// Selects a right-click option for an item in the player's inventory
+        /// </summary>
+        /// <param name="x">column (0-3)</param>
+        /// <param name="y">row (0-6)</param>
+        /// <param name="safeTab">set to false to skip making sure that the inventory tab is open</param>
+        /// <param name="extraOptions">list indices of non-standard right-click options. Standard options include Use, Drop, Examine, and Cancel</param>
+        public void RightClickInventoryOption(int x, int y, int option, bool safeTab = true, int[] extraOptions = null)
+        {
             OpenInventory(safeTab);
             InventoryToScreen(ref x, ref y);
 
             Point click;
-            const int timeout = 3000;
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            bool done = false;
-            RightClickInventory dropPopup = null;
+            RightClickInventory popup = null;
 
-            while (!done && (watch.ElapsedMilliseconds < timeout))
+            for (int i = 0; i < 3; i++)
             {
                 if (BotProgram.StopFlag) { return; }
 
                 click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
                 Mouse.RightClick(click.X, click.Y, RSClient, 0);
-                dropPopup = new RightClickInventory(click.X, click.Y, RSClient, extraOptions);
-                if (dropPopup.WaitForPopup(1000))
+                popup = new RightClickInventory(click.X, click.Y, RSClient, extraOptions);
+                if (popup.WaitForPopup(1000))
                 {
-                    done = true;
+                    popup.CustomOption(option);
+                    return;
                 }
                 else
                 {
                     OpenInventory(true);
                 }
             }
-
-            dropPopup.DropItem();
         }
 
         /// <summary>

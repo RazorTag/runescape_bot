@@ -32,6 +32,7 @@ namespace RunescapeBot.BotPrograms
             startParams.FrameTime = 5000;
             startParams.ClientType = ScreenScraper.Client.OSBuddy;
             startParams.BotWorldCheckEnabled = false;
+            startParams.SlaveDriver = true;
             hasOverloads = true;
             hasAbsorptions = true;
             rockCake = new Point(0, 0);
@@ -97,7 +98,7 @@ namespace RunescapeBot.BotPrograms
                 return false;   //an overload might be taking effect
             }
 
-            const double twoHitpointsMatch = 0.0487;
+            const double twoHitpointsMatch = 0.0487;    //TODO change value to match 1 hitpoint instead of 2
             RectangleBounds hitpoints = Minimap.HitpointsDigitsArea(ScreenWidth);
             double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
@@ -106,7 +107,8 @@ namespace RunescapeBot.BotPrograms
                 return false;   //hitpoints are already at 2
             }
 
-            Inventory.ClickInventory(0, 0, false);
+            //Inventory.ClickInventory(0, 0, false);
+            Inventory.RightClickInventoryOption(0, 0, 1, false, new int[2] { 0, 1 });   //guzzle rock cake
             return true;
         }
 
