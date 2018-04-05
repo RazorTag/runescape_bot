@@ -5,20 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using RunescapeBot.ImageTools;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace RunescapeBot.BotPrograms
 {
     public class IronPowerMining : BotProgram
     {
         RGBHSBRange IronFilter = RGBHSBRangeFactory.IronRock();
-        int minIronBlobPxSize; 
+        int minIronBlobPxSize;
+        int missedRocks;
 
 
         public IronPowerMining(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
-            RunParams.FrameTime = 1000;
+            RunParams.FrameTime = 1800;
             minIronBlobPxSize = ArtifactSize(0.00025);
+            missedRocks = 0;
         }
 
         /// <summary>
@@ -45,16 +48,28 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             ReadWindow();
-            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 1))
+            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 4))
             {
                 Inventory.DropInventory(false, true);
             }
             else {
                 Blob rockLocation = StationaryLocateUnminedOre();
-                if (rockLocation != null) {
+                if (rockLocation == null)
+                {
+                    missedRocks++;
+                    if (missedRocks > 5)
+                    {
+                        MessageBox.Show("Unable to find any iron rocks");
+                        return false;
+                    }
+                }
+                else
+                {
                     Point rockPoint = (Point)rockLocation.RandomBlobPixel();
                     LeftClick(rockPoint.X, rockPoint.Y);
-                    SafeWaitPlus(1000, 300);
+                    SafeWaitPlus(1200, 100);
+                    RunParams.Iterations--;
+                    missedRocks = 0;
                 }
             }
             return true;
@@ -67,15 +82,7 @@ namespace RunescapeBot.BotPrograms
         protected Blob StationaryLocateUnminedOre()
         {
             Blob rockLocation;
-            if (LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, int.MaxValue, LocateUnminedOre))
-            {
-
-            }
-            //Blob rockLocation = ImageProcessing.ClosestBlob(ironBoolArray, Center, 3);
-            // 51 px 
-            // 692 height 
-            // (51/692)^2 
-            // 0.00010650205
+            LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, 5*minIronBlobPxSize, LocateUnminedOre);
             return rockLocation;
         }
 

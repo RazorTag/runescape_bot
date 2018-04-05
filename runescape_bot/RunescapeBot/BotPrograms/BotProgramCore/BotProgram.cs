@@ -628,7 +628,7 @@ namespace RunescapeBot.BotPrograms
         /// Looks for an object that isn't moving (meaning the player isn't moving)
         /// </summary>
         /// <param name="stationaryObject">color filter used to locate the stationary object</param>
-        /// <param name="foundObject">returns the Blob if it is found</param>
+        /// <param name="foundObject">returns the Blob if it is found or null if not found</param>
         /// <param name="tolerance">maximum allowed distance in pixels between subsequent object locations</param>
         /// <param name="maxWaitTime">time to wait before gving up</param>
         /// <param name="minimumSize">minimum required size of the object in pixels</param>

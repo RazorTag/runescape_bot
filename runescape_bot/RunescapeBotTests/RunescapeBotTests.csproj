@@ -57,6 +57,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BotPrograms\Popups\RightClickInventoryTests.cs" />
     <Compile Include="Common\GeometryTests.cs" />
     <Compile Include="Common\LineTests.cs" />
     <Compile Include="Common\NumericalTests.cs" />

@@ -178,7 +178,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y">slots from the top row of the inventory (0-6)</param>
         public void DropItem(int x, int y, bool safeTab = true, int[] extraOptions = null)
         {
-            int dropOptions = RightClickInventory.OptionsAbove(1, extraOptions);
+            int dropOptions = RightClickInventory.OptionIndex(1, extraOptions);
             RightClickInventoryOption(x, y, dropOptions, safeTab, extraOptions);
         }
 

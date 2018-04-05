@@ -1,6 +1,7 @@
 -use OSBuddy
 -turn off the monster hitpoints that show up in the top-left corner
 -turn off show stat changes
-Inventory: rock cake, 7 overloads (28 doses), 20 absorptions (80 doses)
--trying 9 overloads with 1 hp
+
+Inventory: rock cake, 9 overloads (36 doses), 18 absorptions (72 doses)
+
 Bosses: Aarg, Ice Troll King, Count Draynor, King Roald, Me

@@ -66,35 +66,38 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Determines the number of extra options that are listed above the specified option
+        /// Determines the index of the given option in the pop-up
         /// </summary>
         /// <param name="normalIndex"></param>
         /// <returns>the number of extra options that displace the selected option downward</returns>
         private int OptionsAbove(int normalIndex)
         {
-            return OptionsAbove(normalIndex, ExtraOptions);
+            return OptionIndex(normalIndex, ExtraOptions);
         }
 
         /// <summary>
-        /// Determines the number of extra options that are listed above the specified option
+        /// Determines the index of the given option in the pop-up
         /// </summary>
         /// <param name="normalIndex"></param>
         /// /// <param name="extraOptions"></param>
         /// <returns>the number of extra options that displace the selected option downward</returns>
-        public static int OptionsAbove(int normalIndex, int[] extraOptions)
+        public static int OptionIndex(int normalIndex, int[] extraOptions)
         {
-            if (extraOptions == null) { return 0; }
-
             int optionIndex = normalIndex;
 
-            for (int i = 0; i < extraOptions.Length; i++)
+            //determine the number of extra options that are indexed above the given options
+            if (extraOptions != null)
             {
-                if (extraOptions[i] <= optionIndex)
+                for (int i = 0; i < extraOptions.Length; i++)
                 {
-                    optionIndex++;
+                    if (extraOptions[i] <= optionIndex)
+                    {
+                        optionIndex++;
+                    }
                 }
             }
-            return optionIndex - normalIndex;
+
+            return optionIndex;
         }
     }
 }
