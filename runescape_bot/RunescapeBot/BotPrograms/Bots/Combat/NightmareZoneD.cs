@@ -25,7 +25,7 @@ namespace RunescapeBot.BotPrograms
         protected bool hasOverloads;
         protected bool hasAbsorptions;
         protected DateTime lastOverload;
-        protected const int overloadDrainTime = 13000;  //time in milliseconds to wait for a dose of overload to take effect
+        protected const int overloadDrainTime = 10000;  //time in milliseconds to wait for a dose of overload to take effect
 
         public NightmareZoneD(RunParams startParams) : base(startParams)
         {
@@ -88,7 +88,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Eats a bite of rock cake if hitpoints are above 2
+        /// Eats a bite of rock cake if hitpoints are above 1
         /// </summary>
         /// <returns>true if a bite of rock cake is taken</returns>
         protected bool Hitpoints()
@@ -98,17 +98,17 @@ namespace RunescapeBot.BotPrograms
                 return false;   //an overload might be taking effect
             }
 
-            const double twoHitpointsMatch = 0.0487;    //TODO change value to match 1 hitpoint instead of 2
+            const double twoHitpointsMatch = 0.035714285714285712;
             RectangleBounds hitpoints = Minimap.HitpointsDigitsArea(ScreenWidth);
             double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
             if (Numerical.WithinRange(redHitpointsMatch, twoHitpointsMatch, 0.01*twoHitpointsMatch)) //something other than 2 hitpoints
             {
-                return false;   //hitpoints are already at 2
+                return false;   //hitpoints are already at 1
             }
 
-            //Inventory.ClickInventory(0, 0, false);
             Inventory.RightClickInventoryOption(0, 0, 1, false, new int[2] { 0, 1 });   //guzzle rock cake
+            SafeWaitPlus(1000, 250);
             return true;
         }
 

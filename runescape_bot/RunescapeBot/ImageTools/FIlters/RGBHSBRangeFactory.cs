@@ -283,9 +283,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static RGBHSBRange HitpointsRed()
         {
-            Color dark = Color.FromArgb(254, 10, 0);
-            Color light = Color.FromArgb(255, 12, 1);
-            HSBRange hsbRange = new HSBRange(2, 4, 0.995f, 1.000f, 0.495f, 0.505f);
+            Color dark = Color.FromArgb(250, 0, 0);
+            Color light = Color.FromArgb(255, 16, 5);
+            HSBRange hsbRange = new HSBRange(-1, 5, 0.990f, 1.000f, 0.490f, 0.510f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 

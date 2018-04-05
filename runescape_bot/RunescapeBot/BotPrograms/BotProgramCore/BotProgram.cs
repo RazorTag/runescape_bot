@@ -387,7 +387,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             RunParams.BotState = BotState.Running;
-            long workInterval = RunParams.SlaveDriver ? (int)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds : RandomWorkTime();
+            long workInterval = RunParams.SlaveDriver ? (long)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds : RandomWorkTime();
             RunParams.SetNewState(workInterval);
             ScreenScraper.BringToForeGround(RSClient);
             SafeWait(1000); //give the client time to show up on screen
@@ -408,7 +408,7 @@ namespace RunescapeBot.BotPrograms
                     if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                     {
                         RunCharacter(); //Turn on run if the player has run energy
-                        if (!Execute()) //quit by an override Execute method
+                        if (!Execute()) //quit by a bot program
                         {
                             return true;
                         }
