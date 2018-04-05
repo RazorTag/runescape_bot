@@ -329,6 +329,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="stateLength">length of the new bot state in milliseconds</param>
         public void SetNewState(long stateLength)
         {
+            stateLength = Numerical.LimitToRange(stateLength, 0, UnitConversions.HoursToMilliseconds(168));  //limit state length to 1 week as a sanity check
             CurrentStateStart = DateTime.Now;
             CurrentStateEnd = CurrentStateStart.AddMilliseconds(stateLength);
         }

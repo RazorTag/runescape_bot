@@ -63,6 +63,20 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
+        /// Coerces a vlue to the nearest value within a specified range if the given value is outside of the range
+        /// </summary>
+        /// <param name="input">value to coerce</param>
+        /// <param name="minimum">lowest accpetable value</param>
+        /// <param name="maximum">highest acceptable value</param>
+        /// <returns>The nearest value to input within the rang specified by minimum and maximum</returns>
+        public static long LimitToRange(long input, long minimum, long maximum)
+        {
+            if (input < minimum) { return minimum; }
+            if (input > maximum) { return maximum; }
+            return input;
+        }
+
+        /// <summary>
         /// Takes the average of two numbers
         /// </summary>
         /// <param name="a"></param>

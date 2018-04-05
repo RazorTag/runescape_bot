@@ -565,11 +565,11 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="randomize">radius within which to pick a random position</param>
-        protected void MoveMouse(int x, int y, int randomize = 0)
+        protected void MoveMouse(int x, int y, int randomize = 0, double stdRatio = 0.35)
         {
             if (!StopFlag)
             {
-                Point moveLocation = Probability.GaussianCircle(new Point(x, y), 0.35 * randomize, 0, 360, randomize);
+                Point moveLocation = Probability.GaussianCircle(new Point(x, y), stdRatio * randomize, 0, 360, randomize);
                 Mouse.MoveMouse(moveLocation.X, moveLocation.Y, RSClient);
             }
         }

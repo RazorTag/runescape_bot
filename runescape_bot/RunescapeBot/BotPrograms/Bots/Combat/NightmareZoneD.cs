@@ -25,11 +25,12 @@ namespace RunescapeBot.BotPrograms
         protected bool hasOverloads;
         protected bool hasAbsorptions;
         protected DateTime lastOverload;
-        protected const int overloadDrainTime = 10000;  //time in milliseconds to wait for a dose of overload to take effect
+        protected const long overloadDrainTime = 10000;  //time in milliseconds to wait for a dose of overload to take effect
+        protected long overloadBoostTime = UnitConversions.MinutesToMilliseconds(5); //milliseconds that a dose of overload lasts for
 
         public NightmareZoneD(RunParams startParams) : base(startParams)
         {
-            startParams.FrameTime = 5000;
+            startParams.FrameTime = 2000;
             startParams.ClientType = ScreenScraper.Client.OSBuddy;
             startParams.BotWorldCheckEnabled = false;
             startParams.SlaveDriver = true;
@@ -38,6 +39,11 @@ namespace RunescapeBot.BotPrograms
             rockCake = new Point(0, 0);
             lastOverload = DateTime.MinValue;
         }
+
+        /// <summary>
+        /// Gets the time in milliseconds since the last dose of overload was drunk
+        /// </summary>
+        protected long TimeSinceLastOverload { get { return (long)(DateTime.Now - lastOverload).TotalMilliseconds; } }
 
         protected override bool Run()
         {
@@ -93,18 +99,18 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a bite of rock cake is taken</returns>
         protected bool Hitpoints()
         {
-            if ((DateTime.Now - lastOverload).TotalMilliseconds < overloadDrainTime)
+            if (TimeSinceLastOverload < overloadDrainTime || Numerical.CloseEnough(overloadBoostTime, TimeSinceLastOverload, 0.02))
             {
-                return false;   //an overload might be taking effect
+                return false;   //an overload might be taking effect or wearing off
             }
 
             const double twoHitpointsMatch = 0.035714285714285712;
             RectangleBounds hitpoints = Minimap.HitpointsDigitsArea(ScreenWidth);
             double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
-            if (Numerical.WithinRange(redHitpointsMatch, twoHitpointsMatch, 0.01*twoHitpointsMatch)) //something other than 2 hitpoints
+            if (Numerical.WithinRange(redHitpointsMatch, twoHitpointsMatch, 0.01*twoHitpointsMatch) || (redHitpointsMatch < 0.001))
             {
-                return false;   //hitpoints are already at 1
+                return false;   //hitpoints are already at 1 or an overload has just worn off and hitpoints are no longer red
             }
 
             Inventory.RightClickInventoryOption(0, 0, 1, false, new int[2] { 0, 1 });   //guzzle rock cake
