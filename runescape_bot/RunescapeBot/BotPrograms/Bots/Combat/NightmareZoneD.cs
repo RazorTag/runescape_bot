@@ -105,7 +105,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             const double twoHitpointsMatch = 0.035714285714285712;
-            RectangleBounds hitpoints = Minimap.HitpointsDigitsArea(ScreenWidth);
+            RectangleBounds hitpoints = Minimap.HitpointsDigitsArea();
             double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
             if (Numerical.WithinRange(redHitpointsMatch, twoHitpointsMatch, 0.01*twoHitpointsMatch) || (redHitpointsMatch < 0.001))

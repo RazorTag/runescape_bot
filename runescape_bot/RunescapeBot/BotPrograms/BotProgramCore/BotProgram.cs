@@ -173,7 +173,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// The width in pixels of the most recent image o the game screen
+        /// The width in pixels of the most recent image of the game screen
         /// </summary>
         protected int ScreenWidth
         {
@@ -191,7 +191,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// The width in pixels of the most recent image o the game screen
+        /// The width in pixels of the most recent image of the game screen
         /// </summary>
         protected int ScreenHeight
         {
@@ -697,6 +697,20 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Finds the object closest to the center of the screen that matches the given criteria
+        /// </summary>
+        /// <param name="objectFilter">color filter for the object</param>
+        /// <param name="minimumSize">minimum required size for the object in pixels</param>
+        /// <param name="maximumSize">maximum allowed size for the object in pixels</param>
+        /// <returns>the found object or null if none is found</returns>
+        protected Blob LocateClosestObject(RGBHSBRange objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
+        {
+            List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
+            Blob closestObject = Geometry.ClosestBlobToPoint(objects, Center);
+            return closestObject;
+        }
+
+        /// <summary>
         /// Looks for an object that matches a filter
         /// </summary>
         /// <param name="stationaryObject"></param>
@@ -1000,10 +1014,10 @@ namespace RunescapeBot.BotPrograms
                 return null;
             }
 
-            int left = ScreenWidth - 156;
-            int right = ScreenWidth - 7;
-            int top = 8;
-            int bottom = 159;
+            int left = ScreenWidth - Minimap.OFFSET_LEFT;
+            int right = left + Minimap.WIDTH - 1;
+            int top = Minimap.OFFSET_TOP;
+            int bottom = top + Minimap.HEIGHT - 1;
             Point center = new Point((left + right) / 2, (top + bottom) / 2);
             double radius = 70.0;
             double distance;

@@ -126,9 +126,9 @@ namespace RunescapeBot.Common
         /// <summary>
         /// Returns the Blob in the supplied list that is the closest to the supplied point
         /// </summary>
-        /// <param name="allMatches"></param>
-        /// <param name="center"></param>
-        /// <returns></returns>
+        /// <param name="allMatches">list of blobs to check for proximity</param>
+        /// <param name="center">comparison point</param>
+        /// <returns>the blob that is closest to the specified point</returns>
         public static Blob ClosestBlobToPoint(List<Blob> allMatches, Point matchPoint)
         {
             if (allMatches == null || allMatches.Count == 0) {
@@ -137,7 +137,30 @@ namespace RunescapeBot.Common
             Blob foundBlob = allMatches[0];
             foreach (Blob currentBlob in allMatches)
             {
-                if (DistanceBetweenPoints(matchPoint,foundBlob.Center) >= DistanceBetweenPoints(matchPoint,currentBlob.Center))
+                if (DistanceBetweenPoints(matchPoint, currentBlob.Center) <= DistanceBetweenPoints(matchPoint,foundBlob.Center))
+                {
+                    foundBlob = currentBlob;
+                }
+            }
+            return foundBlob;
+        }
+
+        /// <summary>
+        /// Returns the Blob in the supplied list that is the farthest from the supplied point
+        /// </summary>
+        /// <param name="allMatches">list of blobs to check for proximity</param>
+        /// <param name="center">comparison point</param>
+        /// <returns>the blob that is farthest from the specified point</returns>
+        public static Blob FarthestBlobFromPoint(List<Blob> allMatches, Point matchPoint)
+        {
+            if (allMatches == null || allMatches.Count == 0)
+            {
+                return null;
+            }
+            Blob foundBlob = allMatches[0];
+            foreach (Blob currentBlob in allMatches)
+            {
+                if (DistanceBetweenPoints(matchPoint, currentBlob.Center) >= DistanceBetweenPoints(matchPoint, foundBlob.Center))
                 {
                     foundBlob = currentBlob;
                 }

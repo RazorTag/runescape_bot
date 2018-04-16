@@ -349,6 +349,18 @@ namespace RunescapeBot.BotPrograms
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// The dark blues in a fishing minimap icon
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange FishingIcon()
+        {
+            Color dark = Color.FromArgb(0, 47, 209);
+            Color light = Color.FromArgb(19, 111, 255);
+            HSBRange hsbRange = new HSBRange(212.1f, 230.8f, 0.918f, 0.980f, 0.423f, 0.528f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region Inventory
@@ -653,11 +665,19 @@ namespace RunescapeBot.BotPrograms
         /// classic blue color of fish sprinkles
         /// </summary>
         /// <returns></returns>
+        /// 
+        //public static RGBHSBRange FishingTile()
+        //{
+        //    Color dark = Color.FromArgb(116, 156, 213);
+        //    Color light = Color.FromArgb(163, 190, 232);
+        //    HSBRange hsbRange = new HSBRange(205f, 216f, 0.48f, 0.62f, 0.64f, 0.77f);
+        //    return new RGBHSBRange(dark, light, hsbRange);
+        //}
         public static RGBHSBRange FishingTile()
         {
-            Color dark = Color.FromArgb(116, 156, 213);
-            Color light = Color.FromArgb(163, 190, 232);
-            HSBRange hsbRange = new HSBRange(205f, 216f, 0.48f, 0.62f, 0.64f, 0.77f);
+            Color dark = Color.FromArgb(111, 151, 208);
+            Color light = Color.FromArgb(231, 241, 247);
+            HSBRange hsbRange = new HSBRange(200.5f, 217.5f, 0.331f, 0.711f, 0.595f, 0.968f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 

@@ -15,7 +15,7 @@ namespace RunescapeBot.BotPrograms
         bool emptySlotsSet;
         RGBHSBRange FishTileFilter = RGBHSBRangeFactory.FishingTile();
         RGBHSBRange FishingPoleFilter = RGBHSBRangeFactory.FishingPole();
-        int fishTileSearchRadius;
+        RGBHSBRange FishingIcon = RGBHSBRangeFactory.FishingIcon();
         int maxFishingPoleDistance;
 
 
@@ -23,8 +23,6 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.Run = true;
             RunParams.FrameTime = 5000;
-            //fishTileSearchRadius = ArtifactLength(0.03623);
-            fishTileSearchRadius = ArtifactLength(0.02023);
             maxFishingPoleDistance = ArtifactLength(0.0597);
             emptySlotsSet = false;
         }
@@ -35,17 +33,27 @@ namespace RunescapeBot.BotPrograms
         protected override bool Run()
         {
             //ReadWindow();
+            //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\barbarian_fishing\\test.png");
+
+            //ReadWindow();
             //bool[,] bankBooth = ColorFilter(ironFilter);
             //DebugUtilities.TestMask(Bitmap, ColorArray, ironFilter, bankBooth, "C:\\Users\\markq\\Documents\\runescape_bot\\training_pictures\\ironore\\", "ironRockPic");
 
             //ReadWindow();
-            //bool[,] bankBooth = ColorFilter(RGBHSBRangeFactory.EmptyInventorySlot());
-            //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.EmptyInventorySlot(), bankBooth);
+            //bool[,] bankBooth = ColorFilter(RGBHSBRangeFactory.FishingTile());
+            //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.FishingTile(), bankBooth);
 
             //ReadWindow();
             //bool[,] bankBooth = ColorFilter(FishingPoleFilter);
             //DebugUtilities.TestMask(Bitmap, ColorArray, FishingPoleFilter, bankBooth, "C:\\Users\\markq\\Documents\\rs_bot\\training_pictures\\barbarian_fishing\\", "fishingPolePic");
             //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Users\\markq\\Documents\\rs_bot\\training_pictures\\barbarian_fishing\\fishing-training-1.png");
+
+            //ReadWindow();
+            //bool[,] thing = ColorFilter(FishingIcon);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, FishingIcon, thing, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "fishingIcon");
+
+            //MoveToNewFishingSpot();
+
             return true;
         }
 
@@ -67,9 +75,9 @@ namespace RunescapeBot.BotPrograms
             }
             else
             {
-                if (!isCurrentlyFishing())
+                if (!IsCurrentlyFishing())
                 {
-                    Blob fishLocation = StationaryLocateFishingSpot();
+                    Blob fishLocation = LocateClosestObject(FishTileFilter);
                     if (fishLocation != null)
                     {
                         if (fishLocation.Center.X != 0 && fishLocation.Center.Y != 0)
@@ -77,8 +85,12 @@ namespace RunescapeBot.BotPrograms
                             Point fishPoint = (Point)fishLocation.RandomBlobPixel();
                             LeftClick(fishPoint.X, fishPoint.Y);
                             Mouse.RadialOffset(187, 689, 6, 223);
-                            SafeWaitPlus(700, 500);
+                            SafeWaitPlus(8000, 1200);
                         }
+                    }
+                    else if (!MoveToNewFishingSpot())
+                    {
+                        return false;
                     }
                 }
             }
@@ -86,18 +98,34 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Find all of the unmined iron ores on the screen and sorts them by proximity to the player
+        /// Moves the player to a new fishing spot using the fishing icon(s) on the minimap
         /// </summary>
-        /// <returns>true if any ores are located</returns>
-        protected Blob StationaryLocateFishingSpot()
+        /// <returns>true if a new fishing spot is found</returns>
+        protected bool MoveToNewFishingSpot()
         {
-            Blob fishLocation;
-            if (LocateStationaryObject(FishTileFilter, out fishLocation, 50, 5000, 1, int.MaxValue, LocateFishingTile))
-            {
+            Point offset;
+            bool[,] fishingMap = MinimapFilter(FishingIcon, out offset);
+            List<Blob> fishingSpots = ImageProcessing.FindBlobs(fishingMap, false, 11, 51);
 
+            Point minimapCenter = Minimap.MinimapCenter();
+            foreach (Blob fishingSpot in fishingSpots)
+            {   //new fishing spot cannot be more than 30 pixels right of center
+                if (fishingSpot.Center.X - minimapCenter.X > 30)
+                {
+                    fishingSpots.Remove(fishingSpot);
+                }
             }
-            //Blob rockLocation = ImageProcessing.ClosestBlob(ironBoolArray, Center, 3);
-            return fishLocation;
+
+            Blob newFishingSpot = Geometry.FarthestBlobFromPoint(fishingSpots, minimapCenter);
+            if (newFishingSpot == null)
+            {
+                return false;
+            }
+            Point click = Geometry.AddPoints(offset, newFishingSpot.Center);
+            LeftClick(click.X, click.Y, 3);
+            SafeWait(8000);
+
+            return true;
         }
 
         /// <summary>
@@ -120,34 +148,17 @@ namespace RunescapeBot.BotPrograms
             }
             allMatches.Sort(new BlobProximityComparer(Center));
             foundObject = Geometry.ClosestBlobToPoint(allMatches, Center);
-            //foreach (Blob currentBlob in allMatches)
-            //{
-            //    if (WithinExpectedRange(currentBlob, foundObject))
-            //    {
-            //        foundObject.AddBlob(currentBlob);
-            //    }
-            //}
+
             return foundObject != null;
         }
 
-        protected bool WithinExpectedRange(Blob blob1, Blob blob2)
-        {
-            if (Math.Sqrt((Math.Abs(blob1.Center.X - blob2.Center.X))^2 + (Math.Abs(blob1.Center.Y - blob2.Center.Y)) ^ 2) < fishTileSearchRadius)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
         /// <summary>
         /// This method detects whether or not the player is currently still fishing based on the distance of 
         /// the closest fishing pole to the center
         /// 
         /// </summary>
         /// <returns></returns>
-        protected bool isCurrentlyFishing()
+        protected bool IsCurrentlyFishing()
         {
             ReadWindow();
             bool[,] poleBoolArray = ColorFilter(FishingPoleFilter);
