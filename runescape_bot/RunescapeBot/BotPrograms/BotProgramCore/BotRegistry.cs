@@ -37,6 +37,8 @@ namespace RunescapeBot.BotPrograms
             CutGems,
             [Description("Crafting - Gold Bracelets")]
             GoldBracelets,
+            [Description("Fishing - Barbarian Fishing (drop)")]
+            BarbarianFishing,
             [Description("Fletching - Short Bows")]
             FletchShortBows,
             [Description("Fletching - String Bows")]
@@ -57,8 +59,6 @@ namespace RunescapeBot.BotPrograms
             TeaStall,
             [Description("Woodcutting - Willows (drop)")]
             WillowTrees,
-            [Description("Fishing - Barbarian Fishing (drop)")]
-            BarbarianFishing,
             [Description("Do Nothing")]
             DoNothing
         };

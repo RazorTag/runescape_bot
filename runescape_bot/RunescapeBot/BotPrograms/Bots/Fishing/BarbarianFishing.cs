@@ -69,7 +69,7 @@ namespace RunescapeBot.BotPrograms
                 emptySlotsSet = true;
             }
             ReadWindow();
-            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 1, true))
+            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 3, true))
             {
                 Inventory.DropInventory(false, true);
             }
