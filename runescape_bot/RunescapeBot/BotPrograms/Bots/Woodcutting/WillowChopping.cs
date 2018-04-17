@@ -15,12 +15,14 @@ namespace RunescapeBot.BotPrograms
         RGBHSBRange willowTrunk = RGBHSBRangeFactory.WillowTrunk();
         protected int minTreeSize;
         protected List<Blob> Trees;
+        protected int failedTreeSearches;
 
 
         public WillowChopping(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
-            minTreeSize = ArtifactSize(0.0002);
+            minTreeSize = ArtifactSize(0.00006768);
+            failedTreeSearches = 0;
         }
 
         /// <summary>
@@ -45,16 +47,22 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool Execute()
         {
-            if (!LocateTrees())
+            if (!LocateTrees() || !ChopTree())
             {
-                return false;
+                failedTreeSearches++;
+                if (failedTreeSearches > 10)
+                {
+                    Inventory.DropInventory(false, true);
+                    return false;
+                }
+                return true;
             }
-            ChopTree();
+
             SafeWait(2000); //Give the player time to start the chopping animation
             WaitDuringPlayerAnimation();
 
             //Drop logs when inventory fills up. Use the second from bottom row to avoid looking at the Windows 10 watermark.
-            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 2))
+            if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 4))
             {
                 Inventory.DropInventory(false, true);
             }
@@ -68,6 +76,8 @@ namespace RunescapeBot.BotPrograms
         protected bool LocateTrees()
         {
             Trees = LocateObjects(willowTrunk, minTreeSize);
+            //Trees.Sort(new BlobSizeComparer());
+            //Trees.Reverse();
             Trees.Sort(new BlobProximityComparer(Center));
             return Trees.Count > 0;
         }
@@ -82,6 +92,11 @@ namespace RunescapeBot.BotPrograms
 
             foreach (Blob tree in Trees)
             {
+                if (StopFlag)
+                {
+                    return false;
+                }
+
                 click = tree.Center;
                 click = Probability.GaussianCircle(click, 3);
                 Mouse.MoveMouse(click.X, click.Y, RSClient);
@@ -89,6 +104,7 @@ namespace RunescapeBot.BotPrograms
                 if (WaitForMouseOverText(RGBHSBRangeFactory.MouseoverTextStationaryObject(), 1000))
                 {
                     LeftClick(click.X, click.Y, 0, 0);
+                    failedTreeSearches = 0;
                     return true;
                 }
             }
