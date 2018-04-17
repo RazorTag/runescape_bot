@@ -10,7 +10,7 @@ namespace RunescapeBot.BotPrograms
     public class BotRegistry
     {
         /// <summary>
-        /// Number of milliseconds in a sngle game tick
+        /// Number of milliseconds in a single game tick
         /// </summary>
         public const int GAME_TICK = 600;
 
@@ -25,35 +25,37 @@ namespace RunescapeBot.BotPrograms
             AgilityGnomeStronghold,
             [Description("Agility - Seers' Village")]
             AgilitySeersVillage,
-            [Description("Combat - Lesser Demon")]
+            [Description("Combat - Lesser Demon (Wizards' Tower)")]
             LesserDemon,
             [Description("Combat - Lesser Demon (no pickups)")]
             LesserDemonSimple,
             [Description("Combat - Nightmare Zone")]
             NightmareZoneD,
-            [Description("Construction - Butler Sawmill")]
+            [Description("Construction - Butler Sawmill (Camelot PvP)")]
             ButlerSawmill,
-            [Description("Crafting - Cut Gems")]
+            [Description("Crafting - Cut Gems (Varrock west)")]
             CutGems,
-            [Description("Crafting - Gold Bracelets")]
+            [Description("Crafting - Gold Bracelets (Phasmatys)")]
             GoldBracelets,
+            [Description("Firemaking - (Phasmatys)")]
+            Firemaking,
             [Description("Fishing - Barbarian Fishing (drop)")]
             BarbarianFishing,
-            [Description("Fletching - Short Bows")]
+            [Description("Fletching - Short Bows (Varrock west)")]
             FletchShortBows,
-            [Description("Fletching - String Bows")]
+            [Description("Fletching - String Bows (Varrock west)")]
             StringBows,
-            [Description("Herblore - Make Unfinished Potions")]
+            [Description("Herblore - Make Unfinished Potions (Varrock west)")]
             MakeUnfinishedPotions,
-            [Description("Herblore - Make Prepared Potions")]
+            [Description("Herblore - Make Prepared Potions (Varrock west)")]
             MakePotionsSimple,
-            [Description("Herblore - Make Potions from Scratch")]
+            [Description("Herblore - Make Potions from Scratch (Varrock west)")]
             MakePotionsFull,
-            [Description("Magic - Enchant Level 2")]
+            [Description("Magic - Enchant Level 2 (Varrock west)")]
             EnchantLevel2,
             [Description("Mining - Iron Ore")]
             IronOre,
-            [Description("Smithing - Cannonballs")]
+            [Description("Smithing - Cannonballs (Phasmatys)")]
             Cannonballs,
             [Description("Thieving - Tea Stall")]
             TeaStall,
@@ -112,6 +114,8 @@ namespace RunescapeBot.BotPrograms
                     return new ButlerSawmill(runParams);
                 case BotActions.BarbarianFishing:
                     return new BarbarianFishing(runParams);
+                case BotActions.Firemaking:
+                    return new Firemaking(runParams);
             }
             return bot;
         }

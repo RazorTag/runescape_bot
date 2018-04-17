@@ -23,7 +23,7 @@ namespace RunescapeBot.BotPrograms
             if (failedRuns > CONSECUTIVE_FAILURES_ALLOWED) { return false; }
 
             //Move to the bank and open it
-            if (!MoveToBank())
+            if (!MoveToBankPhasmatys())
             {
                 failedRuns++;
                 return true;

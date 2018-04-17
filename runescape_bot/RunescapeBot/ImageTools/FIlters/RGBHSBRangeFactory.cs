@@ -307,9 +307,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         public static RGBHSBRange FurnaceIconOrange()
         {
-            Color dark = Color.FromArgb(146, 83, 0);
-            Color light = Color.FromArgb(255, 255, 136);
-            HSBRange hsbRange = new HSBRange(15, 40, 0.330f, 1.000f, 0.380f, 0.770f);
+            Color dark = Color.FromArgb(249, 110, 25);
+            Color light = Color.FromArgb(255, 120, 35);
+            HSBRange hsbRange = new HSBRange(20.8f, 24.8f, 0.941f, 1.000f, 0.516f, 0.606f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
@@ -346,6 +346,19 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(25, 31, 19);
             Color light = Color.FromArgb(99, 103, 82);
             HSBRange hsbRange = new HSBRange(334, 80, 0.083f, 0.191f, 0.117f, 0.363f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The brown bridge on a minimap.
+        /// A bridge consists of two distinct alternating colors which could be isolated to provide greater precision for this filter
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange BridgeIcon()
+        {
+            Color dark = Color.FromArgb(65, 31, 0);
+            Color light = Color.FromArgb(121, 93, 54);
+            HSBRange hsbRange = new HSBRange(24.2f, 42.5f, 0.332f, 1.000f, 0.047f, 0.404f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 

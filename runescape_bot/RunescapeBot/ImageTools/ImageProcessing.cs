@@ -210,10 +210,6 @@ namespace RunescapeBot.ImageTools
                 biggestBlob = biggestBlob.MaxBlob(blob);
             }
 
-            if (biggestBlob.Size == 0)
-            {
-                biggestBlob = null;
-            }
             return biggestBlob;
         }
 

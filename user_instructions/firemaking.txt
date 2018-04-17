@@ -1,0 +1,2 @@
+-bank slot (7, 0): tinderbox
+-bank slot (6, 0): logs

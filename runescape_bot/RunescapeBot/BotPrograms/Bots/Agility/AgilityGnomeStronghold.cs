@@ -288,7 +288,7 @@ namespace RunescapeBot.BotPrograms
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
                 ReadWindow();
-                minimap = MinimapFilter(Black);
+                minimap = Minimap.MinimapFilter(Black);
                 blackMatch = ImageProcessing.FractionalMatch(minimap);
                 if (blackMatch >= minBlackMatch)
                 {
@@ -313,7 +313,7 @@ namespace RunescapeBot.BotPrograms
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
                 ReadWindow();
-                minimap = MinimapFilter(Black);
+                minimap = Minimap.MinimapFilter(Black);
                 blackMatch = ImageProcessing.FractionalMatch(minimap);
                 if (blackMatch <= maxBlackMatch)
                 {

@@ -7,9 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using System.Linq;
 using RunescapeBot.FileIO;
-using RunescapeBot.BotPrograms.FixedUIComponents;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -122,7 +120,7 @@ namespace RunescapeBot.BotPrograms
         protected Inventory Inventory { get; set; }
 
 
-        protected Minimap Minimap { get; set; }
+        protected MinimapGauge Minimap { get; set; }
 
         /// <summary>
         /// Expected time to complete a single iteration
@@ -221,7 +219,7 @@ namespace RunescapeBot.BotPrograms
             RNG = new Random();
             Keyboard = new Keyboard(RSClient);
             Inventory = new Inventory(RSClient, Keyboard);
-            Minimap = new Minimap(RSClient, Keyboard);
+            Minimap = new MinimapGauge(RSClient, Keyboard);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
             RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
             RunParams.LoginWorld = 0;
@@ -410,6 +408,7 @@ namespace RunescapeBot.BotPrograms
                         RunCharacter(); //Turn on run if the player has run energy
                         if (!Execute()) //quit by a bot program
                         {
+                            LogError.ScreenShot(ColorArray, "bot-quit");
                             return true;
                         }
                         if (StopFlag) { return true; }
@@ -715,7 +714,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="stationaryObject"></param>
         /// <param name="foundObject"></param>
-        /// <param name="maxWaitTime"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
         protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
@@ -998,56 +996,6 @@ namespace RunescapeBot.BotPrograms
         {
             Point empty;
             return ScreenPiece(left, right, top, bottom, out empty);
-        }
-
-        /// <summary>
-        /// Gets a rectangle containing the minimap with the non-minimap corners set to false
-        /// </summary>
-        /// <param name="filter">the filter to use on the minimap</param>
-        /// <param name="offset">gets set to the offset from the game screen to the minimap piece</param>
-        /// <returns>true for the pixels on the minimap that match the filter</returns>
-        protected bool[,] MinimapFilter(RGBHSBRange filter, out Point offset)
-        {
-            if (!MakeSureWindowHasBeenRead())
-            {
-                offset = new Point(0, 0);
-                return null;
-            }
-
-            int left = ScreenWidth - Minimap.OFFSET_LEFT;
-            int right = left + Minimap.WIDTH - 1;
-            int top = Minimap.OFFSET_TOP;
-            int bottom = top + Minimap.HEIGHT - 1;
-            Point center = new Point((left + right) / 2, (top + bottom) / 2);
-            double radius = 70.0;
-            double distance;
-            offset = new Point(left, top);
-            bool[,] minimapFilter = new bool[right - left + 1, bottom - top + 1];
-
-            for (int x = left; x <= right; x++)
-            {
-                for (int y = top; y <= bottom; y++)
-                {
-                    distance = Math.Sqrt(Math.Pow(x - center.X, 2) + Math.Pow(y - center.Y, 2));
-                    if (distance <= radius)
-                    {
-                        minimapFilter[x - left, y - top] = filter.ColorInRange(ColorArray[x, y]);
-                    }
-                }
-            }
-
-            return minimapFilter;
-        }
-
-        /// <summary>
-        /// Gets a rectangle containing the minimap with the non-minimap corners set to false
-        /// </summary>
-        /// <param name="filter">the filter to use on the minimap</param>
-        /// <returns>true for the pixels on the minimap that match the filter</returns>
-        protected bool[,] MinimapFilter(RGBHSBRange filter)
-        {
-            Point offset;
-            return MinimapFilter(filter, out offset);
         }
 
         /// <summary>
@@ -1863,7 +1811,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="timeout">maximum time in milliseconds to wait</param>
         /// <returns>true if player stops moving, false if we give up</returns>
-        protected bool WaitDuringPlayerAnimation(double colorStrictness = 0.95, double locationStrictness = 0.99, int timeout = 180000)
+        protected bool WaitDuringPlayerAnimation(int timeout = 180000, double colorStrictness = 0.95, double locationStrictness = 0.99)
         {
             int xOffset = ArtifactLength(0.06);
             int yOffset = ArtifactLength(0.06);
@@ -2033,14 +1981,14 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to a bank icon on the minimap
         /// </summary>
         /// <returns>true if the bank icon is found</returns>
-        protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true)
+        protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true, int minBankIconSize = 50)
         {
             if (readWindow) { ReadWindow(); }
             
             Point offset;
-            bool[,] minimapBankIcon = MinimapFilter(RGBHSBRangeFactory.BankIconDollar(), out offset);
+            bool[,] minimapBankIcon = Minimap.MinimapFilter(RGBHSBRangeFactory.BankIconDollar(), out offset);
             Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
-            if (bankBlob == null || bankBlob.Size < 10) { return false; }
+            if (bankBlob == null || bankBlob.Size < minBankIconSize) { return false; }
 
             Point clickLocation = new Point(offset.X + bankBlob.Center.X, offset.Y + bankBlob.Center.Y);
             LeftClick(clickLocation.X, clickLocation.Y, 3);

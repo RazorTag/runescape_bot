@@ -104,7 +104,7 @@ namespace RunescapeBot.BotPrograms
         protected bool MoveToNewFishingSpot()
         {
             Point offset;
-            bool[,] fishingMap = MinimapFilter(FishingIcon, out offset);
+            bool[,] fishingMap = Minimap.MinimapFilter(FishingIcon, out offset);
             List<Blob> fishingSpots = ImageProcessing.FindBlobs(fishingMap, false, 11, 51);
 
             Point minimapCenter = Minimap.MinimapCenter();

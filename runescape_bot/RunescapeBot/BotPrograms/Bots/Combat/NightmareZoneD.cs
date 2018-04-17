@@ -1,5 +1,4 @@
-﻿using RunescapeBot.BotPrograms.FixedUIComponents;
-using RunescapeBot.Common;
+﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;

@@ -132,7 +132,7 @@ namespace RunescapeBot.Common
             radius %= maxRadius;
 
             double angle = RandomAngle(arcStart, arcEnd);
-            angle = angle * ((2 * Math.PI) / 360.0);    //normalize and convert to radians
+            angle = angle * ((2 * Math.PI) / 360.0);    //convert to radians
 
             int x = center.X + ((int)Math.Round(Math.Cos(angle) * radius));
             int y = center.Y - ((int)Math.Round(Math.Sin(angle) * radius));
