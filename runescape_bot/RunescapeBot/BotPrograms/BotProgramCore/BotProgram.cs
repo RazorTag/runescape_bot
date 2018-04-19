@@ -640,11 +640,12 @@ namespace RunescapeBot.BotPrograms
 
             foundObject = null;
             Point? lastPosition = null;
-            int passes = 0;
+            int effectivePasses = 0;
+            int totalPasses = 0;
             Stopwatch giveUpWatch = new Stopwatch();
             giveUpWatch.Start();
 
-            while (giveUpWatch.ElapsedMilliseconds < maxWaitTime)
+            while (giveUpWatch.ElapsedMilliseconds < maxWaitTime || totalPasses < verificationPasses + 1)
             {
                 if (StopFlag) { return false; }
 
@@ -655,19 +656,20 @@ namespace RunescapeBot.BotPrograms
                 {
                     if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
                     {
-                        passes++;
+                        effectivePasses++;
                     }
                     else
                     {
-                        passes = 0;
+                        effectivePasses = 0;
                         lastPosition = objectBlob.Center;
                     }
 
-                    if (passes >= verificationPasses)
+                    if (effectivePasses >= verificationPasses)
                     {
                         foundObject = objectBlob;
                         return true;
                     }
+                    totalPasses++;
                 }
                 else
                 {
@@ -707,6 +709,20 @@ namespace RunescapeBot.BotPrograms
             List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
             Blob closestObject = Geometry.ClosestBlobToPoint(objects, Center);
             return closestObject;
+        }
+
+        /// <summary>
+        /// Finds the object closest to the center of the screen that matches the given criteria
+        /// </summary>
+        /// <param name="objectFilter">color filter for the object</param>
+        /// <param name="minimumSize">minimum required size for the object in pixels</param>
+        /// <param name="maximumSize">maximum allowed size for the object in pixels</param>
+        /// <returns>the found object or null if none is found</returns>
+        protected bool LocateClosestObject(RGBHSBRange objectFilter, out Blob closestObject, int minimumSize = 1, int maximumSize = int.MaxValue)
+        {
+            List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
+            closestObject = Geometry.ClosestBlobToPoint(objects, Center);
+            return closestObject != null;
         }
 
         /// <summary>
@@ -794,16 +810,90 @@ namespace RunescapeBot.BotPrograms
             watch.Start();
             Blob mouseoverText = null;
 
-            while (mouseoverText == null)
+            do
             {
-                if ((watch.ElapsedMilliseconds > timeout) || StopFlag)
+                if (LocateObject(textColor, out mouseoverText, left, right, top, bottom, 10))
                 {
-                    return false;
+                    return true;
                 }
-                LocateObject(textColor, out mouseoverText, left, right, top, bottom, 10);
             }
+            while ((watch.ElapsedMilliseconds < timeout) && !StopFlag);
 
-            return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Mouses over each object in a list of blobs. Left-clicks the first stationary object found.
+        /// </summary>
+        /// <param name="ObjectsToCheck">list of objects to mouse over</param>
+        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
+        /// <returns>true if a matching stationary object is found and clicked on</returns>
+        protected bool MouseOverStationaryObject(Blob stationaryObject, bool click = true, int randomization = 5)
+        {
+            List<Blob> stationaryObjects = new List<Blob>();
+            stationaryObjects.Add(stationaryObject);
+            return MouseOver(stationaryObjects, RGBHSBRangeFactory.MouseoverTextStationaryObject(), click, randomization);
+        }
+
+        /// <summary>
+        /// Mouses over each object in a list of blobs. Left-clicks the first NPC found.
+        /// </summary>
+        /// <param name="ObjectsToCheck">list of objects to mouse over</param>
+        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
+        /// <returns>true if a matching NPC is found and clicked on</returns>
+        protected bool MouseOverNPC(Blob npc, bool click = true, int randomization = 5)
+        {
+            List<Blob> npcs = new List<Blob>();
+            npcs.Add(npc);
+            return MouseOver(npcs, RGBHSBRangeFactory.MouseoverTextNPC(), click, randomization);
+        }
+
+        /// <summary>
+        /// Mouses over each object in a list of blobs. Left-clicks the first object with mouseover text matching textColor.
+        /// </summary>
+        /// <param name="ObjectsToCheck">list of objects to mouse over</param>
+        /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
+        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
+        /// <returns>true if a matching object is found and clicked on</returns>
+        protected bool MouseOver(List<Blob> ObjectsToCheck, RGBHSBRange textColor, bool click = true, int randomization = 5)
+        {
+            Point clickLocation;
+
+            foreach (Blob objectCheck in ObjectsToCheck)
+            {
+                if (StopFlag) { return false; }
+
+                clickLocation = objectCheck.Center;
+                clickLocation = Probability.GaussianCircle(clickLocation, randomization);
+                Mouse.MoveMouse(clickLocation.X, clickLocation.Y, RSClient);
+
+                if (WaitForMouseOverText(textColor, 1000))
+                {
+                    LeftClick(clickLocation.X, clickLocation.Y, 0, 0);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Mouses over a single point and left-clicks it if it matches the specified mouseover text color.
+        /// </summary>
+        /// <param name="ObjectsToCheck">list of objects to mouse over</param>
+        /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
+        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
+        /// <returns>true if a matching object is found and clicked on</returns>
+        protected bool MouseOver(Point mouseover, RGBHSBRange textColor, bool click = true, int randomization = 5)
+        {
+            mouseover = Probability.GaussianCircle(mouseover, randomization);
+            Mouse.MoveMouse(mouseover.X, mouseover.Y, RSClient);
+
+            if (WaitForMouseOverText(textColor, 1000))
+            {
+                LeftClick(mouseover.X, mouseover.Y, 0, 0);
+                return true;
+            }
+            return false;
         }
 
         #endregion

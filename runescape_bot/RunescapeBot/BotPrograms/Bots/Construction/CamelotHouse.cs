@@ -272,7 +272,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (!noteSelected)
             {
-                Inventory.ClickInventory(inventorySlot);
+                Inventory.ClickInventory(inventorySlot, true);
             }
 
             Point bankChestClick;
@@ -295,7 +295,7 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            Inventory.ClickInventory(inventorySlot);
+            Inventory.ClickInventory(inventorySlot, true);
             return false;
         }
 

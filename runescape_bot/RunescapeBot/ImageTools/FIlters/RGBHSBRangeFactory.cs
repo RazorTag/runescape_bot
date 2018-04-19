@@ -1,7 +1,7 @@
 ﻿using RunescapeBot.ImageTools;
 using System.Drawing;
 
-namespace RunescapeBot.BotPrograms
+namespace RunescapeBot.ImageTools
 {
     public static class RGBHSBRangeFactory
     {
@@ -42,6 +42,18 @@ namespace RunescapeBot.BotPrograms
             Color dark = Color.FromArgb(0, 0, 0);
             Color light = Color.FromArgb(30, 30, 30);
             HSBRange hsbRange = new HSBRange(355, 5, 0.030f, 0.400f, 0.020f, 0.120f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The purple cloak of a knight of Ardougne
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KnightPurple()
+        {
+            Color dark = Color.FromArgb(28, 0, 62);
+            Color light = Color.FromArgb(144, 39, 251);
+            HSBRange hsbRange = new HSBRange(262.6f, 275.6f, 0.724f, 0.933f, 0.109f, 0.579f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
         #endregion

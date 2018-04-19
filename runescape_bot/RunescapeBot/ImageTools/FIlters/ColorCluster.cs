@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RunescapeBot.ImageTools.FIlters
+namespace RunescapeBot.ImageTools
 {
     public class ColorCluster
     {

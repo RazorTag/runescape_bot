@@ -107,7 +107,7 @@ namespace RunescapeBot.BotPrograms
             bool[,] fishingMap = Minimap.MinimapFilter(FishingIcon, out offset);
             List<Blob> fishingSpots = ImageProcessing.FindBlobs(fishingMap, false, 11, 51);
 
-            Point minimapCenter = Minimap.MinimapCenter();
+            Point minimapCenter = Minimap.Center;
             foreach (Blob fishingSpot in fishingSpots)
             {   //new fishing spot cannot be more than 30 pixels right of center
                 if (fishingSpot.Center.X - minimapCenter.X > 30)

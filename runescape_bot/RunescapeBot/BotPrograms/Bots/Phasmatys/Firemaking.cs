@@ -9,18 +9,21 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
-    class Firemaking : BankPhasmatys
+    public class Firemaking : BankPhasmatys
     {
         public const int SET_FIRE_TIME = 4 * BotRegistry.GAME_TICK;
         RGBHSBRange BridgeIcon = RGBHSBRangeFactory.BridgeIcon();
-        int BridgeIconMinSize;
-        int FireLine;
+        protected int BridgeIconMinSize;
+        protected int FireLine;
+        protected Point Tinderbox;  //location of the tinderbox in the inventory
+
 
         public Firemaking(RunParams startParams) : base(startParams)
         {
             BankIconMinSize = 50;
             BridgeIconMinSize = 100;
             FireLine = 1;
+            Tinderbox = new Point(0, 0);
         }
 
 
@@ -98,10 +101,10 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool SetFires()
         {
-            for (int i = 1; i < Inventory.INVENTORY_CAPACITY; i++)
+            for (int i = 1; i < Math.Min(RunParams.Iterations + 1, Inventory.INVENTORY_CAPACITY); i++)
             {
-                Inventory.ClickInventory(0, false);
-                Inventory.ClickInventory(i, false);
+                Inventory.ClickInventory(Tinderbox.X, Tinderbox.Y, false);
+                Inventory.ClickInventory(i);
                 if (SafeWait(SET_FIRE_TIME)) { return false; }
                 RunParams.Iterations--;
             }

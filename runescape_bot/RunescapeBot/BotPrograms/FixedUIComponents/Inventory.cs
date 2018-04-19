@@ -145,7 +145,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">slots away from the leftmost column (0-3)</param>
         /// <param name="y">slots away from the topmost column (0-6)</param>
-        public void ClickInventory(int x, int y, bool safeTab = true)
+        public void ClickInventory(int x, int y, bool safeTab = false)
         {
             InventoryToScreen(ref x, ref y);
             OpenInventory(safeTab);
@@ -156,7 +156,7 @@ namespace RunescapeBot.BotPrograms
         /// Opens the inventory and clicks on an inventory slot
         /// </summary>
         /// <param name="slot">inventory slot</param>
-        public void ClickInventory(Point slot, bool safeTab = true)
+        public void ClickInventory(Point slot, bool safeTab = false)
         {
             ClickInventory(slot.X, slot.Y, safeTab);
         }
@@ -165,7 +165,7 @@ namespace RunescapeBot.BotPrograms
         /// Opens the inventory and clicks on an inventory slot
         /// </summary>
         /// <param name="index">sequential slot in the inventory (0-27)</param>
-        public void ClickInventory(int index, bool safeTab = true)
+        public void ClickInventory(int index, bool safeTab = false)
         {
             Point inventorySlot = InventoryIndexToCoordinates(index);
             ClickInventory(inventorySlot.X, inventorySlot.Y, safeTab);

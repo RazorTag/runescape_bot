@@ -32,6 +32,20 @@ namespace RunescapeBot.BotPrograms
             }
         }
 
+        /// <summary>
+        /// Determines the center of the minimap viewing area
+        /// </summary>
+        /// <returns></returns>
+        public Point Center
+        {
+            get
+            {
+                int x = ScreenWidth - OFFSET_LEFT + (WIDTH / 2);
+                int y = OFFSET_TOP + (HEIGHT / 2);
+                return new Point(x, y);
+            }
+        }
+
         public MinimapGauge(Process rsClient, Keyboard keyboard)
         {
             RSClient = rsClient;
@@ -57,7 +71,7 @@ namespace RunescapeBot.BotPrograms
         {
             angle *= ((2 * Math.PI) / 360.0);    //convert to radians
             radius *= CLICK_RADIUS;
-            Point center = MinimapCenter();
+            Point center = Center;
             int x = center.X + ((int)Math.Round(Math.Cos(angle) * radius));
             int y = center.Y - ((int)Math.Round(Math.Sin(angle) * radius));
             return new Point(x, y);
@@ -143,7 +157,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines if the player has very green hitpoints
+        /// Determines if the player has very green hitpoints using the most recent screen read
         /// </summary>
         /// <returns></returns>
         public bool HighHitpoints()
@@ -151,6 +165,40 @@ namespace RunescapeBot.BotPrograms
             RectangleBounds hitpoints = HitpointsDigitsArea();
             double greenHitpointMatch = ImageProcessing.FractionalMatchPiece(Screen, RGBHSBRangeFactory.HitpointsGreen(), hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
             return greenHitpointMatch > 0.05;
+        }
+
+        /// <summary>
+        /// Determines the player's hitpoints as a fraction of their maximum hitpoints (0-1)
+        /// </summary>
+        /// <returns>the player's remaining hitpoints as a fraction of total hitpoints (0-1)</returns>
+        public double Hitpoints()
+        {
+            RectangleBounds hitpoints = HitpointsDigitsArea();
+            Color[,] hitPoints = ImageProcessing.ScreenPiece(Screen, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
+            Color hitpointSample = FirstGaugeNumberPixel(hitPoints);
+            double hue = hitpointSample.GetHue();
+            double hitpointFraction = hue / 120.0;
+            return hitpointFraction;
+        }
+
+        /// <summary>
+        /// Finds a pixel in an image that matches the hitpoint number color spectrum (zero blue)
+        /// </summary>
+        /// <param name="gaugeNumber">image of the digits for a minimap gauge</param>
+        /// <returns>the first pixel match for the digits in a gauge</returns>
+        public Color FirstGaugeNumberPixel(Color[,] gaugeNumber)
+        {
+            for (int x = 0; x < gaugeNumber.GetLength(0); x++)
+            {
+                for (int y = 0; y < gaugeNumber.GetLength(1); y++)
+                {
+                    if (gaugeNumber[x, y].B == 0)
+                    {
+                        return gaugeNumber[x, y];
+                    }
+                }
+            }
+            return Color.Red;
         }
 
         /// <summary>
@@ -165,17 +213,6 @@ namespace RunescapeBot.BotPrograms
             int top = HITPOINTS_DIGITS_OFFSET_TOP;
             int bottom = top + HITPOINTS_DIGITS_HEIGHT;
             return new RectangleBounds(left, right, top, bottom);
-        }
-
-        /// <summary>
-        /// Determines the center of the minimap viewing area
-        /// </summary>
-        /// <returns></returns>
-        public Point MinimapCenter()
-        {
-            int x = ScreenWidth - OFFSET_LEFT + (WIDTH / 2);
-            int y = OFFSET_TOP + (HEIGHT / 2);
-            return new Point(x, y);
         }
 
         /// <summary>

@@ -210,7 +210,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool StartSawmillTask()
         {
-            Inventory.ClickInventory(FirstLogSlot);
+            Inventory.ClickInventory(FirstLogSlot, true);
             Blob demon;
             if (!LocateObject(DemonHead, out demon, 100))
             {
@@ -234,7 +234,7 @@ namespace RunescapeBot.BotPrograms
                 return true;
             }
 
-            Inventory.ClickInventory(InventoryLogSlot);
+            Inventory.ClickInventory(InventoryLogSlot, true);
             Mouse.MoveMouse(Center.X, Center.Y, RSClient);
             if (WaitForTeleport())
             {

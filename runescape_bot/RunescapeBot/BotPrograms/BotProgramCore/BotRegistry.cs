@@ -59,6 +59,8 @@ namespace RunescapeBot.BotPrograms
             Cannonballs,
             [Description("Thieving - Tea Stall")]
             TeaStall,
+            [Description("Thieving - Knight of Ardougne")]
+            KnightOfArdougne,
             [Description("Woodcutting - Willows (drop)")]
             WillowTrees,
             [Description("Do Nothing")]
@@ -116,6 +118,8 @@ namespace RunescapeBot.BotPrograms
                     return new BarbarianFishing(runParams);
                 case BotActions.Firemaking:
                     return new Firemaking(runParams);
+                case BotActions.KnightOfArdougne:
+                    return new KnightOfArdougne(runParams);
             }
             return bot;
         }

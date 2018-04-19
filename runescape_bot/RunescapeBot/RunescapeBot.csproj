@@ -109,7 +109,9 @@
     <Compile Include="BotPrograms\Bots\BankStanding\MakePotionFull.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use14On14.cs" />
     <Compile Include="BotPrograms\Bots\Runecrafting\NatureRings.cs" />
-    <Compile Include="BotPrograms\Bots\TeaStall.cs" />
+    <Compile Include="BotPrograms\Bots\Thieving\KnightOfArdougne.cs" />
+    <Compile Include="BotPrograms\Bots\Thieving\SummerGarden.cs" />
+    <Compile Include="BotPrograms\Bots\Thieving\TeaStall.cs" />
     <Compile Include="BotPrograms\Bots\Woodcutting\WillowChopping.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\MinimapGauge.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />

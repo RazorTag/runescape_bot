@@ -2,6 +2,6 @@
 -turn off the monster hitpoints that show up in the top-left corner
 -turn off show stat changes
 
-Inventory: rock cake, 9 overloads (36 doses), 18 absorptions (72 doses)
+Inventory: rock cake, 12 overloads (48 doses), 15 absorptions (60 doses)
 
-Bosses: Aarg, Ice Troll King, Count Draynor, King Roald, Me
+Bosses: Aarg, Sand Snake, Count Draynor, King Roald, Kendal

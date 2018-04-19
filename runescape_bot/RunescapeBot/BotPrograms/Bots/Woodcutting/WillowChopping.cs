@@ -12,17 +12,17 @@ namespace RunescapeBot.BotPrograms
 {
     public class WillowChopping : BotProgram
     {
-        RGBHSBRange willowTrunk = RGBHSBRangeFactory.WillowTrunk();
-        protected int minTreeSize;
+        RGBHSBRange WillowTrunk = RGBHSBRangeFactory.WillowTrunk();
+        protected int MinTreeSize;
         protected List<Blob> Trees;
-        protected int failedTreeSearches;
+        protected int FailedTreeSearches;
 
 
         public WillowChopping(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
-            minTreeSize = ArtifactSize(0.00006768);
-            failedTreeSearches = 0;
+            MinTreeSize = ArtifactSize(0.00006768);
+            FailedTreeSearches = 0;
         }
 
         /// <summary>
@@ -49,8 +49,8 @@ namespace RunescapeBot.BotPrograms
         {
             if (!LocateTrees() || !ChopTree())
             {
-                failedTreeSearches++;
-                if (failedTreeSearches > 10)
+                FailedTreeSearches++;
+                if (FailedTreeSearches > 10)
                 {
                     Inventory.DropInventory(false, true);
                     return false;
@@ -75,7 +75,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if any trees are located</returns>
         protected bool LocateTrees()
         {
-            Trees = LocateObjects(willowTrunk, minTreeSize);
+            Trees = LocateObjects(WillowTrunk, MinTreeSize);
             //Trees.Sort(new BlobSizeComparer());
             //Trees.Reverse();
             Trees.Sort(new BlobProximityComparer(Center));
@@ -92,10 +92,7 @@ namespace RunescapeBot.BotPrograms
 
             foreach (Blob tree in Trees)
             {
-                if (StopFlag)
-                {
-                    return false;
-                }
+                if (StopFlag) { return false; }
 
                 click = tree.Center;
                 click = Probability.GaussianCircle(click, 3);
@@ -104,7 +101,7 @@ namespace RunescapeBot.BotPrograms
                 if (WaitForMouseOverText(RGBHSBRangeFactory.MouseoverTextStationaryObject(), 1000))
                 {
                     LeftClick(click.X, click.Y, 0, 0);
-                    failedTreeSearches = 0;
+                    FailedTreeSearches = 0;
                     return true;
                 }
             }
