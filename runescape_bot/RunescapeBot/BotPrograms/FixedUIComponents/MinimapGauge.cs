@@ -78,6 +78,27 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Wrapper for ScreenScraper.CaptureWindow
+        /// </summary>
+        public bool ReadWindow(bool fastCapture = false)
+        {
+            Bitmap screenshot;
+            try
+            {
+                screenshot = ScreenScraper.CaptureWindow(RSClient, fastCapture);
+                Screen = ScreenScraper.GetRGB(screenshot);
+            }
+            catch
+            {
+                return false;
+            }
+
+            bool success = (screenshot != null) && (Screen.GetLength(0) > 0) && (Screen.GetLength(1) > 0);
+            screenshot.Dispose();
+            return success;
+        }
+
+        /// <summary>
         /// Looks for an object that matches a filter using the most recent screen read
         /// </summary>
         /// <param name="stationaryObject"></param>
@@ -156,6 +177,8 @@ namespace RunescapeBot.BotPrograms
             return MinimapFilter(filter, out offset);
         }
 
+        #region gauge reading
+
         /// <summary>
         /// Determines if the player has very green hitpoints using the most recent screen read
         /// </summary>
@@ -175,10 +198,21 @@ namespace RunescapeBot.BotPrograms
         {
             RectangleBounds hitpoints = HitpointsDigitsArea();
             Color[,] hitPoints = ImageProcessing.ScreenPiece(Screen, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
-            Color hitpointSample = FirstGaugeNumberPixel(hitPoints);
-            double hue = hitpointSample.GetHue();
-            double hitpointFraction = hue / 120.0;
-            return hitpointFraction;
+            return GaugeFraction(hitPoints);
+        }
+
+        /// <summary>
+        /// Determines the fraction remaining of a gauge using the readout digits to the left of the bubble
+        /// </summary>
+        /// <param name="gaugePercentage">array of Color pixels containing the gauge percentage number</param>
+        /// <param name="threshold">minimum match needed to be considered high</param>
+        /// <returns>true if the gauge is low, false otherwise</returns>
+        public double GaugeFraction(Color[,] gaugePercentage)
+        {
+            Color gaugeSample = FirstGaugeNumberPixel(gaugePercentage);
+            double hue = gaugeSample.GetHue();
+            double gaugeFraction = hue / 120.0;
+            return gaugeFraction;
         }
 
         /// <summary>
@@ -214,6 +248,115 @@ namespace RunescapeBot.BotPrograms
             int bottom = top + HITPOINTS_DIGITS_HEIGHT;
             return new RectangleBounds(left, right, top, bottom);
         }
+
+        /// <summary>
+        /// Sets the player to run (as opposed to walk) if run energy is fairly high (~50%)
+        /// </summary>
+        /// <param name="minRunEnergy">minimum fraction of run energy required to to turn on run</param>
+        /// <returns>true if successful</returns>
+        public bool RunCharacter(double minRunEnergy = 0.0, bool readWindow = false)
+        {
+            if (readWindow && !ReadWindow())
+            {
+                return false;
+            }
+
+            if (!CharacterIsRunning() && (RunEnergy() >= minRunEnergy)) //TODO call run energy with 0.5 after adding param
+            {
+                ToggleRun();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Toggle the run/walk status using the run enery meter next to the minimap
+        /// </summary>
+        /// <returns>true if successful</returns>
+        public bool ToggleRun(bool readWindow = false)
+        {
+            if (readWindow && !ReadWindow())
+            {
+                return false;
+            }
+
+            Point runOrb = RunOrbSamplePoint();
+            Mouse.LeftClick(runOrb.X, runOrb.Y, RSClient, 5);
+            return true;
+        }
+
+        /// <summary>
+        /// Determines if the character is currently running
+        /// </summary>
+        /// <returns>true for running, false for walking</returns>
+        public bool CharacterIsRunning(bool readWindow = false)
+        {
+            if (readWindow && !ReadWindow())
+            {
+                return false;
+            }
+
+            Point runOrb = RunOrbSamplePoint();
+            Color runColor = Screen[runOrb.X, runOrb.Y];
+            RGBHSBRange runEnergyFoot = RGBHSBRangeFactory.RunEnergyFoot();
+            return runEnergyFoot.ColorInRange(runColor);
+        }
+
+        /// <summary>
+        /// Returns the point to look at or click on for the run energy orb next to the minimap
+        /// </summary>
+        /// <returns></returns>
+        public Point RunOrbSamplePoint()
+        {
+            Point runOrb;
+            switch (ScreenScraper.ClientType)
+            {
+                case ScreenScraper.Client.Jagex:
+                    runOrb = new Point(ScreenWidth - 145, 146);
+                    break;
+                case ScreenScraper.Client.OSBuddy:
+                    runOrb = new Point(ScreenWidth - 156, 137);
+                    break;
+                default:
+                    return new Point(0, 0);
+            }
+            return runOrb;
+        }
+
+        /// <summary>
+        /// Determines fraction remaining of the character's run energy
+        /// </summary>
+        /// <returns>fraction of remaining run energy</returns>
+        public double RunEnergy(bool readWindow = false)
+        {
+            if (readWindow && !ReadWindow())
+            {
+                return 0.0;
+            }
+
+            int left, right, top, bottom;
+            switch (ScreenScraper.ClientType)
+            {
+                case ScreenScraper.Client.Jagex:
+                    left = ScreenWidth - 181;
+                    right = ScreenWidth - 161;
+                    top = 142;
+                    bottom = 156;
+                    break;
+                case ScreenScraper.Client.OSBuddy:
+                    left = ScreenWidth - 193;
+                    right = ScreenWidth - 173;
+                    top = 133;
+                    bottom = 147;
+                    break;
+                default:
+                    return 0.0;
+            }
+
+            Color[,] runEnergyPercentage = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
+            return GaugeFraction(runEnergyPercentage);
+        }
+
+        #endregion
 
         /// <summary>
         /// Converts coordinates with a screenshot of the minimap to coordinates for the entire game screen

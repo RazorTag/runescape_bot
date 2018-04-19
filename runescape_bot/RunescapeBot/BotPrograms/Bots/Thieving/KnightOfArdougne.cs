@@ -83,7 +83,7 @@ namespace RunescapeBot.BotPrograms
                 watch.Restart();
 
                 if (StopFlag) { return false; }
-                if (LocateStationaryObject(KnightPurple, out purpleCloak, ArtifactLength(0.01), 1500, MinPurpleCloakSize, int.MaxValue, LocateClosestObject, 1))
+                if (LocateStationaryObject(KnightPurple, out purpleCloak, ArtifactLength(0.015), 10000, MinPurpleCloakSize, int.MaxValue, LocateClosestObject, 1))
                 {
                     if (StopFlag) { return false; }
                     if (MouseOver(purpleCloak.Center, NPCMouseover, true, 0))
@@ -95,7 +95,10 @@ namespace RunescapeBot.BotPrograms
                         FailedCloakSearches++;
                     }
 
-                    SafeWait(Math.Max(0, PICKPOCKET_TIME - watch.ElapsedMilliseconds), 200);
+                    if (SafeWait(Math.Max(0, PICKPOCKET_TIME - watch.ElapsedMilliseconds), 200))
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
@@ -123,6 +126,8 @@ namespace RunescapeBot.BotPrograms
             {
                 for (int y = -1; y <= 1; y++)
                 {
+                    if (StopFlag) { return false; }
+
                     guess = new Point(Center.X + (x * GridSquareHeight), Center.Y + (y * GridSquareHeight));
                     if (MouseOver(guess, NPCMouseover, true, NPCClickRandomization))
                     {

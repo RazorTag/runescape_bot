@@ -405,7 +405,11 @@ namespace RunescapeBot.BotPrograms
                 {
                     if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                     {
-                        RunCharacter(); //Turn on run if the player has run energy
+                        if (RunParams.Run)
+                        {
+                            Minimap.RunCharacter(0.5); //Turn on run if the player has run energy
+                        }
+                        
                         if (!Execute()) //quit by a bot program
                         {
                             LogError.ScreenShot(ColorArray, "bot-quit");
@@ -1961,110 +1965,6 @@ namespace RunescapeBot.BotPrograms
                 return ReadWindow();
             }
             return true;
-        }
-
-        /// <summary>
-        /// Sets the player to run (as opposed to walk) if Run is enabled and run energy is fairly high (~50%)
-        /// </summary>
-        protected void RunCharacter()
-        {
-            if (!RunParams.Run)
-            {
-                return;
-            }
-
-            if (!CharacterIsRunning() && RunEnergyIsHigh())
-            {
-                ToggleRun();
-            }
-        }
-
-        /// <summary>
-        /// Toggle the run/walk status using the run enery meter next to the minimap
-        /// </summary>
-        protected void ToggleRun()
-        {
-            Point runOrb = RunOrbSamplePoint();
-            LeftClick(runOrb.X, runOrb.Y, 5);
-        }
-
-        /// <summary>
-        /// Determines if the character is currently running
-        /// </summary>
-        /// <returns>true for running, false for walking</returns>
-        protected bool CharacterIsRunning(bool readWindow = false)
-        {
-            if (readWindow) { ReadWindow(); }
-
-            Point runOrb = RunOrbSamplePoint();
-            Color runColor = GetPixel(runOrb.X, runOrb.Y);
-            RGBHSBRange runEnergyFoot = RGBHSBRangeFactory.RunEnergyFoot();
-            return runEnergyFoot.ColorInRange(runColor);
-        }
-
-        /// <summary>
-        /// Returns the point to look at or click on for the run energy orb next to the minimap
-        /// </summary>
-        /// <returns></returns>
-        protected Point RunOrbSamplePoint()
-        {
-            Point runOrb;
-            switch (ScreenScraper.ClientType)
-            {
-                case ScreenScraper.Client.Jagex:
-                    runOrb = new Point(ScreenWidth - 145, 146);
-                    break;
-                case ScreenScraper.Client.OSBuddy:
-                    runOrb = new Point(ScreenWidth - 156, 137);
-                    break;
-                default:
-                    return new Point(0, 0);
-            }
-            return runOrb;
-        }
-
-        /// <summary>
-        /// Determines if the character's run energy is above roughly 50%
-        /// </summary>
-        /// <returns></returns>
-        protected bool RunEnergyIsHigh(bool readWindow = false)
-        {
-            if (readWindow) { ReadWindow(); }
-
-            int left, right, top, bottom;
-            switch (ScreenScraper.ClientType)
-            {
-                case ScreenScraper.Client.Jagex:
-                    left = ScreenWidth - 181;
-                    right = ScreenWidth - 161;
-                    top = 142;
-                    bottom = 156;
-                    break;
-                case ScreenScraper.Client.OSBuddy:
-                    left = ScreenWidth - 193;
-                    right = ScreenWidth - 173;
-                    top = 133;
-                    bottom = 147;
-                    break;
-                default:
-                    return false;
-            }
-
-            Color[,] runEnergyPercentage = ScreenPiece(left, right, top, bottom);
-            return MinimapGaugeIsHigh(runEnergyPercentage, 0.05);
-        }
-
-        /// <summary>
-        /// Determines if a minimap gauge is above roughly 50%
-        /// </summary>
-        /// <param name="gaugePercentage">array of Color pixels containing the gauge percentage number</param>
-        /// <param name="threshold">minimum match needed to be considered high</param>
-        /// <returns>true if the gauge is low, false otherwise</returns>
-        protected bool MinimapGaugeIsHigh(Color[,] gaugePercentage, double threshold)
-        {
-            RGBHSBRange highGauge = RGBHSBRangeFactory.MinimapGaugeYellowGreen();
-            double highMatch = ImageProcessing.FractionalMatch(gaugePercentage, highGauge);
-            return highMatch >= threshold;
         }
 
         /// <summary>
