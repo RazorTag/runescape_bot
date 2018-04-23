@@ -85,19 +85,22 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return false; }
                 if (LocateStationaryObject(KnightPurple, out purpleCloak, ArtifactLength(0.015), 10000, MinPurpleCloakSize, int.MaxValue, LocateClosestObject, 1))
                 {
-                    if (StopFlag) { return false; }
-                    if (MouseOver(purpleCloak.Center, NPCMouseover, true, 0))
+                    if (CheckPosition(purpleCloak.Center))
                     {
-                        FailedCloakSearches = 0;
-                    }
-                    else
-                    {
-                        FailedCloakSearches++;
-                    }
+                        if (StopFlag) { return false; }
+                        if (MouseOver(purpleCloak.Center, NPCMouseover, true, 0))
+                        {
+                            FailedCloakSearches = 0;
+                        }
+                        else
+                        {
+                            FailedCloakSearches++;
+                        }
 
-                    if (SafeWait(Math.Max(0, PICKPOCKET_TIME - watch.ElapsedMilliseconds), 200))
-                    {
-                        return false;
+                        if (SafeWait(Math.Max(0, PICKPOCKET_TIME - watch.ElapsedMilliseconds), 200))
+                        {
+                            return false;
+                        }
                     }
                 }
                 else
@@ -107,6 +110,20 @@ namespace RunescapeBot.BotPrograms
             }
 
             return FailedCloakSearches < 300;
+        }
+
+        /// <summary>
+        /// Makes sure that the player is north of the knight
+        /// </summary>
+        /// <returns>false if the player's position needs to be adjusted</returns>
+        protected bool CheckPosition(Point knight)
+        {
+            if (knight.Y - Center.Y < GridSquareHeight / 2)
+            {
+                AdjustLocation(0, -1);
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

@@ -94,7 +94,7 @@ namespace RunescapeBot.BotPrograms
             if (BankBoothLocator(out bankBooth))
             {
                 LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
-                bankPopup = new Bank(RSClient);
+                bankPopup = new Bank(RSClient, Inventory);
                 return bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT);
             }
             return false;

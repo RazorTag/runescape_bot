@@ -180,17 +180,6 @@ namespace RunescapeBot.BotPrograms
         #region gauge reading
 
         /// <summary>
-        /// Determines if the player has very green hitpoints using the most recent screen read
-        /// </summary>
-        /// <returns></returns>
-        public bool HighHitpoints()
-        {
-            RectangleBounds hitpoints = HitpointsDigitsArea();
-            double greenHitpointMatch = ImageProcessing.FractionalMatchPiece(Screen, RGBHSBRangeFactory.HitpointsGreen(), hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
-            return greenHitpointMatch > 0.05;
-        }
-
-        /// <summary>
         /// Determines the player's hitpoints as a fraction of their maximum hitpoints (0-1)
         /// </summary>
         /// <returns>the player's remaining hitpoints as a fraction of total hitpoints (0-1)</returns>
@@ -261,7 +250,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            if (!CharacterIsRunning() && (RunEnergy() >= minRunEnergy)) //TODO call run energy with 0.5 after adding param
+            if (!CharacterIsRunning() && (RunEnergy() >= minRunEnergy))
             {
                 ToggleRun();
             }

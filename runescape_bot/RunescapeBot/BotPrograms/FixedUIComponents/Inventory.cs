@@ -3,10 +3,8 @@ using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -187,9 +185,10 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x">column (0-3)</param>
         /// <param name="y">row (0-6)</param>
+        /// <param name="option">option index starting from 0</param>
         /// <param name="safeTab">set to false to skip making sure that the inventory tab is open</param>
         /// <param name="extraOptions">list indices of non-standard right-click options. Standard options include Use, Drop, Examine, and Cancel</param>
-        public void RightClickInventoryOption(int x, int y, int option, bool safeTab = true, int[] extraOptions = null)
+        public void RightClickInventoryOption(int x, int y, int option, bool safeTab = false, int[] extraOptions = null)
         {
             OpenInventory(safeTab);
             InventoryToScreen(ref x, ref y);
@@ -204,7 +203,7 @@ namespace RunescapeBot.BotPrograms
                 click = Probability.GaussianCircle(new Point(x, y), 4.0, 0, 360, 10);
                 Mouse.RightClick(click.X, click.Y, RSClient, 0);
                 popup = new RightClickInventory(click.X, click.Y, RSClient, extraOptions);
-                if (popup.WaitForPopup(1000))
+                if (popup.WaitForPopup(1500))
                 {
                     popup.CustomOption(option);
                     return;
@@ -274,10 +273,24 @@ namespace RunescapeBot.BotPrograms
         /// <param name="screen"></param>
         /// <param name="x">slots away from the leftmost column (0-3)</param>
         /// <param name="y">slots away from the topmost column (0-6)</param>
-        private void ClickSpellbook(int x, int y, bool safeTab = true)
+        public void ClickSpellbookStandard(int x, int y, bool safeTab = false)
         {
             OpenSpellbook(safeTab);
-            SpellbookToScreen(ref x, ref y);
+            SpellbookStandardToScreen(ref x, ref y);
+            Mouse.LeftClick(x, y, RSClient, 5);
+        }
+
+        /// <summary>
+        /// Clicks a slot in the lunar spellbook.
+        /// Does not handle waiting after casting a spell.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="safeTab"></param>
+        public void ClickSpellbookLunar(int x, int y, bool safeTab = false)
+        {
+            OpenSpellbook(safeTab);
+            SpellbookLunarToScreen(ref x, ref y);
             Mouse.LeftClick(x, y, RSClient, 5);
         }
 
@@ -289,7 +302,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y">y pixel location on the screen</param>
         public void Telegrab(int x, int y, bool safeTab = true, bool autoWait = true)
         {
-            ClickSpellbook(5, 2, safeTab);
+            ClickSpellbookStandard(5, 2, safeTab);
             Mouse.LeftClick(x, y, RSClient, 1);
             if (autoWait)
             {
@@ -312,7 +325,7 @@ namespace RunescapeBot.BotPrograms
             if (ScreenToInventory(ref x, ref y))
             {
                 OpenSpellbook(safeTab);
-                ClickSpellbook(spellBookX, spellBookY, safeTab);
+                ClickSpellbookStandard(spellBookX, spellBookY, safeTab);
                 SelectedTab = TabSelect.Inventory;
                 ClickInventory(x, y, false);
                 SelectedTab = TabSelect.Spellbook;
@@ -572,15 +585,34 @@ namespace RunescapeBot.BotPrograms
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>true if translation succeeds</returns>
-        private bool SpellbookToScreen(ref int x, ref int y)
+        private bool SpellbookStandardToScreen(ref int x, ref int y)
         {
-            if (x < 0 || x > 6 || y < 0 || y > 9)
+            if (x < 0 || x >= SPELLBOOK_STANDARD_COLUMNS || y < 0 || y >= SPELLBOOK_STANDARD_ROWS)
             {
                 return false;
             }
             ManuallySetScreen(false);
-            x = Screen.GetLength(0) - SPELLBOOK_OFFSET_LEFT + (x * SPELLBOOK_GAP_X);
-            y = Screen.GetLength(1) - SPELLBOOK_OFFSET_TOP + (y * SPELLBOOK_GAP_Y);
+            x = Screen.GetLength(0) - SPELLBOOK_STANDARD_OFFSET_LEFT + (x * SPELLBOOK_STANDARD_GAP_X);
+            y = Screen.GetLength(1) - SPELLBOOK_STANDARD_OFFSET_TOP + (y * SPELLBOOK_STANDARD_GAP_Y);
+            return true;
+        }
+
+        /// <summary>
+        /// Converts coordinates from the standard spellbook to screen coordinates if the cordinates exceed the size of the spellbook
+        /// </summary>
+        /// <param name="screen"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>true if translation succeeds</returns>
+        private bool SpellbookLunarToScreen(ref int x, ref int y)
+        {
+            if (x < 0 || x >= SPELLBOOK_LUNAR_COLUMNS || y < 0 || y >= SPELLBOOK_LUNAR_ROWS)
+            {
+                return false;
+            }
+            ManuallySetScreen(false);
+            x = Screen.GetLength(0) - SPELLBOOK_LUNAR_OFFSET_LEFT + (x * SPELLBOOK_LUNAR_GAP_X);
+            y = Screen.GetLength(1) - SPELLBOOK_LUNAR_OFFSET_TOP + (y * SPELLBOOK_LUNAR_GAP_Y);
             return true;
         }
 
@@ -618,7 +650,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            ClickSpellbook(spellbookSlot.X, spellbookSlot.Y, false);
+            ClickSpellbookStandard(spellbookSlot.X, spellbookSlot.Y, false);
             if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
             return true;
         }
@@ -670,7 +702,7 @@ namespace RunescapeBot.BotPrograms
             Point inventorySlot = TeleportToSpellBookSlot(location);
             int x = inventorySlot.X;
             int y = inventorySlot.Y;
-            if (!SpellbookToScreen(ref x, ref y))
+            if (!SpellbookStandardToScreen(ref x, ref y))
             {
                 return false;
             }
@@ -718,12 +750,20 @@ namespace RunescapeBot.BotPrograms
 
         public const int SPELLBOOK_TAB_OFFSET_RIGHT = 19;
         public const int SPELLBOOK_TAB_OFFSET_BOTTOM = 320;
-        public const int SPELLBOOK_OFFSET_LEFT = 191;
-        public const int SPELLBOOK_OFFSET_TOP = 272;
-        public const int SPELLBOOK_GAP_X = 24;
-        public const int SPELLBOOK_GAP_Y = 24;
-        public const int SPELLBOOK_COLUMNS = 7;
-        public const int SPELLBOOK_ROWS = 10;
+        public const int SPELLBOOK_STANDARD_OFFSET_LEFT = 191;   //horizontal distance between middle of home teleport icon and right of screen
+        public const int SPELLBOOK_STANDARD_OFFSET_TOP = 272;    //vertical distance between middle of home teleport icon and bottom of screen
+        public const int SPELLBOOK_STANDARD_GAP_X = 24;
+        public const int SPELLBOOK_STANDARD_GAP_Y = 24;
+        public const int SPELLBOOK_STANDARD_COLUMNS = 7;
+        public const int SPELLBOOK_STANDARD_ROWS = 10;
+
+        public const int SPELLBOOK_LUNAR_OFFSET_LEFT = 197;   //horizontal distance between middle of home teleport icon and right of screen
+        public const int SPELLBOOK_LUNAR_OFFSET_TOP = 278;    //vertical distance between middle of home teleport icon and bottom of screen
+        public const int SPELLBOOK_LUNAR_GAP_X = 30;
+        public const int SPELLBOOK_LUNAR_GAP_Y = 29;
+        public const int SPELLBOOK_LUNAR_COLUMNS = 6;
+        public const int SPELLBOOK_LUNAR_ROWS = 8;
+
         public const int TELEPORT_DURATION = 4 * BotRegistry.GAME_TICK;
 
         public const int LOGOUT_TAB_OFFSET_RIGHT = 120;

@@ -75,8 +75,9 @@ namespace RunescapeBot.BotPrograms
         {
             ReadWindow();
 
-            if (Minimap.HighHitpoints())
+            if (Minimap.Hitpoints() > 0.9)
             {
+                Logout();
                 return false;   //Assume that we died in the Nightmare Zone if hitpoints suddenly become full
             }
 
@@ -103,11 +104,11 @@ namespace RunescapeBot.BotPrograms
                 return false;   //an overload might be taking effect or wearing off
             }
 
-            const double twoHitpointsMatch = 0.035714285714285712;
+            const double oneHitpoint = 0.035714285714285712;
             RectangleBounds hitpoints = Minimap.HitpointsDigitsArea();
             double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
-            if (Numerical.WithinRange(redHitpointsMatch, twoHitpointsMatch, 0.01*twoHitpointsMatch) || (redHitpointsMatch < 0.001))
+            if (Numerical.WithinRange(redHitpointsMatch, oneHitpoint, 0.01 * oneHitpoint) || (Minimap.Hitpoints() > 0.25))
             {
                 return false;   //hitpoints are already at 1 or an overload has just worn off and hitpoints are no longer red
             }

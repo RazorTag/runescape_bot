@@ -53,6 +53,8 @@ namespace RunescapeBot.BotPrograms
             MakePotionsFull,
             [Description("Magic - Enchant Level 2 (Varrock west)")]
             EnchantLevel2,
+            [Description("Magic - Tan Hides (Varrock west)")]
+            TanHides,
             [Description("Mining - Iron Ore")]
             IronOre,
             [Description("Smithing - Cannonballs (Phasmatys)")]
@@ -120,6 +122,8 @@ namespace RunescapeBot.BotPrograms
                     return new Firemaking(runParams);
                 case BotActions.KnightOfArdougne:
                     return new KnightOfArdougne(runParams);
+                case BotActions.TanHides:
+                    return new TanHides(runParams);
             }
             return bot;
         }

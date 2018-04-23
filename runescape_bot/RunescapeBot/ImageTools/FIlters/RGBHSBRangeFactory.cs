@@ -90,9 +90,9 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static RGBHSBRange BankBoothPhasmatys()
         {
-            Color dark = Color.FromArgb(62, 67, 27);
-            Color light = Color.FromArgb(71, 76, 36);
-            HSBRange hsbRange = new HSBRange(64, 72, 0.360f, 0.418f, 0.182f, 0.222f);
+            Color dark = Color.FromArgb(50, 55, 19);
+            Color light = Color.FromArgb(72, 76, 37);
+            HSBRange hsbRange = new HSBRange(64, 72, 0.340f, 0.480f, 0.127f, 0.242f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 

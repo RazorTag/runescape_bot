@@ -11,15 +11,17 @@ namespace RunescapeBot.BotPrograms.Popups
     public class Bank
     {
         Process RSClient;
+        Inventory InventoryItems;
         public int Left { get; set; }
         public int Right { get; set; }
         public int Top { get; set; }
         public int Bottom { get; set; }
 
-        public Bank(Process RSClient)
+        public Bank(Process RSClient, Inventory inventory)
         {
             this.RSClient = RSClient;
             Point screenSize = ScreenScraper.GetWindowSize(RSClient);
+            InventoryItems = inventory;
             SetLeft(screenSize.X);
             SetRight(screenSize.X);
             SetTop(screenSize.Y);
@@ -133,6 +135,27 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             Mouse.LeftClick(Left + 427, Bottom - 22, RSClient, 10);
             BotProgram.SafeWaitPlus(200, 20);
+        }
+
+        /// <summary>
+        /// Selects the Deposit-All option for the specified inventory slot to deposit into bank
+        /// </summary>
+        /// <param name="inventorySlot">inventory slot item to deposit</param>
+        public void DepositAll(Point inventorySlot)
+        {
+            Inventory.TabSelect currentTab = InventoryItems.SelectedTab;
+            InventoryItems.SelectedTab = Inventory.TabSelect.Inventory;
+            InventoryItems.RightClickInventoryOption(inventorySlot.X, inventorySlot.Y, 5);
+            InventoryItems.SelectedTab = currentTab;
+        }
+
+        /// <summary>
+        /// Left-clicks a single inventory item to deposit it
+        /// </summary>
+        /// <param name="inventorySlot">inventory slot item to deposit</param>
+        public void DepositItem(Point inventorySlot)
+        {
+            InventoryItems.ClickInventory(inventorySlot.X, inventorySlot.Y);
         }
 
         /// <summary>

@@ -224,7 +224,7 @@ namespace RunescapeBot.BotPrograms
             
             LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
             SafeWait(200, 120);
-            Bank bankPopup = new Bank(RSClient);
+            Bank bankPopup = new Bank(RSClient, Inventory);
             bool bankOpened = bankPopup.WaitForPopup();
             return bankOpened;
         }

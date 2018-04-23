@@ -300,7 +300,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             LeftClick(bankChest.X, bankChest.Y);
-            Bank bankPopup = new Bank(RSClient);
+            Bank bankPopup = new Bank(RSClient, Inventory);
             if (!bankPopup.WaitForPopup(BotUtilities.WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
                 return false;

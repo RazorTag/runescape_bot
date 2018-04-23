@@ -138,7 +138,7 @@ namespace RunescapeBot.BotPrograms
         {
             ReadWindow();
 
-            Bank bank = new Bank(RSClient);
+            Bank bank = new Bank(RSClient, Inventory);
             if (bank.BankIsOpen())
             {
                 bank.CloseBank();

@@ -649,7 +649,7 @@ namespace RunescapeBot.BotPrograms
             Stopwatch giveUpWatch = new Stopwatch();
             giveUpWatch.Start();
 
-            while (giveUpWatch.ElapsedMilliseconds < maxWaitTime || totalPasses < verificationPasses + 1)
+            while (giveUpWatch.ElapsedMilliseconds < maxWaitTime || totalPasses <= verificationPasses)
             {
                 if (StopFlag) { return false; }
 
@@ -673,12 +673,12 @@ namespace RunescapeBot.BotPrograms
                         foundObject = objectBlob;
                         return true;
                     }
-                    totalPasses++;
                 }
                 else
                 {
                     lastPosition = null;
                 }
+                totalPasses++;
             }
 
             return false;
@@ -1763,8 +1763,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected delegate bool BankLocator(out Blob bankBooth);
 
-        protected int MinBankBoothSize { get { return ArtifactSize(0.0005); } }
-        protected int MaxBankBoothSize { get { return ArtifactSize(0.0012); } }
+        protected int MinBankBoothSize { get { return ArtifactSize(0.000728); } } //ex 0.000798
+        protected int MaxBankBoothSize { get { return ArtifactSize(0.000896); } } //ex 0.000826
 
         /// <summary>
         /// Locates a bank booth with the counter color from the Varrock west bank
@@ -1786,43 +1786,36 @@ namespace RunescapeBot.BotPrograms
         {
             bankBooth = null;
             const int numberOfBankBooths = 6;
-            const double maxBoothWidthToHeightRatio = 3.3;
+            const double minBoothWidthToHeightRatio = 2.3667;   //ex 2.6667
+            const double maxBoothWidthToHeightRatio = 3.1333;   //ex 2.8333
 
             ReadWindow();
             bool[,] bankBooths = ColorFilter(RGBHSBRangeFactory.BankBoothPhasmatys());
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, true, MinBankBoothSize, MaxBankBoothSize);  //list of blobs from biggest to smallest
-            Blob blob;
-            int blobIndex = 0;
+            List<Blob> boothBlobs = new List<Blob>();
+            List<Blob> possibleBoothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);  //list of blobs from biggest to smallest
+            possibleBoothBlobs.Sort(new BlobProximityComparer(Center));
+            double widthToHeightRatio;
 
             //Remove blobs that aren't bank booths
-            while (blobIndex < numberOfBankBooths)
+            foreach(Blob possibleBooth in possibleBoothBlobs)
             {
-                if (blobIndex > boothBlobs.Count - 1)
+                widthToHeightRatio = (possibleBooth.Width / (double)possibleBooth.Height);
+                if (Numerical.WithinBounds(widthToHeightRatio, minBoothWidthToHeightRatio, maxBoothWidthToHeightRatio))
                 {
-                    return false;   //We did not find the expected number of bank booths
-                }
-
-                blob = boothBlobs[blobIndex];
-
-                if ((blob.Width / blob.Height) > maxBoothWidthToHeightRatio)
-                {
-                    boothBlobs.RemoveAt(blobIndex); //This blob is too wide to be a bank booth counter.
-                }
-                else
-                {
-                    blobIndex++;
+                    boothBlobs.Add(possibleBooth);
                 }
             }
 
+            if (boothBlobs.Count != numberOfBankBooths)
+            {
+                return false;   //We either failed to locate all of the booths or identified something that was not actually a booth.
+            }
+
             //Reduce the blob list to the bank booths
-            boothBlobs = boothBlobs.GetRange(0, numberOfBankBooths);
-            boothBlobs.Sort(new BlobHorizontalComparer());
-            List<Blob> functioningBankBooths = new List<Blob>();
-            functioningBankBooths.Add(boothBlobs[1]);
-            functioningBankBooths.Add(boothBlobs[2]);
-            functioningBankBooths.Add(boothBlobs[4]);
-            functioningBankBooths.Add(boothBlobs[5]);
-            bankBooth = Blob.ClosestBlob(Center, functioningBankBooths);
+            boothBlobs.Sort(new BlobHorizontalComparer());  //sort from left to right
+            boothBlobs.RemoveAt(3); //remove the unusable booths without tellers
+            boothBlobs.RemoveAt(0);
+            bankBooth = Blob.ClosestBlob(Center, boothBlobs);
             return true;
         }
 

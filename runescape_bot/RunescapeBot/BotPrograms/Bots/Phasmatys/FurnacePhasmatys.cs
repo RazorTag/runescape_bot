@@ -23,16 +23,15 @@ namespace RunescapeBot.BotPrograms
             if (failedRuns > CONSECUTIVE_FAILURES_ALLOWED) { return false; }
 
             //Move to the bank and open it
-            if (!MoveToBankPhasmatys())
+            if (!MoveToBankPhasmatys() || !ClickBankBooth())
             {
                 failedRuns++;
                 return true;
             }
-            ClickBankBooth();
 
             //Refresh inventory to a bracelet mould and 27 gold bars
             if (StopFlag) { return false; }
-            BankPopup = new Bank(RSClient);
+            BankPopup = new Bank(RSClient, Inventory);
             if (!BankPopup.WaitForPopup(BotUtilities.WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
                 failedRuns++;

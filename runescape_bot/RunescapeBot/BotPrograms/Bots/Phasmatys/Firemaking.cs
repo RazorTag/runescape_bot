@@ -157,7 +157,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void BankItems()
         {
-            Bank bankPopup = new Bank(RSClient);
+            Bank bankPopup = new Bank(RSClient, Inventory);
             bankPopup.DepositInventory();
             SafeWaitPlus(500, 200);
             bankPopup.WithdrawOne(7, 0);
