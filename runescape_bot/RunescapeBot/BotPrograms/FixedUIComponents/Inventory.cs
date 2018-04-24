@@ -61,28 +61,41 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Opens the inventory if it isn't open already
+        /// Opens a tab on the inventory UI if it is not already open
         /// </summary>
-        /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
-        /// <returns>True if the inventory is not assumed to already be open</returns>
-        public bool OpenInventory(bool safeTab = true)
+        /// <param name="tab">tab to open</param>
+        /// <param name="x">x coordinate of the center of the tab</param>
+        /// <param name="y">y coordinate of the center of the tab</param>
+        /// <param name="safeTab">set to true to click on tab even if it is already believed to be open</param>
+        /// <returns>true if the tab is clicked on</returns>
+        private bool OpenTab(TabSelect tab, int offsetRight, int offsetBottom, bool safeTab = false)
         {
-            if (!safeTab && SelectedTab == TabSelect.Inventory)
+            if (!safeTab && SelectedTab == tab)
             {
                 return false;
             }
-
             Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
             if (screenSize == null)
             {
                 return false;
             }
-            int x = screenSize.Value.X - INVENTORY_TAB_OFFSET_RIGHT;
-            int y = screenSize.Value.Y - INVENTORY_TAB_OFFSET_BOTTOM;
-            Mouse.LeftClick(x, y, RSClient, 6);
+
+            int x = screenSize.Value.X - offsetRight;
+            int y = screenSize.Value.Y - offsetBottom;
+            Mouse.LeftClick(x, y, RSClient, 10);
             BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
-            SelectedTab = TabSelect.Inventory;
+            SelectedTab = tab;
             return true;
+        }
+
+        /// <summary>
+        /// Opens the inventory if it isn't open already
+        /// </summary>
+        /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
+        /// <returns>True if the inventory is not assumed to already be open</returns>
+        public bool OpenInventory(bool safeTab = false)
+        {
+            return OpenTab(TabSelect.Inventory, INVENTORY_TAB_OFFSET_RIGHT, INVENTORY_TAB_OFFSET_BOTTOM, safeTab);
         }
 
         /// <summary>
@@ -90,16 +103,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
         /// <returns>True if the spellbook is not assumed to already be open</returns>
-        public bool OpenSpellbook(bool safeTab = true)
+        public bool OpenSpellbook(bool safeTab = false)
         {
-            if (!safeTab && SelectedTab == TabSelect.Spellbook)
-            {
-                return false;
-            }
-            Keyboard.FKey(6);
-            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
-            SelectedTab = TabSelect.Spellbook;
-            return true;
+            return OpenTab(TabSelect.Spellbook, SPELLBOOK_TAB_OFFSET_RIGHT, SPELLBOOK_TAB_OFFSET_BOTTOM, safeTab);
         }
 
         /// <summary>
@@ -107,18 +113,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
         /// <returns>true if the logout tab is not assumes to already be open</returns>
-        public bool OpenLogout(bool safeTab = true)
+        public bool OpenLogout(bool safeTab = false)
         {
-            if (!safeTab && SelectedTab == TabSelect.Logout)
-            {
-                return false;
-            }
-            int x = Screen.GetLength(0) - LOGOUT_TAB_OFFSET_RIGHT;
-            int y = Screen.GetLength(1) - LOGOUT_TAB_OFFSET_BOTTOM;
-            Mouse.LeftClick(x, y, RSClient, 6);
-            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
-            SelectedTab = TabSelect.Logout;
-            return true;
+            return OpenTab(TabSelect.Logout, LOGOUT_TAB_OFFSET_RIGHT, LOGOUT_TAB_OFFSET_BOTTOM, safeTab);
         }
 
         /// <summary>
@@ -126,16 +123,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="safeTab">Set to false to rely on the last saved value for the selected tab</param>
         /// <returns>True if the options tab is not assumed to already be open</returns>
-        public bool OpenOptions(bool safeTab = true)
+        public bool OpenOptions(bool safeTab = false)
         {
-            if (!safeTab && SelectedTab == TabSelect.Options)
-            {
-                return false;
-            }
-            Keyboard.FKey(10);
-            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
-            SelectedTab = TabSelect.Options;
-            return true;
+            return OpenTab(TabSelect.Options, OPTIONS_TAB_OFFSET_RIGHT, OPTIONS_TAB_OFFSET_BOTTOM, safeTab);
         }
 
         /// <summary>
@@ -748,7 +738,7 @@ namespace RunescapeBot.BotPrograms
         public const int INVENTORY_COLUMNS = 4;
         public const int INVENTORY_ROWS = 7;
 
-        public const int SPELLBOOK_TAB_OFFSET_RIGHT = 19;
+        public const int SPELLBOOK_TAB_OFFSET_RIGHT = 21;
         public const int SPELLBOOK_TAB_OFFSET_BOTTOM = 320;
         public const int SPELLBOOK_STANDARD_OFFSET_LEFT = 191;   //horizontal distance between middle of home teleport icon and right of screen
         public const int SPELLBOOK_STANDARD_OFFSET_TOP = 272;    //vertical distance between middle of home teleport icon and bottom of screen
@@ -764,10 +754,13 @@ namespace RunescapeBot.BotPrograms
         public const int SPELLBOOK_LUNAR_COLUMNS = 6;
         public const int SPELLBOOK_LUNAR_ROWS = 8;
 
-        public const int TELEPORT_DURATION = 4 * BotRegistry.GAME_TICK;
+        public const int OPTIONS_TAB_OFFSET_RIGHT = 89;
+        public const int OPTIONS_TAB_OFFSET_BOTTOM = 19;
 
         public const int LOGOUT_TAB_OFFSET_RIGHT = 120;
         public const int LOGOUT_TAB_OFFSET_BOTTOM = 18;
+
+        public const int TELEPORT_DURATION = 4 * BotRegistry.GAME_TICK;
 
         public TabSelect SelectedTab { get; set; }
         public enum TabSelect : int

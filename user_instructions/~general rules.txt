@@ -1,2 +1,6 @@
+-If you start the bot while logged in, set the camera facing north and as high as possible.
+-Zoom out fully.
+-Brightness to full.
+-Set inventory to opaque.
 -Keep the bank set to the default tab.
 -Do not wear animated clothing.

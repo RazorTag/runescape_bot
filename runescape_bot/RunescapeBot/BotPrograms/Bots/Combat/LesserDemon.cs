@@ -11,21 +11,21 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class LesserDemon : Combat
     {
-        private const int MAX_DEMON_SPAWN_TIME = 25000;    //max possible lesser demon spawn time in milliseconds
-        private const int DEMON_ENGAGE_TIME = 3000;
-        private const int RUNE_MED_HELM_MIN_SIZE = 70;
-        private const int MITHRIL_ARMOR_MIN_SIZE = 100;
-        private const int CHAOS_RUNE_MIN_SIZE = 3;
-        private const int DEATH_RUNE_MIN_SIZE = 5;
-        private RGBHSBRange LesserDemonSkin;
-        private RGBHSBRange LesserDemonHorn;
-        private RGBHSBRange RuneMedHelm;
-        private RGBHSBRange MithrilArmor;
-        private RGBHSBRange ChaosRune;
-        private RGBHSBRange DeathRune;
-        private RGBHSBRange MouseoverTextNPC;
-        private bool PickUpStackables;
-        private bool PickUpAlchables;
+        protected const int MAX_DEMON_SPAWN_TIME = 25000;    //max possible lesser demon spawn time in milliseconds
+        protected const int DEMON_ENGAGE_TIME = 3000;
+        protected const int CHAOS_RUNE_MIN_SIZE = 3;
+        protected const int DEATH_RUNE_MIN_SIZE = 5;
+        protected RGBHSBRange LesserDemonSkin;
+        protected RGBHSBRange LesserDemonHorn;
+        protected RGBHSBRange RuneMedHelm;
+        protected RGBHSBRange MithrilArmor;
+        protected RGBHSBRange ChaosRune;
+        protected RGBHSBRange DeathRune;
+        protected RGBHSBRange MouseoverTextNPC;
+        protected bool PickUpStackables;
+        protected bool PickUpAlchables;
+        protected int RuneMinSize;
+        protected int MithrilMinSize;
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -53,6 +53,10 @@ namespace RunescapeBot.BotPrograms
             GetReferenceColors();
             PickUpStackables = pickUpStackables;
             PickUpAlchables = pickUpAlchables;
+            MinDemonSize = ArtifactSize(0.000944);
+            LastDemonTime = DateTime.Now;
+            RuneMinSize = ArtifactSize(0.0000694);
+            MithrilMinSize = ArtifactSize(0.0000992);
         }
 
         protected override bool Run()
@@ -80,6 +84,16 @@ namespace RunescapeBot.BotPrograms
             //bool[,] mask = ColorFilter(color);
             //DebugUtilities.TestMask(Bitmap, ColorArray, color, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "cloves");
 
+            //ReadWindow();
+            //RGBHSBRange rune = RGBHSBRangeFactory.RuneMedHelm();
+            //bool[,] runeMask = ColorFilter(rune);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, rune, runeMask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "rune");
+
+            //ReadWindow();
+            //RGBHSBRange mithril = RGBHSBRangeFactory.MithrilArmor();
+            //bool[,] mithrilMask = ColorFilter(mithril);
+            //DebugUtilities.TestMask(Bitmap, ColorArray, mithril, mithrilMask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "mithril");
+
             //SafeWait(3000);
             //ReadWindow();
             //ColorRange color = RGBHSBRanges.MouseoverTextNPC();
@@ -93,8 +107,12 @@ namespace RunescapeBot.BotPrograms
             //Color[,] screenDropArea = ScreenPiece(0, 1800, 0, 900, out trimOffset);
             //FindAndGrabChaosRune(screenDropArea, trimOffset, ChaosRune, CHAOS_RUNE_MIN_SIZE);
 
-            MinDemonSize = ArtifactSize(0.000944);
-            LastDemonTime = DateTime.Now;
+            //LastDemonLocation = Center;
+            //LastDemonLocation.Y += 50;
+            //CheckDrops();
+
+            //Inventory.Telegrab(Center.X, Center.Y);
+
             return true;
         }
 
@@ -129,7 +147,6 @@ namespace RunescapeBot.BotPrograms
                 return MissedDemon();
             }
 
-            RunParams.Iterations--;
             return true;
         }
 
@@ -140,9 +157,10 @@ namespace RunescapeBot.BotPrograms
         {
             MissedDemons++;
 
-            //During the first frame that the bot program can't find a demon, look for drops
             if (MissedDemons == 1)
             {
+                SafeWait(1000);
+                RunParams.Iterations--;
                 CheckDrops();
             }
 
@@ -170,11 +188,13 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if a drop is found</returns>
         private bool CheckDrops()
         {
-            int dropRange = (int) (3 * Math.Sqrt(MinDemonSize));
-            int dropRangeLeft = LastDemonLocation.X - dropRange;
-            int dropRangeRight = LastDemonLocation.X + dropRange;
-            int dropRangeTop = LastDemonLocation.Y - dropRange;
-            int dropRangeBottom = LastDemonLocation.Y + dropRange;
+            ReadWindow();
+
+            int dropRange = (int) (4 * Math.Sqrt(MinDemonSize));
+            int dropRangeLeft = (int) (LastDemonLocation.X - 1.18 * dropRange);
+            int dropRangeRight = (int) (LastDemonLocation.X + 0.82 * dropRange);
+            int dropRangeTop = (int) (LastDemonLocation.Y - 0.24 * dropRange);
+            int dropRangeBottom = (int) (LastDemonLocation.Y + 0.76 * dropRange);
             Point trimOffset;
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
@@ -186,8 +206,8 @@ namespace RunescapeBot.BotPrograms
 
             if (PickUpAlchables)
             {
-                if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RUNE_MED_HELM_MIN_SIZE)) { return true; }
-                if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MITHRIL_ARMOR_MIN_SIZE)) { return true; }
+                if (FindAndAlch(screenDropArea, trimOffset, RuneMedHelm, RuneMinSize)) { return true; }
+                if (FindAndAlch(screenDropArea, trimOffset, MithrilArmor, MithrilMinSize)) { return true; }
             }
 
             return false;
@@ -200,7 +220,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found, picked up, and alched. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndAlch(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize = 50)
+        private bool FindAndAlch(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
@@ -208,7 +228,11 @@ namespace RunescapeBot.BotPrograms
             if (biggestBlob.Size > minimumSize)
             {
                 Point blobCenter = biggestBlob.Center;
-                return Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y) && Inventory.OpenInventory();
+                if (Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y))
+                {
+                    Inventory.OpenInventory();
+                    return true;
+                }
             }
             return false;
         }
@@ -230,6 +254,7 @@ namespace RunescapeBot.BotPrograms
                 Point blobCenter = biggestBlob.Center;
                 Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
                 Inventory.OpenInventory();
+                return true;
             }
             return false;
         }

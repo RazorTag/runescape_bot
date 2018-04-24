@@ -10,6 +10,7 @@ namespace RunescapeBot.BotPrograms
         protected Point SpellSlot;
         protected Point HidesBankSlot;
         protected Point FirstHidesInventorySlot;
+        protected bool spellbookClosed;
 
         public TanHides(RunParams runParams) : base(runParams)
         {
@@ -17,6 +18,7 @@ namespace RunescapeBot.BotPrograms
             HidesBankSlot = new Point(7, 0);
             FirstHidesInventorySlot = new Point(0, 0);
             RunParams.Iterations = (RunParams.Iterations / 5) * 5 ;
+            spellbookClosed = true;
         }
 
         /// <summary>
@@ -37,14 +39,23 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true is successful</returns>
         protected override bool ProcessInventory()
         {
-            int casts = Math.Min(5, RunParams.Iterations / 5);
+            if (spellbookClosed)
+            {
+                SafeWait(1500); //Make sure that the bank closes before trying to switch to the spellbook tab on the first run
+                spellbookClosed = false;
+            }
 
-            for (int i = 0; i < casts; i++)
+            int casts = Math.Min(5, RunParams.Iterations / 5);
+            for (int i = 0; i < casts - 1; i++)
             {
                 Inventory.ClickSpellbookLunar(SpellSlot.X, SpellSlot.Y);
                 RunParams.Iterations -= 5;
                 if (SafeWaitPlus(TAN_HIDE_SPELL_TIME + 150, 100)) { return false; }
             }
+            //Do last cast without waiting afterward
+            Inventory.ClickSpellbookLunar(SpellSlot.X, SpellSlot.Y);
+            RunParams.Iterations -= 5;
+
             return true;
         }
     }

@@ -110,7 +110,7 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
-        /// Determines how rectangular a shape is
+        /// Determines how rectangular a shape is. 0.5 is the minimum rectangularity for a rectangle tilted to a diamond position.
         /// </summary>
         /// <param name="shape">blob to check for rectangularity</param>
         /// <returns>rectangularity (0-1) indicating how rectangular a shape is</returns>

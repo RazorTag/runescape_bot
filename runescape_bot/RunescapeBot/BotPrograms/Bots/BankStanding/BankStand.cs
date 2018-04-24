@@ -39,7 +39,19 @@ namespace RunescapeBot.BotPrograms
             Bank bank;
             if (!OpenBank(out bank) || !WithdrawItems(bank)) { return false; }
             bank.CloseBank();
-            if (!ProcessInventory()) { return false; }
+            if (StopFlag || !ProcessInventory()) { return false; }
+            return true;
+        }
+
+        protected override bool Run()
+        {
+            //ReadWindow();
+            //DebugUtilities.SaveImageToFile(Bitmap);
+
+            //ReadWindow();
+            //bool[,] bankCounter = ColorFilter(RGBHSBRangeFactory.BankBoothVarrockWest());
+            //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.BankBoothVarrockWest(), bankCounter, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankCounter");
+
             return true;
         }
 

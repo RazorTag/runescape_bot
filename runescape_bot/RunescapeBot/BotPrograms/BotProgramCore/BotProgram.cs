@@ -232,7 +232,7 @@ namespace RunescapeBot.BotPrograms
         {
             StopFlag = false;
             BotIsDone = false;
-            LastBotWorldCheck = DateTime.MinValue;
+            LastBotWorldCheck = DateTime.Now;
             RunThread = new Thread(Process);
             RunThread.Start();
         }
@@ -1281,6 +1281,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Switch to a world on the login screen
         /// </summary>
+        /// <returns>true if successful</returns>
         private bool SelectLoginWorld(int world, Point? loginOffset)
         {
             const int rowCount = 18;
@@ -1311,7 +1312,7 @@ namespace RunescapeBot.BotPrograms
             int y = offset.Y + 46 + (row * rowHeight);
             LeftClick(x, y, 5);
             SafeWait(500);
-
+            LastBotWorldCheck = DateTime.Now;
             return true;
         }
 
@@ -1603,19 +1604,6 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            //just in case the last bot world check time is erroneously set to some future date
-            if (LastBotWorldCheck > DateTime.Now)
-            {
-                LastBotWorldCheck = DateTime.MinValue;
-            }
-
-            //only check the bot world if we haven't checked recently
-            long timeSinceLastBotWorldCheck = (long) (DateTime.Now - LastBotWorldCheck).TotalMilliseconds;
-            if (timeSinceLastBotWorldCheck < RunParams.BotWorldCheckInterval)
-            {
-                return false;
-            }
-
             //restart client if set to a bot world
             int loginWorld = (RunParams.LoginWorld > 0) ? RunParams.LoginWorld : 340;
             if (IsLoggedOut(readWindow))
@@ -1625,8 +1613,10 @@ namespace RunescapeBot.BotPrograms
                     SelectLoginWorld(loginWorld, null);
                     return true;
                 }
+                LastBotWorldCheck = DateTime.Now;
             }
-            else
+            //Only check for a bot world while logged in if we haven't checked for a while.
+            else if ((long)(DateTime.Now - LastBotWorldCheck).TotalMilliseconds > RunParams.BotWorldCheckInterval)
             {
                 if (LoggedIntoBotWorld(false))
                 {
@@ -1634,11 +1624,11 @@ namespace RunescapeBot.BotPrograms
                     SelectLoginWorld(loginWorld, null);
                     return true;
                 }
+                //update the last bot world check time only if we verify that we aren't on a bot world
+                //This ensures that restarting the client to a bot world does not allow you to log into a bot world.
+                LastBotWorldCheck = DateTime.Now;
             }
 
-            //update the last bot world check time only if we verify that we aren't on a bot world
-            //This ensures that restarting the client to a bot world does not allow you to log into a bot world.
-            LastBotWorldCheck = DateTime.Now;
             return false;
         }
 
@@ -1750,8 +1740,18 @@ namespace RunescapeBot.BotPrograms
 
             if (!ReadWindow()) { return false; }
             bool[,] bankBooths = ColorFilter(bankBoothColor);
-            List<Blob> boothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);
-            bankBooth = Blob.ClosestBlob(Center, boothBlobs);
+            List<Blob> potentialBoothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);
+            List<Blob> booths = new List<Blob>();
+
+            foreach(Blob potentialBooth in potentialBoothBlobs)
+            {
+                if (Geometry.Rectangularity(potentialBooth) > 0.8)
+                {
+                    booths.Add(potentialBooth);
+                }
+            }
+
+            bankBooth = Blob.ClosestBlob(Center, booths);
 
             return bankBooth != null;
         }
@@ -1763,8 +1763,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected delegate bool BankLocator(out Blob bankBooth);
 
-        protected int MinBankBoothSize { get { return ArtifactSize(0.000728); } } //ex 0.000798
-        protected int MaxBankBoothSize { get { return ArtifactSize(0.000896); } } //ex 0.000826
+        protected int MinBankBoothSize { get { return ArtifactSize(0.000582); } } //ex 0.000682
+        protected int MaxBankBoothSize { get { return ArtifactSize(0.001145); } } //ex 0.001045
 
         /// <summary>
         /// Locates a bank booth with the counter color from the Varrock west bank
