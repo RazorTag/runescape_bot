@@ -104,48 +104,36 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <returns></returns>
         public virtual bool WaitForPopup(int timeout = 3000)
         {
-            Bitmap screen = null;
+            Color[,] screen = null;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             while (watch.ElapsedMilliseconds < timeout)
             {
                 if (BotProgram.StopFlag) { return false; }
                 BotProgram.SafeWait(200);
-                screen = ScreenScraper.CaptureWindow(RSClient);
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 if (PopupExists(screen))
                 {
-                    screen.Dispose();
                     return true;
                 }
-                screen.Dispose();
             }
             
             return false;
         }
 
         /// <summary>
-        /// 
+        /// Checks the area where the title bar should be for blackness
         /// </summary>
         /// <param name="screen"></param>
         /// <returns></returns>
-        protected virtual bool PopupExists(Bitmap screen)
-        {
-            const int xPadding = 20;
-            const int yPadding = 6;
-            const int xOffset = 20;
-
-            //Check title bar
-            int x = XClick + xOffset;
-            int y = YClick + (TITLE_HEIGHT / 2);
-            Color blackBarCheck = screen.GetPixel(x, y);
-
-            //Check the bottom-right of the popup
-            x = XClick + Width / 2 - xPadding;
-            y = YClick + Height - yPadding;
-            Color bottomRight = screen.GetPixel(x, y);
-            RGBHSBRange rightClickColor = RGBHSBRangeFactory.RightClickPopup();
-
-            return ImageProcessing.ColorsAreEqual(blackBarCheck, Color.Black) || rightClickColor.ColorInRange(bottomRight);
+        protected virtual bool PopupExists(Color[,] screen)
+        {   
+            int top = YClick + 1;
+            int bottom = top + 15;
+            int left = XClick - 40;
+            int right = XClick + 40;
+            double blackness = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.Black(), left, right, top, bottom);
+            return blackness > 0.25;
         }
 
         /// <summary>

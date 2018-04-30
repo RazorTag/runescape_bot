@@ -279,7 +279,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <summary>
         /// Close the bank pop-up using the top-right X button
         /// </summary>
-        public void CloseBank()
+        public void Close()
         {
             const int xOffset = 469;
             const int yOffset = 17;

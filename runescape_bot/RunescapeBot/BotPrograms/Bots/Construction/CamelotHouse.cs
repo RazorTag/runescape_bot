@@ -141,7 +141,7 @@ namespace RunescapeBot.BotPrograms
             Bank bank = new Bank(RSClient, Inventory);
             if (bank.BankIsOpen())
             {
-                bank.CloseBank();
+                bank.Close();
                 if (SafeWait(1000)) { return; }
             }
 
@@ -352,7 +352,7 @@ namespace RunescapeBot.BotPrograms
             int right = Center.X + widthRadius;
             int top = Center.Y - heightRadius;
             int bottom = Center.Y + heightRadius;
-            return LocateObject(BankChest, out foundObject, left, right, top, bottom, ArtifactSize(0.0004), ArtifactSize(0.0015));
+            return LocateObject(BankChest, out foundObject, left, right, top, bottom, ArtifactArea(0.0004), ArtifactArea(0.0015));
         }
 
         /// <summary>

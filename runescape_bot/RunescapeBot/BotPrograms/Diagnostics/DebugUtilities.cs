@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -22,7 +23,15 @@ namespace RunescapeBot.BotPrograms
 
             IntPtr hBitmap = bitmap.GetHbitmap();
             Image img = Image.FromHbitmap(hBitmap);
-            img.Save(filePath, ImageFormat.Png);
+
+            try
+            {
+                img.Save(filePath, ImageFormat.Png);
+            }
+            catch
+            {
+                MessageBox.Show("Unable to save test image to " + filePath);
+            }
         }
 
         /// <summary>
@@ -167,14 +176,21 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
-            SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.png");
-            SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.png");
-            SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.png");
-            SaveImageToFile(hueBitmap, directory + saveName + "_HSBHueMaskTest.png");
-            SaveImageToFile(saturationBitmap, directory + saveName + "_HSBSaturationMaskTest.png");
-            SaveImageToFile(brightnessBitmap, directory + saveName + "_HSBBrightnessMaskTest.png");
-            SaveImageToFile(combinedBitmap, directory + saveName + "_TotalMaskTest.png");
-            SaveImageToFile(bitmap, directory + "Original.png");
+            try
+            {
+                SaveImageToFile(redBitmap, directory + saveName + "_ColorRedMaskTest.png");
+                SaveImageToFile(greenBitmap, directory + saveName + "_ColorGreenMaskTest.png");
+                SaveImageToFile(blueBitmap, directory + saveName + "_ColorBlueMaskTest.png");
+                SaveImageToFile(hueBitmap, directory + saveName + "_HSBHueMaskTest.png");
+                SaveImageToFile(saturationBitmap, directory + saveName + "_HSBSaturationMaskTest.png");
+                SaveImageToFile(brightnessBitmap, directory + saveName + "_HSBBrightnessMaskTest.png");
+                SaveImageToFile(combinedBitmap, directory + saveName + "_TotalMaskTest.png");
+                SaveImageToFile(bitmap, directory + "Original.png");
+            }
+            catch
+            {
+                MessageBox.Show("Unable to save " + saveName + " test images to directory " + directory);
+            }
         }
     }
 }

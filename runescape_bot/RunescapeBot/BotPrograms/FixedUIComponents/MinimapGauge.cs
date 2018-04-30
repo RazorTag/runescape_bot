@@ -183,8 +183,9 @@ namespace RunescapeBot.BotPrograms
         /// Determines the player's hitpoints as a fraction of their maximum hitpoints (0-1)
         /// </summary>
         /// <returns>the player's remaining hitpoints as a fraction of total hitpoints (0-1)</returns>
-        public double Hitpoints()
+        public double Hitpoints(bool readWindow = false)
         {
+            if (readWindow) { ReadWindow(); }
             RectangleBounds hitpoints = HitpointsDigitsArea();
             Color[,] hitPoints = ImageProcessing.ScreenPiece(Screen, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
             return GaugeFraction(hitPoints);
@@ -293,14 +294,14 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Returns the point to look at or click on for the run energy orb next to the minimap
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the middle of the run orb</returns>
         public Point RunOrbSamplePoint()
         {
             Point runOrb;
             switch (ScreenScraper.ClientType)
             {
                 case ScreenScraper.Client.Jagex:
-                    runOrb = new Point(ScreenWidth - 145, 146);
+                    runOrb = new Point(ScreenWidth - 160, 132);
                     break;
                 case ScreenScraper.Client.OSBuddy:
                     runOrb = new Point(ScreenWidth - 156, 137);
@@ -326,16 +327,16 @@ namespace RunescapeBot.BotPrograms
             switch (ScreenScraper.ClientType)
             {
                 case ScreenScraper.Client.Jagex:
-                    left = ScreenWidth - 181;
-                    right = ScreenWidth - 161;
-                    top = 142;
-                    bottom = 156;
+                    left = ScreenWidth - 196;
+                    right = left + 20;
+                    top = 128;
+                    bottom = top + 12;
                     break;
                 case ScreenScraper.Client.OSBuddy:
                     left = ScreenWidth - 193;
-                    right = ScreenWidth - 173;
+                    right = left + 20;
                     top = 133;
-                    bottom = 147;
+                    bottom = top + 12;
                     break;
                 default:
                     return 0.0;

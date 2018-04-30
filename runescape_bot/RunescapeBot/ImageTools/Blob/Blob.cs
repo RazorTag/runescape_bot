@@ -14,6 +14,11 @@ namespace RunescapeBot.ImageTools
             FoundPixels = new Queue<Point>();
         }
 
+        public Blob(Point center) : this()
+        {
+            AddPixel(center);
+        }
+
         /// <summary>
         /// List of pixels in the blob.
         /// </summary>

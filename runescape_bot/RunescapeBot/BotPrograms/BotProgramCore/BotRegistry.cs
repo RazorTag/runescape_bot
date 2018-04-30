@@ -12,7 +12,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Number of milliseconds in a single game tick
         /// </summary>
-        public const int GAME_TICK = 600;
+        public const int GAME_TICK = 603;   //theoretically 600 ms per game tick, but the server tends to be slightly slower
 
         /// <summary>
         /// List of existing bot programs. Add a new bot program to this list.

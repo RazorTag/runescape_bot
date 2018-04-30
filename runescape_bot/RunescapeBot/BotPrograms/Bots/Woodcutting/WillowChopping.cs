@@ -21,7 +21,8 @@ namespace RunescapeBot.BotPrograms
         public WillowChopping(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
-            MinTreeSize = ArtifactSize(0.00006768);
+            RunParams.RunLoggedIn = true;
+            MinTreeSize = ArtifactArea(0.00006768);
             FailedTreeSearches = 0;
         }
 

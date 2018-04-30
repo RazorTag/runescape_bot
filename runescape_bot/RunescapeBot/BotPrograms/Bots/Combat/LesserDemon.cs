@@ -53,14 +53,16 @@ namespace RunescapeBot.BotPrograms
             GetReferenceColors();
             PickUpStackables = pickUpStackables;
             PickUpAlchables = pickUpAlchables;
-            MinDemonSize = ArtifactSize(0.000944);
+            MinDemonSize = ArtifactArea(0.000944);
             LastDemonTime = DateTime.Now;
-            RuneMinSize = ArtifactSize(0.0000694);
-            MithrilMinSize = ArtifactSize(0.0000992);
+            RuneMinSize = ArtifactArea(0.0000694);
+            MithrilMinSize = ArtifactArea(0.0000992);
         }
 
         protected override bool Run()
         {
+            #region debugging
+
             //ReadWindow();
             //ColorRange empty = RGBHSBRanges.ChaosRuneOrange();
             //bool[,] mask = ColorFilter(empty);
@@ -112,6 +114,8 @@ namespace RunescapeBot.BotPrograms
             //CheckDrops();
 
             //Inventory.Telegrab(Center.X, Center.Y);
+
+            #endregion
 
             return true;
         }

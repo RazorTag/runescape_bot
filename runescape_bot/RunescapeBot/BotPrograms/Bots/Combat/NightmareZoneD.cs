@@ -17,7 +17,6 @@ namespace RunescapeBot.BotPrograms
         RGBHSBRange OverloadTimer = RGBHSBRangeFactory.OverloadTimer();
         RGBHSBRange AbsorptionInventory = RGBHSBRangeFactory.Absorption();
         RGBHSBRange HitpointsRed = RGBHSBRangeFactory.HitpointsRed();
-        RGBHSBRange HitpointsGreen = RGBHSBRangeFactory.HitpointsGreen();
         RGBHSBRange PotionTimerBackground = RGBHSBRangeFactory.PotionTimerBackground();
 
         protected Point rockCake;   //location of the rock cake in the inventory

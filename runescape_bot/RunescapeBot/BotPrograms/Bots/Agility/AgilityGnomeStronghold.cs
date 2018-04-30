@@ -22,13 +22,13 @@ namespace RunescapeBot.BotPrograms
         private RGBHSBRange DrainPipe;
         private RGBHSBRange Black;
 
-        private int MinLogSize { get { return ArtifactSize(0.00049); } }
-        private int MinCargoNetSize { get { return ArtifactSize(0.0002); } }
-        private int MinTreeBranchSize { get { return ArtifactSize(0.00113); } }
-        private int MinTreeTrunkSize { get { return ArtifactSize(0.000189); } }
-        private int MaxTreeTrunkSize { get { return ArtifactSize(0.000378); } }
-        private int MinTightropeSize { get { return ArtifactSize(0.000189); } }
-        private int MinDrainPipeSize { get { return ArtifactSize(0.000566); } }
+        private int MinLogSize { get { return ArtifactArea(0.00049); } }
+        private int MinCargoNetSize { get { return ArtifactArea(0.0002); } }
+        private int MinTreeBranchSize { get { return ArtifactArea(0.00113); } }
+        private int MinTreeTrunkSize { get { return ArtifactArea(0.000189); } }
+        private int MaxTreeTrunkSize { get { return ArtifactArea(0.000378); } }
+        private int MinTightropeSize { get { return ArtifactArea(0.000189); } }
+        private int MinDrainPipeSize { get { return ArtifactArea(0.000566); } }
 
 
         public AgilityGnomeStronghold(RunParams startParams) : base(startParams)

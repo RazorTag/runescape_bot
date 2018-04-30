@@ -163,7 +163,7 @@ namespace RunescapeBot.BotPrograms
             bankPopup.WithdrawOne(7, 0);
             SafeWaitPlus(500, 200);
             bankPopup.WithdrawAll(6, 0);
-            bankPopup.CloseBank();
+            bankPopup.Close();
         }
     }
 }

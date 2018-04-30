@@ -54,7 +54,7 @@ namespace RunescapeBot.BotPrograms
             }
             bankPopup.DepositInventory();
             bankPopup.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, 14);
-            bankPopup.CloseBank();
+            bankPopup.Close();
 
             return true;
         }

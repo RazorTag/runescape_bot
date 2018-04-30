@@ -20,6 +20,11 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected bool[,] EmptySlots;
 
+        /// <summary>
+        /// Inventory slots to be dropped when more space is needed. Readonly.
+        /// </summary>
+        public bool[,] GetEmptySlots { get { return EmptySlots; } }
+
 
         public Inventory(Process rsClient, Keyboard keyboard)
         {
@@ -83,7 +88,7 @@ namespace RunescapeBot.BotPrograms
             int x = screenSize.Value.X - offsetRight;
             int y = screenSize.Value.Y - offsetBottom;
             Mouse.LeftClick(x, y, RSClient, 10);
-            BotProgram.SafeWaitPlus(TAB_SWITCH_WAIT, 0.1 * TAB_SWITCH_WAIT);
+            BotProgram.SafeWait(TAB_SWITCH_WAIT);
             SelectedTab = tab;
             return true;
         }
@@ -633,16 +638,16 @@ namespace RunescapeBot.BotPrograms
         /// <param name="location">location to teleport to</param>
         /// <param name="wait">whether to wait for expected teleport duration</param>
         /// <returns>False if the player doesn't have the runes to teleport</returns>
-        public bool StandardTeleport(StandardTeleports location, bool wait)
+        public bool StandardTeleport(StandardTeleports location, bool wait = true, bool safeTab = false)
         {
             Point spellbookSlot = TeleportToSpellBookSlot(location);
-            if (!TeleportHasRunes(location))
+            if (TeleportHasRunes(location))
             {
-                return false;
+                ClickSpellbookStandard(spellbookSlot.X, spellbookSlot.Y, safeTab);
+                if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
+                return true;
             }
-            ClickSpellbookStandard(spellbookSlot.X, spellbookSlot.Y, false);
-            if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -726,7 +731,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Milliseconds to wait after switching tabs
         /// </summary>
-        private const int TAB_SWITCH_WAIT = 200;
+        private const int TAB_SWITCH_WAIT = BotRegistry.GAME_TICK;
 
         public const int INVENTORY_TAB_OFFSET_RIGHT = 118;
         public const int INVENTORY_TAB_OFFSET_BOTTOM = 320;
@@ -760,7 +765,7 @@ namespace RunescapeBot.BotPrograms
         public const int LOGOUT_TAB_OFFSET_RIGHT = 120;
         public const int LOGOUT_TAB_OFFSET_BOTTOM = 18;
 
-        public const int TELEPORT_DURATION = 4 * BotRegistry.GAME_TICK;
+        public const int TELEPORT_DURATION = 5 * BotRegistry.GAME_TICK;
 
         public TabSelect SelectedTab { get; set; }
         public enum TabSelect : int

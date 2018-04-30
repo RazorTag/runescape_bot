@@ -15,10 +15,8 @@ namespace RunescapeBot.BotPrograms
     {
         protected RGBHSBRange KnightPurple = RGBHSBRangeFactory.KnightPurple();
         protected RGBHSBRange NPCMouseover = RGBHSBRangeFactory.MouseoverTextNPC();
-        protected const int EAT_TIME = 3 * BotRegistry.GAME_TICK;
         protected const int PICKPOCKET_TIME = 2 * BotRegistry.GAME_TICK;
         protected const int NPCClickRandomization = 5;
-        protected Queue<int> FoodSlots;
         protected int FailedCloakSearches;
         protected int MinPurpleCloakSize;
         protected int KnightSearchRadius;
@@ -27,9 +25,11 @@ namespace RunescapeBot.BotPrograms
 
         public KnightOfArdougne(RunParams startParams) : base(startParams)
         {
+            RunParams.AutoEat = true;
+            RunParams.RunLoggedIn = true;
             FailedCloakSearches = 0;
-            MinPurpleCloakSize = ArtifactSize(0.00002);
-            KnightSearchRadius = ArtifactSize(0.0003);
+            MinPurpleCloakSize = ArtifactArea(0.00002);
+            KnightSearchRadius = ArtifactArea(0.0003);
             GridSquareHeight = ArtifactLength(0.055);
             BlindSpot = new Point(0, 0);
         }
@@ -53,7 +53,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            if (!ManageHitpoints())
+            if (!ManageHitpoints(true, 0.5, 0.8))
             {
                 Logout();
                 return false;
@@ -176,7 +176,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Makes a stack of inventory slots with food in them
         /// </summary>
-        protected void SetFoodSlots()
+        protected override void SetFoodSlots()
         {
             FoodSlots = new Queue<int>();
             for (int i = 0; i < Inventory.INVENTORY_CAPACITY - 1; i++)    //leave the last inventory spot for stolen coins
@@ -186,43 +186,6 @@ namespace RunescapeBot.BotPrograms
                     FoodSlots.Enqueue(i);
                 }
             }
-        }
-
-        /// <summary>
-        /// Consumes food if hitpoints are not high
-        /// </summary>
-        /// <returns>true if hitpoints are succesfully restored, false if hitpoints cannot be restored and bot should stop</returns>
-        protected bool ManageHitpoints()
-        {
-            ReadWindow();
-            while (Minimap.Hitpoints() < 0.75)
-            {
-                if (!EatNextFood())
-                {
-                    return false;
-                }
-                if (SafeWait(EAT_TIME)) { return false; }
-                ReadWindow();
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Eats the next food in the inventory
-        /// </summary>
-        /// <returns>true if successful, false if no more food exists</returns>
-        protected bool EatNextFood()
-        {
-            if (FoodSlots.Count == 0)
-            {
-                return false;
-            }
-
-            int nextFood = FoodSlots.Dequeue();
-            Inventory.ClickInventory(nextFood);
-
-            return true;
         }
     }
 }

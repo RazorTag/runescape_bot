@@ -21,7 +21,7 @@ namespace RunescapeBot.BotPrograms
 
         RGBHSBRange YellowMouseOverText;
 
-        int DemonHeadSize { get { return ArtifactSize(0.0001); } }
+        int DemonHeadSize { get { return ArtifactArea(0.0001); } }
 
         public ButlerSawmill(RunParams startParams) : base(startParams)
         {
@@ -183,7 +183,7 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag && !WaitFor(AnyDialog, 1500))
             {
                 Blob demon;
-                if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000, ArtifactSize(0.00005), ArtifactSize(0.0005)))
+                if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000, ArtifactArea(0.00005), ArtifactArea(0.0005)))
                 {
                     Mouse.MoveMouse(demon.Center.X, demon.Center.Y, RSClient);
                     if (WaitForMouseOverText(YellowMouseOverText))
@@ -314,7 +314,7 @@ namespace RunescapeBot.BotPrograms
             bankPopup.WithdrawAll(BankLawRuneSlot.X, BankLawRuneSlot.Y);
             if (SafeWaitPlus(500, 200)) { return false; }
             bankPopup.WithdrawAll(BankCashSlot.X, BankCashSlot.Y);
-            bankPopup.CloseBank();
+            bankPopup.Close();
 
             return ItemsAreReady();
         }

@@ -16,18 +16,12 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class BankStand : BotProgram
     {
-        protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
-        protected const int WAIT_FOR_BANK_LOCATION = 8000;
-        protected List<BankLocator> PossibleBankTypes;
-        protected BankLocator BankBoothLocator;
         protected int FailedRuns;
 
 
         public BankStand(RunParams startParams) : base(startParams)
         {
-            PossibleBankTypes = new List<BankLocator>();
-            PossibleBankTypes.Add(LocateBankBoothVarrock);
-            PossibleBankTypes.Add(LocateBankBoothPhasmatys);
+
         }
 
         /// <summary>
@@ -38,7 +32,7 @@ namespace RunescapeBot.BotPrograms
         {
             Bank bank;
             if (!OpenBank(out bank) || !WithdrawItems(bank)) { return false; }
-            bank.CloseBank();
+            bank.Close();
             if (StopFlag || !ProcessInventory()) { return false; }
             return true;
         }
@@ -71,65 +65,6 @@ namespace RunescapeBot.BotPrograms
         protected virtual bool ProcessInventory()
         {
             return true;
-        }
-
-        /// <summary>
-        /// Locates and opens an unknown bank type
-        /// Refer to member PossibleBankBooths for a list of possible bank types
-        /// </summary>
-        /// <returns>true if the bank is opened</returns>
-        protected bool OpenBank(out Bank bankPopup)
-        {
-            bankPopup = null;
-
-            if (OpenKnownBank(out bankPopup))
-            {
-                return true;
-            }
-            else
-            {
-                return IdentifyBank() && OpenKnownBank(out bankPopup);
-            }
-        }
-
-        /// <summary>
-        /// Locates and opens a nown bank type
-        /// </summary>
-        /// <param name="bankPopup"></param>
-        /// <returns></returns>
-        protected bool OpenKnownBank(out Bank bankPopup)
-        {
-            bankPopup = null;
-            if (BankBoothLocator == null) { return false; }
-
-            Blob bankBooth;
-            if (BankBoothLocator(out bankBooth))
-            {
-                LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
-                bankPopup = new Bank(RSClient, Inventory);
-                return bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if any of the possible bank types appear on screen.
-        /// Sets BankBoothCounter to the first match found.
-        /// </summary>
-        /// <returns>true if any of them do</returns>
-        protected bool IdentifyBank()
-        {
-            Blob booth;
-            ReadWindow();
-            foreach (BankLocator bankLocator in PossibleBankTypes)
-            {
-                if (bankLocator(out booth))
-                {
-                    BankBoothLocator = bankLocator;
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.Run = true;
             RunParams.FrameTime = 5000;
+            RunParams.RunLoggedIn = true;
             maxFishingPoleDistance = ArtifactLength(0.0597);
             emptySlotsSet = false;
         }

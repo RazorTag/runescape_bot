@@ -8,11 +8,12 @@ namespace RunescapeBot.BotPrograms
 {
     public class Agility : BotProgram
     {
-        private const int MAX_PASS_OBSTACLE_TRIES = 3;
+        protected int MaxPassObstacleTries;
 
         public Agility(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
+            MaxPassObstacleTries = 3;
         }
 
         protected delegate bool BasicAction();
@@ -26,7 +27,7 @@ namespace RunescapeBot.BotPrograms
         protected bool TryPassObstacle(BasicAction passObstacle, BasicAction verifyPassedObstacle)
         {
             verifyPassedObstacle = verifyPassedObstacle ?? HasPassedObstacle;
-            int remainingTries = MAX_PASS_OBSTACLE_TRIES;
+            int remainingTries = MaxPassObstacleTries;
 
             while (remainingTries-- > 0)
             {
@@ -34,8 +35,31 @@ namespace RunescapeBot.BotPrograms
                 {
                     return true;
                 }
+                if (StopFlag) { return false; }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Attempts to clear each of a list of obstacles.
+        /// Stops trying after an obstacle is failed.
+        /// </summary>
+        /// <param name="obstacles">list of pass and verify methods for a series of obstacles</param>
+        /// <returns>True if successful for all obstacles. False if we fail on any obstacle.</returns>
+        protected bool TryPassObstacles(List<Tuple<BasicAction, BasicAction>> obstacles)
+        {
+            foreach(Tuple<BasicAction, BasicAction> obstacle in obstacles)
+            {
+                if (StopFlag) { return false; }
+
+                BasicAction tryPass = obstacle.Item1;
+                BasicAction verifyPassed = obstacle.Item2;
+                if (!TryPassObstacle(tryPass, verifyPassed))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

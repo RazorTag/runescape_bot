@@ -36,7 +36,7 @@ namespace RunescapeBot.BotPrograms
             //DebugUtilities.TestMask(Bitmap, ColorArray, MouseOverText, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "mouseoverText");
 
 
-            minTeaStallSize = ArtifactSize(0.00283);
+            minTeaStallSize = ArtifactArea(0.00283);
             Point? teaSlot = Inventory.FirstEmptySlot();
             if (teaSlot == null)
             {

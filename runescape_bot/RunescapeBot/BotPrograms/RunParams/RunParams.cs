@@ -46,6 +46,9 @@ namespace RunescapeBot.BotPrograms
             BotWorldCheckEnabled = true;
             BotWorldCheckInterval = UnitConversions.MinutesToMilliseconds(5);
             TaskComplete = new BotResponse(DoNothing);
+            StartEatingBelow = 0.5;
+            StopEatingAbove = 0.8;
+            ClosedChatBox = false;
         }
 
         /// <summary>
@@ -273,6 +276,36 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         [XmlIgnore]
         public int LoginWorld { get; set; }
+
+        /// <summary>
+        /// Makes sure to log into the game before calling the Run method
+        /// </summary>
+        [XmlIgnore]
+        public bool RunLoggedIn { get; set; }
+
+        /// <summary>
+        /// Set to true to automatically 
+        /// </summary>
+        [XmlIgnore]
+        public bool AutoEat { get; set; }
+
+        /// <summary>
+        /// Fraction of total hitpoints below which the bot will automaticall eat the next food if AutoEat is set to true
+        /// </summary>
+        [XmlIgnore]
+        public double StartEatingBelow { get; set; }
+
+        /// <summary>
+        /// Fraction of total hitpoints above which the bot will stop automatically eating
+        /// </summary>
+        [XmlIgnore]
+        public double StopEatingAbove { get; set; }
+
+        /// <summary>
+        /// Run the bot with the chat box closed so that the bot can see that area of the screen
+        /// </summary>
+        [XmlIgnore]
+        public bool ClosedChatBox { get; set; }
 
         /// <summary>
         /// How to set the camera after logging in

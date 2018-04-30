@@ -109,6 +109,18 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// The teller side counter of a Port Phasmatys bank booth
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange BankBoothSeersVillage()
+        {
+            Color dark = Color.FromArgb(95, 80, 52);
+            Color light = Color.FromArgb(105, 90, 62);
+            HSBRange hsbRange = new HSBRange(37, 41, 0.244f, 0.304f, 0.278f, 0.338f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// Neutral purple from a house portal.
         /// Does not cover all of the purple shades seen in the portal
         /// </summary>
@@ -209,6 +221,54 @@ namespace RunescapeBot.ImageTools
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// The gray window sill on the Seers' bank wall that starts the agility course
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange SeersBankWindowSill()
+        {
+            Color dark = Color.FromArgb(158, 160, 146);
+            Color light = Color.FromArgb(168, 170, 156);
+            HSBRange hsbRange = new HSBRange(66, 72, 0.052f, 0.092f, 0.600f, 0.640f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The white flag on rooftop agility courses
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange WhiteFlag()
+        {
+            Color dark = Color.FromArgb(244, 244, 244);
+            Color light = Color.FromArgb(254, 254, 254);
+            HSBRange hsbRange = new HSBRange(-3, 3, 0.000f, 0.020f, 0.956f, 0.996f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The yellow background on a mark of grace
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange MarkOfGraceYellow()
+        {
+            Color dark = Color.FromArgb(159, 129, 0);
+            Color light = Color.FromArgb(222, 192, 67);
+            HSBRange hsbRange = new HSBRange(37, 64, 0.518f, 0.971f, 0.275f, 0.608f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The red person on a mark of grace
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange MarkOfGraceRed()
+        {
+            Color dark = Color.FromArgb(97, 4, 0);
+            Color light = Color.FromArgb(195, 78, 82);
+            HSBRange hsbRange = new HSBRange(337, 31, 0.406f, 1.000f, 0.120f, 0.494f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region items (ground)
@@ -302,18 +362,6 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// The green color of the hitpoints digits by the minimap when high on health
-        /// </summary>
-        /// <returns></returns>
-        public static RGBHSBRange HitpointsGreen()
-        {
-            Color dark = Color.FromArgb(0, 250, 0);
-            Color light = Color.FromArgb(5, 255, 5);
-            HSBRange hsbRange = new HSBRange(119, 121, 0.995f, 1.000f, 0.495f, 0.505f);
-            return new RGBHSBRange(dark, light, hsbRange);
-        }
-
-        /// <summary>
         /// The orange part of a furnace minimap icon
         /// </summary>
         /// <returns></returns>
@@ -331,9 +379,9 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static RGBHSBRange BankIconDollar()
         {
-            Color dark = Color.FromArgb(94, 80, 0);
-            Color light = Color.FromArgb(233, 231, 136);
-            HSBRange hsbRange = new HSBRange(43, 69, 0.433f, 1.000f, 0.164f, 0.709f);
+            Color dark = Color.FromArgb(227, 203, 69);
+            Color light = Color.FromArgb(237, 213, 79);
+            HSBRange hsbRange = new HSBRange(48, 54, 0.725f, 0.825f, 0.550f, 0.650f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
@@ -539,6 +587,18 @@ namespace RunescapeBot.ImageTools
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// The tan background in the chat box.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange ChatBoxBackground()
+        {
+            Color dark = Color.FromArgb(139, 126, 99);
+            Color light = Color.FromArgb(221, 204, 171);
+            HSBRange hsbRange = new HSBRange(34.1f, 47.4f, 0.109f, 0.425f, 0.456f, 0.779f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region OSBuddy
@@ -648,6 +708,18 @@ namespace RunescapeBot.ImageTools
             Color dark = Color.FromArgb(181, 181, 0);
             Color light = Color.FromArgb(225, 225, 16);
             HSBRange hsbRange = new HSBRange(58.0f, 62.0f, 0.970f, 1.000f, 0.336f, 0.462f); ;
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The orange-tan text in the top-left corner of the screen when mosuing over a dropped item
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange MouseoverTextDroppedItem()
+        {
+            Color dark = Color.FromArgb(194, 107, 44);
+            Color light = Color.FromArgb(255, 167, 100);
+            HSBRange hsbRange = new HSBRange(21.7f, 29.2f, 0.495f, 0.986f, 0.456f, 0.706f); ;
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
