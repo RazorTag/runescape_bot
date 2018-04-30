@@ -171,12 +171,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         private bool ClimbBank()
         {
-            int left = Center.X - ArtifactLength(0.1);
+            int left = Center.X;
             int right = ScreenWidth - 1;
             int top = 0;
             int bottom = Center.Y;
-            List<Blob> possibleBankWalls = LocateObjects(BankWall, left, right, top, bottom, ArtifactArea(0.00004), ArtifactArea(0.0004));    //ex 0.0000803, 0.0004
-            Point expectedLocation = new Point(Center.X + ArtifactLength(0.168), Center.Y - ArtifactLength(0.204));
+            List<Blob> possibleBankWalls = LocateObjects(BankWall, left, right, top, bottom, true, ArtifactArea(0.00004), ArtifactArea(0.0004));    //ex 0.0000803, 0.0004
+            Point expectedLocation = new Point(Center.X + ArtifactLength(0.15), Center.Y - ArtifactLength(0.15));
             possibleBankWalls.Sort(new BlobProximityComparer(expectedLocation));
             foreach(Blob possibleBankWall in possibleBankWalls)
             {

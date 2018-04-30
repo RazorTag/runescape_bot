@@ -295,6 +295,8 @@ namespace RunescapeBot.ImageTools
                 shiftedPixel = new Point(pixel.Value.X + rightShift, pixel.Value.Y + downShift);
                 shiftedPixels.Add(shiftedPixel, shiftedPixel);
             }
+            center = null;
+            boundsCalculated = false;
             Pixels = shiftedPixels;
         }
 

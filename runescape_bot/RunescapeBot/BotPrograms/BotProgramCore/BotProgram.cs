@@ -733,16 +733,28 @@ namespace RunescapeBot.BotPrograms
         /// Locates all of the matching objects on the game screen (minus UI) that fit within the given size constraints
         /// </summary>
         /// <param name="objectFilter">color filter for the object type to search for</param>
-        /// <param name="minSize">minimum required pixels</param>
-        /// <param name="maxSize">maximum allowed pixels</param>
+        /// <param name="left">left bound of the search area</param>
+        /// <param name="right">right bound of the search area</param>
+        /// <param name="top">top bound of the search area</param>
+        /// <param name="bottom">bottom bound of the search area</param>
+        /// <param name="shiftBlobs">when true, moves all of the found blobs to their position on the original screen rather than the sub piece being scanned</param>
+        /// <param name="minimumSize">minimum required pixels</param>
+        /// <param name="maximumSize">maximum allowed pixels</param>
         /// <returns></returns>
-        protected List<Blob> LocateObjects(RGBHSBRange objectFilter, int left, int right, int top, int bottom, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected List<Blob> LocateObjects(RGBHSBRange objectFilter, int left, int right, int top, int bottom, bool shiftBlobs = true, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilterPiece(objectFilter, left, right, top, bottom);
             EraseClientUIFromMask(ref objectPixels);
-            List<Blob> objects = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
-            return objects;
+            List<Blob> foundObjects = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
+            if (shiftBlobs)
+            {
+                foreach (Blob foundObject in foundObjects)
+                {
+                    foundObject.ShiftPixels(left, top);
+                }
+            }
+            return foundObjects;
         }
 
         /// <summary>
