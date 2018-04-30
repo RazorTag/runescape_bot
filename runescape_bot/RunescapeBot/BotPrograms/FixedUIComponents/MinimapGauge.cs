@@ -32,8 +32,23 @@ namespace RunescapeBot.BotPrograms
             }
         }
 
+        private int ScreenHeight
+        {
+            get
+            {
+                if (Screen != null)
+                {
+                    return Screen.GetLength(1);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
         /// <summary>
-        /// Determines the center of the minimap viewing area
+        /// Determines the center of the minimap viewing area in game screen coordinates
         /// </summary>
         /// <returns></returns>
         public Point Center
@@ -42,6 +57,20 @@ namespace RunescapeBot.BotPrograms
             {
                 int x = ScreenWidth - OFFSET_LEFT + (WIDTH / 2);
                 int y = OFFSET_TOP + (HEIGHT / 2);
+                return new Point(x, y);
+            }
+        }
+
+        /// <summary>
+        /// Determines the center of the minimap viewing area in minimap coordinates
+        /// </summary>
+        /// <returns></returns>
+        public Point MinimapCenter
+        {
+            get
+            {
+                int x = WIDTH / 2;
+                int y = HEIGHT / 2;
                 return new Point(x, y);
             }
         }
@@ -67,7 +96,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="angle">counterclockwise angle from the right direction in degrees</param>
         /// <param name="radius">fraction of the radius of the minimap to move</param>
         /// <returns>a point on the minimap in terms of game screen coordinates</returns>
-        public Point RadialClickLocation(double angle, double radius)
+        public Point RadialToRectangular(double angle, double radius)
         {
             angle *= ((2 * Math.PI) / 360.0);    //convert to radians
             radius *= CLICK_RADIUS;
@@ -104,8 +133,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="stationaryObject"></param>
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
+        /// <param name="shiftObject">set to true to shift the position of the object from minimap coordinates to game screen coordinates</param>
         /// <returns>the biggest object on the minimap that matches the search criteria</returns>
-        public Blob LocateObject(RGBHSBRange stationaryObject, int minimumSize = 1, int maximumSize = int.MaxValue)
+        public Blob LocateObject(RGBHSBRange stationaryObject, int minimumSize = 1, int maximumSize = int.MaxValue, bool shiftObject = false)
         {
             bool[,] objectPixels = MinimapFilter(stationaryObject);
             List<Blob> objectBlobs = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
@@ -120,6 +150,7 @@ namespace RunescapeBot.BotPrograms
                     }
                     if (blob.Size <= maximumSize)
                     {
+                        if (shiftObject) { MinimapToScreenBlob(blob); }
                         return blob;
                     }
                 }
@@ -349,7 +380,22 @@ namespace RunescapeBot.BotPrograms
         #endregion
 
         /// <summary>
-        /// Converts coordinates with a screenshot of the minimap to coordinates for the entire game screen
+        /// Converts coordinates of a point on the minimap to the corresponding position in game.
+        /// This should be treated as a rough estimate, not a precise conversion.
+        /// </summary>
+        /// <param name="minimapCoordinates">a point withing the minimap</param>
+        /// <returns>a point on the game screen within the minimap</returns>
+        public Point ExtrapolateMinimapToGame(Point minimapCoordinates)
+        {
+            int minimapX = minimapCoordinates.X - MinimapCenter.X;
+            int minimapY = minimapCoordinates.Y - MinimapCenter.Y;
+            int gameX = (int) (minimapX * ARTIFACT_LENGTH_TO_MINIMAP_RATIO * ScreenHeight);
+            int gameY = (int) (minimapY * ARTIFACT_LENGTH_TO_MINIMAP_RATIO * ScreenHeight);
+            return new Point((ScreenWidth / 2) + gameX, (ScreenHeight / 2) + gameY);
+        }
+
+        /// <summary>
+        /// Converts coordinates with a screenshot of the minimap to coordinates for the game screen
         /// </summary>
         /// <param name="minimapCoordinates">a point withing the minimap</param>
         /// <returns>a point on the game screen within the minimap</returns>
@@ -358,6 +404,15 @@ namespace RunescapeBot.BotPrograms
             int x = minimapCoordinates.X + ScreenWidth - OFFSET_LEFT;
             int y = minimapCoordinates.Y + OFFSET_TOP;
             return new Point(x, y);
+        }
+
+        /// <summary>
+        /// Converts the position of a blob in the minimap to its position on the game screen
+        /// </summary>
+        /// <param name="minimapBlob">a blob within the minimap</param>
+        public void MinimapToScreenBlob(Blob minimapBlob)
+        {
+            minimapBlob.ShiftPixels(ScreenWidth - OFFSET_LEFT, OFFSET_TOP);
         }
 
         #region constants
@@ -374,6 +429,7 @@ namespace RunescapeBot.BotPrograms
         public const int OFFSET_TOP = 8;    //pixels from the top of the game screen to the top of the minimap
 
         public const int GRID_SQUARE_SIZE = 4;  //width and height of a grid square in pixels on the minimap
+        public const double ARTIFACT_LENGTH_TO_MINIMAP_RATIO = 0.015;   //ratio of the percentage of game screen height to pixels on the minimap
 
         #endregion
     }

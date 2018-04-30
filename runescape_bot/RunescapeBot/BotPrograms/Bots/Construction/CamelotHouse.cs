@@ -278,7 +278,7 @@ namespace RunescapeBot.BotPrograms
             Point bankChestClick;
             if (BankChestClickLocation(out bankChestClick))
             {
-                Mouse.MoveMouse(bankChestClick.X, bankChestClick.Y, RSClient);
+                Mouse.Move(bankChestClick.X, bankChestClick.Y, RSClient);
                 if (WaitForMouseOverText(BlueMouseOverText))
                 {
                     Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient);

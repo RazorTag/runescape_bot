@@ -60,7 +60,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (StopFlag) { return false; }
 
-                Point moveTowardBank = Minimap.RadialClickLocation(350, 1);
+                Point moveTowardBank = Minimap.RadialToRectangular(350, 1);
                 LeftClick(moveTowardBank.X, moveTowardBank.Y);
                 if (SafeWait(6000))
                 {

@@ -129,7 +129,7 @@ namespace RunescapeBot.Common
         public static Point GaussianCircle(Point center, double stdDev, double arcStart = 0, double arcEnd = 360, double maxRadius = double.MaxValue)
         {
             double radius = HalfGaussian(0, stdDev, true);
-            radius %= maxRadius;
+            radius = (maxRadius == 0) ? 0 : (radius % maxRadius);
 
             double angle = RandomAngle(arcStart, arcEnd);
             angle = angle * ((2 * Math.PI) / 360.0);    //convert to radians

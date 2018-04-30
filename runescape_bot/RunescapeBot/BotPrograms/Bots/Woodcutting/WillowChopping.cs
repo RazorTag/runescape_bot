@@ -97,7 +97,7 @@ namespace RunescapeBot.BotPrograms
 
                 click = tree.Center;
                 click = Probability.GaussianCircle(click, 3);
-                Mouse.MoveMouse(click.X, click.Y, RSClient);
+                Mouse.Move(click.X, click.Y, RSClient);
 
                 if (WaitForMouseOverText(RGBHSBRangeFactory.MouseoverTextStationaryObject(), 1000))
                 {

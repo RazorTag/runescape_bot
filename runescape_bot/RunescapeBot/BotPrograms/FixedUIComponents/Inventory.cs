@@ -274,6 +274,19 @@ namespace RunescapeBot.BotPrograms
             SpellbookStandardToScreen(ref x, ref y);
             Mouse.LeftClick(x, y, RSClient, 5);
         }
+        /// <summary>
+        /// Clicks a slot in the standard spellbook.
+        /// Does not handle waiting after casting a spell.
+        /// </summary>
+        /// <param name="screen"></param>
+        /// <param name="x">slots away from the leftmost column (0-3)</param>
+        /// <param name="y">slots away from the topmost column (0-6)</param>
+        public void HoverSpellbookStandard(int x, int y, bool safeTab = false)
+        {
+            OpenSpellbook(safeTab);
+            SpellbookStandardToScreen(ref x, ref y);
+            Mouse.Move(x, y, RSClient);
+        }
 
         /// <summary>
         /// Clicks a slot in the lunar spellbook.
@@ -641,13 +654,23 @@ namespace RunescapeBot.BotPrograms
         public bool StandardTeleport(StandardTeleports location, bool wait = true, bool safeTab = false)
         {
             Point spellbookSlot = TeleportToSpellBookSlot(location);
-            if (TeleportHasRunes(location))
-            {
-                ClickSpellbookStandard(spellbookSlot.X, spellbookSlot.Y, safeTab);
-                if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
-                return true;
-            }
-            return false;
+            ClickSpellbookStandard(spellbookSlot.X, spellbookSlot.Y, safeTab);
+            if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to teleport to the specified location
+        /// </summary>
+        /// <param name="location">location to teleport to</param>
+        /// <param name="wait">whether to wait for expected teleport duration</param>
+        /// <returns>False if the player doesn't have the runes to teleport</returns>
+        public bool HoverStandardTeleport(StandardTeleports location, bool wait = true, bool safeTab = false)
+        {
+            Point spellbookSlot = TeleportToSpellBookSlot(location);
+            HoverSpellbookStandard(spellbookSlot.X, spellbookSlot.Y, safeTab);
+            if (wait) { BotProgram.SafeWait(TELEPORT_DURATION); }
+            return true;
         }
 
         /// <summary>

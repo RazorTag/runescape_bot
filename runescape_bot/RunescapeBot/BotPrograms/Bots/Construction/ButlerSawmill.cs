@@ -58,7 +58,7 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.OpenOptions(false);
             Point houseOptions = Probability.GaussianCircle(HouseOptionsLocation(), 5, 0, 360, 12);
-            Mouse.MoveMouse(houseOptions.X, houseOptions.Y, RSClient);
+            Mouse.Move(houseOptions.X, houseOptions.Y, RSClient);
             if (WaitForTeleport()) { return false; }
             if (!WaitFor(IsAtHouse) || !CallServant() || !InitiateDemonDialog())
             {
@@ -185,7 +185,7 @@ namespace RunescapeBot.BotPrograms
                 Blob demon;
                 if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000, ArtifactArea(0.00005), ArtifactArea(0.0005)))
                 {
-                    Mouse.MoveMouse(demon.Center.X, demon.Center.Y, RSClient);
+                    Mouse.Move(demon.Center.X, demon.Center.Y, RSClient);
                     if (WaitForMouseOverText(YellowMouseOverText))
                     {
                         LeftClick(demon.Center.X, demon.Center.Y);
@@ -235,7 +235,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             Inventory.ClickInventory(InventoryLogSlot, true);
-            Mouse.MoveMouse(Center.X, Center.Y, RSClient);
+            Mouse.Move(Center.X, Center.Y, RSClient);
             if (WaitForTeleport())
             {
                 return false;

@@ -59,7 +59,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             Point click = (Point) teaStall.RandomBlobPixel();
-            Mouse.MoveMouse(click.X, click.Y, RSClient);
+            Mouse.Move(click.X, click.Y, RSClient);
             SafeWait(2000);
             if (!WaitForMouseOverText(MouseOverText))
             {

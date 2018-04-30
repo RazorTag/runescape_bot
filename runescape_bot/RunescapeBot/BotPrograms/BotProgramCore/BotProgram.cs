@@ -599,7 +599,7 @@ namespace RunescapeBot.BotPrograms
             {
                 randomize = (int)((ScreenHeight / 1000.0) * randomize);
                 Point moveLocation = Probability.GaussianCircle(new Point(x, y), stdRatio * randomize, 0, 360, randomize);
-                Mouse.MoveMouse(moveLocation.X, moveLocation.Y, RSClient);
+                Mouse.Move(moveLocation.X, moveLocation.Y, RSClient);
             }
         }
 
@@ -942,7 +942,7 @@ namespace RunescapeBot.BotPrograms
 
                 clickLocation = objectCheck.Center;
                 clickLocation = Probability.GaussianCircle(clickLocation, randomization);
-                Mouse.MoveMouse(clickLocation.X, clickLocation.Y, RSClient);
+                Mouse.Move(clickLocation.X, clickLocation.Y, RSClient);
 
                 if (WaitForMouseOverText(textColor, maxWait))
                 {
@@ -963,7 +963,7 @@ namespace RunescapeBot.BotPrograms
         protected bool MouseOver(Point mouseover, RGBHSBRange textColor, bool click = true, int randomization = 5)
         {
             mouseover = Probability.GaussianCircle(mouseover, randomization);
-            Mouse.MoveMouse(mouseover.X, mouseover.Y, RSClient);
+            Mouse.Move(mouseover.X, mouseover.Y, RSClient);
 
             if (WaitForMouseOverText(textColor, 1000))
             {
@@ -2007,32 +2007,14 @@ namespace RunescapeBot.BotPrograms
         /// Consumes food if hitpoints are not high
         /// </summary>
         /// <returns>true if hitpoints are succesfully restored, false if hitpoints cannot be restored and bot should stop</returns>
-        protected virtual bool ManageHitpoints(bool readWindow = false, double startEatingBelow = -1, double stopEatingAbove = -1)
+        protected virtual bool ManageHitpoints(bool readWindow = false)
         {
             if (readWindow) { ReadWindow(); }
 
-            //Use the RunParams settings when the caller does not specify meaningful values
-            if (startEatingBelow > stopEatingAbove)
-            {
-                startEatingBelow = RunParams.StartEatingBelow;
-                stopEatingAbove = RunParams.StopEatingAbove;
-            }
-            else
-            {
-                if (startEatingBelow <= 0 || startEatingBelow >= 1)
-                {
-                    startEatingBelow = RunParams.StartEatingBelow;
-                }
-                if (stopEatingAbove <= 0 || stopEatingAbove >= 1)
-                {
-                    stopEatingAbove = RunParams.StopEatingAbove;
-                }
-            }
-
             double hitpoints = Minimap.Hitpoints();
-            if (hitpoints < startEatingBelow)
+            if (hitpoints < RunParams.StartEatingBelow)
             {
-                while (hitpoints <= stopEatingAbove)
+                while (hitpoints <= RunParams.StopEatingAbove)
                 {
                     if (!EatNextFood())
                     {

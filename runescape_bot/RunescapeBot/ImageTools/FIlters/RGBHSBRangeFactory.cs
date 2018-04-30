@@ -325,6 +325,18 @@ namespace RunescapeBot.ImageTools
         #region minimap
 
         /// <summary>
+        /// The black person of an agility course icon
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange AgilityIconBlack()
+        {
+            Color dark = Color.FromArgb(0, 0, 0);
+            Color light = Color.FromArgb(5, 5, 6);
+            HSBRange hsbRange = new HSBRange(0, 360, 0.000f, 1.000f, 0.000f, 0.102f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// The yellow version of the run energy foot icon
         /// </summary>
         /// <returns></returns>

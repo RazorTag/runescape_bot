@@ -134,7 +134,7 @@ namespace RunescapeBot.BotPrograms
                 int maxOffset = (int)(0.05 * cloveRange);
                 if (!InCombat() || !HitpointsHaveDecreased())    //engage the demon
                 {
-                    Mouse.MoveMouse(demon.Center.X, demon.Center.Y, RSClient);
+                    Mouse.Move(demon.Center.X, demon.Center.Y, RSClient);
                     if (WaitForMouseOverText(MouseoverTextNPC, 3000))
                     {
                         LeftClick(demon.Center.X, demon.Center.Y, 0, 0);

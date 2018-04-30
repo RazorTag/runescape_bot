@@ -16,6 +16,7 @@ namespace RunescapeBot.BotPrograms
         RGBHSBRange Tightrope = RGBHSBRangeFactory.Tightrope();
         RGBHSBRange MarkOfGraceBackground = RGBHSBRangeFactory.MarkOfGraceYellow();
         RGBHSBRange MarkOfGraceFigure = RGBHSBRangeFactory.MarkOfGraceRed();
+        RGBHSBRange AgilityIcon = RGBHSBRangeFactory.AgilityIconBlack();
 
         protected int FailureLimit;
         protected bool[,] EmptySlots;
@@ -39,7 +40,7 @@ namespace RunescapeBot.BotPrograms
             Obstacles.Add(new Tuple<BasicAction, BasicAction>(JumpToTightrope, null));
             Obstacles.Add(new Tuple<BasicAction, BasicAction>(CrossTightrope, null));
             Obstacles.Add(new Tuple<BasicAction, BasicAction>(JumpToLadderRoof, null));
-            Obstacles.Add(new Tuple<BasicAction, BasicAction>(JumpToTreeRoof, null));
+            Obstacles.Add(new Tuple<BasicAction, BasicAction>(JumpToChurchRoof, null));
             Obstacles.Add(new Tuple<BasicAction, BasicAction>(JumpOffTreeRoof, null));
 
             FailureLimit = 12;
@@ -95,7 +96,14 @@ namespace RunescapeBot.BotPrograms
             {
                 FailedCircuits++;
             }
-            Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot, true);
+            if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot))
+            {
+                SafeWait(3000);
+                if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot, true, true))
+                {
+                    return false;
+                }
+            }
 
             return FailedCircuits < FailureLimit;
         }
@@ -176,17 +184,41 @@ namespace RunescapeBot.BotPrograms
             int top = 0;
             int bottom = Center.Y;
             List<Blob> possibleBankWalls = LocateObjects(BankWall, left, right, top, bottom, true, ArtifactArea(0.00004), ArtifactArea(0.0004));    //ex 0.0000803, 0.0004
-            Point expectedLocation = new Point(Center.X + ArtifactLength(0.15), Center.Y - ArtifactLength(0.15));
-            possibleBankWalls.Sort(new BlobProximityComparer(expectedLocation));
+            Point? expectedWallLocation = ExpectedBankWallLocation();
+            if (expectedWallLocation == null)
+            {
+                return false;
+            }
+
+            possibleBankWalls.Sort(new BlobProximityComparer((Point)expectedWallLocation));
             foreach(Blob possibleBankWall in possibleBankWalls)
             {
-                if (MouseOverStationaryObject(possibleBankWall, true, 8, 3000))
+                if (MouseOverStationaryObject(possibleBankWall, true, 6, 3000))
                 {
-                    SafeWait(6000);
+                    SafeWait(4500);
+                    MoveMouse(Center.X - ArtifactLength(0.511), Center.Y - ArtifactLength(0.065));
                     return true;
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Determines approximately where the bank wall should be based on the location of the agility course icon on the minimap
+        /// </summary>
+        /// <returns></returns>
+        private Point? ExpectedBankWallLocation()
+        {
+            Blob agilityIcon = Minimap.LocateObject(AgilityIcon, ArtifactArea(0.00002), ArtifactArea(0.00008), false);   //ex 0.00004
+            if (agilityIcon == null || agilityIcon.Size == 0)
+            {
+                return null;
+            }
+            Point agilityIconLocation = agilityIcon.Center;
+            agilityIconLocation.Y -= 5;
+            Point bankWall = Minimap.ExtrapolateMinimapToGame(agilityIconLocation);
+            return bankWall;
+            
         }
 
         /// <summary>
@@ -202,8 +234,9 @@ namespace RunescapeBot.BotPrograms
                 Point expectedLocation = new Point(whiteFlag.Center.X - ArtifactLength(0.337), whiteFlag.Center.Y + ArtifactLength(0.0688));
                 if (MouseOverStationaryObject(new Blob(expectedLocation), true, 25, 3000))
                 {
-                    SafeWait(6000);
-                    WaitDuringPlayerAnimation(5000);
+                    SafeWait(5500);
+                    MoveMouse(Center.X - ArtifactLength(0.207), Center.Y + ArtifactLength(0.34));
+                    WaitDuringPlayerAnimation(4000);
                     return true;
                 }
             }
@@ -263,7 +296,7 @@ namespace RunescapeBot.BotPrograms
         /// Jumps from the ladder roof to the church roof
         /// </summary>
         /// <returns>true if successful</returns>
-        private bool JumpToTreeRoof()
+        private bool JumpToChurchRoof()
         {
             Point hitboxCenter = new Point(Center.X - ArtifactLength(0.498), Center.Y + ArtifactLength(0.200));
             Blob hitboxBlob = new Blob(hitboxCenter);
@@ -272,7 +305,7 @@ namespace RunescapeBot.BotPrograms
                 ScanForMarkOfGrace();
                 if (MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
                 {
-                    SafeWait(4500);
+                    SafeWait(5000);
                     return true;
                 }
             }            
@@ -293,6 +326,7 @@ namespace RunescapeBot.BotPrograms
                 if (MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
                 {
                     SafeWait(3000);
+                    Inventory.HoverStandardTeleport(Inventory.StandardTeleports.Camelot, false, false);
                     WaitDuringPlayerAnimation(3000);
                     return true;
                 }

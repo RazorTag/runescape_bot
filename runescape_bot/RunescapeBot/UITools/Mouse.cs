@@ -283,7 +283,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">x-coordinate within the game screen</param>
         /// <param name="y">y-coordinate within the game screen</param>
-        public static void MoveMouse(int x, int y, Process rsClient)
+        public static void Move(int x, int y, Process rsClient)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
@@ -301,7 +301,7 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient">RuneScape client in which to move the mouse</param>
         public static void MoveMouseAsynchronous(int x, int y, Process rsClient)
         {
-            Thread moveMouse = new Thread(unused => MoveMouse(x, y, rsClient));
+            Thread moveMouse = new Thread(unused => Move(x, y, rsClient));
             moveMouse.Start();
         }
         #endregion

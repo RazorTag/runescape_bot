@@ -27,6 +27,8 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.AutoEat = true;
             RunParams.RunLoggedIn = true;
+            RunParams.StartEatingBelow = 0.5;
+            RunParams.StopEatingAbove = 0.8;
             FailedCloakSearches = 0;
             MinPurpleCloakSize = ArtifactArea(0.00002);
             KnightSearchRadius = ArtifactArea(0.0003);
@@ -53,7 +55,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            if (!ManageHitpoints(true, 0.5, 0.8))
+            if (!ManageHitpoints(true))
             {
                 Logout();
                 return false;
