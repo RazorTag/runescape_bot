@@ -30,7 +30,6 @@ namespace RunescapeBot.BotPrograms
         {
             startParams.FrameTime = 2000;
             startParams.ClientType = ScreenScraper.Client.OSBuddy;
-            startParams.BotWorldCheckEnabled = false;
             startParams.SlaveDriver = true;
             hasOverloads = true;
             hasAbsorptions = true;
@@ -85,8 +84,7 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return false; }
                 Point inventoryCorner = new Point(ScreenWidth - Inventory.INVENTORY_OFFSET_LEFT - Inventory.INVENTORY_GAP_X, ScreenHeight - Inventory.INVENTORY_OFFSET_TOP - Inventory.INVENTORY_GAP_Y);
                 int acceptableAreaRadius = (int) Geometry.DistanceBetweenPoints(Center, inventoryCorner);
-                MoveMouse(Center.X, Center.Y, acceptableAreaRadius);
-                SafeWait(3000);
+                MouseOverNPC(new Blob(new Point(Center.X, Center.Y)), true, acceptableAreaRadius, 1000);
             }
 
             return true;

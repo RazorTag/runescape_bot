@@ -43,7 +43,7 @@ namespace RunescapeBot.BotPrograms
             RandomizeFrames = true;
             BotState = BotProgram.BotState.Running;
             RunUntil = DateTime.Now;
-            BotWorldCheckEnabled = true;
+            BotWorldCheckEnabled = false;
             BotWorldCheckInterval = UnitConversions.MinutesToMilliseconds(5);
             TaskComplete = new BotResponse(DoNothing);
             StartEatingBelow = 0.5;

@@ -37,7 +37,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Withdraw two sets of 14 items from the bank
+        /// Withdraw one item and 27 of another item
         /// </summary>
         /// <returns>true if successful</returns>
         protected override bool WithdrawItems(Bank bank)
@@ -45,8 +45,8 @@ namespace RunescapeBot.BotPrograms
             if (RunParams.Iterations < 14) { return false; }
 
             bank.DepositInventory();
-            bank.WithdrawOne(7, 0);
-            bank.WithdrawAll(6, 0);
+            bank.WithdrawOne(UseWithBankSlot.X, UseWithBankSlot.Y);
+            bank.WithdrawAll(UseOnBankSlot.X, UseOnBankSlot.Y);
             return true;
         }
 
@@ -57,21 +57,13 @@ namespace RunescapeBot.BotPrograms
         protected override bool ProcessInventory()
         {
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
-            int left = 170;
-            int right = 222;
-            int top = ScreenHeight - 110;
-            int bottom = ScreenHeight - 70;
-            Point rightClick = Probability.GaussianRectangle(left, right, top, bottom);
-            RightClick(rightClick.X, rightClick.Y);
-            MakeXSlim MakeXSlim = new MakeXSlim(rightClick.X, rightClick.Y, RSClient);
-            if (!MakeXSlim.WaitForPopup(WAIT_FOR_MAKEX_POPUP_TIMEOUT))
+            if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
             {
-                FailedRuns++;
-                return true;
+                return false;
             }
-            MakeXSlim.MakeXItems(27);
 
             //Wait for the inventory to be processed
+            WatchNetflix(0);
             CountDownItems(true);
             SafeWaitPlus(0, 300);
 

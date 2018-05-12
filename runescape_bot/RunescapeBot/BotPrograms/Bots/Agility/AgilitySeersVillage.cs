@@ -17,6 +17,7 @@ namespace RunescapeBot.BotPrograms
         RGBHSBRange MarkOfGraceBackground = RGBHSBRangeFactory.MarkOfGraceYellow();
         RGBHSBRange MarkOfGraceFigure = RGBHSBRangeFactory.MarkOfGraceRed();
         RGBHSBRange AgilityIcon = RGBHSBRangeFactory.AgilityIconBlack();
+        RGBHSBRange StationaryObjectText = RGBHSBRangeFactory.MouseoverTextStationaryObject();
 
         protected int FailureLimit;
         protected bool[,] EmptySlots;
@@ -28,7 +29,7 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.StartEatingBelow = 0.4;
             RunParams.StopEatingAbove = 0.9;
-            RunParams.RunLoggedIn = true;
+            RunParams.RunLoggedIn = true;   //Makes sure we are logged in before calling the Run method
             RunParams.ClosedChatBox = true;
 
             MaxPassObstacleTries = 1;
@@ -191,14 +192,11 @@ namespace RunescapeBot.BotPrograms
             }
 
             possibleBankWalls.Sort(new BlobProximityComparer((Point)expectedWallLocation));
-            foreach(Blob possibleBankWall in possibleBankWalls)
+            if (MouseOver(possibleBankWalls, StationaryObjectText, true, 6, 1600))
             {
-                if (MouseOverStationaryObject(possibleBankWall, true, 6, 3000))
-                {
-                    SafeWait(4500);
-                    MoveMouse(Center.X - ArtifactLength(0.511), Center.Y - ArtifactLength(0.065));
-                    return true;
-                }
+                SafeWait(4500);
+                MoveMouse(Center.X - ArtifactLength(0.511), Center.Y - ArtifactLength(0.065));
+                return true;
             }
             return false;
         }

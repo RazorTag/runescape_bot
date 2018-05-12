@@ -150,7 +150,6 @@ namespace RunescapeBot.BotPrograms
             {
                 return MissedDemon();
             }
-
             return true;
         }
 

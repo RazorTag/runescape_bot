@@ -34,6 +34,7 @@ namespace RunescapeBot.BotPrograms
         public AgilityGnomeStronghold(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
+            RunParams.ClosedChatBox = true;
         }
 
         protected override bool Run()

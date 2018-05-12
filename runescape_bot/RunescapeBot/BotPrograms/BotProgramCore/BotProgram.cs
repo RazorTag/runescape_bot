@@ -891,9 +891,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a matching stationary object is found and clicked on</returns>
         protected bool MouseOverStationaryObject(Blob stationaryObject, bool click = true, int randomization = 5, int maxWait = 1000)
         {
-            List<Blob> stationaryObjects = new List<Blob>();
-            stationaryObjects.Add(stationaryObject);
-            return MouseOver(stationaryObjects, RGBHSBRangeFactory.MouseoverTextStationaryObject(), click, randomization, maxWait);
+            return MouseOver(stationaryObject.Center, RGBHSBRangeFactory.MouseoverTextStationaryObject(), click, randomization, maxWait);
         }
 
         /// <summary>
@@ -905,9 +903,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a matching NPC is found and clicked on</returns>
         protected bool MouseOverNPC(Blob npc, bool click = true, int randomization = 5, int maxWait = 1000)
         {
-            List<Blob> npcs = new List<Blob>();
-            npcs.Add(npc);
-            return MouseOver(npcs, RGBHSBRangeFactory.MouseoverTextNPC(), click, randomization, maxWait);
+            return MouseOver(npc.Center, RGBHSBRangeFactory.MouseoverTextNPC(), click, randomization, maxWait);
         }
 
         /// <summary>
@@ -919,9 +915,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if a matching NPC is found and clicked on</returns>
         protected bool MouseOverDroppedItem(Blob item, bool click = true, int randomization = 5, int maxWait = 1000)
         {
-            List<Blob> items = new List<Blob>();
-            items.Add(item);
-            return MouseOver(items, RGBHSBRangeFactory.MouseoverTextDroppedItem(), click, randomization, maxWait);
+            return MouseOver(item.Center, RGBHSBRangeFactory.MouseoverTextDroppedItem(), click, randomization, maxWait);
         }
 
         /// <summary>
@@ -941,12 +935,9 @@ namespace RunescapeBot.BotPrograms
                 if (StopFlag) { return false; }
 
                 clickLocation = objectCheck.Center;
-                clickLocation = Probability.GaussianCircle(clickLocation, randomization);
-                Mouse.Move(clickLocation.X, clickLocation.Y, RSClient);
 
-                if (WaitForMouseOverText(textColor, maxWait))
+                if (MouseOver(clickLocation, textColor, click, randomization, maxWait))
                 {
-                    if (click) { LeftClick(clickLocation.X, clickLocation.Y, 0, 0); }
                     return true;
                 }
             }
@@ -956,18 +947,23 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Mouses over a single point and left-clicks it if it matches the specified mouseover text color.
         /// </summary>
-        /// <param name="ObjectsToCheck">list of objects to mouse over</param>
+        /// <param name="mouseover">point to mouse over</param>
         /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
+        /// <param name="click">set to false to hover and check without clicking</param>
         /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
+        /// <param name="maxWait">max time to wait before concluding that the mouse over failed</param>
+        /// <param name="lagTime">time to wait before checking and clicking after mousing over</param>
         /// <returns>true if a matching object is found and clicked on</returns>
-        protected bool MouseOver(Point mouseover, RGBHSBRange textColor, bool click = true, int randomization = 5)
+        protected bool MouseOver(Point mouseover, RGBHSBRange textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 100)
         {
+            randomization = (int)((ScreenHeight / 1000.0) * randomization);
             mouseover = Probability.GaussianCircle(mouseover, randomization);
             Mouse.Move(mouseover.X, mouseover.Y, RSClient);
+            if (SafeWait(lagTime)) { return false; }
 
-            if (WaitForMouseOverText(textColor, 1000))
+            if (WaitForMouseOverText(textColor, maxWait))
             {
-                LeftClick(mouseover.X, mouseover.Y, 0, 0);
+                if (click) { LeftClick(mouseover.X, mouseover.Y, 0, 0); }
                 return true;
             }
             return false;
