@@ -57,6 +57,8 @@ namespace RunescapeBot.BotPrograms
             TanHides,
             [Description("Mining - Iron Ore")]
             IronOre,
+            [Description("Mining - Motherlode Mine")]
+            MotherlodeMine,
             [Description("Smithing - Cannonballs (Phasmatys)")]
             Cannonballs,
             [Description("Thieving - Tea Stall")]
@@ -124,6 +126,8 @@ namespace RunescapeBot.BotPrograms
                     return new KnightOfArdougne(runParams);
                 case BotActions.TanHides:
                     return new TanHides(runParams);
+                case BotActions.MotherlodeMine:
+                    return new MotherlodeMine(runParams);
             }
             return bot;
         }

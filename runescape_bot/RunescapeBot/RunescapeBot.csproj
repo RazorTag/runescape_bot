@@ -101,6 +101,7 @@
     <Compile Include="BotPrograms\Bots\Fishing\BarbarianFishing.cs" />
     <Compile Include="BotPrograms\Bots\LogIn.cs" />
     <Compile Include="BotPrograms\Bots\Mining\IronPowerMining.cs" />
+    <Compile Include="BotPrograms\Bots\Mining\MotherlodeMine.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use1On27.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\Cannonballs.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="BotPrograms\Bots\BankStanding\MakePotionFull.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use14On14.cs" />
     <Compile Include="BotPrograms\Bots\Runecrafting\NatureRings.cs" />
+    <Compile Include="BotPrograms\Bots\Smithing\BlastFurnace.cs" />
     <Compile Include="BotPrograms\Bots\Thieving\KnightOfArdougne.cs" />
     <Compile Include="BotPrograms\Bots\Thieving\SummerGarden.cs" />
     <Compile Include="BotPrograms\Bots\Thieving\TeaStall.cs" />

@@ -33,8 +33,7 @@ namespace RunescapeBot.BotPrograms
             //DebugUtilities.TestMask(Bitmap, ColorArray, FurnaceIconOrange, furnaceIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnaceIcon");
 
             //ReadWindow();
-            //bool[,] bankIcon = ColorFilter(BankIconDollar);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, BankIconDollar, bankIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankIcon");
+            //MaskTest(BankIconDollar);
 
             //ReadWindow();
             //bool[,] furnace = ColorFilter(Furnace);

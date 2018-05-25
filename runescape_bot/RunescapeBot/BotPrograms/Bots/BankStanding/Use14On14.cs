@@ -103,6 +103,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
+            //Wait for the inventory to be processed
+            WatchNetflix(0);
             CountDownItems(finishedProduct);
             return !SafeWaitPlus(0, 300.0);
         }

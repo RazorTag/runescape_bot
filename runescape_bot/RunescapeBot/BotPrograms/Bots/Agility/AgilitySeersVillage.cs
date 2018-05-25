@@ -97,6 +97,7 @@ namespace RunescapeBot.BotPrograms
             {
                 FailedCircuits++;
             }
+
             if (!Inventory.StandardTeleport(Inventory.StandardTeleports.Camelot))
             {
                 SafeWait(3000);

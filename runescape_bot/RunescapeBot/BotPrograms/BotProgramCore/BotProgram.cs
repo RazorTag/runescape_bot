@@ -319,7 +319,7 @@ namespace RunescapeBot.BotPrograms
                 return;
             }
 
-            int awakeTime = UnitConversions.HoursToMilliseconds(11);
+            int awakeTime = UnitConversions.HoursToMilliseconds(10);
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
             sleepWatch.Start();
@@ -513,7 +513,7 @@ namespace RunescapeBot.BotPrograms
             double workType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
-            //average of 93.9 minutes
+            //average of 92.65 minutes
             if (workType < 0.25)   //25%
             {
                 mean = 45;
@@ -531,7 +531,7 @@ namespace RunescapeBot.BotPrograms
             }
             else  //5%
             {
-                mean = 215;
+                mean = 190;
                 stdDev = 56;
             }
 
@@ -549,7 +549,7 @@ namespace RunescapeBot.BotPrograms
             double breakType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
-            //average of 22.4 minutes
+            //average of 25.1 minutes
             if (breakType < 0.75)   //75%
             {
                 mean = 15;
@@ -562,7 +562,7 @@ namespace RunescapeBot.BotPrograms
             }
             else  //10%
             {
-                mean = 62;
+                mean = 89;
                 stdDev = 41;
             }
 

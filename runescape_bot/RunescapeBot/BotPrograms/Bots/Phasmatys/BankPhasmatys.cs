@@ -28,7 +28,7 @@ namespace RunescapeBot.BotPrograms
         protected BankPhasmatys(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
-            BankIconMinSize = 50;
+            BankIconMinSize = 4;   //ex. 19
         }
 
         /// <summary>
