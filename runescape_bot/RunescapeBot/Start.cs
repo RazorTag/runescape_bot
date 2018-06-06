@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.BotPrograms.Settings;
 using RunescapeBot.Common;
 using RunescapeBot.FileIO;
 using RunescapeBot.UITools;
@@ -740,6 +741,38 @@ namespace RunescapeBot
             RunningBot.Start();
             SetActiveState(startButton);
             UpdateTimer.Enabled = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowSettings_Click(object sender, EventArgs e)
+        {
+            CollectGeneralSettings();
+            CustomSettingsData settings = RunParams.CustomSettingsData;
+            Form settingsForm = GetCustomSettingsForm(settings);
+            if (settingsForm != null)
+            {
+                settingsForm.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("No custom settings options for " + BotActionSelect.Text);
+            }
+            SaveBot();
+        }
+
+        /// <summary>
+        /// Displays a form for bot actions requiring extra settings
+        /// </summary>
+        /// <returns></returns>
+        public Form GetCustomSettingsForm(CustomSettingsData settings)
+        {
+            if (RunParams.BotAction == BotRegistry.BotActions.NatureRings) { return new NatureRingsSettings(settings); }
+
+            return null;    //The selected bot action does not have custom settings associated with it.
         }
     }
 }

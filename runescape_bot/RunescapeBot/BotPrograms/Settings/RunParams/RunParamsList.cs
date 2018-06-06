@@ -24,7 +24,7 @@ namespace RunescapeBot.BotPrograms
         public RunParams[] ParamsList { get; set; }
 
         /// <summary>
-        /// Indexes RunParamslIst to ParamsList
+        /// Indexes RunParamsList to ParamsList
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>

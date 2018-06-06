@@ -124,6 +124,31 @@
     <value>281, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="ShowSettings.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        /9j/4AAQSkZJRgABAQEAYABgAAD/4QBGRXhpZgAATU0AKgAAAAgABAESAAMAAAABAAEAAFEQAAEAAAAB
+        AQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYE
+        BAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcI
+        DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAYABgD
+        ASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+        AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6
+        Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKz
+        tLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEB
+        AQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEI
+        FEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hp
+        anN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX
+        2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9Av8Agqh/wWM1z/gmV8d/Ceh3nwr/AOEq
+        8I+KvDl9fWmpJrqWdxd6lDJEvkKmx/KgiEkXmOylm+1KY1PkMsv50fDL/guF8cfhR+1bqH7Q3izwT4v1
+        D4Y/EC2i0pNElvNXh8L20O+DE2mTSo9s90FhYgon73fIoCbsjO/bgTxw3/BXz4Z/8Ni/8IqdH+1aaLk2
+        IT+yT4e+3XHleZ28rzvM87fxt8zPy1+8X7Rx8DH4CeMP+Fnf2V/wro6Tcf8ACQf2ln7GbLYfM3Y5+702
+        /Nnbt+bFdGkY7bnPdzb12Pyt1L/gq78Ur7xzqfwD0O18T618ZfFXxaj1nwf4otNSt20K88MXGoLe2br8
+        277KdMCq0QBVo2dt4fKAr55/YlEw/wCCwn7Kfneb53/CAeExJvxvLf8ACL87scbs9ccZzRSqpRdkFG8l
+        ds/R7/gqd/wRx1z/AIKb/Hrwprl38U/+EV8J+FfDl9Y2mnLoSXlxZ6lNJGwmV98fmwSiOPzEdgyfZVEb
+        Dz2aP86Phn/wQ9+OHxW/as1H9nfxZ428X6f8Mfh/bRaomty2erzeF7mHdDiHTIJXW1S6KzMMI/7opI2X
+        27SUVMZNKxU6abue/wCpf8EofipY+OdU+Pmh3XijRfjN4X+LMejeD/DFpp1uuh2fhi31BbKzRfl3fZBp
+        hVml3ALGrqUL7mJRRS9o3uHs0tj/2Q==
+</value>
+  </data>
   <data name="JagexClientSelect.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL

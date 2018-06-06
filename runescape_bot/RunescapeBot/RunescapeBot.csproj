@@ -110,6 +110,7 @@
     <Compile Include="BotPrograms\Bots\Phasmatys\FurnacePhasmatys.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\MakePotionFull.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Use14On14.cs" />
+    <Compile Include="BotPrograms\Bots\Runecrafting\LawBalloon.cs" />
     <Compile Include="BotPrograms\Bots\Runecrafting\NatureRings.cs" />
     <Compile Include="BotPrograms\Bots\Smithing\BlastFurnace.cs" />
     <Compile Include="BotPrograms\Bots\Thieving\KnightOfArdougne.cs" />
@@ -126,9 +127,17 @@
     <Compile Include="BotPrograms\Popups\MakeXSlim.cs" />
     <Compile Include="BotPrograms\Popups\RightClick.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotUtilities.cs" />
-    <Compile Include="BotPrograms\RunParams\PhasmatysRunParams.cs" />
-    <Compile Include="BotPrograms\RunParams\RotationRunParams.cs" />
-    <Compile Include="BotPrograms\RunParams\RunParamsList.cs" />
+    <Compile Include="BotPrograms\Settings\RunParams\PhasmatysRunParams.cs" />
+    <Compile Include="BotPrograms\Settings\RunParams\RotationRunParams.cs" />
+    <Compile Include="BotPrograms\Settings\RunParams\RunParamsList.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsData\NatureRingsSettingsData.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsData\SettingsData.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.Designer.cs">
+      <DependentUpon>NatureRingsSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Line.cs" />
     <Compile Include="Common\Numerical.cs" />
@@ -172,12 +181,15 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BotPrograms\RunParams\RunParams.cs" />
+    <Compile Include="BotPrograms\Settings\RunParams\RunParams.cs" />
     <Compile Include="UITools\GDI32.cs" />
     <Compile Include="UITools\Kernel32.cs" />
     <Compile Include="UITools\Keyboard.cs" />
     <Compile Include="UITools\Mouse.cs" />
     <Compile Include="UITools\User32.cs" />
+    <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.resx">
+      <DependentUpon>NatureRingsSettings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

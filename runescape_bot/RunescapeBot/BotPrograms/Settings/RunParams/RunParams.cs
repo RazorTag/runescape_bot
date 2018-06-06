@@ -1,8 +1,8 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.Settings;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 namespace RunescapeBot.BotPrograms
@@ -49,6 +49,8 @@ namespace RunescapeBot.BotPrograms
             StartEatingBelow = 0.5;
             StopEatingAbove = 0.8;
             ClosedChatBox = false;
+
+            CustomSettingsData = new CustomSettingsData();
         }
 
         /// <summary>
@@ -312,7 +314,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         [XmlIgnore]
         public CameraPosition DefaultCameraPosition { get; set; }
-
         public enum CameraPosition : int
         {
             AsIs,
@@ -337,6 +338,15 @@ namespace RunescapeBot.BotPrograms
 
         #endregion
 
+        #region custom settings
+
+        /// <summary>
+        /// Used for saving custom settings choices
+        /// </summary>
+        public CustomSettingsData CustomSettingsData { get; set; }
+
+        #endregion
+
         #region start form state info
 
         /// <summary>
@@ -354,8 +364,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public virtual int SelectedRotationBot { get; set; }
 
-        #endregion
-
         /// <summary>
         /// Sets the start time and length of a new bot state
         /// </summary>
@@ -366,6 +374,8 @@ namespace RunescapeBot.BotPrograms
             CurrentStateStart = DateTime.Now;
             CurrentStateEnd = CurrentStateStart.AddMilliseconds(stateLength);
         }
+
+        #endregion
 
         #region delegates
         /// <summary>

@@ -59,6 +59,8 @@ namespace RunescapeBot.BotPrograms
             IronOre,
             [Description("Mining - Motherlode Mine")]
             MotherlodeMine,
+            [Description("Runecrafting - Fairy Ring Nature Runes")]
+            NatureRings,
             [Description("Smithing - Cannonballs (Phasmatys)")]
             Cannonballs,
             [Description("Thieving - Tea Stall")]
@@ -128,6 +130,8 @@ namespace RunescapeBot.BotPrograms
                     return new TanHides(runParams);
                 case BotActions.MotherlodeMine:
                     return new MotherlodeMine(runParams);
+                case BotActions.NatureRings:
+                    return new NatureRings(runParams);
             }
             return bot;
         }

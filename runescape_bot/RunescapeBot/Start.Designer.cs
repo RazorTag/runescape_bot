@@ -39,6 +39,7 @@ namespace RunescapeBot
             this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.BotManagerType = new System.Windows.Forms.TabControl();
             this.SoloBot = new System.Windows.Forms.TabPage();
+            this.ShowSettings = new System.Windows.Forms.Button();
             this.JagexClientLocation = new System.Windows.Forms.TextBox();
             this.JagexClientSelect = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
@@ -120,6 +121,7 @@ namespace RunescapeBot
             // 
             // SoloBot
             // 
+            this.SoloBot.Controls.Add(this.ShowSettings);
             this.SoloBot.Controls.Add(this.JagexClientLocation);
             this.SoloBot.Controls.Add(this.JagexClientSelect);
             this.SoloBot.Controls.Add(this.label13);
@@ -145,6 +147,18 @@ namespace RunescapeBot
             this.SoloBot.TabIndex = 0;
             this.SoloBot.Text = "Solo Bot";
             this.SoloBot.UseVisualStyleBackColor = true;
+            // 
+            // ShowSettings
+            // 
+            this.ShowSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ShowSettings.Image = ((System.Drawing.Image)(resources.GetObject("ShowSettings.Image")));
+            this.ShowSettings.Location = new System.Drawing.Point(423, 167);
+            this.ShowSettings.Name = "ShowSettings";
+            this.ShowSettings.Size = new System.Drawing.Size(35, 30);
+            this.ShowSettings.TabIndex = 34;
+            this.ShowSettings.Text = ". . .";
+            this.ShowSettings.UseVisualStyleBackColor = true;
+            this.ShowSettings.Click += new System.EventHandler(this.ShowSettings_Click);
             // 
             // JagexClientLocation
             // 
@@ -234,7 +248,7 @@ namespace RunescapeBot
             this.BotActionSelect.Location = new System.Drawing.Point(84, 168);
             this.BotActionSelect.MaxDropDownItems = 12;
             this.BotActionSelect.Name = "BotActionSelect";
-            this.BotActionSelect.Size = new System.Drawing.Size(374, 28);
+            this.BotActionSelect.Size = new System.Drawing.Size(339, 28);
             this.BotActionSelect.TabIndex = 7;
             // 
             // Iterations
@@ -758,6 +772,7 @@ namespace RunescapeBot
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Button QuickLogin;
         private System.Windows.Forms.Button QuickLogInPhasmatys;
+        private System.Windows.Forms.Button ShowSettings;
     }
 }
 

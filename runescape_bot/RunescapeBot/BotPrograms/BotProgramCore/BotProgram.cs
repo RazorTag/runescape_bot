@@ -319,12 +319,16 @@ namespace RunescapeBot.BotPrograms
                 return;
             }
 
-            int awakeTime = UnitConversions.HoursToMilliseconds(10);
+            double avgWorkTime = 84.8;
+            double avgRestTime = 25.1;
+            double avgStatusTimeRemaining = (avgRestTime / (avgRestTime + avgWorkTime)) * (avgRestTime / 2) + (avgWorkTime / (avgRestTime + avgWorkTime)) * (avgWorkTime / 2);  //expected time left in minutes to finish working or resting when it is time for the bot to sleep
+            int awakeTime = UnitConversions.HoursToMilliseconds(10 - (avgStatusTimeRemaining / 60.0));
             Stopwatch sleepWatch = new Stopwatch();
             bool done = false;
             sleepWatch.Start();
 
             //alternate between work periods (Iterate) and break periods
+            //Works for an average of 7.716 hours during each 10 hour awake period
             while (!(done = Iterate()))
             {
                 if (sleepWatch.ElapsedMilliseconds < awakeTime) //rest before another work cycle
@@ -513,26 +517,21 @@ namespace RunescapeBot.BotPrograms
             double workType = RNG.NextDouble();
             double mean, stdDev;   //measured in minutes
 
-            //average of 92.65 minutes
-            if (workType < 0.25)   //25%
+            //average of 84.8 minutes
+            if (workType < 0.3)   //30%
             {
                 mean = 45;
-                stdDev = 8;
+                stdDev = 18;
             }
-            else if (workType < 0.65) //40%
+            else if (workType < 0.7) //40%
             {
-                mean = 92; 
-                stdDev = 5;
+                mean = 83; 
+                stdDev = 35;
             }
-            else if (workType < 0.95) //30%
+            else //30%
             {
-                mean = 117;
-                stdDev = 30;
-            }
-            else  //5%
-            {
-                mean = 190;
-                stdDev = 56;
+                mean = 127;
+                stdDev = 21;
             }
 
             double workTime = Probability.BoundedGaussian(mean, stdDev, 1, 345);
