@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.BotPrograms.Settings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,19 +11,14 @@ namespace RunescapeBot.BotPrograms
     {
         protected bool ringSlotEmpty;
         protected bool pouchDamaged;
+        protected NatureRingsSettingsData.FairyRingOptions FairyRingLocation;
+        protected NatureRingsSettingsData.GloryOptions GloryType;
 
         public NatureRings(RunParams startParams) : base(startParams)
         {
-            GetReferenceColors();
             RunParams.Run = true;
-        }
-
-        /// <summary>
-        /// Sets the filter colors for landmarks
-        /// </summary>
-        private void GetReferenceColors()
-        {
-
+            FairyRingLocation = startParams.CustomSettingsData.NatureRings.FairyRing;
+            GloryType = startParams.CustomSettingsData.NatureRings.GloryType;
         }
 
         protected override bool Run()
@@ -35,7 +31,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            
+            MoveToBank();
 
             return true;    //assumes success
         }

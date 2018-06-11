@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace RunescapeBot
@@ -155,7 +156,14 @@ namespace RunescapeBot
             Password.Text = RunParams.Password;
             JagexClientLocation.Text = RunParams.JagexClient;
             OSBuddyClientLocation.Text = RunParams.OSBuddyClient;
+
+            int priorSelectedIndex = BotActionSelect.SelectedIndex;
             BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
+            if (priorSelectedIndex == BotActionSelect.SelectedIndex)    //Make sure that we respond to the first item in the bot list being loaded
+            {
+                BotActionSelect_SelectedIndexChanged(null, null);
+            }
+
             Iterations.Value = Math.Max(0, RunParams.Iterations);
         }
 
@@ -197,6 +205,8 @@ namespace RunescapeBot
         /// <param name="e">not used</param>
         private void StartButton_Click(object sender, EventArgs e)
         {
+            SendToBack();
+            WindowState = FormWindowState.Minimized;
             RunParams.BotManager = BotRegistry.BotManager.Standard;
             StartButtonClicked((Button)sender);
         }
@@ -744,7 +754,7 @@ namespace RunescapeBot
         }
 
         /// <summary>
-        /// 
+        /// Shows the custom settings form for bots that are associated with custom settings
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -765,7 +775,7 @@ namespace RunescapeBot
         }
 
         /// <summary>
-        /// Displays a form for bot actions requiring extra settings
+        /// Creates a form for bot actions requiring extra settings if the bot has custom settings associated with it
         /// </summary>
         /// <returns></returns>
         public Form GetCustomSettingsForm(CustomSettingsData settings)
@@ -773,6 +783,30 @@ namespace RunescapeBot
             if (RunParams.BotAction == BotRegistry.BotActions.NatureRings) { return new NatureRingsSettings(settings); }
 
             return null;    //The selected bot action does not have custom settings associated with it.
+        }
+
+        /// <summary>
+        /// Enables or disables the custom settings button depending on whether the selected bot has custom settings associated with it
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BotActionSelect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (RunParams == null || RunParams.CustomSettingsData == null)
+            {
+                return;
+            }
+
+            RunParams.BotAction = (BotRegistry.BotActions)BotActionSelect.SelectedIndex;
+
+            if (GetCustomSettingsForm(RunParams.CustomSettingsData) == null)
+            {
+                ShowSettings.Enabled = false;
+            }
+            else
+            {
+                ShowSettings.Enabled = true;
+            }
         }
     }
 }

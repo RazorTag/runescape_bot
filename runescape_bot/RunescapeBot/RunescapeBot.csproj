@@ -131,7 +131,7 @@
     <Compile Include="BotPrograms\Settings\RunParams\RotationRunParams.cs" />
     <Compile Include="BotPrograms\Settings\RunParams\RunParamsList.cs" />
     <Compile Include="BotPrograms\Settings\SettingsData\NatureRingsSettingsData.cs" />
-    <Compile Include="BotPrograms\Settings\SettingsData\SettingsData.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsData\CustomSettingsData.cs" />
     <Compile Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.cs">
       <SubType>Form</SubType>
     </Compile>

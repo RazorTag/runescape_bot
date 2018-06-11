@@ -250,6 +250,7 @@ namespace RunescapeBot
             this.BotActionSelect.Name = "BotActionSelect";
             this.BotActionSelect.Size = new System.Drawing.Size(339, 28);
             this.BotActionSelect.TabIndex = 7;
+            this.BotActionSelect.SelectedIndexChanged += new System.EventHandler(this.BotActionSelect_SelectedIndexChanged);
             // 
             // Iterations
             // 

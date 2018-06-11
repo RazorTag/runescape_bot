@@ -1,6 +1,6 @@
 === Options ===
 -route to fairy ring: Edgeville, Legends' Guild
--glory type: normal, eternal
+-glory type: Amulet of Glory (4), Amulet of Glory (6), Amulet of Eternal Glory
 
 
 
