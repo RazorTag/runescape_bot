@@ -1890,7 +1890,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected delegate bool BankLocator(out Blob bankBooth);
 
-        protected int MinBankBoothSize { get { return ArtifactArea(0.000582); } } //ex 0.000682
+        protected int MinBankBoothSize { get { return ArtifactArea(0.000292); } } //ex 0.000583
         protected int MaxBankBoothSize { get { return ArtifactArea(0.001145); } } //ex 0.001045
 
         /// <summary>

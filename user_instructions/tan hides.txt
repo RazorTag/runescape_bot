@@ -1,0 +1,2 @@
+-put stacks of astral runes and nature runes in the last two inventory slots
+-put dragonhides in the top-right bank slot

@@ -52,9 +52,10 @@ namespace RunescapeBot.BotPrograms
                 RunParams.Iterations -= 5;
                 if (SafeWaitPlus(TAN_HIDE_SPELL_TIME + 150, 100)) { return false; }
             }
-            //Do last cast without waiting afterward
+            //Do last cast with a shorter wait
             Inventory.ClickSpellbookLunar(SpellSlot.X, SpellSlot.Y);
             RunParams.Iterations -= 5;
+            if (SafeWaitPlus(350, 150)) { return false; }
 
             return true;
         }
