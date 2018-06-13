@@ -1,4 +1,5 @@
-﻿using RunescapeBot.ImageTools;
+﻿using RunescapeBot.FileIO;
+using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class LesserDemon : Combat
     {
-        protected const int MAX_DEMON_SPAWN_TIME = 25000;    //max possible lesser demon spawn time in milliseconds
+        protected const int MAX_DEMON_SPAWN_TIME = 30000;    //max possible lesser demon spawn time in milliseconds
         protected const int DEMON_ENGAGE_TIME = 3000;
         protected const int CHAOS_RUNE_MIN_SIZE = 3;
         protected const int DEATH_RUNE_MIN_SIZE = 5;
@@ -22,25 +23,17 @@ namespace RunescapeBot.BotPrograms
         protected RGBHSBRange ChaosRune;
         protected RGBHSBRange DeathRune;
         protected RGBHSBRange MouseoverTextNPC;
+        protected Blob LastDemon;
         protected bool PickUpStackables;
         protected bool PickUpAlchables;
-        protected int RuneMinSize;
-        protected int MithrilMinSize;
+        protected int RuneMinSize { get { return ArtifactArea(0.0000694); } }
+        protected int MithrilMinSize { get { return ArtifactArea(0.0000992); } }
+        protected int MinDemonSize { get { return ArtifactArea(0.000944); } }
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
         /// </summary>
         private int MissedDemons;
-
-        /// <summary>
-        /// The minimum required proportion of screen for a lesser demon
-        /// </summary>
-        private int MinDemonSize;
-
-        /// <summary>
-        /// The last location where a demon was found. Set to (0, 0) is no demon has been found yet.
-        /// </summary>
-        private Point LastDemonLocation;
 
         /// <summary>
         /// The last time when a demon was found.
@@ -53,10 +46,7 @@ namespace RunescapeBot.BotPrograms
             GetReferenceColors();
             PickUpStackables = pickUpStackables;
             PickUpAlchables = pickUpAlchables;
-            MinDemonSize = ArtifactArea(0.000944);
             LastDemonTime = DateTime.Now;
-            RuneMinSize = ArtifactArea(0.0000694);
-            MithrilMinSize = ArtifactArea(0.0000992);
         }
 
         protected override bool Run()
@@ -129,28 +119,36 @@ namespace RunescapeBot.BotPrograms
             double cloveRange = Math.Max(2.0 * Math.Sqrt(MinDemonSize), ArtifactLength(0.05));
 
             if (LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
-            {
-                LastDemonTime = DateTime.Now;
-                int maxOffset = (int)(0.05 * cloveRange);
-                if (!InCombat() || !HitpointsHaveDecreased())    //engage the demon
+            {                
+                if (InCombat() && HitpointsHaveDecreased())    //engage the demon
                 {
-                    Mouse.Move(demon.Center.X, demon.Center.Y, RSClient);
-                    if (WaitForMouseOverText(MouseoverTextNPC, 3000))
-                    {
-                        LeftClick(demon.Center.X, demon.Center.Y, 0, 0);
-                        Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
-                    }
+                    FoundDemon(demon);
+                    return true;
                 }
-                MissedDemons = 0;
-                LastDemonLocation = demon.Center;
-                MinDemonSize = demon.Size / 2;
-                SafeWait(DEMON_ENGAGE_TIME);
+
+                Mouse.Move(demon.Center.X, demon.Center.Y, RSClient);
+                if (WaitForMouseOverText(MouseoverTextNPC, 3000))
+                {
+                    FoundDemon(demon);
+                    LeftClick(demon.Center.X, demon.Center.Y, 0, 0);
+                    Mouse.RadialOffset(187, 689, 6, 223);   //arbitrary region to rest the mouse in
+                    SafeWait(DEMON_ENGAGE_TIME);
+                    return true;
+                }
+
             }
-            else
-            {
-                return MissedDemon();
-            }
-            return true;
+            return MissedDemon();
+        }
+
+        /// <summary>
+        /// Recordkeeping in response to locating a demon
+        /// </summary>
+        /// <param name="demon"></param>
+        private void FoundDemon(Blob demon)
+        {
+            MissedDemons = 0;
+            LastDemonTime = DateTime.Now;
+            LastDemon = demon;
         }
 
         /// <summary>
@@ -170,18 +168,19 @@ namespace RunescapeBot.BotPrograms
             //Reduce the minimum required size of the demon in a desperate attempt to find a demon
             if ((DateTime.Now - LastDemonTime).TotalMilliseconds > MAX_DEMON_SPAWN_TIME)
             {
-                MinDemonSize /= 2;
+                LogError.ScreenShot(ColorArray, "long-spawn-" + (DateTime.Now - LastDemonTime).TotalMilliseconds);
                 DefaultCamera();
             }
 
             //Give up, log out of the game, go outside and play
             if ((MissedDemons * RunParams.FrameTime) > (5 * MAX_DEMON_SPAWN_TIME))
             {
+                LogError.ScreenShot(ColorArray, MissedDemons + "-missed-demons");
                 Logout();
                 return false;
             }
 
-            return true;
+            return true;    //keep trying
         }
 
         /// <summary>
@@ -191,13 +190,15 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if a drop is found</returns>
         private bool CheckDrops()
         {
+            if (LastDemon == null) { return false; }    //No demon has been found yet
+
             ReadWindow();
 
             int dropRange = (int) (4 * Math.Sqrt(MinDemonSize));
-            int dropRangeLeft = (int) (LastDemonLocation.X - 1.18 * dropRange);
-            int dropRangeRight = (int) (LastDemonLocation.X + 0.82 * dropRange);
-            int dropRangeTop = (int) (LastDemonLocation.Y - 0.24 * dropRange);
-            int dropRangeBottom = (int) (LastDemonLocation.Y + 0.76 * dropRange);
+            int dropRangeLeft = (int) (LastDemon.Center.X - 1.18 * dropRange);
+            int dropRangeRight = (int) (LastDemon.Center.X + 0.82 * dropRange);
+            int dropRangeTop = (int) (LastDemon.Center.Y - 0.24 * dropRange);
+            int dropRangeBottom = (int) (LastDemon.Center.Y + 0.76 * dropRange);
             Point trimOffset;
             Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 

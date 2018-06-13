@@ -2134,9 +2134,7 @@ namespace RunescapeBot.BotPrograms
                 presentImage = futureImage;
                 futureImage = ScreenPiece(Center.X - xOffset, Center.X + xOffset, Center.Y - yOffset, Center.Y + yOffset);
             }
-            //DebugUtilities.SaveImageToFile(pastImage, "C:\\Projects\\Roboport\\debug_pictures\\player-before.png");
-            //DebugUtilities.SaveImageToFile(presentImage, "C:\\Projects\\Roboport\\debug_pictures\\player-during.png");
-            //DebugUtilities.SaveImageToFile(presentImage, "C:\\Projects\\Roboport\\debug_pictures\\player-after.png");
+
             return true;
         }
 

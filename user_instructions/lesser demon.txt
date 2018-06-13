@@ -1,0 +1,9 @@
+-kills the lesser demon at the top of the Wizards' Tower
+-requires the use of a halberd, ranged weapon, or magic
+-avoid red clothing
+-carry law, air, nature, and fire runes
+-Set [Options -> Controls -> NPC 'Attack' options] to Left-click where available
+-wear a ring of wealth
+
+//TIPS
+-a nacklace of passage can teleport you to the Wizards' Tower

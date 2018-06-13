@@ -41,7 +41,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (spellbookClosed)
             {
-                SafeWait(1500); //Make sure that the bank closes before trying to switch to the spellbook tab on the first run
+                SafeWait(1000); //Make sure that the bank closes before trying to switch to the spellbook tab on the first run
                 spellbookClosed = false;
             }
 
@@ -50,7 +50,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Inventory.ClickSpellbookLunar(SpellSlot.X, SpellSlot.Y);
                 RunParams.Iterations -= 5;
-                if (SafeWaitPlus(TAN_HIDE_SPELL_TIME + 150, 100)) { return false; }
+                if (SafeWaitPlus(TAN_HIDE_SPELL_TIME + 250, 100)) { return false; }
             }
             //Do last cast with a shorter wait
             Inventory.ClickSpellbookLunar(SpellSlot.X, SpellSlot.Y);
