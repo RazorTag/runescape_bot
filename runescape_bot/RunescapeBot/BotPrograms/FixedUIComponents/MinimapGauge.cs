@@ -318,8 +318,8 @@ namespace RunescapeBot.BotPrograms
 
             Point runOrb = RunOrbSamplePoint();
             Color runColor = Screen[runOrb.X, runOrb.Y];
-            RGBHSBRange runEnergyFoot = RGBHSBRangeFactory.RunEnergyFoot();
-            return runEnergyFoot.ColorInRange(runColor);
+            RGBHSBRange runEnergyBackground = RGBHSBRangeFactory.RunEnergyBackground();
+            return runEnergyBackground.ColorInRange(runColor);
         }
 
         /// <summary>
@@ -332,10 +332,10 @@ namespace RunescapeBot.BotPrograms
             switch (ScreenScraper.ClientType)
             {
                 case ScreenScraper.Client.Jagex:
-                    runOrb = new Point(ScreenWidth - 160, 132);
+                    runOrb = new Point(ScreenWidth - 153, 129);
                     break;
                 case ScreenScraper.Client.OSBuddy:
-                    runOrb = new Point(ScreenWidth - 156, 137);
+                    runOrb = new Point(ScreenWidth - 149, 134);
                     break;
                 default:
                     return new Point(0, 0);

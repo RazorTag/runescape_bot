@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -29,6 +30,8 @@ namespace RunescapeBot.BotPrograms.Settings
         {
             FairyRingSelect.SelectedIndex = (int)settings.FairyRing;
             GloryTypeSelect.SelectedIndex = (int)settings.GloryType;
+            BankSelect.SelectedIndex = (int)settings.BankChoice;
+            PouchesSelect.SelectedIndex = settings.NumberOfPouches;
         }
 
         /// <summary>
@@ -40,6 +43,9 @@ namespace RunescapeBot.BotPrograms.Settings
         {
             settings.FairyRing = (NatureRingsSettingsData.FairyRingOptions) FairyRingSelect.SelectedIndex;
             settings.GloryType = (NatureRingsSettingsData.GloryOptions) GloryTypeSelect.SelectedIndex;
+            settings.BankChoice = (NatureRingsSettingsData.BankOptions)BankSelect.SelectedIndex;
+            settings.NumberOfPouches = (int) Numerical.LimitToRange(PouchesSelect.SelectedIndex, 0, 4);
+
             Close();
         }
     }

@@ -49,7 +49,7 @@ namespace RunescapeBot.BotPrograms
             StartEatingBelow = 0.5;
             StopEatingAbove = 0.8;
             ClosedChatBox = false;
-
+            RunLoggedIn = true;
             CustomSettingsData = new CustomSettingsData();
         }
 

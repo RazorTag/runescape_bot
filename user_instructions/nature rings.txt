@@ -13,19 +13,18 @@
 	*slot 4 -> huge pouch
 
 -bank going from top-right to top-left
-	*small pouch
-	*medium pouch
-	*large pouch
-	*huge pouch
+	*pure essence
+	*stamina potion(4)
 	*cosmic runes
 	*astral runes
 	*air runes
+-[optional] put the other three dosages of stamina potion on the right three slots of the second row to have the bot pull from those first when available
 
 
 
 
 
--edgeville - > fairy ring = 19s
+-edgeville -> fairy ring = 19s
 -salve graveyard teleport = 9s (costs ~2k)
 -quest point cape teleport = 5s
 

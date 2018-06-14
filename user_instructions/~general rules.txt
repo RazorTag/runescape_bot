@@ -5,4 +5,5 @@
 -Keep the bank set to the default tab.
 -Do not wear animated clothing.
 -For combat bots, set [Options -> Controls -> NPC 'Attack' options] to Left-click where available
--For OSBuddy, turn off item overlay text and mouseover text
+-For OSBuddy, turn off Current Boosts, Item Overlay Text and Mouseover Text.
+-For OSBuddy, turn on All Opponent Info.

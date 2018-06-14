@@ -240,6 +240,7 @@ namespace RunescapeBot.BotPrograms
             PossibleBankTypes.Add(LocateBankBoothVarrock);
             PossibleBankTypes.Add(LocateBankBoothSeersVillage);
             PossibleBankTypes.Add(LocateBankBoothPhasmatys);
+            PossibleBankTypes.Add(LocateBankBoothEdgeville);
         }
        
         /// <summary>
@@ -436,7 +437,7 @@ namespace RunescapeBot.BotPrograms
 
                         if (RunParams.Run)
                         {
-                            Minimap.RunCharacter(0.5, false); //Turn on run if the player has run energy
+                            Minimap.RunCharacter(0.2, false); //Turn on run if the player has run energy
                         }
                         
                         if (!Execute() && !StopFlag) //quit by a bot program
@@ -1856,7 +1857,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Finds the closest bank booth in the Varrock west bank
+        /// Finds the closest bank booth counter that matches a given color
         /// </summary>
         /// <param name="bankBoothColor">not used</param>
         /// <param name="bankBooth">returns the found bank booth blob</param>
@@ -1980,10 +1981,43 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
-        /// <returns>True if the bank booths are found</returns>
+        /// <returns>True if a bank booths is found</returns>
         protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             return LocateBankBoothPhasmatys(out bankBooth);
+        }
+
+        /// <summary>
+        /// Finds the closest bank booth in the Edgeville bank out of the northern two booths
+        /// </summary>
+        /// <param name="bankBooth">returns a blob for a found bank booth</param>
+        /// <returns>True if a bank booth is found</returns>
+        protected bool LocateBankBoothEdgeville(out Blob bankBooth)
+        {
+            int searchRadius = ArtifactLength(0.1475);  //ex 150 pixels on a 1080p screen
+            int left = Center.X - searchRadius;
+            int right = Center.X + searchRadius;
+            int top = Center.Y - searchRadius;
+            int bottom = Center.Y + searchRadius;
+            List<Blob> bankBooths = LocateObjects(RGBHSBRangeFactory.BankBoothEdgeville(), left, right, top, bottom, true, ArtifactArea(0.0000754), ArtifactArea(0.0004));   //ex 0.000151 - 0.000211
+            
+            if (bankBooths.Count == 0)
+            {
+                bankBooth = null;
+                return false;
+            }
+            bankBooths.Sort(new BlobProximityComparer(Center));
+            bankBooth = bankBooths[0];
+            if (bankBooth.Width > bankBooth.Height)
+            {
+                bankBooth.ShiftPixels(0, 24);
+            }
+            else
+            {
+                bankBooth.ShiftPixels(15, 0);
+            }
+
+            return true;
         }
 
         #endregion
@@ -2207,17 +2241,18 @@ namespace RunescapeBot.BotPrograms
         /// Moves the character to a bank icon on the minimap
         /// </summary>
         /// <returns>true if the bank icon is found</returns>
-        protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true, int minBankIconSize = 4)
+        protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true, int minBankIconSize = 4, int randomization = 3, Point? moveTarget = null)
         {
             if (readWindow) { ReadWindow(); }
+            if (moveTarget == null) { moveTarget = new Point(0, 0); }
             
             Point offset;
             bool[,] minimapBankIcon = Minimap.MinimapFilter(RGBHSBRangeFactory.BankIconDollar(), out offset);
             Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
             if (bankBlob == null || bankBlob.Size < minBankIconSize) { return false; }
 
-            Point clickLocation = new Point(offset.X + bankBlob.Center.X, offset.Y + bankBlob.Center.Y);
-            LeftClick(clickLocation.X, clickLocation.Y, 3);
+            Point clickLocation = new Point(offset.X + bankBlob.Center.X + moveTarget.Value.X, offset.Y + bankBlob.Center.Y + moveTarget.Value.Y);
+            LeftClick(clickLocation.X, clickLocation.Y, randomization);
             SafeWait(maxRunTimeToBank);
 
             return true;

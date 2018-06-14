@@ -165,7 +165,7 @@ namespace RunescapeBot.BotPrograms
             Blob backpack;
             int radius = 15;
             int x = Inventory.INVENTORY_TAB_OFFSET_RIGHT;
-            int y = Inventory.INVENTORY_TAB_OFFSET_BOTTOM;
+            int y = Inventory.TAB_TOP_OFFSET_BOTTOM;
             int left = ScreenWidth - x - radius;
             int right = left + 2 * radius;
             int top = ScreenHeight - y - radius;

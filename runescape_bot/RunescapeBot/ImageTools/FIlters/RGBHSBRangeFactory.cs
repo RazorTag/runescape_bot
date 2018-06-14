@@ -85,6 +85,35 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Neutral purple from a house portal.
+        /// Does not cover all of the purple shades seen in the portal
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange HousePortalPurple()
+        {
+            Color dark = Color.FromArgb(59, 15, 78);
+            Color light = Color.FromArgb(141, 78, 176);
+            HSBRange hsbRange = new HSBRange(273.6f, 288.7f, 0.293f, 0.724f, 0.152f, 0.529f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Brown wood from a bank chest (like at castle wars)
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange BankChest()
+        {
+            Color dark = Color.FromArgb(30, 21, 14);
+            Color light = Color.FromArgb(156, 118, 87);
+            HSBRange hsbRange = new HSBRange(23.0f, 29.2f, 0.270f, 0.322f, 0.050f, 0.507f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        #endregion
+
+        #region bank
+
+        /// <summary>
         /// The teller side counter of a Port Phasmatys bank booth
         /// </summary>
         /// <returns></returns>
@@ -121,27 +150,14 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Neutral purple from a house portal.
-        /// Does not cover all of the purple shades seen in the portal
+        /// The dark gray bar on the front of an Edgeville bank booth
         /// </summary>
         /// <returns></returns>
-        public static RGBHSBRange HousePortalPurple()
+        public static RGBHSBRange BankBoothEdgeville()
         {
-            Color dark = Color.FromArgb(59, 15, 78);
-            Color light = Color.FromArgb(141, 78, 176);
-            HSBRange hsbRange = new HSBRange(273.6f, 288.7f, 0.293f, 0.724f, 0.152f, 0.529f);
-            return new RGBHSBRange(dark, light, hsbRange);
-        }
-
-        /// <summary>
-        /// Brown wood from a bank chest (like at castle wars)
-        /// </summary>
-        /// <returns></returns>
-        public static RGBHSBRange BankChest()
-        {
-            Color dark = Color.FromArgb(30, 21, 14);
-            Color light = Color.FromArgb(156, 118, 87);
-            HSBRange hsbRange = new HSBRange(23.0f, 29.2f, 0.270f, 0.322f, 0.050f, 0.507f);
+            Color dark = Color.FromArgb(55, 50, 50);
+            Color light = Color.FromArgb(65, 60, 60);
+            HSBRange hsbRange = new HSBRange(-2, 2, 0.036f, 0.051f, 0.191f, 0.260f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
@@ -337,6 +353,18 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// The yellow background of the run energy orb when run is turned on
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange RunEnergyBackground()
+        {
+            Color dark = Color.FromArgb(196, 158, 0);
+            Color light = Color.FromArgb(216, 178, 11);
+            HSBRange hsbRange = new HSBRange(39, 59, 0.890f, 1.000f, 0.306f, 0.506f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// The yellow version of the run energy foot icon
         /// </summary>
         /// <returns></returns>
@@ -345,6 +373,18 @@ namespace RunescapeBot.ImageTools
             Color dark = Color.FromArgb(215, 192, 77);
             Color light = Color.FromArgb(255, 236, 130);
             HSBRange hsbRange = new HSBRange(39, 60, 0.668f, 0.948f, 0.557f, 0.778f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The orange version of the run energy foot icon while a stamina potion is active
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange RunEnergyFootStamina()
+        {
+            Color dark = Color.FromArgb(218, 105, 51);
+            Color light = Color.FromArgb(238, 125, 71);
+            HSBRange hsbRange = new HSBRange(9, 29, 0.656f, 0.856f, 0.467f, 0.667f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 

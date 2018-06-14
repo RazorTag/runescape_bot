@@ -110,7 +110,7 @@ namespace RunescapeBot.BotPrograms
                 return false;   //hitpoints are already at 1 or an overload has just worn off and hitpoints are no longer red
             }
 
-            Inventory.RightClickInventoryOption(0, 0, 1, false, new int[2] { 0, 1 });   //guzzle rock cake
+            Inventory.RightClickInventoryOption(0, 0, 1, false);   //guzzle rock cake
             SafeWaitPlus(1000, 250);
             return true;
         }

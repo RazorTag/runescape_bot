@@ -33,12 +33,16 @@
             this.label1 = new System.Windows.Forms.Label();
             this.GloryTypeSelect = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.BankSelect = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.PouchesSelect = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SaveSettings
             // 
             this.SaveSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SaveSettings.Location = new System.Drawing.Point(128, 113);
+            this.SaveSettings.Location = new System.Drawing.Point(129, 273);
             this.SaveSettings.Name = "SaveSettings";
             this.SaveSettings.Size = new System.Drawing.Size(125, 55);
             this.SaveSettings.TabIndex = 11;
@@ -90,11 +94,63 @@
             this.label2.TabIndex = 24;
             this.label2.Text = "Glory type:";
             // 
+            // BankSelect
+            // 
+            this.BankSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BankSelect.FormattingEnabled = true;
+            this.BankSelect.Items.AddRange(new object[] {
+            "Edgeville"});
+            this.BankSelect.Location = new System.Drawing.Point(97, 99);
+            this.BankSelect.MaxDropDownItems = 12;
+            this.BankSelect.Name = "BankSelect";
+            this.BankSelect.Size = new System.Drawing.Size(270, 28);
+            this.BankSelect.TabIndex = 25;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(10, 105);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(48, 18);
+            this.label3.TabIndex = 26;
+            this.label3.Text = "Bank:";
+            // 
+            // PouchesSelect
+            // 
+            this.PouchesSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PouchesSelect.FormattingEnabled = true;
+            this.PouchesSelect.Items.AddRange(new object[] {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"});
+            this.PouchesSelect.Location = new System.Drawing.Point(97, 142);
+            this.PouchesSelect.MaxDropDownItems = 12;
+            this.PouchesSelect.Name = "PouchesSelect";
+            this.PouchesSelect.Size = new System.Drawing.Size(270, 28);
+            this.PouchesSelect.TabIndex = 27;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(10, 148);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(73, 18);
+            this.label4.TabIndex = 28;
+            this.label4.Text = "Pouches:";
+            // 
             // NatureRingsSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(379, 180);
+            this.ClientSize = new System.Drawing.Size(379, 340);
+            this.Controls.Add(this.PouchesSelect);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.BankSelect);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.GloryTypeSelect);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.FairyRingSelect);
@@ -114,5 +170,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox GloryTypeSelect;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox BankSelect;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox PouchesSelect;
+        private System.Windows.Forms.Label label4;
     }
 }

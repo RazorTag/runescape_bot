@@ -30,6 +30,23 @@ namespace RunescapeBot.BotPrograms.Settings
             Glory6
         }
 
+        /// <summary>
+        /// Specifies a bank to use
+        /// </summary>
+        public BankOptions BankChoice;
+        public enum BankOptions : int
+        {
+            Edgeville,
+            CastleWars,
+            CraftingGuild
+        }
+
+        /// <summary>
+        /// The number of runecrafting pouches being used.
+        /// Assumes that we are not skipping pouches such as using small and large but not medium.
+        /// </summary>
+        public int NumberOfPouches;
+
         public NatureRingsSettingsData()
         {
 
