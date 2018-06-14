@@ -13,6 +13,8 @@ namespace RunescapeBot.BotPrograms
 {
     public class MinimapGauge
     {
+        #region properties
+
         Color[,] Screen;
         private Process RSClient;
         private Keyboard Keyboard;
@@ -75,6 +77,10 @@ namespace RunescapeBot.BotPrograms
             }
         }
 
+        #endregion
+
+        #region constructors
+
         public MinimapGauge(Process rsClient, Keyboard keyboard)
         {
             RSClient = rsClient;
@@ -90,21 +96,9 @@ namespace RunescapeBot.BotPrograms
             Screen = colorArray;
         }
 
-        /// <summary>
-        /// Converts radial coordinates from the center of the minimap into rectangular game screen coordinates
-        /// </summary>
-        /// <param name="angle">counterclockwise angle from the right direction in degrees</param>
-        /// <param name="radius">fraction of the radius of the minimap to move</param>
-        /// <returns>a point on the minimap in terms of game screen coordinates</returns>
-        public Point RadialToRectangular(double angle, double radius)
-        {
-            angle *= ((2 * Math.PI) / 360.0);    //convert to radians
-            radius *= CLICK_RADIUS;
-            Point center = Center;
-            int x = center.X + ((int)Math.Round(Math.Cos(angle) * radius));
-            int y = center.Y - ((int)Math.Round(Math.Sin(angle) * radius));
-            return new Point(x, y);
-        }
+        #endregion
+
+        #region visual
 
         /// <summary>
         /// Wrapper for ScreenScraper.CaptureWindow
@@ -207,6 +201,33 @@ namespace RunescapeBot.BotPrograms
             Point offset;
             return MinimapFilter(filter, out offset);
         }
+
+        /// <summary>
+        /// Waits for the disappearance of the red flag on the minimap which indicates the target to move to
+        /// </summary>
+        /// <param name="timeout">maximum time to wait for the red flag to disappear</param>
+        /// <returns>true if the red flag disappears</returns>
+        public bool WaitDuringMovement(int timeout = 10000)
+        {
+            const int redFlagMinSize = 20;  //ex 28
+            const int redFlagMaxSize = 43;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            Blob redFlag;
+            while (watch.ElapsedMilliseconds < timeout)
+            {
+                BotProgram.SafeWait(200);
+                ReadWindow();
+                redFlag = LocateObject(RGBHSBRangeFactory.GenericColor(Color.Red), redFlagMinSize, redFlagMaxSize);
+                if (redFlag == null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        #endregion
 
         #region gauge reading
 
@@ -379,6 +400,24 @@ namespace RunescapeBot.BotPrograms
 
         #endregion
 
+        #region conversions
+
+        /// <summary>
+        /// Converts radial coordinates from the center of the minimap into rectangular game screen coordinates
+        /// </summary>
+        /// <param name="angle">counterclockwise angle from the right direction in degrees</param>
+        /// <param name="radius">fraction of the radius of the minimap to move</param>
+        /// <returns>a point on the minimap in terms of game screen coordinates</returns>
+        public Point RadialToRectangular(double angle, double radius)
+        {
+            angle *= ((2 * Math.PI) / 360.0);    //convert to radians
+            radius *= CLICK_RADIUS;
+            Point center = Center;
+            int x = center.X + ((int)Math.Round(Math.Cos(angle) * radius));
+            int y = center.Y - ((int)Math.Round(Math.Sin(angle) * radius));
+            return new Point(x, y);
+        }
+
         /// <summary>
         /// Converts coordinates of a point on the minimap to the corresponding position in game.
         /// This should be treated as a rough estimate, not a precise conversion.
@@ -414,6 +453,8 @@ namespace RunescapeBot.BotPrograms
         {
             minimapBlob.ShiftPixels(ScreenWidth - OFFSET_LEFT, OFFSET_TOP);
         }
+
+        #endregion
 
         #region constants
 

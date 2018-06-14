@@ -18,6 +18,8 @@
 	*cosmic runes
 	*astral runes
 	*air runes
+	*amulets of glory
+	*charge dragonstone scrolls
 -[optional] put the other three dosages of stamina potion on the right three slots of the second row to have the bot pull from those first when available
 
 
