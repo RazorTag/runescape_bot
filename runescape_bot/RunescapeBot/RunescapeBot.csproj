@@ -118,7 +118,9 @@
     <Compile Include="BotPrograms\Bots\Thieving\TeaStall.cs" />
     <Compile Include="BotPrograms\Bots\Woodcutting\WillowChopping.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\MinimapGauge.cs" />
+    <Compile Include="BotPrograms\FixedUIComponents\MinimapWaypoint.cs" />
     <Compile Include="BotPrograms\Popups\Bank.cs" />
+    <Compile Include="BotPrograms\Popups\FairyRingsConfigure.cs" />
     <Compile Include="BotPrograms\Popups\RightClickInventory.cs" />
     <Compile Include="BotPrograms\Popups\FurnaceCrafting.cs" />
     <Compile Include="BotPrograms\Popups\MakeAll.cs" />

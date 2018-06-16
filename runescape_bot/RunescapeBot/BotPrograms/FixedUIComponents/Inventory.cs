@@ -155,6 +155,52 @@ namespace RunescapeBot.BotPrograms
 
         #endregion
 
+        #region imaging
+
+        /// <summary>
+        /// Wrapper for ScreenScraper.CaptureWindow
+        /// </summary>
+        public bool ReadWindow(bool fastCapture = false)
+        {
+            Bitmap screenshot;
+            try
+            {
+                screenshot = ScreenScraper.CaptureWindow(RSClient, fastCapture);
+                Screen = ScreenScraper.GetRGB(screenshot);
+            }
+            catch
+            {
+                return false;
+            }
+
+            bool success = (screenshot != null) && (Screen.GetLength(0) > 0) && (Screen.GetLength(1) > 0);
+            screenshot.Dispose();
+            return success;
+        }
+
+        /// <summary>
+        /// Makes an image of an inventory slot
+        /// </summary>
+        /// <param name="column">column to look at (0-3, left to right)</param>
+        /// <param name="row">row to look at (0-6, top to bottom)</param>
+        /// <param name="readWindow">set to false to skip taking a new screenshot</param>
+        /// <returns>an image of an inventory slot</returns>
+        public Color[,] SlotPicture(int column, int row, bool readWindow = true)
+        {
+            OpenInventory(false);
+            int x = 0, y = 0;
+            InventoryToScreen(ref x, ref y);
+            int left = x - INVENTORY_GAP_X / 2;
+            int right = x + INVENTORY_GAP_X / 2;
+            int top = y - INVENTORY_GAP_Y / 2;
+            int bottom = y + INVENTORY_GAP_Y / 2;
+            if (readWindow) { ReadWindow(); }
+
+            return ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
+        }
+
+        #endregion
+
         #region inventory
 
         /// <summary>

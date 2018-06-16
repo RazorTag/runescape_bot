@@ -120,11 +120,11 @@ namespace RunescapeBot.Common.Tests
         [TestMethod()]
         [DataRow(-1, 0, 100, 0)]
         [DataRow(101, 0, 100, 100)]
-        [DataRow(long.MaxValue, -55, 55, 55)]
-        [DataRow(int.MinValue, 0, long.MaxValue, 0)]
-        public void LimitToRangeTest(long input, long minimum, long maximum, long expectedResult)
+        [DataRow(double.MaxValue, -55, 55, 55)]
+        [DataRow(int.MinValue, 0, double.MaxValue, 0)]
+        public void LimitToRangeTest(double input, double minimum, double maximum, double expectedResult)
         {
-            long result = Numerical.LimitToRange(input, minimum, maximum);
+            double result = Numerical.LimitToRange(input, minimum, maximum);
             Assert.AreEqual(expectedResult, result);
         }
     }

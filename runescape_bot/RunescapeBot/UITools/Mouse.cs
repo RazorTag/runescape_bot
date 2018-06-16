@@ -283,6 +283,17 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">x-coordinate within the game screen</param>
         /// <param name="y">y-coordinate within the game screen</param>
+        public static void Move(Point? location, Process rsClient)
+        {
+            if (location == null) { return; }
+            Move(location.Value.X, location.Value.Y, rsClient);
+        }
+
+        /// <summary>
+        /// Moves a mouse across a screen like a human would
+        /// </summary>
+        /// <param name="x">x-coordinate within the game screen</param>
+        /// <param name="y">y-coordinate within the game screen</param>
         public static void Move(int x, int y, Process rsClient)
         {
             if (ScreenScraper.ProcessExists(rsClient))

@@ -169,7 +169,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// Selects an option from the right-click menu by y-offset in terms pf pixels
         /// </summary>
         /// <param name="yOffset">y-offset of the middle of the option from the top of the popup</param>
-        public void SelectOption(int yOffset, int maxXOffset = int.MaxValue)
+        protected void SelectOption(int yOffset, int maxXOffset = int.MaxValue)
         {
             int xRandomization = Math.Min(maxXOffset, Math.Max(10, (Width / 2) - 5));
             int yRandomization = 2;

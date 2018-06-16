@@ -109,6 +109,30 @@ namespace RunescapeBot.ImageTools
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// White mushroom parts in a fairy ring
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange FairyRingMushroom()
+        {
+            Color dark = Color.FromArgb(177, 167, 167);
+            Color light = Color.FromArgb(255, 255, 255);
+            HSBRange hsbRange = new HSBRange(-1f, 1f, 0.000f, 0.168f, 0.614f, 1.000f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Red flowers seen during the fairy ring teleport animation
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange FairyRingTeleport()
+        {
+            Color dark = Color.FromArgb(180, 46, 17);
+            Color light = Color.FromArgb(251, 113, 99);
+            HSBRange hsbRange = new HSBRange(-3f, 19f, 0.603f, 0.801f, 0.375f, 0.587f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region bank
@@ -752,7 +776,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// The blue text in the top-left corner of the screen when mousing over a clickable stationary object
+        /// The yello text in the top-left corner of the screen when mousing over a clickable NPC
         /// </summary>
         /// <returns></returns>
         public static RGBHSBRange MouseoverTextNPC()

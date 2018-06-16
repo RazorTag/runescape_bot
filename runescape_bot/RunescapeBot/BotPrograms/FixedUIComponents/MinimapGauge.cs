@@ -1,4 +1,5 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.FixedUIComponents;
+using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -202,31 +203,6 @@ namespace RunescapeBot.BotPrograms
             return MinimapFilter(filter, out offset);
         }
 
-        /// <summary>
-        /// Waits for the disappearance of the red flag on the minimap which indicates the target to move to
-        /// </summary>
-        /// <param name="timeout">maximum time to wait for the red flag to disappear</param>
-        /// <returns>true if the red flag disappears</returns>
-        public bool WaitDuringMovement(int timeout = 10000)
-        {
-            const int redFlagMinSize = 20;  //ex 28
-            const int redFlagMaxSize = 43;
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            Blob redFlag;
-            while (watch.ElapsedMilliseconds < timeout)
-            {
-                BotProgram.SafeWait(200);
-                ReadWindow();
-                redFlag = LocateObject(RGBHSBRangeFactory.GenericColor(Color.Red), redFlagMinSize, redFlagMaxSize);
-                if (redFlag == null)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         #endregion
 
         #region gauge reading
@@ -396,6 +372,83 @@ namespace RunescapeBot.BotPrograms
 
             Color[,] runEnergyPercentage = ImageProcessing.ScreenPiece(Screen, left, right, top, bottom);
             return GaugeFraction(runEnergyPercentage);
+        }
+
+        #endregion
+
+        #region movement
+
+        /// <summary>
+        /// Waits for the disappearance of the red flag on the minimap which indicates the target to move to
+        /// </summary>
+        /// <param name="timeout">maximum time to wait for the red flag to disappear</param>
+        /// <returns>true if the red flag disappears</returns>
+        public bool WaitDuringMovement(int timeout = 30000, int startupWait = 0)
+        {
+            const int redFlagMinSize = 20;  //ex 28
+            const int redFlagMaxSize = 43;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            Blob redFlag;
+
+            BotProgram.SafeWait(startupWait);
+            while (watch.ElapsedMilliseconds < timeout)
+            {
+                if (BotProgram.StopFlag) { return false; }
+                ReadWindow();
+                redFlag = LocateObject(RGBHSBRangeFactory.GenericColor(Color.Red), redFlagMinSize, redFlagMaxSize);
+                if (redFlag == null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Clicks a point on the minimap specified by radial coordinates
+        /// </summary>
+        /// <param name="angle">counterclockwise angle from the right direction in degrees</param>
+        /// <param name="radius">fraction of the radius of the minimap to move (0-1)</param>
+        /// <param name="waitToArrive">set to true to wait until the player almost reaches the destination before returning</param>
+        /// <param name="randomization">maximum allowed randomized deviation from the exact click point</param>
+        /// <returns>true if successful</returns>
+        public bool MoveToPosition(double angle, double radius, bool waitToArrive, int randomization, int minimumWaitTime = 0, Point? restMouse = null, int timeout = 30000)
+        {
+            radius = Numerical.LimitToRange(radius, 0, 1);
+            Point click = RadialToRectangular(angle, radius);
+            Mouse.LeftClick(click.X, click.Y, RSClient, randomization);
+            if (waitToArrive)
+            {
+                //safe minimum time before we expect the red flag to disappear
+                //This is also necessary to ensure that the red flag appears on the minimap before we start looking for it.
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                int waitTime = Math.Max(minimumWaitTime, (int) (500 + radius * 2500 - watch.ElapsedMilliseconds));
+                if (BotProgram.SafeWait(waitTime)) { return false; }
+                Mouse.Move(restMouse, RSClient);
+                return WaitDuringMovement(timeout);
+            }
+            Mouse.Move(restMouse, RSClient);
+            return true;
+        }
+
+        /// <summary>
+        /// Moves along a path described by a series of movement vectors.
+        /// Tries to avoid being stationary between movement vectors.
+        /// </summary>
+        /// <param name="waypoints">list of movement vectors</param>
+        /// <param name="randomization">maximum allowed randomized deviation from the exact click point</param>
+        /// <returns>true if successful</returns>
+        public bool MoveAlongPath(List<MinimapWaypoint> waypoints, int randomization, Point? restMouse)
+        {
+            for (int i = 0; i < waypoints.Count - 1; i++)
+            {
+                Point nextWaypoint = RadialToRectangular(waypoints[i + 1].Angle, waypoints[i + 1].Radius);
+                MoveToPosition(waypoints[i].Angle, waypoints[i].Radius, true, randomization, waypoints[i].MinWaitTime, nextWaypoint);
+            }
+            MoveToPosition(waypoints[waypoints.Count - 1].Angle, waypoints[waypoints.Count - 1].Radius, true, randomization, waypoints[waypoints.Count - 1].MinWaitTime);
+            return true;
         }
 
         #endregion

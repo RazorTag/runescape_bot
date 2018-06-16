@@ -69,7 +69,7 @@ namespace RunescapeBot.Common
         /// <param name="minimum">lowest accpetable value</param>
         /// <param name="maximum">highest acceptable value</param>
         /// <returns>The nearest value to input within the rang specified by minimum and maximum</returns>
-        public static long LimitToRange(long input, long minimum, long maximum)
+        public static double LimitToRange(double input, double minimum, double maximum)
         {
             if (input < minimum) { return minimum; }
             if (input > maximum) { return maximum; }

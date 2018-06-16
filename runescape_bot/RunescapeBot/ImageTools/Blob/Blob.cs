@@ -19,6 +19,8 @@ namespace RunescapeBot.ImageTools
             AddPixel(center);
         }
 
+        #region properties
+
         /// <summary>
         /// List of pixels in the blob.
         /// </summary>
@@ -162,6 +164,8 @@ namespace RunescapeBot.ImageTools
                 return Pixels.Count;
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Determines the left, right, top, and bottom most pixels in the blob
