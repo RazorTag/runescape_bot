@@ -224,7 +224,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found, picked up, and alched. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndAlch(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize)
+        private bool FindAndAlch(Color[,] screenDropArea, Point offset, ColorFilter referenceColor, int minimumSize)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
@@ -248,7 +248,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndGrab(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize = 50)
+        private bool FindAndGrab(Color[,] screenDropArea, Point offset, ColorFilter referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
@@ -270,7 +270,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="referenceColor"></param>
         /// <param name="minimumSize">minimum number of pixels needed to </param>
         /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
-        private bool FindAndGrabChaosRune(Color[,] screenDropArea, Point offset, RGBHSBRange referenceColor, int minimumSize = 50)
+        private bool FindAndGrabChaosRune(Color[,] screenDropArea, Point offset, ColorFilter referenceColor, int minimumSize = 50)
         {
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             List<Blob> chaosRunes = ImageProcessing.FindBlobs(matchedPixels, true);

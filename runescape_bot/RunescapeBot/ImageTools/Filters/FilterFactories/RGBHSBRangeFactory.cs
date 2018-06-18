@@ -133,6 +133,30 @@ namespace RunescapeBot.ImageTools
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// The gray of a runcrafting altar (exterior or interior)
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange RunecraftingAltar()
+        {
+            Color dark = Color.FromArgb(0, 0, 0);
+            Color light = Color.FromArgb(255, 255, 255);
+            HSBRange hsbRange = new HSBRange(0, 360, 0.000f, 0.140f, 0.093f, 0.539f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The green glow of a runcrafting altar
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange NatureAltarGlow()
+        {
+            Color dark = Color.FromArgb(44, 50, 40);
+            Color light = Color.FromArgb(140, 145, 132);
+            HSBRange hsbRange = new HSBRange(73, 135, 0.001f, 0.141f, 0.166f, 0.554f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region bank

@@ -641,7 +641,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="afterClickWait">time to wait after clicking on the stationary object</param>
         /// <param name="maxWaitTime">maximum time to wait before giving up</param>
         /// <returns></returns>
-        protected bool ClickStationaryObject(RGBHSBRange stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
+        protected bool ClickStationaryObject(ColorFilter stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
         {
             Blob foundObject;
 
@@ -666,7 +666,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="findObject">custom method to locate the object</param>
         /// <param name="verificationPasses">number of times to verify the position of the object after finding it</param>
         /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(RGBHSBRange stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize = 1, int maximumSize = int.MaxValue, FindObject findObject = null, int verificationPasses = 1)
+        protected bool LocateStationaryObject(ColorFilter stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize = 1, int maximumSize = int.MaxValue, FindObject findObject = null, int verificationPasses = 1)
         {
             findObject = findObject ?? LocateObject;
 
@@ -711,7 +711,7 @@ namespace RunescapeBot.BotPrograms
 
             return false;
         }
-        protected delegate bool FindObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue);
+        protected delegate bool FindObject(ColorFilter stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue);
 
         /// <summary>
         /// Locates all of the matching objects on the game screen (minus UI) that fit within the given size constraints
@@ -720,7 +720,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minSize">minimum required pixels</param>
         /// <param name="maxSize">maximum allowed pixels</param>
         /// <returns></returns>
-        protected List<Blob> LocateObjects(RGBHSBRange objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected List<Blob> LocateObjects(ColorFilter objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilter(objectFilter);
@@ -741,7 +741,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minimumSize">minimum required pixels</param>
         /// <param name="maximumSize">maximum allowed pixels</param>
         /// <returns></returns>
-        protected List<Blob> LocateObjects(RGBHSBRange objectFilter, int left, int right, int top, int bottom, bool shiftBlobs = true, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected List<Blob> LocateObjects(ColorFilter objectFilter, int left, int right, int top, int bottom, bool shiftBlobs = true, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilterPiece(objectFilter, left, right, top, bottom);
@@ -764,7 +764,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minimumSize">minimum required size for the object in pixels</param>
         /// <param name="maximumSize">maximum allowed size for the object in pixels</param>
         /// <returns>the found object or null if none is found</returns>
-        protected Blob LocateClosestObject(RGBHSBRange objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected Blob LocateClosestObject(ColorFilter objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
             Blob closestObject = Geometry.ClosestBlobToPoint(objects, Center);
@@ -778,7 +778,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minimumSize">minimum required size for the object in pixels</param>
         /// <param name="maximumSize">maximum allowed size for the object in pixels</param>
         /// <returns>the found object or null if none is found</returns>
-        protected bool LocateClosestObject(RGBHSBRange objectFilter, out Blob closestObject, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected bool LocateClosestObject(ColorFilter objectFilter, out Blob closestObject, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
             closestObject = Geometry.ClosestBlobToPoint(objects, Center);
@@ -792,7 +792,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected bool LocateObject(ColorFilter stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilter(stationaryObject);
@@ -811,7 +811,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bottom"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        protected bool LocateObject(RGBHSBRange stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected bool LocateObject(ColorFilter stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
             bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
@@ -821,6 +821,25 @@ namespace RunescapeBot.BotPrograms
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Looks for an object that matches a filter in a particular region of the screen
+        /// </summary>
+        /// <param name="stationaryObject"></param>
+        /// <param name="foundObject"></param>
+        /// <param name="center"></param>
+        /// <param name="searchRadius"></param>
+        /// <param name="minimumSize"></param>
+        /// <param name="maximumSize"></param>
+        /// <returns></returns>
+        protected bool LocateObject(ColorFilter stationaryObject, out Blob foundObject, Point center, int searchRadius, int minimumSize = 1, int maximumSize = int.MaxValue)
+        {
+            int left = center.X - searchRadius;
+            int right = center.X + searchRadius;
+            int top = center.Y - searchRadius;
+            int bottom = center.Y + searchRadius;
+            return LocateObject(stationaryObject, out foundObject, left, right, top, bottom, minimumSize, maximumSize);
         }
 
         /// <summary>
@@ -859,7 +878,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="textColor">the color of the mousover text to wait for</param>
         /// <param name="timeout">time to wait before giving up</param>
         /// <returns>true if the specified type of mouseover text is found</returns>
-        protected bool WaitForMouseOverText(RGBHSBRange textColor, int timeout = 5000)
+        protected bool WaitForMouseOverText(ColorFilter textColor, int timeout = 5000)
         {
             const int left = 5;
             const int right = 500;
@@ -925,7 +944,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
         /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
         /// <returns>true if a matching object is found and clicked on</returns>
-        protected bool MouseOver(List<Blob> ObjectsToCheck, RGBHSBRange textColor, bool click = true, int randomization = 5, int maxWait = 1000)
+        protected bool MouseOver(List<Blob> ObjectsToCheck, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000)
         {
             randomization = (int)((ScreenHeight / 1000.0) * randomization);
             Point clickLocation;
@@ -954,7 +973,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWait">max time to wait before concluding that the mouse over failed</param>
         /// <param name="lagTime">time to wait before checking and clicking after mousing over</param>
         /// <returns>true if a matching object is found and clicked on</returns>
-        protected bool MouseOver(Point mouseover, RGBHSBRange textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 100)
+        protected bool MouseOver(Point mouseover, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 100)
         {
             randomization = (int)((ScreenHeight / 1000.0) * randomization);
             mouseover = Probability.GaussianCircle(mouseover, randomization);
@@ -1040,7 +1059,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="artifactColor"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilter(RGBHSBRange artifactColor)
+        protected bool[,] ColorFilter(ColorFilter artifactColor)
         {
             return ColorFilter(ColorArray, artifactColor);
         }
@@ -1050,7 +1069,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="artifactColor"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilter(Color[,] image, RGBHSBRange artifactColor)
+        protected bool[,] ColorFilter(Color[,] image, ColorFilter artifactColor)
         {
             if (ColorArray == null)
             {
@@ -1068,7 +1087,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="top"></param>
         /// <param name="bottom"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilterPiece(RGBHSBRange filter, int left, int right, int top, int bottom, out Point trimOffset)
+        protected bool[,] ColorFilterPiece(ColorFilter filter, int left, int right, int top, int bottom, out Point trimOffset)
         {
             Color[,] colorArray = ScreenPiece(left, right, top, bottom, out trimOffset);
             if (ColorArray == null)
@@ -1087,7 +1106,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="top"></param>
         /// <param name="bottom"></param>
         /// <returns></returns>
-        protected bool[,] ColorFilterPiece(RGBHSBRange filter, int left, int right, int top, int bottom)
+        protected bool[,] ColorFilterPiece(ColorFilter filter, int left, int right, int top, int bottom)
         {
             Point empty;
             return ColorFilterPiece(filter, left, right, top, bottom, out empty);
@@ -1101,7 +1120,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="radius"></param>
         /// <param name="offset"></param>
         /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
-        protected bool[,] ColorFilterPiece(RGBHSBRange filter, Point center, int radius, out Point offset)
+        protected bool[,] ColorFilterPiece(ColorFilter filter, Point center, int radius, out Point offset)
         {
             int left = center.X - radius;
             int right = center.X + radius;
@@ -1117,7 +1136,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="center"></param>
         /// <param name="radius"></param>
         /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
-        protected bool[,] ColorFilterPiece(RGBHSBRange filter, Point center, int radius)
+        protected bool[,] ColorFilterPiece(ColorFilter filter, Point center, int radius)
         {
             Point offset;
             return ColorFilterPiece(filter, center, radius, out offset);
@@ -1132,7 +1151,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="top">top bound (inclusive)</param>
         /// <param name="bottom">bottom bound (inclusive)</param>
         /// <returns>The fraction (0-1) of the image that matches the filter</returns>
-        protected double FractionalMatchPiece(RGBHSBRange filter, int left, int right, int top, int bottom)
+        protected double FractionalMatchPiece(ColorFilter filter, int left, int right, int top, int bottom)
         {
             bool[,] binaryImage = ColorFilterPiece(filter, left, right, top, bottom);
             return ImageProcessing.FractionalMatch(binaryImage);
@@ -1862,7 +1881,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bankBoothColor">not used</param>
         /// <param name="bankBooth">returns the found bank booth blob</param>
         /// <returns>true if a bank booth is found</returns>
-        protected bool LocateBankBooth(RGBHSBRange bankBoothColor, out Blob bankBooth)
+        protected bool LocateBankBooth(ColorFilter bankBoothColor, out Blob bankBooth)
         {
             bankBooth = null;
 
@@ -1982,7 +2001,7 @@ namespace RunescapeBot.BotPrograms
         /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if a bank booths is found</returns>
-        protected bool LocateBankBoothPhasmatys(RGBHSBRange bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
+        protected bool LocateBankBoothPhasmatys(ColorFilter bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             return LocateBankBoothPhasmatys(out bankBooth);
         }
@@ -2298,7 +2317,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="filter">color filter to test</param>
         /// <param name="directory">directory in which to save test images</param>
         /// <param name="name">base name for test images</param>
-        protected void MaskTest(RGBHSBRange filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\")
+        protected void MaskTest(ColorFilter filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\")
         {
             ReadWindow();
             bool[,] thing = ColorFilter(filter);

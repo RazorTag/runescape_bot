@@ -43,6 +43,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="xClick">the x-coordinate of the click that opened the Make-X popup</param>
         /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
         /// <param name="rsClient"></param>
+        /// <param name="rows">Expected number of lines in the popup. Include all rows expect for the title.</param>
         public RightClick(int xClick, int yClick, Process rsClient, int rows)
         {
             this.RSClient = rsClient;

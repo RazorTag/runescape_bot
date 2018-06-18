@@ -82,7 +82,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="directory">e.x. "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\"</param>
         /// <param name="saveName"></param>
         /// <param name="mask"></param>
-        public static void TestMask(Bitmap bitmap, Color[,] colorArray, RGBHSBRange bodyPart, bool[,] mask, string directory = "C:\\Projects\\Roboport\\debug_pictures\\mask_tests\\", string saveName = "test")
+        public static void TestMask(Bitmap bitmap, Color[,] colorArray, ColorFilter bodyPart, bool[,] mask, string directory = "C:\\Projects\\Roboport\\debug_pictures\\mask_tests\\", string saveName = "test")
         {
             Bitmap redBitmap = (Bitmap)bitmap.Clone();
             Bitmap greenBitmap = (Bitmap)bitmap.Clone();
@@ -99,73 +99,40 @@ namespace RunescapeBot.BotPrograms
                 {
                     pixel = colorArray[x, y];
 
-                    if ((bodyPart.DarkestColor != null) && (bodyPart.LightestColor != null))
+                    //make red bitmap
+                    if (!bodyPart.RedInRange(pixel))
                     {
-                        //make red bitmap
-                        if (pixel.R < bodyPart.DarkestColor.R)
-                        {
-                            redBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.R > bodyPart.LightestColor.R)
-                        {
-                            redBitmap.SetPixel(x, y, Color.White);
-                        }
-
-                        //make green bitmap
-                        if (pixel.G < bodyPart.DarkestColor.G)
-                        {
-                            greenBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.G > bodyPart.LightestColor.G)
-                        {
-                            greenBitmap.SetPixel(x, y, Color.White);
-                        }
-
-                        //make blue bitmap
-                        if (pixel.B < bodyPart.DarkestColor.B)
-                        {
-                            blueBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.B > bodyPart.LightestColor.B)
-                        {
-                            blueBitmap.SetPixel(x, y, Color.White);
-                        }
+                        redBitmap.SetPixel(x, y, Color.White);
                     }
 
-                    if (bodyPart.HSBRange != null)
+                    //make green bitmap
+                    if (!bodyPart.GreenInRange(pixel))
                     {
-                        //make hue bitmap
-                        if (!bodyPart.HSBRange.HueInRange(pixel))
-                        {
-                            if (pixel.GetHue() < bodyPart.HSBRange.MinimumHue)
-                            {
-                                hueBitmap.SetPixel(x, y, Color.Black);
-                            }
-                            else if (pixel.GetHue() > bodyPart.HSBRange.MaximumHue)
-                            {
-                                hueBitmap.SetPixel(x, y, Color.White);
-                            }
-                        }
+                        greenBitmap.SetPixel(x, y, Color.White);
+                    }
 
-                        //make saturation bitmap
-                        if (pixel.GetSaturation() < bodyPart.HSBRange.MinimumSaturation)
-                        {
-                            saturationBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.GetSaturation() > bodyPart.HSBRange.MaximumSaturation)
-                        {
-                            saturationBitmap.SetPixel(x, y, Color.White);
-                        }
+                    //make blue bitmap
+                    if (!bodyPart.BlueInRange(pixel))
+                    {
+                        blueBitmap.SetPixel(x, y, Color.White);
+                    }
 
-                        //make brightness bitmap
-                        if (pixel.GetBrightness() < bodyPart.HSBRange.MinimumBrightness)
-                        {
-                            brightnessBitmap.SetPixel(x, y, Color.Black);
-                        }
-                        else if (pixel.GetBrightness() > bodyPart.HSBRange.MaximumBrightness)
-                        {
-                            brightnessBitmap.SetPixel(x, y, Color.White);
-                        }
+                    //make hue bitmap
+                    if (!bodyPart.HueInRange(pixel))
+                    {
+                        hueBitmap.SetPixel(x, y, Color.White);
+                    }
+
+                    //make saturation bitmap
+                    if (!bodyPart.SaturationInRange(pixel))
+                    {
+                        saturationBitmap.SetPixel(x, y, Color.White);
+                    }
+
+                    //make brightness bitmap
+                    if (!bodyPart.BrightnessInRange(pixel))
+                    {
+                        brightnessBitmap.SetPixel(x, y, Color.White);
                     }
 
                     //make combined bitmap

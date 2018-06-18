@@ -12,11 +12,14 @@ namespace RunescapeBot.BotPrograms
 {
     public class NatureRings : BotProgram
     {
+        #region properties
+
         const int STAMINA_DURATION = 120000; //duration of a dose of stamina potion in milliseconds
         Stopwatch StaminaTimer;
 
         RGBHSBRange FairyRingWhite = RGBHSBRangeFactory.FairyRingMushroom();
         RGBHSBRange FairyRingTeleport = RGBHSBRangeFactory.FairyRingTeleport();
+        RGBHSBRange NatureAltar = RGBHSBRangeFactory.RunecraftingAltar();
 
         protected bool ringSlotEmpty;
         protected bool pouchDamaged;
@@ -28,13 +31,18 @@ namespace RunescapeBot.BotPrograms
         protected Point BankSlotAmuletOfGlory;
         protected Point BankSlotChargeDragonstone;
 
-        protected Point InventorySlotSmallPouch, InventorySlotMediumPouch, InventorySlotLargePouch, InventorySlotHugePouch;
+        protected Point InventorySlotSmallPouch, InventorySlotMediumPouch, InventorySlotLargePouch, InventorySlotGiantPouch;
         protected Point[] PouchSlots;
         protected Point InventorySlotCraftedRunes;
         protected Point InventorySlotStaminaPotion;
         protected Point InventoryDepletedGlory;
 
         bool LowStamina, DepletedGlory, DamagedPouches, FairyRingConfigured;
+        int FailedRuns;
+
+        #endregion
+
+        #region iteration
 
         public NatureRings(RunParams startParams) : base(startParams)
         {
@@ -46,6 +54,7 @@ namespace RunescapeBot.BotPrograms
 
             SetItemSlots();
             FairyRingConfigured = false;
+            FailedRuns = 0;
         }
 
         /// <summary>
@@ -64,12 +73,12 @@ namespace RunescapeBot.BotPrograms
             InventorySlotSmallPouch = new Point(0, 0);
             InventorySlotMediumPouch = new Point(1, 0);
             InventorySlotLargePouch = new Point(2, 0);
-            InventorySlotHugePouch = new Point(3, 0);
+            InventorySlotGiantPouch = new Point(3, 0);
             PouchSlots = new Point[4];
             PouchSlots[0] = InventorySlotSmallPouch;
             PouchSlots[1] = InventorySlotMediumPouch;
             PouchSlots[2] = InventorySlotLargePouch;
-            PouchSlots[3] = InventorySlotHugePouch;
+            PouchSlots[3] = InventorySlotGiantPouch;
 
             InventorySlotCraftedRunes = Inventory.InventoryIndexToCoordinates(UserSelections.NumberOfPouches);
             InventorySlotStaminaPotion = InventorySlotCraftedRunes;
@@ -82,24 +91,39 @@ namespace RunescapeBot.BotPrograms
             //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\nature rings\\test.png");
             //MaskTest(RGBHSBRangeFactory.BankBoothEdgeville());
             //MaskTest(RGBHSBRangeFactory.FairyRing());
+            //MaskTest(RGBHSBRangeFactory.Furnace());
+            //MaskTest(RGBHSBRangeFactory.RunecraftingAltar());
+            //MaskTest(RGBHSBRangeFactory.RunecraftingAltar());
 
             //Minimap.MoveToPosition(170, 1, true);
             //MoveToFairyRing();
             //EnterFairyRing(new Point(Center.X, Center.Y + 119), 250);
+            //MoveInsideNatureAltar();
 
             return true;
         }
 
         protected override bool Execute()
         {
-            if (!Bank() || !FairyRing())
+            if (Bank()
+                && FairyRing()
+                && MoveToNatureAltar()
+                && EnterAltar()
+                && CraftAllPouches())
             {
-                return false;
+                FailedRuns = 0;
+            }
+            else
+            {
+                FailedRuns++;
             }
 
             RunParams.Iterations--;
-            return true;
+            bool giveUp = FailedRuns > 10;
+            return !giveUp;
         }
+
+        #endregion
 
         #region banking
 
@@ -119,6 +143,7 @@ namespace RunescapeBot.BotPrograms
             }
             Inventory.OpenInventory();
             if (!Minimap.WaitDuringMovement(8000, 0)) { return false; }
+            WaitDuringPlayerAnimation(500);
 
             return RefreshItems();
         }
@@ -138,7 +163,7 @@ namespace RunescapeBot.BotPrograms
 
             //Start moving to bank booth
             Point bankIconOffsetTarget = new Point(2 * MinimapGauge.GRID_SQUARE_SIZE, MinimapGauge.GRID_SQUARE_SIZE/2);
-            MoveToBank(0, true, 4, 2, bankIconOffsetTarget);
+            if (!MoveToBank(0, true, 4, 2, bankIconOffsetTarget)) { return false; }
 
             CheckItems();
             MoveMouse(Center.X, Center.Y + 50, 75);
@@ -207,7 +232,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool RefreshItems()
         {
-            LowStamina = StaminaTimer.ElapsedMilliseconds > (STAMINA_DURATION - UnitConversions.SecondsToMilliseconds(30));
+            LowStamina |= StaminaTimer.ElapsedMilliseconds > (STAMINA_DURATION - UnitConversions.SecondsToMilliseconds(10)) && (Minimap.RunEnergy(true) < 0.7);
 
             //Fill small-large pouches. Service if not using all four pouches.
             bool earlyService = LowStamina && UserSelections.NumberOfPouches <= 3;
@@ -337,7 +362,6 @@ namespace RunescapeBot.BotPrograms
                     DepletedGlory = false;
                 }
                 DrinkStaminaPotion();
-                LowStamina = false;
             }
             else if (DepletedGlory)
             {
@@ -359,7 +383,7 @@ namespace RunescapeBot.BotPrograms
             if (!OpenBank(out bank)) { return false; }
             bank.WithdrawAll(BankSlotPureEssence.X, BankSlotPureEssence.Y);
             bank.Close();
-            Inventory.ClickInventory(InventorySlotHugePouch);
+            Inventory.ClickInventory(InventorySlotGiantPouch);
 
             return true;
         }
@@ -392,7 +416,7 @@ namespace RunescapeBot.BotPrograms
             List<MinimapWaypoint> waypoints = new List<MinimapWaypoint>();
             waypoints.Add(new MinimapWaypoint(45, 1, 0));
             waypoints.Add(new MinimapWaypoint(29, 1, 0));
-            waypoints.Add(new MinimapWaypoint(293, 1, 7000));
+            waypoints.Add(new MinimapWaypoint(295, 0.95, 7000));
             if (!Minimap.MoveAlongPath(waypoints, 3, null))
             {
                 return false;
@@ -401,7 +425,7 @@ namespace RunescapeBot.BotPrograms
             MoveMouse(expectedFairyRingLocation.X, expectedFairyRingLocation.Y, 68);
 
             int waitTime = 500;
-            for (int i = 0; i < 10; i++)
+            for (int searchRadius = 250; searchRadius < 1000; searchRadius += 100)
             {
                 if (SafeWait(waitTime)) { return false; }
                 if (EnterFairyRing(expectedFairyRingLocation, 250))
@@ -461,7 +485,7 @@ namespace RunescapeBot.BotPrograms
             int x = ringCenter.Value.X;
             int y = ringCenter.Value.Y;
             RightClick(x, y, 6);
-            RightClick fairyRingOptions = new RightClick(x, y, RSClient);
+            RightClick fairyRingOptions = new RightClick(x, y, RSClient, 6);
             if (!fairyRingOptions.WaitForPopup(5000))
             {
                 return false;
@@ -523,6 +547,147 @@ namespace RunescapeBot.BotPrograms
                 }
             }
         }
+
+        #endregion
+
+        #region Karamja
+
+        /// <summary>
+        /// Moves the player from Karamja fairy ring to the inside of the nature altar
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool MoveToNatureAltar()
+        {
+            List<MinimapWaypoint> waypoints = new List<MinimapWaypoint>();
+            waypoints.Add(new MinimapWaypoint(10, 1, 10000));
+            waypoints.Add(new MinimapWaypoint(0, 1, 0));
+            waypoints.Add(new MinimapWaypoint(-5, 1, 0));
+            waypoints.Add(new MinimapWaypoint(30, 1, 0));
+            if (!Minimap.MoveAlongPath(waypoints, 3, null))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Crafts all runes in pouches.
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool CraftAllPouches()
+        {
+            if (!CraftSmallMediumLargePouches()
+                || !CraftGiantPouch())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Empties up to the first three pouches and crafts their runes.
+        /// Does nothing if the player is not using small, medium, or large pouch.
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool CraftSmallMediumLargePouches()
+        {
+            for (int i = 0; i < Math.Min(3, UserSelections.NumberOfPouches); i++)
+            {
+                Inventory.RightClickInventoryOption(PouchSlots[i].X, PouchSlots[i].Y, 1);
+            }
+
+            Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.120));
+            if (UserSelections.NumberOfPouches > 3)
+            {
+                CraftInventory(altarLocation, InventorySlotGiantPouch, true);
+            }
+            else
+            {
+                CraftInventory(altarLocation, null, false);
+                Inventory.OpenEquipment();
+                WaitDuringPlayerAnimation(RUNECRAFT_ANIMATION_DURATION);
+            }
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Empties the giant pouch and crafts its runes.
+        /// Does nothing if the user is not using a giant pouch.
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool CraftGiantPouch()
+        {
+            if (UserSelections.NumberOfPouches > 3)
+            {
+                Inventory.RightClickInventoryOption(InventorySlotGiantPouch.X, InventorySlotGiantPouch.Y, 1);
+                Point equipmentSlot = new Point(ScreenWidth - Inventory.TAB_RIGHT_OFFSET_RIGHT - 2 * Inventory.TAB_HORIZONTAL_GAP);
+                CraftInventory(new Point(Center.X, Center.Y - ArtifactLength(0.120)), null, false);
+                Inventory.OpenEquipment(false);
+                WaitDuringPlayerAnimation(RUNECRAFT_ANIMATION_DURATION);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Clicks the exterior nature altar to enter it and clicks the nature altar to craft the first inventory of essence
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool EnterAltar()
+        {
+            int minimumSize = ArtifactArea(0.01);   //ex 0.0236
+            Blob exteriorAltar;
+            Point searchCenter = new Point(Center.X + ArtifactLength(0.122), Center.Y - ArtifactLength(0.169));
+            WaitDuringPlayerAnimation(6000);
+            if (!LocateObject(NatureAltar, out exteriorAltar, searchCenter, ArtifactLength(0.3), minimumSize) && !LocateObject(NatureAltar, out exteriorAltar, minimumSize))
+            {
+                return false;
+            }
+            if (!MouseOverStationaryObject(exteriorAltar, true, 10, 2000))  //click on the exterior nature altar to enter
+            {
+                WaitDuringPlayerAnimation(3000);
+                if (!MouseOverStationaryObject(exteriorAltar, true, 10, 2000))
+                {
+                    return false;
+                }
+            }
+
+            //click on the interior nature altar to craft inventory by guessing the location
+            Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.311));
+            int x = InventorySlotSmallPouch.X, y = InventorySlotSmallPouch.Y;
+            Inventory.InventoryToScreen(ref x, ref y);
+            CraftInventory(altarLocation, new Point(x, y), true);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Clicks the interior nature altar and waits for the animation to finish
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected bool CraftInventory(Point altarLocation, Point? restMouse, bool waitToCraft)
+        {
+            //click on the interior nature altar to craft inventory by guessing the location
+            altarLocation = Probability.GaussianCircle(altarLocation, 5, 0, 360, 15);
+            Blob interiorAltar = new Blob(altarLocation);
+
+            //guess the location before searching
+            if (!MouseOverStationaryObject(interiorAltar, true, 20, 5000) && !LocateObject(NatureAltar, out interiorAltar, ArtifactArea(0)))  //search the entire screen for the altar as a fallback
+            {
+                return false;
+            }
+            if (restMouse != null)
+            {
+                MoveMouse(restMouse.Value.X, restMouse.Value.Y);    //leave the mouse close to where it will be needed next
+            }
+            WaitDuringPlayerAnimation(4500);    //wait for the player to run to the altar and go through the runecrafting animation
+
+            return true;
+        }
+
+        const int RUNECRAFT_ANIMATION_DURATION = BotRegistry.GAME_TICK;
 
         #endregion
     }

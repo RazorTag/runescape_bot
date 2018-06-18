@@ -5,7 +5,7 @@ namespace RunescapeBot.ImageTools
     /// <summary>
     /// Represents a range of RGB colors used to identify artifacts of a known color
     /// </summary>
-    public class RGBHSBRange
+    public class RGBHSBRange : ColorFilter
     {
         /// <summary>
         /// The color with the values closest to black that occur in an artifact
@@ -69,20 +69,10 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Determines if a color falls within the hue range
+        /// Determines if a color falls within the red, green, and blue ranges
         /// </summary>
         /// <param name="color"></param>
-        /// <returns>true if the color is in hue range or if the hue is unspecified</returns>
-        public bool HSBInRange(Color color)
-        {
-            if (HSBRange == null)
-            {
-                return true;
-            }
-            return HSBRange.ColorInRange(color);
-        }
-
-
+        /// <returns>true if color meets all thre red, green, and blue color ranges</returns>
         public bool RGBInRange(Color color)
         {
             if ((DarkestColor == null) || (LightestColor == null))
@@ -124,6 +114,48 @@ namespace RunescapeBot.ImageTools
         public bool BlueInRange(Color color)
         {
             return (color.B >= DarkestColor.B) && (color.B <= LightestColor.B);
+        }
+
+        /// <summary>
+        /// Determines if a color falls within the hue range
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns>true if the color is in hue range or if the hue is unspecified</returns>
+        public bool HSBInRange(Color color)
+        {
+            if (HSBRange == null)
+            {
+                return true;
+            }
+            return HSBRange.ColorInRange(color);
+        }
+
+        /// <summary>
+        /// Determines if a color is in the acceptable hue range
+        /// </summary>
+        public bool HueInRange(Color color)
+        {
+            return HSBRange.HueInRange(color);
+        }
+
+        /// <summary>
+        /// Determines if a color is in the acceptable saturation range
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public bool SaturationInRange(Color color)
+        {
+            return HSBRange.SaturationInRange(color);
+        }
+
+        /// <summary>
+        /// Determines if a color is in the acceptable brightness range
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public bool BrightnessInRange(Color color)
+        {
+            return HSBRange.SaturationInRange(color);
         }
     }
 }

@@ -151,8 +151,9 @@
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
-    <Compile Include="ImageTools\FIlters\ColorCluster.cs" />
-    <Compile Include="ImageTools\FIlters\RGBHSBRangeFactory.cs" />
+    <Compile Include="ImageTools\Filters\ColorCluster.cs" />
+    <Compile Include="ImageTools\Filters\ColorFilter.cs" />
+    <Compile Include="ImageTools\Filters\FilterFactories\RGBHSBRangeFactory.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\Inventory.cs" />
     <Compile Include="FileIO\BotSettings.cs" />
@@ -168,8 +169,10 @@
     <Compile Include="ImageTools\Blob\Blob.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\GoldBracelets.cs" />
     <Compile Include="BotPrograms\Bots\Combat\LesserDemon.cs" />
-    <Compile Include="ImageTools\FIlters\RGBHSBRange.cs" />
-    <Compile Include="ImageTools\FIlters\HSBRange.cs" />
+    <Compile Include="ImageTools\Filters\FilterFactories\RGBHSBRangeGroupFactory.cs" />
+    <Compile Include="ImageTools\Filters\RGBHSBRange.cs" />
+    <Compile Include="ImageTools\Filters\HSBRange.cs" />
+    <Compile Include="ImageTools\Filters\RGBHSBRangeGroup.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />
     <Compile Include="UITools\Spline\ArrayUtil.cs" />

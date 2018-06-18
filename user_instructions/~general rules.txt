@@ -1,3 +1,4 @@
+-The escape key stops the bot.
 -If you start the bot while logged in, set the camera facing north and as high as possible.
 -Zoom out fully.
 -Brightness to full.
