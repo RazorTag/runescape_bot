@@ -3,6 +3,7 @@ using RunescapeBot.BotPrograms.Popups;
 using RunescapeBot.BotPrograms.Settings;
 using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,6 +21,7 @@ namespace RunescapeBot.BotPrograms
         RGBHSBRange FairyRingWhite = RGBHSBRangeFactory.FairyRingMushroom();
         RGBHSBRange FairyRingTeleport = RGBHSBRangeFactory.FairyRingTeleport();
         RGBHSBRange NatureAltar = RGBHSBRangeFactory.RunecraftingAltar();
+        RGBHSBRange DamagedPouch = RGBHSBRangeFactory.RunecraftingPouchDamaged();
 
         protected bool ringSlotEmpty;
         protected bool pouchDamaged;
@@ -30,10 +32,12 @@ namespace RunescapeBot.BotPrograms
         protected Point BankSlotCosmicRunes, BankSlotAstralRunes, BankSlotAirRunes;
         protected Point BankSlotAmuletOfGlory;
         protected Point BankSlotChargeDragonstone;
+        protected Point[] BankSlotStaminaPotions;
 
         protected Point InventorySlotSmallPouch, InventorySlotMediumPouch, InventorySlotLargePouch, InventorySlotGiantPouch;
         protected Point[] PouchSlots;
         protected Point InventorySlotCraftedRunes;
+        protected Point InventorySlotEssenceCheck;
         protected Point InventorySlotStaminaPotion;
         protected Point InventoryDepletedGlory;
 
@@ -48,6 +52,8 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.Run = true;
             RunParams.RunLoggedIn = true;
+            RunParams.RunAbove = 0.04;
+
             UserSelections = startParams.CustomSettingsData.NatureRings;
             LowStamina = true;
             StaminaTimer = new Stopwatch();
@@ -69,6 +75,11 @@ namespace RunescapeBot.BotPrograms
             BankSlotAirRunes = new Point(3, 0);
             BankSlotAmuletOfGlory = new Point(2, 0);
             BankSlotChargeDragonstone = new Point(1, 0);
+            BankSlotStaminaPotions = new Point[4];
+            BankSlotStaminaPotions[0] = new Point(5, 1);
+            BankSlotStaminaPotions[1] = new Point(6, 1);
+            BankSlotStaminaPotions[2] = new Point(7, 1);
+            BankSlotStaminaPotions[3] = BankSlotStaminaPotion;
 
             InventorySlotSmallPouch = new Point(0, 0);
             InventorySlotMediumPouch = new Point(1, 0);
@@ -81,6 +92,7 @@ namespace RunescapeBot.BotPrograms
             PouchSlots[3] = InventorySlotGiantPouch;
 
             InventorySlotCraftedRunes = Inventory.InventoryIndexToCoordinates(UserSelections.NumberOfPouches);
+            InventorySlotEssenceCheck = Inventory.InventoryIndexToCoordinates(UserSelections.NumberOfPouches + 1);
             InventorySlotStaminaPotion = InventorySlotCraftedRunes;
             InventoryDepletedGlory = Inventory.InventoryIndexToCoordinates(UserSelections.NumberOfPouches + 1);
         }
@@ -89,16 +101,32 @@ namespace RunescapeBot.BotPrograms
         {
             //ReadWindow();
             //DebugUtilities.SaveImageToFile(Bitmap, "C:\\Projects\\Roboport\\test_pictures\\nature rings\\test.png");
+
             //MaskTest(RGBHSBRangeFactory.BankBoothEdgeville());
             //MaskTest(RGBHSBRangeFactory.FairyRing());
             //MaskTest(RGBHSBRangeFactory.Furnace());
             //MaskTest(RGBHSBRangeFactory.RunecraftingAltar());
             //MaskTest(RGBHSBRangeFactory.RunecraftingAltar());
+            //MaskTest(RGBHSBRangeFactory.BankSlotPlaceholderZero());
 
             //Minimap.MoveToPosition(170, 1, true);
             //MoveToFairyRing();
             //EnterFairyRing(new Point(Center.X, Center.Y + 119), 250);
             //MoveInsideNatureAltar();
+
+            //ReadWindow();
+            //Bank bank = new Bank(RSClient, Inventory);
+            //bool slotIsEmpty = bank.SlotIsEmpty(7, 1, ColorArray);
+
+            //Bank bank = new Bank(RSClient, Inventory);
+            //WithdrawStaminaPotion(bank);
+
+            //Point click = RightClick(Center.X, Center.Y, 100);
+            //RightClick popup = new RightClick(click.X, click.Y, RSClient);
+            //popup.WaitForPopup();
+            //WaitForFairyRingTeleport();
+            //RepairPouches();
+            //EvaluateStamina();
 
             return true;
         }
@@ -112,13 +140,13 @@ namespace RunescapeBot.BotPrograms
                 && CraftAllPouches())
             {
                 FailedRuns = 0;
+                RunParams.Iterations--;
             }
             else
             {
                 FailedRuns++;
             }
 
-            RunParams.Iterations--;
             bool giveUp = FailedRuns > 10;
             return !giveUp;
         }
@@ -141,10 +169,10 @@ namespace RunescapeBot.BotPrograms
                 default:
                     return false;
             }
+
             Inventory.OpenInventory();
             if (!Minimap.WaitDuringMovement(8000, 0)) { return false; }
-            WaitDuringPlayerAnimation(500);
-
+            SafeWait(2 * BotRegistry.GAME_TICK);
             return RefreshItems();
         }
 
@@ -171,11 +199,12 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Check for damaged pouches and a depleted glory.
+        /// Check for damaged pouches and a depleted glory on the way to the bank.
         /// </summary>
         protected void CheckItems()
         {
-            //Check items on the way to bank
+            ReadWindow();
+
             for (int i = 0; i < PouchSlots.Length; i++)
             {
                 Point pouchLocation = PouchSlots[i];
@@ -209,21 +238,26 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if pouch is damaged</returns>
         protected bool PouchIsDamaged(int x, int y, bool readWindow = true)
         {
-            //TODO determine if a pouch is damaged
-            Color[,] slotImage = Inventory.SlotPicture(x, y, readWindow);
-
-            return false;
+            return Inventory.SlotMatchesColorFilter(x, y, DamagedPouch, 0.005);
         }
 
         /// <summary>
-        /// Uses Contact NPC to contact the Dark Mage and have him repair pouches
+        /// Uses Contact NPC to contact the Dark Mage and have him repair pouches.
+        /// Assumes that the required runes are already in the player's inventory.
         /// </summary>
         /// <returns>true if successful</returns>
         protected bool RepairPouches()
         {
-            //TODO contact dark mage using Contact NPC
-            DamagedPouches = false;
-            return false;
+            Inventory.ClickSpellbookLunar(5, 0);
+            NPCContact npcContact = new NPCContact(RSClient);
+            if (!npcContact.WaitForPopup()) { return false; }
+            if (npcContact.RepairPouches(Textbox))
+            {
+                DamagedPouches = false;
+                return true;
+            }
+
+            return false;   //failed to repair pouches
         }
 
         /// <summary>
@@ -232,11 +266,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool RefreshItems()
         {
-            LowStamina |= StaminaTimer.ElapsedMilliseconds > (STAMINA_DURATION - UnitConversions.SecondsToMilliseconds(10)) && (Minimap.RunEnergy(true) < 0.7);
+            EvaluateStamina();  //determine if the player should drink a dose of stamina potion
 
             //Fill small-large pouches. Service if not using all four pouches.
             bool earlyService = LowStamina && UserSelections.NumberOfPouches <= 3;
-            if (StopFlag || !FillSmallMediumLargePouches())    //TODO replace glory and pouches
+            if (StopFlag || !FillSmallMediumLargePouches())
             {
                 return false;
             }
@@ -265,13 +299,40 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Withdraws a stamina potion.
+        /// Determine if the player should drink a dose of stamina potion
+        /// </summary>
+        protected void EvaluateStamina()
+        {
+            const int drinkBelow = 75;  //Do not drink above 75 run energy.
+            const int mostEarlyDrink = 90;  //Never drink more than 80 seconds before a stamina potion runs out.
+            double runEnergy = 100 * Minimap.RunEnergy(true);
+            long timeSinceLastDose = StaminaTimer.ElapsedMilliseconds;
+
+            if (StaminaTimer.ElapsedMilliseconds == 0) //drink a stamina potion for the first time
+            {
+                timeSinceLastDose = STAMINA_DURATION;
+            }
+
+            int drinkEarly = (int) (mostEarlyDrink * ((drinkBelow - (int)runEnergy) / (double)drinkBelow));
+            LowStamina = timeSinceLastDose > (STAMINA_DURATION - UnitConversions.SecondsToMilliseconds(drinkEarly));
+        }
+
+        /// <summary>
+        /// Withdraws the lowest dose stamina potion available.
         /// Assumes that the bank is open.
         /// </summary>
         /// <returns>true if successful</returns>
         protected bool WithdrawStaminaPotion(Bank bank)
         {
-            //TODO use 1, 2, and 3 dose stamina potions before using the main 4 dose stack
+            ReadWindow();
+            for (int i = 0; i < Math.Min(3, UserSelections.NumberOfPouches); i++)
+            {
+                if (!bank.SlotIsEmpty(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y, ColorArray))
+                {
+                    bank.WithdrawOne(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y);
+                    return true;
+                }
+            }
             bank.WithdrawOne(BankSlotStaminaPotion.X, BankSlotStaminaPotion.Y);
             return true;
         }
@@ -297,13 +358,9 @@ namespace RunescapeBot.BotPrograms
         {
             Bank bank;
 
-            if (!OpenBank(out bank))
+            if (!OpenBank(out bank, 3))
             {
-                SafeWait(200);
-                if (!OpenBank(out bank))
-                {
-                    return false;
-                }
+                return false;
             }
             bank.DepositAll(InventorySlotCraftedRunes);
 
@@ -311,8 +368,7 @@ namespace RunescapeBot.BotPrograms
             bank.WithdrawAll(BankSlotPureEssence.X, BankSlotPureEssence.Y);
             bank.Close();
 
-            Servicing();
-            return true;
+            return Servicing();
         }
 
         /// <summary>
@@ -343,7 +399,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Repairs damaged pouches, replaces depleted glory, replenishes stamina, and fills three smallest pouches.
         /// </summary>
-        protected void Servicing()
+        protected bool Servicing()
         {
             if (DamagedPouches)
             {
@@ -352,7 +408,7 @@ namespace RunescapeBot.BotPrograms
             for (int i = 0; i < Math.Min(UserSelections.NumberOfPouches, 3); i++)
             {
                 Inventory.ClickInventory(PouchSlots[i]);
-                if (SafeWaitPlus(0, 50)) { return; }
+                if (SafeWaitPlus(0, 50)) { return false; }
             }
             if (LowStamina)
             {
@@ -368,6 +424,8 @@ namespace RunescapeBot.BotPrograms
                 Inventory.ClickInventory(InventorySlotCraftedRunes);
                 DepletedGlory = false;
             }
+
+            return true;
         }
 
         /// <summary>
@@ -423,14 +481,19 @@ namespace RunescapeBot.BotPrograms
             }
             Point expectedFairyRingLocation = new Point(Center.X, Center.Y + 119);
             MoveMouse(expectedFairyRingLocation.X, expectedFairyRingLocation.Y, 68);
+            SafeWaitPlus(1000, 100);
 
-            int waitTime = 500;
+            int waitTime = 200;
             for (int searchRadius = 250; searchRadius < 1000; searchRadius += 100)
             {
                 if (SafeWait(waitTime)) { return false; }
                 if (EnterFairyRing(expectedFairyRingLocation, 250))
                 {
                     return true;
+                }
+                else
+                {
+                    MoveMouse(Mouse.X + 10, Mouse.Y - 50, 25);
                 }
             }
 
@@ -450,10 +513,6 @@ namespace RunescapeBot.BotPrograms
             int right = expectedLocation.X + searchRadius + fairyRingRadius;
             int top = expectedLocation.Y - searchRadius - fairyRingRadius;
             int bottom = expectedLocation.Y + searchRadius + fairyRingRadius;
-
-            ReadWindow();
-            Color[,] testImage = ScreenPiece(left, right, top, bottom);
-            DebugUtilities.SaveImageToFile(testImage);
 
             List<Blob> mushrooms = LocateObjects(FairyRingWhite, left, right, top, bottom, true, 1, ArtifactArea(0.0000326));   //ex 0.0000261
             if (mushrooms == null)
@@ -486,7 +545,7 @@ namespace RunescapeBot.BotPrograms
             int y = ringCenter.Value.Y;
             RightClick(x, y, 6);
             RightClick fairyRingOptions = new RightClick(x, y, RSClient, 6);
-            if (!fairyRingOptions.WaitForPopup(5000))
+            if (!fairyRingOptions.WaitForPopup(2000, true))
             {
                 return false;
             }
@@ -500,7 +559,8 @@ namespace RunescapeBot.BotPrograms
                 fairyRingOptions.CustomOption(2);   //teleport to the last location
             }
 
-            //SafeWait(4500); //wait for the fairy ring teleport animation
+            MoveMouse(Minimap.Center.X + 40, Minimap.Center.Y, 20);
+            SafeWait(2500);
             WaitForFairyRingTeleport();
             return true;
         }
@@ -518,7 +578,7 @@ namespace RunescapeBot.BotPrograms
             SafeWaitPlus(2000, 400);
             FairyRingsConfigure menu = new FairyRingsConfigure(ColorArray, RSClient);
             menu.SetConfiguration('c', 'k', 'r');
-            menu.Teleport(true);
+            menu.Teleport(false);
             FairyRingConfigured = true;
         }
 
@@ -531,7 +591,7 @@ namespace RunescapeBot.BotPrograms
             Stopwatch watch = new Stopwatch();
             watch.Start();
             double match;
-            while (watch.ElapsedMilliseconds < 10000)
+            while (watch.ElapsedMilliseconds < 4000 && !StopFlag)
             {
                 ReadWindow();
                 bool[,] portal = ColorFilterPiece(FairyRingTeleport, Center, 50);
@@ -592,6 +652,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool CraftSmallMediumLargePouches()
         {
+            if (UserSelections.NumberOfPouches == 0)
+            {
+                return true;
+            }
+
             for (int i = 0; i < Math.Min(3, UserSelections.NumberOfPouches); i++)
             {
                 Inventory.RightClickInventoryOption(PouchSlots[i].X, PouchSlots[i].Y, 1);
@@ -601,14 +666,14 @@ namespace RunescapeBot.BotPrograms
             if (UserSelections.NumberOfPouches > 3)
             {
                 CraftInventory(altarLocation, InventorySlotGiantPouch, true);
+                WaitForRunesToCraft();
             }
             else
             {
                 CraftInventory(altarLocation, null, false);
-                Inventory.OpenEquipment();
-                WaitDuringPlayerAnimation(RUNECRAFT_ANIMATION_DURATION);
+                WaitForRunesToCraft(true);
             }
-            
+
             return true;
         }
 
@@ -619,15 +684,15 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool CraftGiantPouch()
         {
-            if (UserSelections.NumberOfPouches > 3)
+            if (UserSelections.NumberOfPouches < 4)
             {
-                Inventory.RightClickInventoryOption(InventorySlotGiantPouch.X, InventorySlotGiantPouch.Y, 1);
-                Point equipmentSlot = new Point(ScreenWidth - Inventory.TAB_RIGHT_OFFSET_RIGHT - 2 * Inventory.TAB_HORIZONTAL_GAP);
-                CraftInventory(new Point(Center.X, Center.Y - ArtifactLength(0.120)), null, false);
-                Inventory.OpenEquipment(false);
-                WaitDuringPlayerAnimation(RUNECRAFT_ANIMATION_DURATION);
+                return true;
             }
 
+            Inventory.RightClickInventoryOption(InventorySlotGiantPouch.X, InventorySlotGiantPouch.Y, 1);
+            Point equipmentSlot = new Point(ScreenWidth - Inventory.TAB_RIGHT_OFFSET_RIGHT - 2 * Inventory.TAB_HORIZONTAL_GAP);
+            CraftInventory(new Point(Center.X, Center.Y - ArtifactLength(0.120)), null, false);
+            WaitForRunesToCraft(true);
             return true;
         }
 
@@ -639,32 +704,64 @@ namespace RunescapeBot.BotPrograms
         {
             int minimumSize = ArtifactArea(0.01);   //ex 0.0236
             Blob exteriorAltar;
-            Point searchCenter = new Point(Center.X + ArtifactLength(0.122), Center.Y - ArtifactLength(0.169));
-            WaitDuringPlayerAnimation(6000);
-            if (!LocateObject(NatureAltar, out exteriorAltar, searchCenter, ArtifactLength(0.3), minimumSize) && !LocateObject(NatureAltar, out exteriorAltar, minimumSize))
+            Point searchCenter = new Point(Center.X + ArtifactLength(0.1), Center.Y - ArtifactLength(0.15));
+
+            if (!MouseOverStationaryObject(new Blob(searchCenter), true, 10, 1000))  //click on the exterior nature altar to enter
             {
-                return false;
-            }
-            if (!MouseOverStationaryObject(exteriorAltar, true, 10, 2000))  //click on the exterior nature altar to enter
-            {
+                if (!LocateObject(NatureAltar, out exteriorAltar, searchCenter, ArtifactLength(0.3), minimumSize) && !LocateObject(NatureAltar, out exteriorAltar, minimumSize))
+                {
+                    return false;
+                }
                 WaitDuringPlayerAnimation(3000);
                 if (!MouseOverStationaryObject(exteriorAltar, true, 10, 2000))
                 {
                     return false;
                 }
             }
+            SafeWait(BotRegistry.GAME_TICK);
 
             //click on the interior nature altar to craft inventory by guessing the location
             Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.311));
             int x = InventorySlotSmallPouch.X, y = InventorySlotSmallPouch.Y;
             Inventory.InventoryToScreen(ref x, ref y);
             CraftInventory(altarLocation, new Point(x, y), true);
+            WaitForRunesToCraft(false, 3 * BotRegistry.GAME_TICK);
 
             return true;
         }
 
         /// <summary>
-        /// Clicks the interior nature altar and waits for the animation to finish
+        /// Waits for inventory runes to be crafted and disappear from the inventory
+        /// </summary>
+        /// <param name="shortWait">Waits a constant time without visual confirmation</param>
+        /// <returns></returns>
+        protected bool WaitForRunesToCraft(bool shortWait = false, int waitToStartLooking = 2 * BotRegistry.GAME_TICK, int timeout = 10 * BotRegistry.GAME_TICK)
+        {
+            if (shortWait)
+            {
+                SafeWaitPlus(2 * BotRegistry.GAME_TICK, 100);
+                return true;
+            }
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            if (SafeWait(waitToStartLooking)) { return false; }
+
+            while (watch.ElapsedMilliseconds < timeout)
+            {
+                ReadWindow();
+                if (Inventory.SlotIsEmpty(InventorySlotEssenceCheck, true))
+                {
+                    SafeWait(BotRegistry.GAME_TICK + 100);
+                    return true;
+                }
+                if (SafeWait(100)) { return false; }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Clicks the interior nature altar
         /// </summary>
         /// <returns>true if successful</returns>
         protected bool CraftInventory(Point altarLocation, Point? restMouse, bool waitToCraft)
@@ -682,12 +779,9 @@ namespace RunescapeBot.BotPrograms
             {
                 MoveMouse(restMouse.Value.X, restMouse.Value.Y);    //leave the mouse close to where it will be needed next
             }
-            WaitDuringPlayerAnimation(4500);    //wait for the player to run to the altar and go through the runecrafting animation
 
             return true;
         }
-
-        const int RUNECRAFT_ANIMATION_DURATION = BotRegistry.GAME_TICK;
 
         #endregion
     }

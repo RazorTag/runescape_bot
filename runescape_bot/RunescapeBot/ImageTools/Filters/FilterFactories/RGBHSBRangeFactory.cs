@@ -162,6 +162,18 @@ namespace RunescapeBot.ImageTools
         #region bank
 
         /// <summary>
+        /// The dark yellow 0 shown as the item counter for an empty bank slot placeholder
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange BankSlotPlaceholderZero()
+        {
+            Color dark = Color.FromArgb(141, 137, 14);
+            Color light = Color.FromArgb(179, 175, 87);
+            HSBRange hsbRange = new HSBRange(51.146f, 61.345f, 0.225f, 0.851f, 0.278f, 0.547f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
         /// The teller side counter of a Port Phasmatys bank booth
         /// </summary>
         /// <returns></returns>
@@ -418,9 +430,9 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static RGBHSBRange RunEnergyFoot()
         {
-            Color dark = Color.FromArgb(215, 192, 77);
-            Color light = Color.FromArgb(255, 236, 130);
-            HSBRange hsbRange = new HSBRange(39, 60, 0.668f, 0.948f, 0.557f, 0.778f);
+            Color dark = Color.FromArgb(197, 160, 39);
+            Color light = Color.FromArgb(255, 238, 130);
+            HSBRange hsbRange = new HSBRange(36, 62, 0.575f, 0.948f, 0.441f, 0.778f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
@@ -430,8 +442,8 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static RGBHSBRange RunEnergyFootStamina()
         {
-            Color dark = Color.FromArgb(218, 105, 51);
-            Color light = Color.FromArgb(238, 125, 71);
+            Color dark = Color.FromArgb(208, 95, 41);
+            Color light = Color.FromArgb(248, 135, 81);
             HSBRange hsbRange = new HSBRange(9, 29, 0.656f, 0.856f, 0.467f, 0.667f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
@@ -622,6 +634,30 @@ namespace RunescapeBot.ImageTools
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
+        /// <summary>
+        /// Inventory apsorption potion light blue
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange RunecraftingPouchUndamaged()
+        {
+            Color dark = Color.FromArgb(55, 43, 16);
+            Color light = Color.FromArgb(65, 53, 26);
+            HSBRange hsbRange = new HSBRange(38.5f, 44.5f, 0.431f, 0.531f, 0.109f, 0.209f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// Inventory apsorption potion light blue
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange RunecraftingPouchDamaged()
+        {
+            Color dark = Color.FromArgb(33, 33, 0);
+            Color light = Color.FromArgb(43, 43, 5);
+            HSBRange hsbRange = new HSBRange(57, 63, 0.950f, 1.000f, 0.025f, 0.125f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
         #endregion
 
         #region textBoxes
@@ -632,15 +668,16 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public static RGBHSBRange RightClickPopup()
         {
-            Color dark = Color.FromArgb(91, 82, 69);
-            Color light = Color.FromArgb(95, 86, 73);
-            HSBRange hsbRange = new HSBRange(33, 37, 0.126f, 0.143f, 0.309f, 0.334f);
+            Color dark = Color.FromArgb(93, 84, 71);
+            Color light = Color.FromArgb(93, 84, 71);
+            HSBRange hsbRange = new HSBRange(35.355f, 35.555f, 0.133f, 0.135f, 0.321f, 0.323f);
             return new RGBHSBRange(dark, light, hsbRange);
         }
 
         /// <summary>
-        /// The orange title text in the bank screen
-        /// Also applies to lots of inventory text
+        /// The orange title text in the bank screen.
+        /// Also applies to NPC Contact popup title.
+        /// Also applies to lots of inventory text.
         /// </summary>
         /// <returns></returns>
         public static RGBHSBRange BankTitle()
@@ -679,7 +716,7 @@ namespace RunescapeBot.ImageTools
         /// The blue text for a dialog box body
         /// </summary>
         /// <returns></returns>
-        public static RGBHSBRange DialogBoxBody()
+        public static RGBHSBRange DialogBoxBodyBlue()
         {
             Color dark = Color.FromArgb(0, 0, 128);
             Color light = Color.FromArgb(0, 0, 128);

@@ -25,7 +25,6 @@
 
 
 
-
 -edgeville -> fairy ring = 19s
 -salve graveyard teleport = 9s (costs ~2k)
 -quest point cape teleport = 5s

@@ -50,6 +50,7 @@ namespace RunescapeBot.BotPrograms
             StopEatingAbove = 0.8;
             ClosedChatBox = false;
             RunLoggedIn = true;
+            RunAbove = 0.2;
             CustomSettingsData = new CustomSettingsData();
         }
 
@@ -308,6 +309,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         [XmlIgnore]
         public bool ClosedChatBox { get; set; }
+
+        /// <summary>
+        /// Do not turn on run below this threshold
+        /// </summary>
+        [XmlIgnore]
+        public double RunAbove { get; set; }
 
         /// <summary>
         /// How to set the camera after logging in

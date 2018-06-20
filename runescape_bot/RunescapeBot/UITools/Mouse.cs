@@ -29,7 +29,25 @@ namespace RunescapeBot.UITools
         private const double MOUSE_MOVE_RATE = 125.0;
 
         /// <summary>
-        /// Gets the cursor's current location
+        /// RuneScape client process
+        /// </summary>
+        public static Process RSClient { get; set; }
+
+        /// <summary>
+        /// Gets the cursor's current location in operating system coordinates
+        /// </summary>
+        private static Point SystemLocation
+        {
+            get
+            {
+                POINT location;
+                GetCursorPos(out location);
+                return location;
+            }
+        }
+
+        /// <summary>
+        /// Gets the cursor's current location in game screen coordinates
         /// </summary>
         public static Point Location
         {
@@ -37,7 +55,9 @@ namespace RunescapeBot.UITools
             {
                 POINT location;
                 GetCursorPos(out location);
-                return location;
+                int x = location.X, y = location.Y;
+                ScreenScraper.WindowToGameScreen(ref x, ref y, RSClient);
+                return new Point(x, y);
             }
         }
 
@@ -58,12 +78,13 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void LeftClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
+        public static Point LeftClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
-                Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
+                return Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
             }
+            return new Point(0, 0);
         }
 
         /// <summary>
@@ -71,12 +92,13 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static void RightClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
+        public static Point RightClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
-                Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
+                return Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
             }
+            return new Point(0, 0);
         }
 
         /// <summary>
@@ -87,25 +109,26 @@ namespace RunescapeBot.UITools
         /// <param name="rsClient"></param>
         /// <param name="clickTypeDown"></param>
         /// <param name="clickTypeUp"></param>
-        private static void Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay, int randomize)
+        private static Point Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay, int randomize)
         {
             Random rng = new Random();
-            if (randomize > 0)
-            {
-                Point clickPoint = Probability.GaussianCircle(new Point(x, y), 0.35 * randomize, 0, 360, randomize);
-                x = clickPoint.X;
-                y = clickPoint.Y;
-            }
+            Point clickPoint = Probability.GaussianCircle(new Point(x, y), 0.35 * randomize, 0, 360, randomize);
+            x = clickPoint.X;
+            y = clickPoint.Y;
 
             ScreenScraper.BringToForeGround(rsClient);
             ScreenScraper.GameScreenToWindow(ref x, ref y, rsClient);
+            if (BotProgram.StopFlag) { return new Point(0, 0); }
             NaturalMove(x, y);
-            Thread.Sleep(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
+
+            BotProgram.SafeWait(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
             if (!BotProgram.StopFlag)
             {
                 mouse_event(clickTypeDown, x, y, 0, 0);
                 mouse_event(clickTypeUp, x, y, 0, 0);
             }
+
+            return clickPoint;
         }
 
         /// <summary>
@@ -132,8 +155,8 @@ namespace RunescapeBot.UITools
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY;
-            currentX = Location.X;
-            currentY = Location.Y;
+            currentX = SystemLocation.X;
+            currentY = SystemLocation.Y;
             xDistance = x - currentX;
             yDistance = y - currentY;
             totalDistance = Math.Sqrt(Math.Pow(xDistance, 2.0) + Math.Pow(yDistance, 2.0));
@@ -164,8 +187,8 @@ namespace RunescapeBot.UITools
         public static void Offset(int x, int y, int randomize = 100)
         {
             Random rng = new Random();
-            x += Location.X + rng.Next(-randomize, randomize + 1);
-            y += Location.Y + rng.Next(-randomize, randomize + 1);
+            x += SystemLocation.X + rng.Next(-randomize, randomize + 1);
+            y += SystemLocation.Y + rng.Next(-randomize, randomize + 1);
             NaturalMove(x, y);
         }
 
@@ -191,8 +214,8 @@ namespace RunescapeBot.UITools
             double angle = arcStart + (rng.NextDouble() * (arcEnd - arcStart));
             angle = (angle % 360) * ((2 * Math.PI) / 360.0);
 
-            int x = Location.X + ((int) Math.Round(Math.Cos(angle) * radius));
-            int y = Location.Y - ((int) Math.Round(Math.Sin(angle) * radius));
+            int x = SystemLocation.X + ((int) Math.Round(Math.Cos(angle) * radius));
+            int y = SystemLocation.Y - ((int) Math.Round(Math.Sin(angle) * radius));
             NaturalMove(x, y);
         }
 
@@ -204,7 +227,7 @@ namespace RunescapeBot.UITools
         private static void NaturalMove(int x, int y)
         {
             Stopwatch watch = new Stopwatch();
-            Point startingPosition = Location;
+            Point startingPosition = SystemLocation;
             double currentX = startingPosition.X;
             double currentY = startingPosition.Y;
             float slope = (float)((y - currentY) / (x - currentX));

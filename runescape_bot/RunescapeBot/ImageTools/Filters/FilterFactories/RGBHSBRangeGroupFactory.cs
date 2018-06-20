@@ -8,17 +8,17 @@ namespace RunescapeBot.ImageTools
 {
     public static class RGBHSBRangeGroupFactory
     {
-        //not use because the filter isn't necessary. left here for reference purposes
-        ///// <summary>
-        ///// The runecrafting altar gray and the nature altar green glow
-        ///// </summary>
-        ///// <returns></returns>
-        //public static RGBHSBRangeGroup NatureAltar()
-        //{
-        //    RGBHSBRangeGroup filter = new RGBHSBRangeGroup();
-        //    filter.AddColorRange(RGBHSBRangeFactory.RunecraftingAltar());
-        //    filter.AddColorRange(RGBHSBRangeFactory.NatureAltarGlow());
-        //    return filter;
-        //}
+        /// <summary>
+        /// Text colors that can appear in an NPC dialog
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRangeGroup DialogText()
+        {
+            RGBHSBRangeGroup filter = new RGBHSBRangeGroup();
+            filter.AddColorRange(RGBHSBRangeFactory.Black());
+            filter.AddColorRange(RGBHSBRangeFactory.DialogBoxBodyBlue());
+            
+            return filter;
+        }
     }
 }

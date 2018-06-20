@@ -13,11 +13,15 @@ namespace RunescapeBot.BotPrograms.Popups
         protected const int MAX_ROWS = 20;
         protected const int TITLE_HEIGHT = 16;
         protected const int ROW_HEIGHT = 15;
+        protected const int MIN_WIDTH = 103;
         protected Process RSClient;
         protected int XClick;
         protected int YClick;
         protected int Height;
         protected int Width;
+
+        public int Top { get { return YClick; } }
+        public int Bottom { get { return YClick + Height; } }
 
         public int GetHeight() { return Height; }
         public int GetWidth() { return Width; }
@@ -103,7 +107,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public virtual bool WaitForPopup(int timeout = 3000)
+        public virtual bool WaitForPopup(int timeout = 3000, bool checkHeight = false)
         {
             Color[,] screen = null;
             Stopwatch watch = new Stopwatch();
@@ -115,7 +119,7 @@ namespace RunescapeBot.BotPrograms.Popups
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 if (PopupExists(screen))
                 {
-                    return true;
+                    return !checkHeight || PopupIsCorrectHeight(screen);
                 }
             }
             
@@ -125,16 +129,31 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <summary>
         /// Checks the area where the title bar should be for blackness
         /// </summary>
-        /// <param name="screen"></param>
-        /// <returns></returns>
-        protected virtual bool PopupExists(Color[,] screen)
+        /// <param name="screen">the full game screen</param>
+        /// <returns>true if the black popup title bar is found</returns>
+        protected bool PopupExists(Color[,] screen)
         {   
             int top = YClick + 1;
-            int bottom = top + 15;
-            int left = XClick - 40;
-            int right = XClick + 40;
+            int bottom = top + TITLE_HEIGHT - 1;
+            int left = XClick - MIN_WIDTH / 2;
+            int right = XClick + MIN_WIDTH / 2;
             double blackness = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.Black(), left, right, top, bottom);
             return blackness > 0.25;
+        }
+
+        /// <summary>
+        /// Checks the area where the center of the bottom row of the popup is expected to be
+        /// </summary>
+        /// <param name="screen">the full game screen</param>
+        /// <returns>true if the expected bottom row is found</returns>
+        protected bool PopupIsCorrectHeight(Color[,] screen)
+        {
+            int left = XClick - MIN_WIDTH / 2;
+            int right = XClick + MIN_WIDTH / 2;
+            int top = Bottom - ROW_HEIGHT;
+            double lastRow = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.RightClickPopup(), left, right, top, Bottom);
+            double belowPopup = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.RightClickPopup(), left, right, top + ROW_HEIGHT, Bottom + ROW_HEIGHT);
+            return lastRow > 0.7 && belowPopup < 0.7;
         }
 
         /// <summary>

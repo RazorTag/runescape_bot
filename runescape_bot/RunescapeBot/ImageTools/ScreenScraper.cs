@@ -24,7 +24,7 @@ namespace RunescapeBot.ImageTools
         public const int LOGIN_WINDOW_HEIGHT = 503;
         public const int LOGIN_WINDOW_WIDTH = 765;
 
-        private const int MULTIPLE_SCREEN_READ_INTERVAL = 200;
+        private const int SCREEN_READ_INTERVAL = 200;
         private static DateTime LastScan;
 
         /// <summary>
@@ -163,6 +163,28 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Wrapper for ScreenScraper.CaptureWindow
+        /// </summary>
+        public static Color[,] ReadWindow(Process rsClient, bool fastCapture = false)
+        {
+            Bitmap screenshot;
+            Color[,] screen;
+            try
+            {
+                screenshot = CaptureWindow(rsClient, fastCapture);
+                screen = GetRGB(screenshot);
+            }
+            catch
+            {
+                return null;
+            }
+
+            bool success = (screenshot != null) && (screen.GetLength(0) > 0) && (screen.GetLength(1) > 0);
+            screenshot.Dispose();
+            return screen;
+        }
+
+        /// <summary>
         /// Makes sure that we don't take screenshots too close together
         /// </summary>
         private static void WaitToCapture(bool fastCapture)
@@ -170,7 +192,7 @@ namespace RunescapeBot.ImageTools
             if (!fastCapture)
             {
                 int timeSinceLastCapture = (int)(DateTime.Now - LastScan).TotalMilliseconds;
-                int waitTimeRemaining = MULTIPLE_SCREEN_READ_INTERVAL - timeSinceLastCapture;
+                int waitTimeRemaining = SCREEN_READ_INTERVAL - timeSinceLastCapture;
                 if (waitTimeRemaining > 0)
                 {
                     Thread.Sleep(waitTimeRemaining);
@@ -289,9 +311,11 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// COnverts a pixel from game screen coordinates to game window coordinates
+        /// Converts a pixel from game screen coordinates to operating system coordinates
         /// </summary>
-        /// <param name="point"></param>
+        /// <param name="x">goes from left to right</param>
+        /// <param name="y">goes from top to bottom</param>
+        /// <param name="rsClient">RuneScape client process</param>
         /// <returns></returns>
         public static void GameScreenToWindow(ref int x, ref int y, Process rsClient)
         {
@@ -307,6 +331,20 @@ namespace RunescapeBot.ImageTools
 
             x += windowLeft + BorderWidth;
             y += windowTop + ToolbarWidth;
+        }
+
+        /// <summary>
+        /// Converts a pixel from operating system coordinates to game screen coordinates
+        /// </summary>
+        /// <param name="x">goes from left to right</param>
+        /// <param name="y">goes from top to bottom</param>
+        /// <param name="rsClient">RuneScape client process</param>
+        public static void WindowToGameScreen(ref int x, ref int y, Process rsClient)
+        {
+            RECT windowRect = new RECT();
+            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            x -= windowRect.left + BorderWidth;
+            y -= windowRect.top + ToolbarWidth;
         }
 
         /// <summary>

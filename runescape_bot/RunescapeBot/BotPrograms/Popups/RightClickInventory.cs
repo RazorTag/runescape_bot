@@ -51,7 +51,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void DropItem()
         {
             const int normalIndex = 1;
-            int yOffset = 40 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
+            int yOffset = 25 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
             SelectOption(yOffset, 15);
         }
 
@@ -61,7 +61,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public void Examine()
         {
             const int normalIndex = 2;
-            int yOffset = 55 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
+            int yOffset = 25 + (OptionsAbove(normalIndex) * ROW_HEIGHT);
             SelectOption(yOffset, 15);
         }
 

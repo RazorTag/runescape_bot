@@ -67,6 +67,13 @@ namespace RunescapeBot.BotPrograms
             if (!emptySlotsSet)
             {
                 Inventory.SetEmptySlots(); // this tells the inventory to record which spots are empty
+                for (int x = 0; x < Inventory.INVENTORY_COLUMNS; x++)
+                {
+                    for (int y = Inventory.INVENTORY_ROWS - 2; y < Inventory.INVENTORY_ROWS; y++)
+                    {
+                        Inventory.SetEmptySlot(x, y, false);
+                    }
+                }
                 emptySlotsSet = true;
             }
             ReadWindow();

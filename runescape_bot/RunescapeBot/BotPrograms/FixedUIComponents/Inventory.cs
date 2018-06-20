@@ -300,6 +300,20 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Sets the empty of full value of an inventory slot
+        /// </summary>
+        /// <param name="x">column (0-3)</param>
+        /// <param name="y">row (0-6)</param>
+        /// <param name="slotIsEmpty">true for an empty slot, false for a full slot</param>
+        public void SetEmptySlot(int x, int y, bool slotIsEmpty)
+        {
+            if (x >= 0 && x < INVENTORY_COLUMNS && y >= 0 && y < INVENTORY_ROWS)
+            {
+                EmptySlots[x, y] = slotIsEmpty;
+            }
+        }
+
+        /// <summary>
         /// Drops all of the items in the inventory
         /// </summary>
         /// <param name="safeTab"></param>

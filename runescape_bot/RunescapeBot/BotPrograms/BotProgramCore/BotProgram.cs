@@ -55,6 +55,7 @@ namespace RunescapeBot.BotPrograms
             set
             {
                 client = value;
+                Mouse.RSClient = client;
                 if (Keyboard != null)
                 {
                     Keyboard.SetClient(client);
@@ -62,6 +63,14 @@ namespace RunescapeBot.BotPrograms
                 if (Inventory != null)
                 {
                     Inventory.SetClient(client);
+                }
+                if (Minimap != null)
+                {
+                    Minimap.SetClient(client);
+                }
+                if (Textbox != null)
+                {
+                    Textbox.SetClient(client);
                 }
             }
         }
@@ -102,6 +111,10 @@ namespace RunescapeBot.BotPrograms
                 {
                     Minimap.SetScreen(colorArray);
                 }
+                if(Textbox != null)
+                {
+                    Textbox.SetScreen(colorArray);
+                }
             }
         }
 
@@ -116,12 +129,19 @@ namespace RunescapeBot.BotPrograms
         protected DateTime LastBotWorldCheck { get; set; }
 
         /// <summary>
-        /// The sidebar including the inventory and spellbook
+        /// The sidebar including the inventory and spellbook.
         /// </summary>
         protected Inventory Inventory { get; set; }
 
-
+        /// <summary>
+        /// The minimap and associated gauges at the top-left of the game window.
+        /// </summary>
         protected MinimapGauge Minimap { get; set; }
+
+        /// <summary>
+        /// The textbox at the bottom-left of the game screen.
+        /// </summary>
+        protected TextBoxTool Textbox { get; set; }
 
         /// <summary>
         /// Expected time to complete a single iteration
@@ -208,7 +228,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         //Banking
-        protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 5000;
+        protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 2500;
         protected const int WAIT_FOR_BANK_LOCATION = 8000;
         protected List<BankLocator> PossibleBankTypes;
         protected BankLocator BankBoothLocator;
@@ -232,6 +252,7 @@ namespace RunescapeBot.BotPrograms
             Keyboard = new Keyboard(RSClient);
             Inventory = new Inventory(RSClient, Keyboard);
             Minimap = new MinimapGauge(RSClient, Keyboard);
+            Textbox = new TextBoxTool(RSClient, Keyboard);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
             RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
             RunParams.LoginWorld = 0;
@@ -437,7 +458,7 @@ namespace RunescapeBot.BotPrograms
 
                         if (RunParams.Run)
                         {
-                            Minimap.RunCharacter(0.2, false); //Turn on run if the player has run energy
+                            Minimap.RunCharacter(RunParams.RunAbove, false); //Turn on run if the player has run energy
                         }
                         
                         if (!Execute() && !StopFlag) //quit by a bot program
@@ -610,13 +631,10 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y"></param>
         /// <param name="hoverDelay"></param>
         /// <param name="randomize">maximum number of pixels in each direction by which to randomize the click location</param>
-        protected void LeftClick(int x, int y, int randomize = 0, int hoverDelay = 200)
+        protected Point LeftClick(int x, int y, int randomize = 0, int hoverDelay = 200)
         {
-            if (!StopFlag)  //don't click if the stop flag has been raised
-            {
-                randomize = (int)((ScreenHeight / 1000.0) * randomize);
-                Mouse.LeftClick(x, y, RSClient, randomize, hoverDelay);
-            }
+            randomize = (int)((ScreenHeight / 1000.0) * randomize);
+            return Mouse.LeftClick(x, y, RSClient, randomize, hoverDelay);
         }
 
         /// <summary>
@@ -624,13 +642,10 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected void RightClick(int x, int y, int randomize = 0, int hoverDelay = 200)
+        protected Point RightClick(int x, int y, int randomize = 0, int hoverDelay = 200)
         {
-            if (!StopFlag)  //don't click if the stop flag has been raised
-            {
-                randomize = (int)((ScreenHeight / 1000.0) * randomize);
-                Mouse.RightClick(x, y, RSClient, randomize, hoverDelay);
-            }
+            randomize = (int)((ScreenHeight / 1000.0) * randomize);
+            return Mouse.RightClick(x, y, RSClient, randomize, hoverDelay);
         }
 
         /// <summary>
@@ -996,7 +1011,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected bool ReadWindow(bool checkClient = true, bool fastCapture = false)
         {
-            if (checkClient && !PrepareClient()) { return false; }
+            if (StopFlag || checkClient && !PrepareClient()) { return false; }
 
             if (Bitmap != null)
             {
@@ -1824,11 +1839,11 @@ namespace RunescapeBot.BotPrograms
         /// Refer to member PossibleBankBooths for a list of possible bank types
         /// </summary>
         /// <returns>true if the bank is opened</returns>
-        protected bool OpenBank(out Bank bankPopup)
+        protected bool OpenBank(out Bank bankPopup, int allowedAttempts = 1)
         {
             bankPopup = null;
 
-            if (OpenKnownBank(out bankPopup))
+            if (OpenKnownBank(out bankPopup, allowedAttempts))
             {
                 return true;
             }
@@ -1840,17 +1855,22 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="bankPopup"></param>
         /// <returns></returns>
-        protected bool OpenKnownBank(out Bank bankPopup)
+        protected bool OpenKnownBank(out Bank bankPopup, int allowedAttempts = 1)
         {
             bankPopup = null;
             if (BankBoothLocator == null) { return false; }
 
             Blob bankBooth;
-            if (BankBoothLocator(out bankBooth))
+            for (int i = 0; i < allowedAttempts; i++)
             {
-                MouseOverStationaryObject(bankBooth, true, 10);
-                bankPopup = new Bank(RSClient, Inventory);
-                return bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT);
+                if (BankBoothLocator(out bankBooth) && MouseOverStationaryObject(bankBooth, true, 10))
+                {
+                    bankPopup = new Bank(RSClient, Inventory);
+                    if (bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
+                    {
+                        return true;
+                    }
+                }
             }
             return false;
         }
@@ -2177,12 +2197,12 @@ namespace RunescapeBot.BotPrograms
             while (!ImageProcessing.ImageMatch(pastImage, presentImage, colorStrictness, locationStrictness)
                 || !ImageProcessing.ImageMatch(presentImage, futureImage, colorStrictness, locationStrictness))
             {
-                if (StopFlag || watch.ElapsedMilliseconds >= timeout)
+                if (StopFlag || watch.ElapsedMilliseconds >= timeout || SafeWait(100))
                 {
                     return false;   //timeout
                 }
 
-                ReadWindow();
+                ReadWindow(true, true);
                 pastImage = presentImage;
                 presentImage = futureImage;
                 futureImage = ScreenPiece(Center.X - xOffset, Center.X + xOffset, Center.Y - yOffset, Center.Y + yOffset);
@@ -2205,7 +2225,7 @@ namespace RunescapeBot.BotPrograms
                     break;
                 case RunParams.CameraPosition.NorthAerial:
                     LeftClick(compassX, compassY);
-                    Keyboard.UpArrow(1500);
+                    Keyboard.UpArrow(1000);
                     break;
             }
         }

@@ -10,6 +10,8 @@ namespace RunescapeBot.BotPrograms.Popups
 {
     public class Bank
     {
+        #region properties
+
         Process RSClient;
         Inventory InventoryItems;
         public int Left { get; set; }
@@ -17,10 +19,14 @@ namespace RunescapeBot.BotPrograms.Popups
         public int Top { get; set; }
         public int Bottom { get; set; }
 
-        public Bank(Process RSClient, Inventory inventory)
+        #endregion
+
+        #region constructors
+
+        public Bank(Process rsClient, Inventory inventory)
         {
-            this.RSClient = RSClient;
-            Point screenSize = ScreenScraper.GetWindowSize(RSClient);
+            RSClient = rsClient;
+            Point screenSize = ScreenScraper.GetWindowSize(rsClient);
             InventoryItems = inventory;
             SetLeft(screenSize.X);
             SetRight(screenSize.X);
@@ -83,6 +89,20 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
+        /// Close the bank pop-up using the top-right X button
+        /// </summary>
+        public void Close()
+        {
+            int x = Left + 469;
+            int y = Top + 17;
+            Mouse.LeftClick(x, y, RSClient, 7);
+        }
+
+        #endregion
+
+        #region visual
+
+        /// <summary>
         /// Determines if the bank screen is currently visible
         /// </summary>
         /// <returns>true if the bank is open</returns>
@@ -127,6 +147,68 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
+        /// Waits for the "Enter amount:" prompt to appear over the chat box
+        /// </summary>
+        /// <param name="timeout">Gives up after the max wait time has elapsed</param>
+        /// <returns>true if the prompt appears</returns>
+        public bool WaitForEnterAmount(int timeout)
+        {
+            return BotUtilities.WaitForEnterAmount(RSClient, timeout);
+        }
+
+        /// <summary>
+        /// Determines the point on screen of a bank item slot.
+        /// Assumes that the scroll is at the top of the current tab.
+        /// Only works on the current tab.
+        /// </summary>
+        /// <param name="column">bank item slots from left slot (0-7)</param>
+        /// <param name="row">bank item slots from top slot (0-n)</param>
+        /// <returns></returns>
+        private Point? ItemSlotLocation(int column, int row)
+        {
+            if (column < 0 || column > 7 || row < 0)
+            {
+                return null;
+            }
+
+            const int xOffset = 71;
+            const int yOffset = 91;
+            const int slotWidth = 48;
+            const int slotHeight = 36;
+
+            int xCoordinate = Left + xOffset + (column * slotWidth);
+            int yCoordinate = Top + yOffset + (row * slotHeight);
+            return new Point(xCoordinate, yCoordinate);
+        }
+
+        /// <summary>
+        /// Determines if a bank slot is occupied by an empty placeholder
+        /// </summary>
+        /// <param name="screen">image of the entire game screen</param>
+        /// <returns></returns>
+        public bool SlotIsEmpty(int x, int y, Color[,] screen)
+        {
+            Rectangle counterOffset = new Rectangle(-16, -17, 8, 11);
+            Point slotLocation = ItemSlotLocation(x, y).Value;
+            int left = slotLocation.X + counterOffset.X;
+            int right = slotLocation.X + counterOffset.X + counterOffset.Width;
+            int top = slotLocation.Y + counterOffset.Y;
+            int bottom = slotLocation.Y + counterOffset.Y + counterOffset.Height;
+
+            if (screen == null)
+            {
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            }
+            screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
+            double slotCounterMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRangeFactory.BankSlotPlaceholderZero());
+            return slotCounterMatch > 0.1;
+        }
+
+        #endregion
+
+        #region deposit / withdraw
+
+        /// <summary>
         /// Clicks on the "Deposit Inventory" button in the bank pop-up
         /// </summary>
         /// <param name="screenWidth">width of the game screen in pixels</param>
@@ -165,31 +247,6 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             Mouse.LeftClick(Left + 279, Bottom - 15, RSClient, 5);
             BotProgram.SafeWaitPlus(200, 20);
-        }
-
-        /// <summary>
-        /// Determines the point on screen of a bank item slot.
-        /// Assumes that the scroll is at the top of the current tab.
-        /// Only works on the current tab.
-        /// </summary>
-        /// <param name="column">bank item slots from left slot (0-7)</param>
-        /// <param name="row">bank item slots from top slot (0-n)</param>
-        /// <returns></returns>
-        private Point? ItemSlotLocation(int column, int row)
-        {
-            if (column < 0 || column > 7 || row < 0)
-            {
-                return null;
-            }
-
-            const int xOffset = 71;
-            const int yOffset = 91;
-            const int slotWidth = 48;
-            const int slotHeight = 36;
-
-            int xCoordinate = Left + xOffset + (column * slotWidth);
-            int yCoordinate = Top + yOffset + (row * slotHeight);
-            return new Point(xCoordinate, yCoordinate);
         }
 
         /// <summary>
@@ -276,25 +333,6 @@ namespace RunescapeBot.BotPrograms.Popups
             BotProgram.SafeWaitPlus(200, 100);
         }
 
-        /// <summary>
-        /// Close the bank pop-up using the top-right X button
-        /// </summary>
-        public void Close()
-        {
-            const int xOffset = 469;
-            const int yOffset = 17;
-            Point click = Probability.GaussianCircle(new Point(Left + xOffset, Top + yOffset), 3, 0, 360, 7);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
-        }
-
-        /// <summary>
-        /// Waits for the "Enter amount:" prompt to appear over the chat box
-        /// </summary>
-        /// <param name="timeout">Gives up after the max wait time has elapsed</param>
-        /// <returns>true if the prompt appears</returns>
-        public bool WaitForEnterAmount(int timeout)
-        {
-            return BotUtilities.WaitForEnterAmount(RSClient, timeout);
-        }
+        #endregion
     }
 }

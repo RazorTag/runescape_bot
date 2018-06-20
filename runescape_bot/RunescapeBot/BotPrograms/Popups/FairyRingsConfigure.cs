@@ -112,6 +112,7 @@ namespace RunescapeBot.BotPrograms.Popups
             SpinLeftDial(leftCode);
             SpinCenterDial(centerCode);
             SpinRightDial(rightCode);
+            WaitForDialSpin(2);
         }
 
         /// <summary>
@@ -132,9 +133,7 @@ namespace RunescapeBot.BotPrograms.Popups
                     break;
                 case 'c':
                     Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y, RSClient);
-                    WaitForDialSpin();
                     Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y, RSClient);
-                    WaitForDialSpin();
                     break;
             }
         }
@@ -157,9 +156,7 @@ namespace RunescapeBot.BotPrograms.Popups
                     break;
                 case 'k':
                     Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y, RSClient);
-                    WaitForDialSpin();
                     Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y, RSClient);
-                    WaitForDialSpin();
                     break;
             }
         }
@@ -182,19 +179,18 @@ namespace RunescapeBot.BotPrograms.Popups
                     break;
                 case 'r':
                     Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y, RSClient);
-                    WaitForDialSpin();
                     Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y, RSClient);
-                    WaitForDialSpin();
                     break;
             }
         }
 
         /// <summary>
-        /// Waits for a dial to spin one quarter turn.
+        /// Waits for a dial to spin the specified number of quarter turns
         /// </summary>
-        protected void WaitForDialSpin()
+        protected void WaitForDialSpin(int numberOfTurns)
         {
-            BotProgram.SafeWaitPlus(1500, 500);
+            const int quarterTurnTime = 1000;
+            BotProgram.SafeWaitPlus(numberOfTurns * quarterTurnTime, 100);
         }
 
         /// <summary>
@@ -205,7 +201,7 @@ namespace RunescapeBot.BotPrograms.Popups
             Mouse.LeftClick(TeleportButton.X, TeleportButton.Y, RSClient, 8);
             if (waitForTeleport)
             {
-                BotProgram.SafeWait(4000);
+                BotProgram.SafeWait(2000);
             }
         }
 

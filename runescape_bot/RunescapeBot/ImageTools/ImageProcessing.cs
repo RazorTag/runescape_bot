@@ -1,4 +1,5 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms;
+using RunescapeBot.Common;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

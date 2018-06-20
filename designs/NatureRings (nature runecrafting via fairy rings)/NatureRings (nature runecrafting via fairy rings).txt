@@ -59,5 +59,4 @@
 
 
   //---Failsafes:
-  //Use a glory teleport to bank in edgeville if we find ourselves without a ring of dueling
-  //If inventory gets messed up, the deposit all at the bank and withdraw pouches
+  //If inventory gets messed up, then deposit all at the bank and withdraw pouches

@@ -97,6 +97,15 @@ namespace RunescapeBot.BotPrograms
             Screen = colorArray;
         }
 
+        /// <summary>
+        /// Called by BotProgram to update with the most current client process.
+        /// </summary>
+        /// <param name="colorArray">the newest screenshot</param>
+        public void SetClient(Process rsClient)
+        {
+            RSClient = rsClient;
+        }
+
         #endregion
 
         #region visual
@@ -303,7 +312,8 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines if the character is currently running
+        /// Determines if the character is currently running.
+        /// Assumes the character is running if a stamina potion is active because we cannot differentiate.
         /// </summary>
         /// <returns>true for running, false for walking</returns>
         public bool CharacterIsRunning(bool readWindow = false)
@@ -315,8 +325,11 @@ namespace RunescapeBot.BotPrograms
 
             Point runOrb = RunOrbSamplePoint();
             Color runColor = Screen[runOrb.X, runOrb.Y];
-            RGBHSBRange runEnergyBackground = RGBHSBRangeFactory.RunEnergyBackground();
-            return runEnergyBackground.ColorInRange(runColor);
+            RGBHSBRange normalRunEnergyFoot = RGBHSBRangeFactory.RunEnergyFoot();
+            RGBHSBRange staminaRunEnergyFoot = RGBHSBRangeFactory.RunEnergyFootStamina();
+            bool normalRun = normalRunEnergyFoot.ColorInRange(runColor);
+            bool staminaRun = staminaRunEnergyFoot.ColorInRange(runColor);
+            return normalRun || staminaRun;
         }
 
         /// <summary>
@@ -329,10 +342,10 @@ namespace RunescapeBot.BotPrograms
             switch (ScreenScraper.ClientType)
             {
                 case ScreenScraper.Client.Jagex:
-                    runOrb = new Point(ScreenWidth - 153, 129);
+                    runOrb = new Point(ScreenWidth - 160, 132);
                     break;
                 case ScreenScraper.Client.OSBuddy:
-                    runOrb = new Point(ScreenWidth - 149, 134);
+                    runOrb = new Point(ScreenWidth - 156, 137);
                     break;
                 default:
                     return new Point(0, 0);
