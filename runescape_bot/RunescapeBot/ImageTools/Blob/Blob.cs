@@ -446,6 +446,21 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Finds the unweighter center of a cluster of blobs by treating each blob as an equal point
+        /// </summary>
+        /// <param name="cluster">list of blobs to find the center of</param>
+        /// <returns>unweighted center of a cluster</returns>
+        public static Point ClusterCenter(List<Blob> cluster)
+        {
+            List<Point> blobCenters = new List<Point>();
+            foreach(Blob blob in cluster)
+            {
+                blobCenters.Add(blob.Center);
+            }
+            return Geometry.CenterPoint(blobCenters);
+        }
+
+        /// <summary>
         /// Finds the closest blob in a list of blobs
         /// </summary>
         /// <param name="center">center point to search from</param>

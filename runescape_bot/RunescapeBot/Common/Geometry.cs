@@ -94,7 +94,7 @@ namespace RunescapeBot.Common
         /// <returns>the averae of the list of points</returns>
         public static Point CenterPoint(List<Point> cluster)
         {
-            if (cluster == null) { return new Point(); }
+            if (cluster == null || cluster.Count == 0) { return new Point(); }
 
             int xTotal = 0;
             int yTotal = 0;
@@ -103,8 +103,8 @@ namespace RunescapeBot.Common
                 xTotal += cluster[i].X;
                 yTotal += cluster[i].Y;
             }
-            int x = (int) Math.Round(xTotal / ((double)cluster.Count));
-            int y = (int) Math.Round(yTotal / ((double)cluster.Count));
+            int x = (int) Math.Round(xTotal / ((double)cluster.Count), 0);
+            int y = (int) Math.Round(yTotal / ((double)cluster.Count), 0);
 
             return new Point(x, y);
         }

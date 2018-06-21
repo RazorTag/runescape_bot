@@ -107,23 +107,32 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public virtual bool WaitForPopup(int timeout = 3000, bool checkHeight = false)
+        public virtual bool WaitForPopup(int timeout = 3000, CheckHeight checkHeight = CheckHeight.None)
         {
             Color[,] screen = null;
             Stopwatch watch = new Stopwatch();
             watch.Start();
             while (watch.ElapsedMilliseconds < timeout)
             {
-                if (BotProgram.StopFlag) { return false; }
-                BotProgram.SafeWait(200);
+                if (BotProgram.SafeWait(200)) { return false; }
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
                 if (PopupExists(screen))
                 {
-                    return !checkHeight || PopupIsCorrectHeight(screen);
+                    return PopupIsCorrectHeight(screen, checkHeight);
                 }
             }
             
             return false;
+        }
+
+        /// <summary>
+        /// Method for verifying the popup
+        /// </summary>
+        public enum CheckHeight : int
+        {
+            None,   //Do not check height at all
+            Half,   //Verify that the popup is at least as tall as we expect.
+            Full    //Verify that the popup is exactly as tall as we expect.
         }
 
         /// <summary>
@@ -146,14 +155,28 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         /// <param name="screen">the full game screen</param>
         /// <returns>true if the expected bottom row is found</returns>
-        protected bool PopupIsCorrectHeight(Color[,] screen)
+        protected bool PopupIsCorrectHeight(Color[,] screen, CheckHeight checkHeight)
         {
+            if (checkHeight == CheckHeight.None)
+            {
+                return true;    //No height checking needed
+            }
+
             int left = XClick - MIN_WIDTH / 2;
             int right = XClick + MIN_WIDTH / 2;
             int top = Bottom - ROW_HEIGHT;
             double lastRow = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.RightClickPopup(), left, right, top, Bottom);
-            double belowPopup = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.RightClickPopup(), left, right, top + ROW_HEIGHT, Bottom + ROW_HEIGHT);
-            return lastRow > 0.7 && belowPopup < 0.7;
+
+            switch (checkHeight)
+            {
+                case CheckHeight.Half:
+                    return lastRow > 0.7;
+                case CheckHeight.Full:
+                    double belowPopup = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.RightClickPopup(), left, right, top + ROW_HEIGHT, Bottom + ROW_HEIGHT);
+                    return lastRow > 0.7 && belowPopup < 0.7;
+            }
+
+            return false;   //Should never reach here.
         }
 
         /// <summary>

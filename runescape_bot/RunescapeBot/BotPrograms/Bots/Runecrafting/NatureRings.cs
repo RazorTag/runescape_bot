@@ -140,7 +140,7 @@ namespace RunescapeBot.BotPrograms
                 && CraftAllPouches())
             {
                 FailedRuns = 0;
-                RunParams.Iterations--;
+                RunParams.Iterations -= EssencePerRun;
             }
             else
             {
@@ -149,6 +149,31 @@ namespace RunescapeBot.BotPrograms
 
             bool giveUp = FailedRuns > 10;
             return !giveUp;
+        }
+
+        /// <summary>
+        /// The expected number of essence for the player to craft in each successful run.
+        /// </summary>
+        protected int EssencePerRun
+        {
+            get
+            {
+                switch (UserSelections.NumberOfPouches)
+                {
+                    case 0:
+                        return 28;
+                    case 1:
+                        return 30;
+                    case 2:
+                        return 35;
+                    case 3:
+                        return 43;
+                    case 4:
+                        return 54;
+                    default:
+                        return 28;
+                }
+            }
         }
 
         #endregion
@@ -519,12 +544,8 @@ namespace RunescapeBot.BotPrograms
             {
                 return null;
             }
-            Blob ringCenter = new Blob();
-            foreach(Blob mushroom in mushrooms)
-            {
-                ringCenter.AddBlob(mushroom);
-            }
-            return ringCenter.Center;
+
+            return Blob.ClusterCenter(mushrooms);
         }
 
         /// <summary>
@@ -545,7 +566,7 @@ namespace RunescapeBot.BotPrograms
             int y = ringCenter.Value.Y;
             RightClick(x, y, 6);
             RightClick fairyRingOptions = new RightClick(x, y, RSClient, 6);
-            if (!fairyRingOptions.WaitForPopup(2000, true))
+            if (!fairyRingOptions.WaitForPopup(2000, Popups.RightClick.CheckHeight.Half))
             {
                 return false;
             }
@@ -708,7 +729,7 @@ namespace RunescapeBot.BotPrograms
 
             if (!MouseOverStationaryObject(new Blob(searchCenter), true, 10, 1000))  //click on the exterior nature altar to enter
             {
-                if (!LocateObject(NatureAltar, out exteriorAltar, searchCenter, ArtifactLength(0.3), minimumSize) && !LocateObject(NatureAltar, out exteriorAltar, minimumSize))
+                if (!LocateAltar(out exteriorAltar, searchCenter, ArtifactLength(0.3)))
                 {
                     return false;
                 }
@@ -724,9 +745,36 @@ namespace RunescapeBot.BotPrograms
             Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.311));
             int x = InventorySlotSmallPouch.X, y = InventorySlotSmallPouch.Y;
             Inventory.InventoryToScreen(ref x, ref y);
-            CraftInventory(altarLocation, new Point(x, y), true);
-            WaitForRunesToCraft(false, 3 * BotRegistry.GAME_TICK);
 
+            for (int i = 0; i < 5; i++)
+            {
+                CraftInventory(altarLocation, new Point(x, y), true);
+                if (WaitForRunesToCraft(false, 3 * BotRegistry.GAME_TICK))
+                {
+                    break;
+                }
+                SafeWait(BotRegistry.GAME_TICK);
+            }
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Looks for the exterior of interior of a runecrafting altar
+        /// </summary>
+        /// <param name="altar">returns the altar blob if found</param>
+        /// <param name="searchCenter">center of area to look at in first pass</param>
+        /// <param name="searchRadius">vertical and horitzontal offset from the center defining the swuare to search in</param>
+        /// <returns>true if an altar is found</returns>
+        protected bool LocateAltar(out Blob altar, Point? searchCenter = null, int searchRadius = int.MaxValue)
+        {
+            searchCenter = searchCenter ?? Center;
+            int minimumSize = ArtifactArea(0.01);   //ex 0.0236
+
+            if (!LocateObject(NatureAltar, out altar, searchCenter.Value, ArtifactLength(0.3), minimumSize))
+            {
+                return LocateObject(NatureAltar, out altar);
+            }
             return true;
         }
 
@@ -771,9 +819,12 @@ namespace RunescapeBot.BotPrograms
             Blob interiorAltar = new Blob(altarLocation);
 
             //guess the location before searching
-            if (!MouseOverStationaryObject(interiorAltar, true, 20, 5000) && !LocateObject(NatureAltar, out interiorAltar, ArtifactArea(0)))  //search the entire screen for the altar as a fallback
+            if (!MouseOverStationaryObject(interiorAltar, true, 20, 5000))
             {
-                return false;
+                if (!LocateAltar(out interiorAltar) || !MouseOverStationaryObject(interiorAltar, true, 20, 3000))
+                {
+                    return false;
+                }
             }
             if (restMouse != null)
             {
