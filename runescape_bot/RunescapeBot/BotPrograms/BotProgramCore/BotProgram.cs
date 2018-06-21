@@ -1847,7 +1847,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return true;
             }
-            return IdentifyBank() && OpenKnownBank(out bankPopup);
+            return IdentifyBank() && OpenKnownBank(out bankPopup, 1);
         }
 
         /// <summary>

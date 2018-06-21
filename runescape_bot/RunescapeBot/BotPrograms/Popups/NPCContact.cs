@@ -13,7 +13,7 @@ namespace RunescapeBot.BotPrograms.Popups
 {
     public class NPCContact
     {
-        const int NPC_CONTACT_CAST_TIME = 8 * BotRegistry.GAME_TICK;    //minimum time between choosing an NPC to contact and the NPC dialog opening
+        public const int NPC_CONTACT_CAST_TIME = 8 * BotRegistry.GAME_TICK;    //minimum time between choosing an NPC to contact and the NPC dialog opening
 
         Process RSClient;
         public int Left { get; set; }
@@ -129,7 +129,7 @@ namespace RunescapeBot.BotPrograms.Popups
         }
 
         /// <summary>
-        /// Wait for the bank pop-up to open
+        /// Wait for the NPC Contact pop-up to open
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns>true if the bank pop-up opens</returns>

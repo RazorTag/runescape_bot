@@ -321,16 +321,9 @@ namespace RunescapeBot.ImageTools
         {
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
-            int windowLeft = windowRect.left;
-            int windowTop = windowRect.top;
-            if (windowTop < 0)
-            {
-                windowLeft -= windowTop;
-                windowTop = 0;
-            }
-
-            x += windowLeft + BorderWidth;
-            y += windowTop + ToolbarWidth;
+            TrimClient(ref windowRect);
+            x += windowRect.left;
+            y += windowRect.top;
         }
 
         /// <summary>
@@ -343,8 +336,9 @@ namespace RunescapeBot.ImageTools
         {
             RECT windowRect = new RECT();
             GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
-            x -= windowRect.left + BorderWidth;
-            y -= windowRect.top + ToolbarWidth;
+            TrimClient(ref windowRect);
+            x -= windowRect.left;
+            y -= windowRect.top;
         }
 
         /// <summary>

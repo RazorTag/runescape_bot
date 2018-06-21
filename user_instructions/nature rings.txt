@@ -1,18 +1,18 @@
 -have the lunar magicks spellbook active
 
--equip:
+-Equip:
 	*dramen staff or lunar staff
 	*amulet of eternal glory
 	*nature tiara
 	*weight-reducing clothing
 
--inventory:
+-Inventory:
 	*slot 1 -> small pouch
 	*slot 2 -> medium pouch
 	*slot 3 -> large pouch
 	*slot 4 -> huge pouch
 
--bank going from top-right to top-left
+-Bank going from top-right to top-left
 	*pure essence
 	*stamina potion(4)
 	*cosmic runes
@@ -22,6 +22,8 @@
 	*charge dragonstone scrolls
 -[optional] put the other three dosages of stamina potion on the right three slots of the second row to have the bot pull from those first when available
 
+-Settings:
+	*Iterations counts the number of pure essence used.
 
 
 

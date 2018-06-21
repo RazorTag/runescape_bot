@@ -59,7 +59,7 @@ namespace RunescapeBot.BotPrograms
             IronOre,
             [Description("Mining - Motherlode Mine")]
             MotherlodeMine,
-            [Description("Runecrafting - Fairy Ring Nature Runes")]
+            [Description("Runecrafting - Nature Rings")]
             NatureRings,
             [Description("Smithing - Cannonballs (Phasmatys)")]
             Cannonballs,

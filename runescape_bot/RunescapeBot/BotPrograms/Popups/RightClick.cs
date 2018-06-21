@@ -170,10 +170,10 @@ namespace RunescapeBot.BotPrograms.Popups
             switch (checkHeight)
             {
                 case CheckHeight.Half:
-                    return lastRow > 0.7;
+                    return lastRow > 0.5;
                 case CheckHeight.Full:
                     double belowPopup = ImageProcessing.FractionalMatchPiece(screen, RGBHSBRangeFactory.RightClickPopup(), left, right, top + ROW_HEIGHT, Bottom + ROW_HEIGHT);
-                    return lastRow > 0.7 && belowPopup < 0.7;
+                    return lastRow > 0.5 && belowPopup < 0.25;
             }
 
             return false;   //Should never reach here.
