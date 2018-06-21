@@ -304,11 +304,11 @@ namespace RunescapeBot.BotPrograms
         protected void EvaluateStamina()
         {
             const int drinkBelow = 75;  //Do not drink above 75 run energy.
-            const int mostEarlyDrink = 90;  //Never drink more than 80 seconds before a stamina potion runs out.
+            const int mostEarlyDrink = 100;  //Never drink more than 80 seconds before a stamina potion runs out.
             double runEnergy = 100 * Minimap.RunEnergy(true);
             long timeSinceLastDose = StaminaTimer.ElapsedMilliseconds;
 
-            if (StaminaTimer.ElapsedMilliseconds == 0) //drink a stamina potion for the first time
+            if (!StaminaTimer.IsRunning) //drink a stamina potion for the first time
             {
                 timeSinceLastDose = STAMINA_DURATION;
             }
@@ -474,7 +474,7 @@ namespace RunescapeBot.BotPrograms
             List<MinimapWaypoint> waypoints = new List<MinimapWaypoint>();
             waypoints.Add(new MinimapWaypoint(45, 1, 0));
             waypoints.Add(new MinimapWaypoint(29, 1, 0));
-            waypoints.Add(new MinimapWaypoint(295, 0.95, 7000));
+            waypoints.Add(new MinimapWaypoint(298, 1, 7000));
             if (!Minimap.MoveAlongPath(waypoints, 3, null))
             {
                 return false;
@@ -622,7 +622,7 @@ namespace RunescapeBot.BotPrograms
             waypoints.Add(new MinimapWaypoint(10, 1, 10000));
             waypoints.Add(new MinimapWaypoint(0, 1, 0));
             waypoints.Add(new MinimapWaypoint(-5, 1, 0));
-            waypoints.Add(new MinimapWaypoint(30, 1, 0));
+            waypoints.Add(new MinimapWaypoint(30, 0.94, 0));
             if (!Minimap.MoveAlongPath(waypoints, 3, null))
             {
                 return false;
@@ -718,7 +718,7 @@ namespace RunescapeBot.BotPrograms
                     return false;
                 }
             }
-            SafeWait(BotRegistry.GAME_TICK);
+            SafeWaitPlus((long)(1.5 * BotRegistry.GAME_TICK), 100);
 
             //click on the interior nature altar to craft inventory by guessing the location
             Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.311));
@@ -739,7 +739,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (shortWait)
             {
-                SafeWaitPlus(2 * BotRegistry.GAME_TICK, 100);
+                SafeWaitPlus((long)(1.5 * BotRegistry.GAME_TICK), 100);
                 return true;
             }
 
