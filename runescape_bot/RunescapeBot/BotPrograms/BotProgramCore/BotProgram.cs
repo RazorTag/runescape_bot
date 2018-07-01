@@ -262,6 +262,8 @@ namespace RunescapeBot.BotPrograms
             PossibleBankTypes.Add(LocateBankBoothSeersVillage);
             PossibleBankTypes.Add(LocateBankBoothPhasmatys);
             PossibleBankTypes.Add(LocateBankBoothEdgeville);
+
+            Bank.ResetNAmount();
         }
        
         /// <summary>
@@ -1335,14 +1337,14 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
         protected virtual bool CheckLogIn()
         {
-            if (!IsLoggedOut())
+            //Check several times over several seconds to make sure that we are logged out before trying to log in
+            for (int i = 0; i < 6; i++)
             {
-                return true;    //already logged in
-            }
-            if (SafeWait(2000)) { return false; }
-            if (!IsLoggedOut())
-            {
-                return true;
+                if (!IsLoggedOut())
+                {
+                    return true;    //already logged in
+                }
+                SafeWait(1000);
             }
 
             //see if we have login and password to log in
@@ -1986,19 +1988,25 @@ namespace RunescapeBot.BotPrograms
             const int numberOfBankBooths = 6;
             const double minBoothWidthToHeightRatio = 2.3667;   //ex 2.6667
             const double maxBoothWidthToHeightRatio = 3.1333;   //ex 2.8333
+            int left = Center.X - ArtifactLength(0.5);
+            int right = Center.X + ArtifactLength(0.3);
+            int top = Center.Y - ArtifactLength(0.15);
+            int bottom = Center.Y + ArtifactLength(0.2);
 
             ReadWindow();
-            bool[,] bankBooths = ColorFilter(RGBHSBRangeFactory.BankBoothPhasmatys());
+            Point offset;
+            bool[,] bankBooths = ColorFilterPiece(RGBHSBRangeFactory.BankBoothPhasmatys(), left, right, top, bottom, out offset);
             List<Blob> boothBlobs = new List<Blob>();
             List<Blob> possibleBoothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);  //list of blobs from biggest to smallest
             possibleBoothBlobs.Sort(new BlobProximityComparer(Center));
-            double widthToHeightRatio;
+            double widthToHeightRatio, rectangularity;
 
             //Remove blobs that aren't bank booths
             foreach(Blob possibleBooth in possibleBoothBlobs)
             {
                 widthToHeightRatio = (possibleBooth.Width / (double)possibleBooth.Height);
-                if (Numerical.WithinBounds(widthToHeightRatio, minBoothWidthToHeightRatio, maxBoothWidthToHeightRatio))
+                rectangularity = Geometry.Rectangularity(possibleBooth);
+                if (Numerical.WithinBounds(widthToHeightRatio, minBoothWidthToHeightRatio, maxBoothWidthToHeightRatio) && rectangularity > 0.75)
                 {
                     boothBlobs.Add(possibleBooth);
                 }
@@ -2013,7 +2021,8 @@ namespace RunescapeBot.BotPrograms
             boothBlobs.Sort(new BlobHorizontalComparer());  //sort from left to right
             boothBlobs.RemoveAt(3); //remove the unusable booths without tellers
             boothBlobs.RemoveAt(0);
-            bankBooth = Blob.ClosestBlob(Center, boothBlobs);
+            bankBooth = Blob.ClosestBlob(new Point(Center.X - left, Center.Y - top), boothBlobs);
+            bankBooth.ShiftPixels(offset.X, offset.Y);
             return true;
         }
 
@@ -2164,7 +2173,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="minWaitTime"></param>
         /// <param name="stdDev"></param>
-        /// <returns></returns>
+        /// <returns>true if the stop flag is raised</returns>
         public static bool SafeWaitPlus(long minWaitTime, double stdDev)
         {
             if (minWaitTime <= 0)
@@ -2298,12 +2307,17 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Decrements the Iterations counter as items are made
+        /// Decrements the Iterations counter as items are made.
         /// Assumes that items are being made in time. Does not visually check.
         /// </summary>
         /// <param name="decrement">Set to true to decrement Iterations during the countdown</param>
-        protected void CountDownItems(bool decrement)
+        protected void CountDownItems(bool decrement, bool watchNetflix = false)
         {
+            if (watchNetflix)
+            {
+                WatchNetflix(0);
+            }
+
             RunParams.BotIdle = true;
             for (int i = 0; i < MakeQuantity; i++)
             {

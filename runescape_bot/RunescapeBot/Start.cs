@@ -1,5 +1,6 @@
 ﻿using RunescapeBot.BotPrograms;
 using RunescapeBot.BotPrograms.Settings;
+using RunescapeBot.BotPrograms.Settings.SettingsForms;
 using RunescapeBot.Common;
 using RunescapeBot.FileIO;
 using RunescapeBot.UITools;
@@ -250,6 +251,7 @@ namespace RunescapeBot
                 return;
             }
             RunBotProgram(sender);
+            SaveBot();
         }
 
         /// <summary>
@@ -389,13 +391,20 @@ namespace RunescapeBot
         {
             if (IsHandleCreated)
             {
-                Invoke((MethodInvoker)(() =>
+                try
                 {
-                    UpdateTimer_Tick(null, null);
-                    SetIdleState();
-                    StartButton.Enabled = true;
-                    SaveBot();
-                }));
+                    Invoke((MethodInvoker)(() =>
+                    {
+                        UpdateTimer_Tick(null, null);
+                        SetIdleState();
+                        StartButton.Enabled = true;
+                        SaveBot();
+                    }));
+                }
+                catch
+                {
+                    //TODO
+                }
             }
         }
 
@@ -781,6 +790,7 @@ namespace RunescapeBot
         public Form GetCustomSettingsForm(CustomSettingsData settings)
         {
             if (RunParams.BotAction == BotRegistry.BotActions.NatureRings) { return new NatureRingsSettings(settings); }
+            if (RunParams.BotAction == BotRegistry.BotActions.LesserDemon) { return new LesserDemonSettings(settings); }
 
             return null;    //The selected bot action does not have custom settings associated with it.
         }

@@ -352,11 +352,11 @@ namespace RunescapeBot.BotPrograms
         /// <param name="subjectItem">the item to use on another item</param>
         /// <param name="objectItem">the item to be used on</param>
         /// <returns>true if the operation seems to succeed</returns>
-        public void UseItemOnItem(Point subjectItem, Point objectItem, bool safeTab = true)
+        public void UseItemOnItem(Point subjectItem, Point objectItem, bool safeTab = false)
         {
             ClickInventory(subjectItem.X, subjectItem.Y, safeTab);
             BotProgram.SafeWaitPlus(200, 30);
-            ClickInventory(objectItem.X, objectItem.Y, safeTab);
+            ClickInventory(objectItem.X, objectItem.Y, false);
         }
 
         /// <summary>
@@ -524,6 +524,46 @@ namespace RunescapeBot.BotPrograms
             x = Screen.GetLength(0) - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X);
             y = Screen.GetLength(1) - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y);
             return true;
+        }
+
+        /// <summary>
+        /// Mirrors an inventory slot across the horzontal midline of the inventory.
+        /// Slots in the middle row of an odd number of rows are mirrored horizontally.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <returns>A mirror of the input point original.</returns>
+        public Point MirrorVertical(Point original)
+        {
+            int mirrorX = original.X;
+            int mirrorY = (INVENTORY_ROWS - 1) - original.Y;
+
+            //mirror horizontally for a middle row since it has no vertical mirror row
+            if ((INVENTORY_ROWS % 2 == 1) && (original.Y == INVENTORY_ROWS / 2))
+            {
+                mirrorX = (INVENTORY_COLUMNS - 1) - original.X;
+            }
+
+            return new Point(mirrorX, mirrorY);
+        }
+
+        /// <summary>
+        /// Mirrors an inventory slot across the vertical midline of the inventory.
+        /// Slots in the middle row of an odd number of rows are mirrored horizontally.
+        /// </summary>
+        /// <param name="original"></param>
+        /// <returns>A mirror of the input point original.</returns>
+        public Point MirrorHorizontal(Point original)
+        {
+            int mirrorX = (INVENTORY_COLUMNS - 1) - original.X;
+            int mirrorY = original.Y;
+
+            //mirror vertically for a middle column since it has no horizontal mirror row
+            if ((INVENTORY_ROWS % 2 == 1) && (original.Y == INVENTORY_ROWS / 2))
+            {
+                mirrorY = (INVENTORY_ROWS - 1) - original.Y;
+            }
+
+            return new Point(mirrorX, mirrorY);
         }
 
         #endregion
@@ -948,7 +988,7 @@ namespace RunescapeBot.BotPrograms
         public const int INVENTORY_OFFSET_TOP = 275;
         public const int INVENTORY_GAP_X = 42;
         public const int INVENTORY_GAP_Y = 36;
-        public const int INVENTORY_CAPACITY = 28;
+        public const int INVENTORY_CAPACITY = INVENTORY_ROWS * INVENTORY_COLUMNS;
         public const int INVENTORY_COLUMNS = 4;
         public const int INVENTORY_ROWS = 7;
 

@@ -92,6 +92,7 @@
     <Compile Include="BotPrograms\Bots\BankStanding\BankStand.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Enchant.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Herblore.cs" />
+    <Compile Include="BotPrograms\Bots\BankStanding\Serum207.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\TanHides.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\UnfinishedPotions.cs" />
     <Compile Include="BotPrograms\Bots\Combat\Combat.cs" />
@@ -134,8 +135,15 @@
     <Compile Include="BotPrograms\Settings\RunParams\PhasmatysRunParams.cs" />
     <Compile Include="BotPrograms\Settings\RunParams\RotationRunParams.cs" />
     <Compile Include="BotPrograms\Settings\RunParams\RunParamsList.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsData\LesserDemonSettingsData.cs" />
     <Compile Include="BotPrograms\Settings\SettingsData\NatureRingsSettingsData.cs" />
     <Compile Include="BotPrograms\Settings\SettingsData\CustomSettingsData.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsForms\LesserDemonSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BotPrograms\Settings\SettingsForms\LesserDemonSettings.Designer.cs">
+      <DependentUpon>LesserDemonSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -194,6 +202,9 @@
     <Compile Include="UITools\Keyboard.cs" />
     <Compile Include="UITools\Mouse.cs" />
     <Compile Include="UITools\User32.cs" />
+    <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\LesserDemonSettings.resx">
+      <DependentUpon>LesserDemonSettings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.resx">
       <DependentUpon>NatureRingsSettings.cs</DependentUpon>
     </EmbeddedResource>

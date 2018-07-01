@@ -12,6 +12,11 @@ namespace RunescapeBot.BotPrograms.Popups
     {
         #region properties
 
+        /// <summary>
+        /// The most recent amount of items withdrawn using Withdraw-X that will apply to Withdraw-N.
+        /// </summary>
+        public static int NAmount { get; set; }
+
         Process RSClient;
         Inventory InventoryItems;
         public int Left { get; set; }
@@ -96,6 +101,14 @@ namespace RunescapeBot.BotPrograms.Popups
             int x = Left + 469;
             int y = Top + 17;
             Mouse.LeftClick(x, y, RSClient, 7);
+        }
+
+        /// <summary>
+        /// Resets the saved value for the amount to withdrawn with Withdraw-N.
+        /// </summary>
+        public static void ResetNAmount()
+        {
+            NAmount = 0;
         }
 
         #endregion
@@ -286,11 +299,18 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="quantity">number of items to withdraw</param>
         public void WithdrawX(int column, int row, int quantity)
         {
+            if (quantity == NAmount)
+            {
+                WithdrawN(column, row); //Use Withdraw-N instead of Withdraw-X if Withdraw-N is set to withdraw the amount that we want
+                return;
+            }
+
             const int yOffset = 85;
             WithdrawMenuClick(column, row, yOffset);
             if (WaitForEnterAmount(5000))
             {
                 BotUtilities.EnterAmount(RSClient, quantity);
+                NAmount = quantity;
             }
         }
 

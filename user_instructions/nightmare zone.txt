@@ -2,6 +2,7 @@
 -turn off the monster hitpoints that show up in the top-left corner
 -turn off show stat changes
 
-Inventory: rock cake, 12 overloads (48 doses), 15 absorptions (60 doses)
+Inventory (melee with high defense): rock cake, 12 overloads, 15 absorptions
+Inventory (range with high defense): rock cake, 8 overloads, 19 absorptions
 
 Bosses: Aarg, Sand Snake, Count Draynor, King Roald, Kendal

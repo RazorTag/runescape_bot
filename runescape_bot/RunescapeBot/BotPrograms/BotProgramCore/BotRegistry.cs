@@ -27,33 +27,33 @@ namespace RunescapeBot.BotPrograms
             AgilitySeersVillage,
             [Description("Combat - Lesser Demon (Wizards' Tower)")]
             LesserDemon,
-            [Description("Combat - Lesser Demon (no pickups)")]
-            LesserDemonSimple,
             [Description("Combat - Nightmare Zone")]
             NightmareZoneD,
             [Description("Construction - Butler Sawmill (Camelot PvP)")]
             ButlerSawmill,
-            [Description("Crafting - Cut Gems (Varrock west)")]
+            [Description("Crafting - Cut Gems")]
             CutGems,
             [Description("Crafting - Gold Bracelets (Phasmatys)")]
             GoldBracelets,
-            [Description("Firemaking - (Phasmatys)")]
+            [Description("Firemaking - Phasmatys")]
             Firemaking,
             [Description("Fishing - Barbarian Fishing (drop)")]
             BarbarianFishing,
-            [Description("Fletching - Short Bows (Varrock west)")]
+            [Description("Fletching - Short Bows")]
             FletchShortBows,
-            [Description("Fletching - String Bows (Varrock west)")]
+            [Description("Fletching - String Bows")]
             StringBows,
-            [Description("Herblore - Make Unfinished Potions (Varrock west)")]
+            [Description("Herblore - Make Unfinished Potions")]
             MakeUnfinishedPotions,
-            [Description("Herblore - Make Prepared Potions (Varrock west)")]
+            [Description("Herblore - Make Prepared Potions")]
             MakePotionsSimple,
-            [Description("Herblore - Make Potions from Scratch (Varrock west)")]
+            [Description("Herblore - Make Potions from Scratch")]
             MakePotionsFull,
-            [Description("Magic - Enchant Level 2 (Varrock west)")]
+            [Description("Herblore - Serum 207")]
+            Serum207,
+            [Description("Magic - Enchant Level 2")]
             EnchantLevel2,
-            [Description("Magic - Tan Hides (Varrock west)")]
+            [Description("Magic - Tan Hides")]
             TanHides,
             [Description("Mining - Iron Ore")]
             IronOre,
@@ -82,8 +82,6 @@ namespace RunescapeBot.BotPrograms
             {
                 case BotActions.LesserDemon:
                     return new LesserDemon(runParams);
-                case BotActions.LesserDemonSimple:
-                    return new LesserDemon(runParams, false, false);
                 case BotActions.GoldBracelets:
                     return new GoldBracelets(runParams);
                 case BotActions.Cannonballs:
@@ -132,6 +130,8 @@ namespace RunescapeBot.BotPrograms
                     return new MotherlodeMine(runParams);
                 case BotActions.NatureRings:
                     return new NatureRings(runParams);
+                case BotActions.Serum207:
+                    return new Serum207(runParams);
             }
             return bot;
         }

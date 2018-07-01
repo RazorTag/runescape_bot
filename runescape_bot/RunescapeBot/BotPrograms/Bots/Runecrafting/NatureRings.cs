@@ -515,7 +515,7 @@ namespace RunescapeBot.BotPrograms
             List<MinimapWaypoint> waypoints = new List<MinimapWaypoint>();
             waypoints.Add(new MinimapWaypoint(45, 1, 0));
             waypoints.Add(new MinimapWaypoint(29, 1, 0));
-            waypoints.Add(new MinimapWaypoint(295, 1, 7000));
+            waypoints.Add(new MinimapWaypoint(297, 1, 7000));
             if (!Minimap.MoveAlongPath(waypoints, 3, null))
             {
                 return false;

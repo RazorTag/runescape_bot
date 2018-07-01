@@ -98,6 +98,7 @@ namespace RunescapeBot.BotPrograms
         protected bool MakeItems(bool finishedProduct)
         {
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
+            SafeWaitPlus(500, 150);
             if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
             {
                 return false;
@@ -106,7 +107,7 @@ namespace RunescapeBot.BotPrograms
             //Wait for the inventory to be processed
             WatchNetflix(0);
             CountDownItems(finishedProduct);
-            return !SafeWaitPlus(0, 300.0);
+            return !SafeWaitPlus(0, 300);
         }
 
         /// <summary>

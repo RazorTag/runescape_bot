@@ -116,6 +116,7 @@ namespace RunescapeBot.Common
         /// <returns>rectangularity (0-1) indicating how rectangular a shape is</returns>
         public static double Rectangularity(Blob shape)
         {
+            //TODO  Find the minimum area bounding rectangle instead of the vertical/horizontal bounding rectangle
             int width = shape.RightBound - shape.LeftBound + 1;
             int height = shape.BottomBound - shape.TopBound + 1;
             double interiorVolume = width * height;

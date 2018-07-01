@@ -39,9 +39,7 @@ namespace RunescapeBot.BotPrograms
             //bool[,] furnace = ColorFilter(Furnace);
             //DebugUtilities.TestMask(Bitmap, ColorArray, Furnace, furnace, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnace");
 
-            //ReadWindow();
-            //bool[,] bankBooth = ColorFilter(BankBooth);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, BankBooth, bankBooth, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankBooth");
+            //MaskTest(RGBHSBRangeFactory.BankBoothPhasmatys());
 
             //ReadWindow();
             //bankPopup = new Bank(ScreenWidth, ScreenHeight);

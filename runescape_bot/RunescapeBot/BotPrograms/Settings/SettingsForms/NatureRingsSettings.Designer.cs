@@ -1,4 +1,4 @@
-﻿namespace RunescapeBot.BotPrograms.Settings
+﻿namespace RunescapeBot.BotPrograms.Settings.SettingsForms
 {
     partial class NatureRingsSettings
     {

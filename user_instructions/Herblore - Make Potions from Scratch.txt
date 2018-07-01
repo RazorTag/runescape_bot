@@ -1,0 +1,4 @@
+Bank slots from top-right to top-left:
+	-herbs (grimy or clean)
+	-vials of water
+	-secondary ingredients

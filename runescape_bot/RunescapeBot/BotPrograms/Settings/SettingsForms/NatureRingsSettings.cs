@@ -9,11 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace RunescapeBot.BotPrograms.Settings
+namespace RunescapeBot.BotPrograms.Settings.SettingsForms
 {
     public partial class NatureRingsSettings : Form
     {
         private NatureRingsSettingsData settings;
+
 
         public NatureRingsSettings(CustomSettingsData settingsData)
         {

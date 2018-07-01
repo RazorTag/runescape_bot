@@ -42,8 +42,6 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool WithdrawItems(Bank bank)
         {
-            if (RunParams.Iterations < 14) { return false; }
-
             bank.DepositInventory();
             bank.WithdrawOne(UseWithBankSlot.X, UseWithBankSlot.Y);
             bank.WithdrawAll(UseOnBankSlot.X, UseOnBankSlot.Y);
@@ -57,6 +55,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool ProcessInventory()
         {
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
+            SafeWaitPlus(500, 200);
             if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
             {
                 return false;
