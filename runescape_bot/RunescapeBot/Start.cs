@@ -791,6 +791,8 @@ namespace RunescapeBot
         {
             if (RunParams.BotAction == BotRegistry.BotActions.NatureRings) { return new NatureRingsSettings(settings); }
             if (RunParams.BotAction == BotRegistry.BotActions.LesserDemon) { return new LesserDemonSettings(settings); }
+            if (RunParams.BotAction == BotRegistry.BotActions.StringBows) { return new Use14On14Settings(settings); }
+            if (RunParams.BotAction == BotRegistry.BotActions.MakeUnfinishedPotions) { return new Use14On14Settings(settings); }
 
             return null;    //The selected bot action does not have custom settings associated with it.
         }

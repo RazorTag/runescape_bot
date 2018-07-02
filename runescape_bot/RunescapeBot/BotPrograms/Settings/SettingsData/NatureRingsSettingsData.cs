@@ -46,10 +46,5 @@ namespace RunescapeBot.BotPrograms.Settings
         /// Assumes that we are not skipping pouches such as using small and large but not medium.
         /// </summary>
         public int NumberOfPouches;
-
-        public NatureRingsSettingsData()
-        {
-
-        }
     }
 }

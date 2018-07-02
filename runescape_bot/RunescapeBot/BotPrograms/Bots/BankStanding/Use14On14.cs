@@ -2,6 +2,7 @@
 using RunescapeBot.ImageTools;
 using System.Drawing;
 using System.Collections.Generic;
+using RunescapeBot.BotPrograms.Settings;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -10,6 +11,8 @@ namespace RunescapeBot.BotPrograms
         public const int STRING_BOW_TIME = 2 * BotRegistry.GAME_TICK;
         public const int FLETCH_BOW_TIME = 3 * BotRegistry.GAME_TICK;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
+
+        protected Use14On14SettingsData UserSelections;
 
         protected Point UseOnInventorySlot;
         protected Point UseWithInventorySlot;
@@ -23,7 +26,16 @@ namespace RunescapeBot.BotPrograms
         /// <param name="makeTime">time needed to make the 14 items being crafted</param>
         public Use14On14(RunParams startParams, int makeTime) : base(startParams)
         {
-            SingleMakeTime = makeTime;
+            UserSelections = startParams.CustomSettingsData.Use14On14;
+            if (UserSelections.MakeTime > 0)
+            {
+                SingleMakeTime = UserSelections.MakeTime;
+            }
+            else
+            {
+                SingleMakeTime = makeTime;
+            }
+
             MakeQuantity = Inventory.INVENTORY_CAPACITY / 2;
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);

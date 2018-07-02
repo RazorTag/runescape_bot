@@ -24,19 +24,6 @@ namespace RunescapeBot.BotPrograms
 
         }
 
-        /// <summary>
-        /// Open bank, withdraw items, close bank, do work with items
-        /// </summary>
-        /// <returns>true if successful</returns>
-        protected override bool Execute()
-        {
-            Bank bank;
-            if (!OpenBank(out bank) || !WithdrawItems(bank)) { return false; }
-            bank.Close();
-            if (StopFlag || !ProcessInventory()) { return false; }
-            return true;
-        }
-
         protected override bool Run()
         {
             //ReadWindow();
@@ -45,6 +32,26 @@ namespace RunescapeBot.BotPrograms
             //ReadWindow();
             //bool[,] bankCounter = ColorFilter(RGBHSBRangeFactory.BankBoothVarrockWest());
             //DebugUtilities.TestMask(Bitmap, ColorArray, RGBHSBRangeFactory.BankBoothVarrockWest(), bankCounter, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankCounter");
+
+            return true;
+        }
+
+        /// <summary>
+        /// Open bank, withdraw items, close bank, do work with items
+        /// </summary>
+        /// <returns>true if successful</returns>
+        protected override bool Execute()
+        {
+            Bank bank;
+            if (!OpenBank(out bank) || !WithdrawItems(bank))
+            {
+                return false;
+            }
+            bank.Close();
+            if (StopFlag || !ProcessInventory())
+            {
+                return false;
+            }
 
             return true;
         }

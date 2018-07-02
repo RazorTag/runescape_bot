@@ -150,6 +150,13 @@
     <Compile Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.Designer.cs">
       <DependentUpon>NatureRingsSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="BotPrograms\Settings\SettingsData\Use14On14SettingsData.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsForms\Use14On14Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BotPrograms\Settings\SettingsForms\Use14On14Settings.Designer.cs">
+      <DependentUpon>Use14On14Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Common\Geometry.cs" />
     <Compile Include="Common\Line.cs" />
     <Compile Include="Common\Numerical.cs" />
@@ -207,6 +214,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\NatureRingsSettings.resx">
       <DependentUpon>NatureRingsSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\Use14On14Settings.resx">
+      <DependentUpon>Use14On14Settings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,0 +1,3 @@
+-Use the closest yellow cube pile in the top-left corner.
+-Enchant only yellow cubes without considering the bonus shape.
+-Deposit in the middle after filling up inventory.
