@@ -145,7 +145,7 @@ namespace RunescapeBot.BotPrograms
             if (true && !CleanHerbs()) { return false; }    //TODO Replace true with conditional based user settings
             Inventory.UseItemOnItem(SecondHalfInventorySlot, FirstHalfInventorySlot);
             if (SafeWaitPlus(750, 200)) { return false; }
-            if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient)) { return false; }
+            if (!ChatBoxSingleOptionMakeAll(RSClient)) { return false; }
             return WaitToMakeUnfinishedPotions(countdown);
         }
 
@@ -170,7 +170,7 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.UseItemOnItem(FirstHalfInventorySlot, SecondHalfInventorySlot);
             if (SafeWaitPlus(750, 200)) { return false; }
-            if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient)) { return false; }
+            if (!ChatBoxSingleOptionMakeAll(RSClient)) { return false; }
             return WaitToMakeFinishedPotions(countdown);
         }
     }

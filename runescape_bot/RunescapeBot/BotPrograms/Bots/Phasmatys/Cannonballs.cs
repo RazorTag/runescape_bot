@@ -25,7 +25,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the actions succeed, false if they fail</returns>
         protected override bool FurnaceActions()
         {
-            BotUtilities.ChatBoxSingleOptionMakeAll(RSClient);
+            ChatBoxSingleOptionMakeAll(RSClient);
             SafeWait(300);
             WatchNetflix(-200);
             CountDownItems(true);

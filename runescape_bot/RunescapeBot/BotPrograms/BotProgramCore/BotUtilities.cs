@@ -65,25 +65,5 @@ namespace RunescapeBot.BotPrograms
             keyboard.Enter();
         }
 
-        /// <summary>
-        /// Selects Make All for the single make option that shows up over the chat box
-        /// </summary>
-        /// <param name="rsClient"></param>
-        /// <returns></returns>
-        public static bool ChatBoxSingleOptionMakeAll(Process rsClient)
-        {
-            Point screenSize = ScreenScraper.GetWindowSize(rsClient);
-            int left = 230;
-            int right = 282;
-            int top = screenSize.Y - 110;
-            int bottom = screenSize.Y - 70;
-            Random rng = new Random();
-
-            Point leftClick = new Point(rng.Next(left, right), rng.Next(top, bottom));
-            Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
-            Mouse.LeftClick(leftClick.X, leftClick.Y, rsClient);
-
-            return true;
-        }
     }
 }

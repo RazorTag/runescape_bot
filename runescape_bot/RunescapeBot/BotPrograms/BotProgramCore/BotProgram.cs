@@ -1005,6 +1005,28 @@ namespace RunescapeBot.BotPrograms
             return false;
         }
 
+        /// <summary>
+        /// Selects Make All for the single make option that shows up over the chat box
+        /// </summary>
+        /// <param name="rsClient"></param>
+        /// <returns></returns>
+        public bool ChatBoxSingleOptionMakeAll(Process rsClient)
+        {
+            Point screenSize = ScreenScraper.GetWindowSize(rsClient);
+            int X = 256;
+            int Y = screenSize.Y - 90;
+            Random rng = new Random();
+
+            Point leftClick = new Point(X, Y);
+            Blob clickBlob = new Blob(leftClick);
+
+            MouseOverDroppedItem(clickBlob,true, 20, 5000);
+            //Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
+            //Mouse.LeftClick(leftClick.X, leftClick.Y, rsClient);
+
+            return true;
+        }
+
         #endregion
 
         #region vision utilities
@@ -1340,7 +1362,7 @@ namespace RunescapeBot.BotPrograms
             //Check several times over several seconds to make sure that we are logged out before trying to log in
             for (int i = 0; i < 6; i++)
             {
-                if (!IsLoggedOut())
+                if (!IsLoggedOut(true))
                 {
                     return true;    //already logged in
                 }

@@ -56,7 +56,7 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
             SafeWaitPlus(500, 200);
-            if (!BotUtilities.ChatBoxSingleOptionMakeAll(RSClient))
+            if (!ChatBoxSingleOptionMakeAll(RSClient))
             {
                 return false;
             }
