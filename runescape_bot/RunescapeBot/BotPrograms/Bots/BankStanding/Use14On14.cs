@@ -24,7 +24,7 @@ namespace RunescapeBot.BotPrograms
         public Use14On14(RunParams startParams, int makeTime) : base(startParams)
         {
             SingleMakeTime = makeTime;
-            MakeQuantity = 14;
+            MakeQuantity = Inventory.INVENTORY_CAPACITY / 2;
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);
             UseOnBankSlot = new Point(6, 0);
@@ -37,25 +37,6 @@ namespace RunescapeBot.BotPrograms
             //bool[,] bankBooth = ColorFilter(ColorFilters.BankBoothVarrockWest());
             //DebugUtilities.TestMask(Bitmap, ColorArray, ColorFilters.BankBoothVarrockWest(), bankBooth, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankBooth");
 
-            Inventory.OpenInventory(true);
-
-            //Open the bank
-            Bank bankPopup;
-            if (!OpenBank(out bankPopup))
-            {
-                if (!MoveToBank())
-                {
-                    return false;
-                }
-                if (!OpenBank(out bankPopup))
-                {
-                    return false;
-                }
-            }
-            bankPopup.DepositInventory();
-            bankPopup.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, 14);
-            bankPopup.Close();
-
             return true;
         }
 
@@ -65,11 +46,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool WithdrawItems(Bank bank)
         {
-            if (RunParams.Iterations < 14) { return false; }
+            if (RunParams.Iterations < Inventory.INVENTORY_CAPACITY / 2) { return false; }
 
             bank.DepositInventory();
-            bank.WithdrawN(UseWithBankSlot.X, UseWithBankSlot.Y);
-            bank.WithdrawN(UseOnBankSlot.X, UseOnBankSlot.Y);
+            bank.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, Inventory.INVENTORY_CAPACITY / 2);
+            bank.WithdrawX(UseOnBankSlot.X, UseOnBankSlot.Y, Inventory.INVENTORY_CAPACITY / 2);
             return true;
         }
 
