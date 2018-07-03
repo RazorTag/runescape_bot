@@ -2,6 +2,7 @@
 using RunescapeBot.ImageTools;
 using System.Drawing;
 using System.Collections.Generic;
+using RunescapeBot.BotPrograms.Settings;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -10,6 +11,8 @@ namespace RunescapeBot.BotPrograms
         public const int STRING_BOW_TIME = 2 * BotRegistry.GAME_TICK;
         public const int FLETCH_BOW_TIME = 3 * BotRegistry.GAME_TICK;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
+
+        protected Use14On14SettingsData UserSelections;
 
         protected Point UseOnInventorySlot;
         protected Point UseWithInventorySlot;
@@ -23,8 +26,17 @@ namespace RunescapeBot.BotPrograms
         /// <param name="makeTime">time needed to make the 14 items being crafted</param>
         public Use14On14(RunParams startParams, int makeTime) : base(startParams)
         {
-            SingleMakeTime = makeTime;
-            MakeQuantity = 14;
+            UserSelections = startParams.CustomSettingsData.Use14On14;
+            if (UserSelections.MakeTime > 0)
+            {
+                SingleMakeTime = UserSelections.MakeTime;
+            }
+            else
+            {
+                SingleMakeTime = makeTime;
+            }
+
+            MakeQuantity = Inventory.INVENTORY_CAPACITY / 2;
             UseOnInventorySlot = new Point(0, 4);
             UseWithInventorySlot = new Point(0, 3);
             UseOnBankSlot = new Point(6, 0);
@@ -37,25 +49,6 @@ namespace RunescapeBot.BotPrograms
             //bool[,] bankBooth = ColorFilter(ColorFilters.BankBoothVarrockWest());
             //DebugUtilities.TestMask(Bitmap, ColorArray, ColorFilters.BankBoothVarrockWest(), bankBooth, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "bankBooth");
 
-            Inventory.OpenInventory(true);
-
-            //Open the bank
-            Bank bankPopup;
-            if (!OpenBank(out bankPopup))
-            {
-                if (!MoveToBank())
-                {
-                    return false;
-                }
-                if (!OpenBank(out bankPopup))
-                {
-                    return false;
-                }
-            }
-            bankPopup.DepositInventory();
-            bankPopup.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, 14);
-            bankPopup.Close();
-
             return true;
         }
 
@@ -65,11 +58,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool WithdrawItems(Bank bank)
         {
-            if (RunParams.Iterations < 14) { return false; }
+            if (RunParams.Iterations < Inventory.INVENTORY_CAPACITY / 2) { return false; }
 
             bank.DepositInventory();
-            bank.WithdrawN(UseWithBankSlot.X, UseWithBankSlot.Y);
-            bank.WithdrawN(UseOnBankSlot.X, UseOnBankSlot.Y);
+            bank.WithdrawX(UseWithBankSlot.X, UseWithBankSlot.Y, Inventory.INVENTORY_CAPACITY / 2);
+            bank.WithdrawX(UseOnBankSlot.X, UseOnBankSlot.Y, Inventory.INVENTORY_CAPACITY / 2);
             return true;
         }
 

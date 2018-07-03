@@ -1681,27 +1681,32 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            //check for "Welcome to RuneScape" yellow text
+            //Check for "Welcome to RuneScape" yellow text. We are probably logged out at this point.
             int topWelcome = top + 241;
             int bottomWelcome = topWelcome + 13;
             int leftWelcome = Center.X - 75;
             int rightWelcome = leftWelcome + 146;
             bool[,] welcomeText = ColorFilterPiece(RGBHSBRangeFactory.Yellow(), leftWelcome, rightWelcome, topWelcome, bottomWelcome);
             double welcomeMatch = ImageProcessing.FractionalMatch(welcomeText);
-            if (welcomeMatch > 0.2)
+
+            if (!Numerical.WithinRange(welcomeMatch, 0.23275, 0.01)) //ex 0.23275
             {
-                return true;
+                //Check for the "Enter your username/email & password." text.
+                leftWelcome = Center.X - 140;
+                rightWelcome = leftWelcome + 280;
+                topWelcome = top + 206;
+                bottomWelcome = topWelcome + 10;
+                welcomeText = ColorFilterPiece(RGBHSBRangeFactory.Yellow(), leftWelcome, rightWelcome, topWelcome, bottomWelcome);
+                welcomeMatch = ImageProcessing.FractionalMatch(welcomeText);
+
+                if (!Numerical.WithinRange(welcomeMatch, 0.25234, 0.01)) //ex. 0.2523
+                {
+                    return false;   //Could not find the welcome text or the enter text.
+                }
             }
 
-            //color-based hash of the RUNE SCAPE logo on the login screen to verify that it is there
-            int topLogo = top;
-            int leftLogo = Center.X - 224 + loginOffset.X;
-            int rightLogo = leftLogo + 444;
-            int bottomLogo = topLogo + 160;
-            long colorSum = ImageProcessing.ColorSum(ScreenPiece(leftLogo, rightLogo, topLogo, bottomLogo));
-            return Numerical.CloseEnough(LOGIN_LOGO_COLOR_SUM, colorSum, 0.01) || Numerical.CloseEnough(LOGIN_LOGO_ALT, colorSum, 0.01);
+            return true;
         }
-        const int LOGIN_LOGO_ALT = 15821488;
 
         /// <summary>
         /// Logs out of the game

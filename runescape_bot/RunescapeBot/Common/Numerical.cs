@@ -63,7 +63,7 @@ namespace RunescapeBot.Common
         }
 
         /// <summary>
-        /// Coerces a vlue to the nearest value within a specified range if the given value is outside of the range
+        /// Coerces a value to the nearest value within a specified range if the given value is outside of the range.
         /// </summary>
         /// <param name="input">value to coerce</param>
         /// <param name="minimum">lowest accpetable value</param>
