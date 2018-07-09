@@ -14,18 +14,13 @@ namespace RunescapeBot.BotPrograms
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
         private const int CONSECUTIVE_FAILURES_ALLOWED = 3;
 
-        protected Point UseWithInventorySlot;
-        protected Point UseOnInventorySlot;
         protected Point WithDrawBankSlot;
 
         public ClickAll28(RunParams startParams, int makeTime) : base(startParams)
         {
             SingleMakeTime = makeTime;
             MakeQuantity = 28;
-            UseWithInventorySlot = new Point(0, 0);
-            // UseOnInventorySlot = new Point(1, 0);
             WithDrawBankSlot = new Point(7, 0);
-            UseOnBankSlot = new Point(6, 0);
         }
 
         protected override bool Run()
@@ -53,17 +48,20 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected override bool ProcessInventory()
         {
-            Inventory.UseItemOnItem(UseWithInventorySlot, UseOnInventorySlot, false);
-            SafeWaitPlus(500, 200);
-            if (!ChatBoxSingleOptionMakeAll(RSClient))
-            {
-                return false;
+            for (int i = 0 ; i < 28 ; i++) {
+                Inventory.ClickInventory(int index, false)
+                SafeWait(500);
             }
+            // SafeWaitPlus(500, 200);
+            // if (!ChatBoxSingleOptionMakeAll(RSClient))
+            // {
+            //     return false;
+            // }
 
             //Wait for the inventory to be processed
             WatchNetflix(0);
             CountDownItems(true);
-            SafeWaitPlus(0, 300);
+            SafeWaitPlus(0, 1500);
 
             return true;
         }
