@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace RunescapeBot.BotPrograms
 {
-    class Use1On27 : BankStand
+    class ClickAll28 : BankStand
     {
         public const int CUT_GEM_TIME = 2 * BotRegistry.GAME_TICK;
 
@@ -18,7 +18,7 @@ namespace RunescapeBot.BotPrograms
         protected Point UseOnInventorySlot;
         protected Point WithDrawBankSlot;
 
-        public Use1On27(RunParams startParams, int makeTime) : base(startParams)
+        public ClickAll28(RunParams startParams, int makeTime) : base(startParams)
         {
             SingleMakeTime = makeTime;
             MakeQuantity = 28;
