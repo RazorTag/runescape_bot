@@ -8,7 +8,7 @@ namespace RunescapeBot.BotPrograms
 {
     class ClickAll28 : BankStand
     {
-        public const int CUT_GEM_TIME = 2 * BotRegistry.GAME_TICK;
+        public const int HERB_CLEAN_TIME = 2 * BotRegistry.GAME_TICK;
 
         private const int WAIT_FOR_FLETCHING_WINDOW_TIMEOUT = 5000;
         private const int WAIT_FOR_MAKEX_POPUP_TIMEOUT = 5000;
