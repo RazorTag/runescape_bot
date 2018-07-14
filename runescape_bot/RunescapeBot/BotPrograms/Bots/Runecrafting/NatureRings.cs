@@ -51,7 +51,6 @@ namespace RunescapeBot.BotPrograms
         public NatureRings(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
-            RunParams.RunLoggedIn = true;
             RunParams.RunAbove = 0.04;
 
             UserSelections = startParams.CustomSettingsData.NatureRings;
@@ -359,7 +358,7 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             for (int i = 0; i < Math.Min(3, UserSelections.NumberOfPouches); i++)
             {
-                if (!bank.SlotIsEmpty(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y, ColorArray))
+                if (!bank.SlotIsEmpty(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y, GameScreen))
                 {
                     bank.WithdrawOne(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y);
                     return true;
@@ -613,7 +612,7 @@ namespace RunescapeBot.BotPrograms
         {
             fairyRingOptions.CustomOption(1);   //open the configuration popup
             SafeWaitPlus(2000, 400);
-            FairyRingsConfigure menu = new FairyRingsConfigure(ColorArray, RSClient);
+            FairyRingsConfigure menu = new FairyRingsConfigure(GameScreen, RSClient);
             menu.SetConfiguration('c', 'k', 'r');
             menu.Teleport(false);
             FairyRingConfigured = true;

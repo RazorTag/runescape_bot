@@ -20,5 +20,18 @@ namespace RunescapeBot.ImageTools
             
             return filter;
         }
+
+        /// <summary>
+        /// The fur of a dark kebbit not including its spots.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRangeGroup KebbitDarkFur()
+        {
+            RGBHSBRangeGroup filter = new RGBHSBRangeGroup();
+            filter.AddColorRange(RGBHSBRangeFactory.KebbitDarkFurBlue());
+            filter.AddColorRange(RGBHSBRangeFactory.KebbitDarkFurRed());
+
+            return filter;
+        }
     }
 }

@@ -168,14 +168,14 @@ namespace RunescapeBot.BotPrograms
             //Reduce the minimum required size of the demon in a desperate attempt to find a demon
             if ((DateTime.Now - LastDemonTime).TotalMilliseconds > MAX_DEMON_SPAWN_TIME)
             {
-                LogError.ScreenShot(ColorArray, "long-spawn-" + (DateTime.Now - LastDemonTime).TotalMilliseconds);
+                LogError.ScreenShot(GameScreen, "long-spawn-" + (DateTime.Now - LastDemonTime).TotalMilliseconds);
                 DefaultCamera();
             }
 
             //Give up, log out of the game, go outside and play
             if ((MissedDemons * RunParams.FrameTime) > (5 * MAX_DEMON_SPAWN_TIME))
             {
-                LogError.ScreenShot(ColorArray, MissedDemons + "-missed-demons");
+                LogError.ScreenShot(GameScreen, MissedDemons + "-missed-demons");
                 Logout();
                 return false;
             }

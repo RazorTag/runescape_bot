@@ -121,7 +121,7 @@ namespace RunescapeBot.UITools
             if (BotProgram.StopFlag) { return new Point(0, 0); }
             NaturalMove(x, y);
 
-            BotProgram.SafeWait(rng.Next(hoverDelay, (int)(hoverDelay * 1.5)));  //wait for RS client to recognize the cursor hover
+            BotProgram.SafeWaitPlus(hoverDelay, 0.3 * hoverDelay);  //wait for RS client to recognize the cursor hover
             if (!BotProgram.StopFlag)
             {
                 mouse_event(clickTypeDown, x, y, 0, 0);

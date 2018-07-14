@@ -70,4 +70,56 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         bool BrightnessInRange(Color color);
     }
+
+
+    /// <summary>
+    /// Does not pass any pixels ever.
+    /// </summary>
+    public class RejectFilter : ColorFilter
+    {
+        public bool BlueInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool BrightnessInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool ColorInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool GreenInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool HSBInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool HueInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool RedInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool RGBInRange(Color color)
+        {
+            return false;
+        }
+
+        public bool SaturationInRange(Color color)
+        {
+            return false;
+        }
+    }
 }

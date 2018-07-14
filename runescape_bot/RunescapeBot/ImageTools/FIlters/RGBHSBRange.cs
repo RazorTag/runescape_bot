@@ -155,7 +155,7 @@ namespace RunescapeBot.ImageTools
         /// <returns></returns>
         public bool BrightnessInRange(Color color)
         {
-            return HSBRange.SaturationInRange(color);
+            return HSBRange.BrightnessInRange(color);
         }
     }
 }

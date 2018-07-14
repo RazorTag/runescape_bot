@@ -34,12 +34,11 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Caches the center point of the blob
         /// </summary>
-        private Point? center;
         public Point Center
         {
             get
             {
-                if (center == null)
+                if (_center == null)
                 {
                     int totalX = 0;
                     int totalY = 0;
@@ -51,17 +50,18 @@ namespace RunescapeBot.ImageTools
                     }
                     if (Size == 0)
                     {
-                        center = new Point(0, 0);
+                        _center = new Point(0, 0);
                     }
                     else
                     {
-                        center = new Point(totalX / Size, totalY / Size);
+                        _center = new Point(totalX / Size, totalY / Size);
                     }
                 }
                 
-                return (Point)center;
+                return (Point)_center;
             }
         }
+        private Point? _center;
 
         /// <summary>
         /// Returns the horizontal distance between left and right bounds
@@ -299,7 +299,7 @@ namespace RunescapeBot.ImageTools
                 shiftedPixel = new Point(pixel.Value.X + rightShift, pixel.Value.Y + downShift);
                 shiftedPixels.Add(shiftedPixel, shiftedPixel);
             }
-            center = null;
+            _center = null;
             boundsCalculated = false;
             Pixels = shiftedPixels;
         }
@@ -314,7 +314,7 @@ namespace RunescapeBot.ImageTools
             {
                 if (!skipQueue) { FoundPixels.Enqueue(newPixel); }
                 Pixels.Add(newPixel, newPixel);
-                center = null;
+                _center = null;
                 boundsCalculated = false;
                 return true;
             }

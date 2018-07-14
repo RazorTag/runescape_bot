@@ -29,7 +29,6 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.StartEatingBelow = 0.4;
             RunParams.StopEatingAbove = 0.9;
-            RunParams.RunLoggedIn = true;   //Makes sure we are logged in before calling the Run method
             RunParams.ClosedChatBox = true;
 
             MaxPassObstacleTries = 1;

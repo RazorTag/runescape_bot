@@ -20,7 +20,6 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.Run = true;
             RunParams.FrameTime = 1800;
-            RunParams.RunLoggedIn = true;
             minIronBlobPxSize = ArtifactArea(0.00025);
             missedRocks = 0;
         }

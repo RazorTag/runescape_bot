@@ -13,12 +13,14 @@ namespace RunescapeBot.BotPrograms.Settings
         public LesserDemonSettingsData LesserDemon;
         public NatureRingsSettingsData NatureRings;
         public Use14On14SettingsData Use14On14;
+        public FalconrySettingsData Falconry;
 
         public CustomSettingsData()
         {
             LesserDemon = new LesserDemonSettingsData();
             NatureRings = new NatureRingsSettingsData();
             Use14On14 = new Use14On14SettingsData();
+            Falconry = new FalconrySettingsData();
         }
     }
 }

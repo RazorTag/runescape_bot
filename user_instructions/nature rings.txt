@@ -1,4 +1,5 @@
 -have the lunar magicks spellbook active
+-own an abyssal book
 
 -Equip:
 	*dramen staff or lunar staff

@@ -26,7 +26,6 @@ namespace RunescapeBot.BotPrograms
         public KnightOfArdougne(RunParams startParams) : base(startParams)
         {
             RunParams.AutoEat = true;
-            RunParams.RunLoggedIn = true;
             RunParams.StartEatingBelow = 0.5;
             RunParams.StopEatingAbove = 0.8;
             FailedCloakSearches = 0;

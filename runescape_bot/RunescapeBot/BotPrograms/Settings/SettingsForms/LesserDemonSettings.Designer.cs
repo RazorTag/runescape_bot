@@ -39,7 +39,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(17, 62);
+            this.label2.Location = new System.Drawing.Point(82, 59);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(42, 18);
             this.label2.TabIndex = 33;
@@ -49,7 +49,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(17, 18);
+            this.label1.Location = new System.Drawing.Point(82, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 18);
             this.label1.TabIndex = 31;
@@ -58,7 +58,7 @@
             // SaveSettings
             // 
             this.SaveSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SaveSettings.Location = new System.Drawing.Point(20, 127);
+            this.SaveSettings.Location = new System.Drawing.Point(85, 124);
             this.SaveSettings.Name = "SaveSettings";
             this.SaveSettings.Size = new System.Drawing.Size(125, 55);
             this.SaveSettings.TabIndex = 29;
@@ -69,7 +69,7 @@
             // TelegrabSelection
             // 
             this.TelegrabSelection.AutoSize = true;
-            this.TelegrabSelection.Location = new System.Drawing.Point(136, 21);
+            this.TelegrabSelection.Location = new System.Drawing.Point(201, 18);
             this.TelegrabSelection.Name = "TelegrabSelection";
             this.TelegrabSelection.Size = new System.Drawing.Size(15, 14);
             this.TelegrabSelection.TabIndex = 34;
@@ -78,7 +78,7 @@
             // AlchSelection
             // 
             this.AlchSelection.AutoSize = true;
-            this.AlchSelection.Location = new System.Drawing.Point(136, 66);
+            this.AlchSelection.Location = new System.Drawing.Point(201, 63);
             this.AlchSelection.Name = "AlchSelection";
             this.AlchSelection.Size = new System.Drawing.Size(15, 14);
             this.AlchSelection.TabIndex = 35;
@@ -88,14 +88,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(170, 200);
+            this.ClientSize = new System.Drawing.Size(305, 200);
             this.Controls.Add(this.AlchSelection);
             this.Controls.Add(this.TelegrabSelection);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.SaveSettings);
             this.Name = "LesserDemonSettings";
-            this.Text = "LesserDemonSettings";
+            this.Text = "Lesser Demon Settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 

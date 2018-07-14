@@ -3,6 +3,6 @@
 -turn off show stat changes
 
 Inventory (melee with high defense): rock cake, 12 overloads, 15 absorptions
-Inventory (range with high defense): rock cake, 8 overloads, 19 absorptions
+Inventory (range with high defense): rock cake, 7 overloads, 20 absorptions
 
 Bosses: Aarg, Sand Snake, Count Draynor, King Roald, Kendal

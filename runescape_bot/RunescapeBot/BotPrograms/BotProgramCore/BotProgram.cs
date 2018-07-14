@@ -93,27 +93,27 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Stores a Color array of the client window
         /// </summary>
-        private Color[,] colorArray;
-        protected Color[,] ColorArray
+        private Color[,] _gameScreen;
+        protected Color[,] GameScreen
         {
             get
             {
-                return colorArray;
+                return _gameScreen;
             }
             set
             {
-                colorArray = value;
+                _gameScreen = value;
                 if (Inventory != null)
                 {
-                    Inventory.SetScreen(colorArray);
+                    Inventory.SetScreen(_gameScreen);
                 }
                 if (Minimap != null)
                 {
-                    Minimap.SetScreen(colorArray);
+                    Minimap.SetScreen(_gameScreen);
                 }
                 if(Textbox != null)
                 {
-                    Textbox.SetScreen(colorArray);
+                    Textbox.SetScreen(_gameScreen);
                 }
             }
         }
@@ -180,7 +180,7 @@ namespace RunescapeBot.BotPrograms
         {
             get
             {
-                if (ColorArray == null)
+                if (GameScreen == null)
                 {
                     return new Point(0, 0);
                 }
@@ -198,9 +198,9 @@ namespace RunescapeBot.BotPrograms
         {
             get
             {
-                if (ColorArray != null)
+                if (GameScreen != null)
                 {
-                    return ColorArray.GetLength(0);
+                    return GameScreen.GetLength(0);
                 }
                 else
                 {
@@ -216,9 +216,9 @@ namespace RunescapeBot.BotPrograms
         {
             get
             {
-                if (ColorArray != null)
+                if (GameScreen != null)
                 {
-                    return ColorArray.GetLength(1);
+                    return GameScreen.GetLength(1);
                 }
                 else
                 {
@@ -236,6 +236,11 @@ namespace RunescapeBot.BotPrograms
         //Eating
         protected const int EAT_TIME = 3 * BotRegistry.GAME_TICK;
         protected Queue<int> FoodSlots;
+
+        /// <summary>
+        /// Gets the approximate width/height of a square tile near the center of the game screen.
+        /// </summary>
+        public double TileWidth { get { return ArtifactLength(0.06); } }
 
         #endregion
 
@@ -465,7 +470,7 @@ namespace RunescapeBot.BotPrograms
                         
                         if (!Execute() && !StopFlag) //quit by a bot program
                         {
-                            LogError.ScreenShot(ColorArray, "bot-quit");
+                            LogError.ScreenShot(GameScreen, "bot-quit");
                             return true;
                         }
                         if (StopFlag) { return true; }
@@ -736,7 +741,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="objectFilter">color filter for the object type to search for</param>
         /// <param name="minSize">minimum required pixels</param>
         /// <param name="maxSize">maximum allowed pixels</param>
-        /// <returns></returns>
+        /// <returns>List of blobs sorted from biggest to smallest</returns>
         protected List<Blob> LocateObjects(ColorFilter objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             ReadWindow();
@@ -834,7 +839,7 @@ namespace RunescapeBot.BotPrograms
             bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
             if (LocateObject(objectPixels, out foundObject, minimumSize, maximumSize))
             {
-                foundObject.ShiftPixels(left, top);
+                foundObject.ShiftPixels(Math.Max(0, left), Math.Max(0, top));
                 return true;
             }
             return false;
@@ -1046,7 +1051,7 @@ namespace RunescapeBot.BotPrograms
             {
                 LastScreenShot = DateTime.Now;
                 Bitmap = ScreenScraper.CaptureWindow(RSClient, fastCapture);
-                ColorArray = ScreenScraper.GetRGB(Bitmap);
+                GameScreen = ScreenScraper.GetRGB(Bitmap);
             }
             catch
             {
@@ -1090,7 +1095,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return Color.Black;
             }
-            return ColorArray[x, y];
+            return GameScreen[x, y];
         }
 
         /// <summary>
@@ -1100,7 +1105,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool[,] ColorFilter(ColorFilter artifactColor)
         {
-            return ColorFilter(ColorArray, artifactColor);
+            return ColorFilter(GameScreen, artifactColor);
         }
 
         /// <summary>
@@ -1110,7 +1115,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool[,] ColorFilter(Color[,] image, ColorFilter artifactColor)
         {
-            if (ColorArray == null)
+            if (GameScreen == null)
             {
                 return null;
             }
@@ -1129,7 +1134,7 @@ namespace RunescapeBot.BotPrograms
         protected bool[,] ColorFilterPiece(ColorFilter filter, int left, int right, int top, int bottom, out Point trimOffset)
         {
             Color[,] colorArray = ScreenPiece(left, right, top, bottom, out trimOffset);
-            if (ColorArray == null)
+            if (GameScreen == null)
             {
                 return null;
             }
@@ -1204,7 +1209,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected Color[,] ScreenPiece(int left, int right, int top, int bottom, out Point trimOffset)
         {
-            return ImageProcessing.ScreenPiece(ColorArray, left, right, top, bottom, out trimOffset);
+            return ImageProcessing.ScreenPiece(GameScreen, left, right, top, bottom, out trimOffset);
         }
 
         /// <summary>
@@ -1659,19 +1664,19 @@ namespace RunescapeBot.BotPrograms
             for (int x = centerX - xOffset; x < centerX + xOffset; x++)
             {
                 //check bottom of login box
-                color = ColorArray[x, checkRow];
+                color = GameScreen[x, checkRow];
                 blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
                 totalPixels++;
             }
             for (int y = top; y < checkRow; y++)  //check sides
             {
                 //check left of login box
-                color = ColorArray[centerX - xOffset, y];
+                color = GameScreen[centerX - xOffset, y];
                 blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
                 totalPixels++;
 
                 //check right of login box
-                color = ColorArray[centerX + xOffset, y];
+                color = GameScreen[centerX + xOffset, y];
                 blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
                 totalPixels++;
             }
@@ -2302,6 +2307,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Calls ReadWindow if the current screen image is unsatisfactory
         /// </summary>
+        /// <param name="readWindow">Set to true to always read the window</param>
         /// <returns>true unless the window needs to be read but can't</returns>
         private bool MakeSureWindowHasBeenRead(bool readWindow = false)
         {
@@ -2378,11 +2384,30 @@ namespace RunescapeBot.BotPrograms
         /// <param name="filter">color filter to test</param>
         /// <param name="directory">directory in which to save test images</param>
         /// <param name="name">base name for test images</param>
-        protected void MaskTest(ColorFilter filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\")
+        /// <param name="readWindow">Set to true to always read the window</param>
+        protected void MaskTest(ColorFilter filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", bool readWindow = false)
         {
-            ReadWindow();
+            MakeSureWindowHasBeenRead();
             bool[,] thing = ColorFilter(filter);
-            DebugUtilities.TestMask(Bitmap, ColorArray, filter, thing, directory, name);
+            DebugUtilities.TestMask(Bitmap, GameScreen, filter, thing, directory, name);
+        }
+
+        /// <summary>
+        /// Very rough time needed for the player to run to another point on the game screen.
+        /// Assumes that there are no obstacles between the player and target that would force the player to change course.
+        /// </summary>
+        /// <param name="target">Target point to run to.</param>
+        /// <returns>The estimated time to run to the target location.</returns>
+        public double RunTime(Point target)
+        {
+            double tiles = Geometry.DistanceBetweenPoints(target, Center) / TileWidth;
+            int effectiveTiles = (int)Math.Round(tiles);
+            if (effectiveTiles % 2 == 1)
+            {
+                tiles++;
+            }
+            double travelTime = (tiles / 2.0) * BotRegistry.GAME_TICK;
+            return travelTime + (2 * BotRegistry.GAME_TICK);
         }
 
         #endregion

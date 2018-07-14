@@ -38,8 +38,6 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Run()
         {
-            base.Run();
-
             //ReadWindow();
             //ConvertPlanksDialog();
             //PayButler();
@@ -47,7 +45,7 @@ namespace RunescapeBot.BotPrograms
             //InitiateDemonDialog();
             //Construct();
 
-            return true;
+            return base.Run();
         }
 
         /// <summary>

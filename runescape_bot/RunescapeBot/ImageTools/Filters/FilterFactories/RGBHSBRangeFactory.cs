@@ -1,5 +1,4 @@
-﻿using RunescapeBot.ImageTools;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace RunescapeBot.ImageTools
 {
@@ -776,51 +775,6 @@ namespace RunescapeBot.ImageTools
         }
         #endregion
 
-        #region generic colors
-
-        /// <summary>
-        /// perfect black
-        /// </summary>
-        /// <returns></returns>
-        public static RGBHSBRange Black()
-        {
-            Color dark = Color.FromArgb(0, 0, 0);
-            Color light = Color.FromArgb(0, 0, 0);
-            return new RGBHSBRange(dark, light, null);
-        }
-
-        /// <summary>
-        /// perfect white
-        /// </summary>
-        /// <returns></returns>
-        public static RGBHSBRange White()
-        {
-            Color dark = Color.FromArgb(255, 255, 255);
-            Color light = Color.FromArgb(255, 255, 255);
-            return new RGBHSBRange(dark, light, null);
-        }
-
-        /// <summary>
-        /// Perfect yellow
-        /// </summary>
-        /// <returns></returns>
-        public static RGBHSBRange Yellow()
-        {
-            Color dark = Color.FromArgb(255, 255, 0);
-            Color light = Color.FromArgb(255, 255, 0);
-            return new RGBHSBRange(dark, light, null);
-        }
-
-        /// <summary>
-        /// Makes a color filter that perfectly fits the provided color
-        /// </summary>
-        /// <param name="color"></param>
-        /// <returns></returns>
-        public static RGBHSBRange GenericColor(Color color)
-        {
-            return new RGBHSBRange(color, color, null);
-        }
-        #endregion
 
         #region mouseover description
 
@@ -837,7 +791,7 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// The yello text in the top-left corner of the screen when mousing over a clickable NPC
+        /// The yellow text in the top-left corner of the screen when mousing over a clickable NPC
         /// </summary>
         /// <returns></returns>
         public static RGBHSBRange MouseoverTextNPC()
@@ -899,14 +853,6 @@ namespace RunescapeBot.ImageTools
         /// classic blue color of fish sprinkles
         /// </summary>
         /// <returns></returns>
-        /// 
-        //public static RGBHSBRange FishingTile()
-        //{
-        //    Color dark = Color.FromArgb(116, 156, 213);
-        //    Color light = Color.FromArgb(163, 190, 232);
-        //    HSBRange hsbRange = new HSBRange(205f, 216f, 0.48f, 0.62f, 0.64f, 0.77f);
-        //    return new RGBHSBRange(dark, light, hsbRange);
-        //}
         public static RGBHSBRange FishingTile()
         {
             Color dark = Color.FromArgb(111, 151, 208);
@@ -925,5 +871,138 @@ namespace RunescapeBot.ImageTools
 
         #endregion
 
+        #region hunter
+
+        /// <summary>
+        /// The black spots on a kebbit's back.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KebbitBlackSpot()
+        {
+            Color dark = Color.FromArgb(21, 17, 17);
+            Color light = Color.FromArgb(21, 17, 17);
+            HSBRange hsbRange = new HSBRange(-0.1f, 0.1f, 0.1043f, 0.1063f, 0.0735f, 0.0755f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The white spots on a kebbit's back.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KebbitWhiteSpot()
+        {
+            Color dark = Color.FromArgb(150, 138, 118);
+            Color light = Color.FromArgb(213, 204, 190);
+            HSBRange hsbRange = new HSBRange(-35.5f, 39.4f, 0.088f, 0.259f, 0.495f, 0.821f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The brown fur of a spotted kebbit.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KebbitSpottedFur()
+        {
+            Color dark = Color.FromArgb(50, 39, 24);
+            Color light = Color.FromArgb(145, 124, 99);
+            HSBRange hsbRange = new HSBRange(-31.6f, 35.6f, 0.147f, 0.427f, 0.114f, 0.509f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The brown fur of a dashing kebbit.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KebbitDashingFur()
+        {
+            Color dark = Color.FromArgb(98, 79, 53);
+            Color light = Color.FromArgb(192, 156, 111);
+            HSBRange hsbRange = new HSBRange(-32.0f, 35.7f, 0.223f, 0.423f, 0.266f, 0.625f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The portion of a dark kebbit's fur with a blue hue.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KebbitDarkFurBlue()
+        {
+            Color dark = Color.FromArgb(33, 33, 35);
+            Color light = Color.FromArgb(75, 75, 81);
+            HSBRange hsbRange = new HSBRange(235f, 245f, 0.000f, 0.096f, 0.103f, 0.336f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The portion of a dark kebbit's fur with a red hue.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange KebbitDarkFurRed()
+        {
+            Color dark = Color.FromArgb(16, 12, 12);
+            Color light = Color.FromArgb(98, 92, 92);
+            HSBRange hsbRange = new HSBRange(-5f, 5f, 0.000f, 0.155f, 0.024f, 0.403f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        /// <summary>
+        /// The flashing yellow arrow above a Gyr falcon that has caught a kebbit.
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange FlashingArrow()
+        {
+            Color dark = Color.FromArgb(245, 242, 29);
+            Color light = Color.FromArgb(255, 255, 184);
+            HSBRange hsbRange = new HSBRange(57.6f, 60.4f, 0.906f, 1.000f, 0.507f, 0.899f);
+            return new RGBHSBRange(dark, light, hsbRange);
+        }
+
+        #endregion
+
+        #region generic colors
+
+        /// <summary>
+        /// perfect black
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange Black()
+        {
+            Color dark = Color.FromArgb(0, 0, 0);
+            Color light = Color.FromArgb(0, 0, 0);
+            return new RGBHSBRange(dark, light, null);
+        }
+
+        /// <summary>
+        /// perfect white
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange White()
+        {
+            Color dark = Color.FromArgb(255, 255, 255);
+            Color light = Color.FromArgb(255, 255, 255);
+            return new RGBHSBRange(dark, light, null);
+        }
+
+        /// <summary>
+        /// Perfect yellow
+        /// </summary>
+        /// <returns></returns>
+        public static RGBHSBRange Yellow()
+        {
+            Color dark = Color.FromArgb(255, 255, 0);
+            Color light = Color.FromArgb(255, 255, 0);
+            return new RGBHSBRange(dark, light, null);
+        }
+
+        /// <summary>
+        /// Makes a color filter that perfectly fits the provided color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static RGBHSBRange GenericColor(Color color)
+        {
+            return new RGBHSBRange(color, color, null);
+        }
+        #endregion
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms.Settings
 {
+    [Serializable]
     public class LesserDemonSettingsData
     {
         /// <summary>
@@ -17,8 +18,5 @@ namespace RunescapeBot.BotPrograms.Settings
         /// Set to true to cast high alchemy on armor drops
         /// </summary>
         public bool HighAlch { get; set; }
-
-
-        public LesserDemonSettingsData() { }
     }
 }

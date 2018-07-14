@@ -100,6 +100,8 @@
     <Compile Include="BotPrograms\Bots\Construction\CamelotHouse.cs" />
     <Compile Include="BotPrograms\Bots\DoNothing.cs" />
     <Compile Include="BotPrograms\Bots\Fishing\BarbarianFishing.cs" />
+    <Compile Include="BotPrograms\Bots\Hunter\Falconry.cs" />
+    <Compile Include="BotPrograms\Bots\Hunter\Kebbit.cs" />
     <Compile Include="BotPrograms\Bots\LogIn.cs" />
     <Compile Include="BotPrograms\Bots\Mining\IronPowerMining.cs" />
     <Compile Include="BotPrograms\Bots\Mining\MotherlodeMine.cs" />
@@ -135,9 +137,16 @@
     <Compile Include="BotPrograms\Settings\RunParams\PhasmatysRunParams.cs" />
     <Compile Include="BotPrograms\Settings\RunParams\RotationRunParams.cs" />
     <Compile Include="BotPrograms\Settings\RunParams\RunParamsList.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsData\FalconrySettingsData.cs" />
     <Compile Include="BotPrograms\Settings\SettingsData\LesserDemonSettingsData.cs" />
     <Compile Include="BotPrograms\Settings\SettingsData\NatureRingsSettingsData.cs" />
     <Compile Include="BotPrograms\Settings\SettingsData\CustomSettingsData.cs" />
+    <Compile Include="BotPrograms\Settings\SettingsForms\FalconrySettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BotPrograms\Settings\SettingsForms\FalconrySettings.Designer.cs">
+      <DependentUpon>FalconrySettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="BotPrograms\Settings\SettingsForms\LesserDemonSettings.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -168,7 +177,7 @@
     <Compile Include="ImageTools\Blob\BlobProximityComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
-    <Compile Include="ImageTools\Filters\ColorCluster.cs" />
+    <Compile Include="ImageTools\Cluster.cs" />
     <Compile Include="ImageTools\Filters\ColorFilter.cs" />
     <Compile Include="ImageTools\Filters\FilterFactories\RGBHSBRangeFactory.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
@@ -209,6 +218,9 @@
     <Compile Include="UITools\Keyboard.cs" />
     <Compile Include="UITools\Mouse.cs" />
     <Compile Include="UITools\User32.cs" />
+    <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\FalconrySettings.resx">
+      <DependentUpon>FalconrySettings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BotPrograms\Settings\SettingsForms\LesserDemonSettings.resx">
       <DependentUpon>LesserDemonSettings.cs</DependentUpon>
     </EmbeddedResource>
