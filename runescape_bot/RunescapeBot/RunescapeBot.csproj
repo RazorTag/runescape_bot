@@ -90,6 +90,7 @@
     <Compile Include="BotPrograms\Bots\Agility\AgilityGnomeStronghold.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilitySeersVillage.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\BankStand.cs" />
+    <Compile Include="BotPrograms\Bots\BankStanding\ClickAll28.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Enchant.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Herblore.cs" />
     <Compile Include="BotPrograms\Bots\BankStanding\Serum207.cs" />

@@ -49,7 +49,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool ProcessInventory()
         {
             for (int i = 0 ; i < 28 ; i++) {
-                Inventory.ClickInventory(int index, false)
+                Inventory.ClickInventory(Inventory.InventoryIndexToCoordinates(i), false);
                 SafeWait(500);
             }
             // SafeWaitPlus(500, 200);
