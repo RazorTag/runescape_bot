@@ -137,10 +137,13 @@ namespace RunescapeBot.BotPrograms
                     return new NatureRings(runParams);
                 case BotActions.Serum207:
                     return new Serum207(runParams);
+<<<<<<< HEAD
                 case BotActions.Falconry:
                     return new Falconry(runParams);
+=======
                 case BotActions.CleanHerbs:
                     return new ClickAll28(runParams, ClickAll28.HERB_CLEAN_TIME);
+>>>>>>> e1cec7050e51e9fa3973d666f44450aa4b81fc8c
             }
             return bot;
         }

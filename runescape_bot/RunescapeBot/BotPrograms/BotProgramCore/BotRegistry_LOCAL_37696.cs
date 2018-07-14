@@ -19,7 +19,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public enum BotActions : int
         {
-            // alphabetical list
             [Description("Log In")]
             Login,
             [Description("Agility - Gnome Stronghold")]
@@ -44,8 +43,6 @@ namespace RunescapeBot.BotPrograms
             FletchShortBows,
             [Description("Fletching - String Bows")]
             StringBows,
-            [Description("Herblore - Clean Herbs")]
-            CleanHerbs,
             [Description("Herblore - Make Unfinished Potions")]
             MakeUnfinishedPotions,
             [Description("Herblore - Make Prepared Potions")]
@@ -139,8 +136,6 @@ namespace RunescapeBot.BotPrograms
                     return new Serum207(runParams);
                 case BotActions.Falconry:
                     return new Falconry(runParams);
-                case BotActions.CleanHerbs:
-                    return new ClickAll28(runParams, ClickAll28.HERB_CLEAN_TIME);
             }
             return bot;
         }
