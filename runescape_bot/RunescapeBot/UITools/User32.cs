@@ -1,18 +1,26 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace RunescapeBot.UITools
 {
     public static class User32
     {
+        #region constants
+
         public const int GWL_STYLE = -16;
         public const int ESCAPE_HOTKEY_ID = 1;
         public const int SW_MAXIMIZE = 3;
         public const int SW_MINIMIZE = 6;
         public const int SW_RESTORE = 9;
         public const UInt32 WS_MAXIMIZE = 0x1000000;
+
+        const int KEYEVENTF_KEYUP = 0x0002;
+        const int INPUT_KEYBOARD = 1;
+
+        #endregion
+
+        #region interops
 
         // DLL libraries used to manage hotkeys
         [DllImport("user32.dll")]
@@ -67,7 +75,10 @@ namespace RunescapeBot.UITools
         [DllImport("user32.dll")]
         public static extern long ReleaseCapture();
 
+        #endregion
+
         #region custom structs
+
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
@@ -88,6 +99,7 @@ namespace RunescapeBot.UITools
             public int right;
             public int bottom;
         }
+
         #endregion
     }
 }

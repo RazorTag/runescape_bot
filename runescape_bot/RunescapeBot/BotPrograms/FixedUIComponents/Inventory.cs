@@ -242,28 +242,10 @@ namespace RunescapeBot.BotPrograms
         public bool DropItem(int x, int y, bool safeTab = true, int[] extraOptions = null)
         {
             InventoryToScreen(ref x, ref y);
-            RightClickInventory popup;
-            Point click;
-            int dropOptions = RightClickInventory.OptionIndex(1, extraOptions);
-            for (int i = 0; i < 3; i++)
-            {
-                if (BotProgram.StopFlag) { return false; }
-
-                click = Probability.GaussianCircle(new Point(x, y), 5.0, 0, 360, 10);
-                Mouse.RightClick(click.X, click.Y, RSClient, 0);
-                popup = new RightClickInventory(click.X, click.Y, RSClient, null);
-                if (popup.WaitForPopup(1500))
-                {
-                    popup.DropItem();
-                    return true;
-                }
-                else
-                {
-                    OpenInventory(true);
-                }
-            }
-
-            return false;
+            Keyboard.ShiftDown();
+            Mouse.LeftClick(x, y, RSClient, 10);
+            Keyboard.ShiftUp();
+            return true;
         }
 
         /// <summary>
@@ -294,13 +276,13 @@ namespace RunescapeBot.BotPrograms
             {
                 for (int y = 0; y < INVENTORY_ROWS; y++)
                 {
-                    EmptySlots[x, y] = SlotIsEmpty(x, y);
+                    EmptySlots[x, y] = SlotIsEmpty(x, y, false, false);
                 }
             }
         }
 
         /// <summary>
-        /// Sets the empty of full value of an inventory slot
+        /// Sets the empty or full value of an inventory slot
         /// </summary>
         /// <param name="x">column (0-3)</param>
         /// <param name="y">row (0-6)</param>
@@ -321,17 +303,27 @@ namespace RunescapeBot.BotPrograms
         {
             Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             OpenInventory(safeTab);
+            int effectiveY;
+
+            Keyboard.ShiftDown();
             for (int x = 0; x < INVENTORY_COLUMNS; x++)
             {
                 for (int y = 0; y < INVENTORY_ROWS; y++)
                 {
-                    if ((!onlyDropPreviouslyEmptySlots || EmptySlots[x, y]) && !SlotIsEmpty(x, y, false, false))
+                    effectiveY = (x % 2 == 0) ? y : INVENTORY_ROW_MAX - y;
+                    if ((!onlyDropPreviouslyEmptySlots || EmptySlots[x, effectiveY]) && !SlotIsEmpty(x, effectiveY, false, false))
                     {
-                        if (BotProgram.StopFlag) { return; }
-                        DropItem(x, y, false);
+                        if (BotProgram.StopFlag)
+                        {
+                            Keyboard.ShiftUp();
+                            return;
+                        }
+                        ClickInventory(x, effectiveY, false);
+                        BotProgram.SafeWaitPlus(50, 25);
                     }
                 }
             }
+            Keyboard.ShiftUp();
         }
 
         /// <summary>
@@ -362,21 +354,28 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Finds the next slot that matches a single color filter
         /// </summary>
+        /// <param name="emptySlotNumber">Set to a number higher than 1 to find the second, third, etc empty slot.</param>
         /// <returns>The first matching inventory slot scanning left to right then top to bottom. Returns null if no match is found.</returns>
-        public Point? FirstColorMatchingSlot(ColorFilter colorFilter, double matchStrictness = 0.1, bool safeTab = true)
+        public Point? FirstColorMatchingSlot(ColorFilter colorFilter, double matchStrictness = 0.1, bool safeTab = true, int emptySlotNumber = 1)
         {
+            emptySlotNumber = (int) Numerical.LimitToRange(emptySlotNumber, 1, INVENTORY_CAPACITY);
             if (OpenInventory(safeTab))
             {
                 Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
             }
             Point? inventorySlot;
 
+            int slotCount = 0;
             for (int slot = 0; slot < INVENTORY_CAPACITY; slot++)
             {
                 inventorySlot = InventoryIndexToCoordinates(slot);
                 if (SlotMatchesColorFilter(inventorySlot.Value.X, inventorySlot.Value.Y, colorFilter, matchStrictness, false, false))
                 {
-                    return inventorySlot;
+                    slotCount++;
+                    if (slotCount >= emptySlotNumber)
+                    {
+                        return inventorySlot;
+                    }
                 }
 
                 if (BotProgram.StopFlag) { return null; }
@@ -389,10 +388,11 @@ namespace RunescapeBot.BotPrograms
         /// Finds the next slot that a new picked up item would go into.
         /// </summary>
         /// <param name="safeTab">set to false to rely on the Inventory's record of whether it is already on the inventory tab</param>
+        /// <param name="emptySlotNumber">Set to a number higher than 1 to find the second, third, etc empty slot.</param>
         /// <returns>The first empty inventory slot scanning left to right then top to bottom. Returns null if inventory is full.</returns>
-        public Point? FirstEmptySlot(bool safeTab = true)
+        public Point? FirstEmptySlot(bool safeTab = false, int emptySlotNumber = 1)
         {
-            return FirstColorMatchingSlot(RGBHSBRangeFactory.EmptyInventorySlot(), 0.99, safeTab);
+            return FirstColorMatchingSlot(RGBHSBRangeFactory.EmptyInventorySlot(), 0.99, safeTab, emptySlotNumber);
         }
 
         /// <summary>
@@ -461,7 +461,28 @@ namespace RunescapeBot.BotPrograms
         public bool SlotIsEmpty(int slot, bool readScreen = false, bool safeTab = false)
         {
             Point slotCoordinates = InventoryIndexToCoordinates(slot);
-            return SlotIsEmpty(slotCoordinates);
+            return SlotIsEmpty(slotCoordinates, readScreen, safeTab);
+        }
+
+        /// <summary>
+        /// Waits for a specified inventory slot to be filled.
+        /// </summary>
+        /// <param name="nextEmptySlot">The slot that expect to fill.</param>
+        /// <param name="maxWaitTime">THe maximum time in milliseconds that we should wait for this slot to be filled.</param>
+        /// <returns>True if slot is filled while waiting.</returns>
+        public bool WaitForSlotToFill(Point nextEmptySlot, int maxWaitTime)
+        {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            while (watch.ElapsedMilliseconds < maxWaitTime && !BotProgram.StopFlag)
+            {
+                if (!SlotIsEmpty(nextEmptySlot, true, false))
+                {
+                    return true;
+                }
+                BotProgram.SafeWait(50);
+            }
+            return false;
         }
 
         /// <summary>
@@ -874,7 +895,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         public bool GrabAndAlch(int x, int y)
         {
-            Point? emptySlot = FirstEmptySlot();
+            Point? emptySlot = FirstEmptySlot(true);
             if (emptySlot == null)
             {
                 return false;   //no empty inventory slots
@@ -991,6 +1012,10 @@ namespace RunescapeBot.BotPrograms
         public const int INVENTORY_CAPACITY = INVENTORY_ROWS * INVENTORY_COLUMNS;
         public const int INVENTORY_COLUMNS = 4;
         public const int INVENTORY_ROWS = 7;
+        public const int INVENTORY_ROW_MIN = 0;
+        public const int INVENTORY_ROW_MAX = INVENTORY_ROWS + (INVENTORY_ROW_MIN - 1);
+        public const int INVENTORY_COLUMN_MIN = 0;
+        public const int INVENTORY_COLUMN_MAX = INVENTORY_COLUMNS + (INVENTORY_COLUMN_MIN - 1);
 
         public const int EQUIPMENT_TAB_OFFSET_RIGHT = TAB_RIGHT_OFFSET_RIGHT + 2 * TAB_HORIZONTAL_GAP;
         public const int EQUIPMENT_LEFT_OFFSET_RIGHT = 177; //pixels from the left column of the equipment tab to the right edge of the screen

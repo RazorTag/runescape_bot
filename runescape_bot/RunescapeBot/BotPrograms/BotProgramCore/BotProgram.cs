@@ -638,7 +638,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y"></param>
         /// <param name="hoverDelay"></param>
         /// <param name="randomize">maximum number of pixels in each direction by which to randomize the click location</param>
-        protected Point LeftClick(int x, int y, int randomize = 0, int hoverDelay = 200)
+        protected Point LeftClick(int x, int y, int randomize = 0, int hoverDelay = Mouse.HOVER_DELAY)
         {
             randomize = (int)((ScreenHeight / 1000.0) * randomize);
             return Mouse.LeftClick(x, y, RSClient, randomize, hoverDelay);
@@ -649,7 +649,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected Point RightClick(int x, int y, int randomize = 0, int hoverDelay = 200)
+        protected Point RightClick(int x, int y, int randomize = 0, int hoverDelay = Mouse.HOVER_DELAY)
         {
             randomize = (int)((ScreenHeight / 1000.0) * randomize);
             return Mouse.RightClick(x, y, RSClient, randomize, hoverDelay);
@@ -995,7 +995,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWait">max time to wait before concluding that the mouse over failed</param>
         /// <param name="lagTime">time to wait before checking and clicking after mousing over</param>
         /// <returns>true if a matching object is found and clicked on</returns>
-        protected bool MouseOver(Point mouseover, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 100)
+        protected bool MouseOver(Point mouseover, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 250)
         {
             randomization = (int)((ScreenHeight / 1000.0) * randomization);
             mouseover = Probability.GaussianCircle(mouseover, randomization);
@@ -2266,7 +2266,7 @@ namespace RunescapeBot.BotPrograms
                     break;
                 case RunParams.CameraPosition.NorthAerial:
                     LeftClick(compassX, compassY);
-                    Keyboard.UpArrow(1000);
+                    Keyboard.HoldKey(Keys.Up, 3000);
                     break;
             }
         }

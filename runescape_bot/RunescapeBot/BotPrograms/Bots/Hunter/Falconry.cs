@@ -1,7 +1,9 @@
-﻿using RunescapeBot.BotPrograms.Settings;
+﻿using RunescapeBot.BotPrograms.Popups;
+using RunescapeBot.BotPrograms.Settings;
 using RunescapeBot.Common;
 using RunescapeBot.FileIO;
 using RunescapeBot.ImageTools;
+using RunescapeBot.UITools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,30 +20,32 @@ namespace RunescapeBot.BotPrograms
 
         public Falconry(RunParams startParams) : base(startParams)
         {
+            RunParams.FrameTime = 0;
             RunParams.Run = true;
             RunParams.ClosedChatBox = true;
             UserSelections = startParams.CustomSettingsData.Falconry;
             FailedRuns = 0;
-            KebbitSearchRadius = ArtifactLength(0.5);
         }
 
         protected FalconrySettingsData UserSelections;
         protected int FailedRuns;
         protected int KebbitSearchRadius;
+        protected bool FalconRanAway;
 
 
         protected override bool Run()
         {
             //DebugUtilities.SaveImageToFile(GameScreen);
 
-            //MaskTest(KebbitBlackSpot, "black_spot");
+            //MaskTest(Kebbit.KebbitBlackSpot, "black_spot");
             //MaskTest(KebbitWhiteSpot, "white_spot");
             //MaskTest(KebbitSpottedFur, "spotted_fur");
             //MaskTest(KebbitDashingFur, "dashing_fur");
-            //MaskTest(KebbitDarkFur, "dark_dur");
+            //MaskTest(Kebbit.KebbitDarkFur, "dark_dur");
             //MaskTest(FlashingArrow, "arrow");
 
             //RetrieveFalcon(new Point(957, 502));
+            //Inventory.DropInventory(false, false);
 
             Inventory.SetEmptySlots();
             return true;
@@ -50,31 +54,46 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             //Drop kebbit pickups to make room for more.
-            if (!Inventory.SlotIsEmpty(19, true))
+            if (!Inventory.SlotIsEmpty(18, true))
             {
                 Inventory.DropInventory(false);
             }
 
             List<Kebbit> kebbits = LocateKebbits();
             kebbits = SortAndFilterKebbits(kebbits);
-            kebbits = kebbits.GetRange(0, Math.Min(kebbits.Count, 1));   //Only try the first kebbit.
+            kebbits = kebbits.GetRange(0, Math.Min(kebbits.Count, 2));   //Only try the first 2 kebbits.
 
             foreach (Kebbit kebbit in kebbits)
             {
                 if (StopFlag) { return false; }
 
-                if (MouseOverNPC(new Blob(kebbit.Location.Center), true, 1, 500) && RetrieveFalcon(kebbit.Location.Center))
+                if (MouseOverNPC(new Blob(kebbit.Location.Center), true, 1, 500))
                 {
-                    FailedRuns = 0;
-                    RunParams.Iterations--;
-                    KebbitSearchRadius = 2 * (int)Geometry.DistanceBetweenPoints(Center, kebbit.Location.Center);
-                    return true;
+                    if (RetrieveFalcon(kebbit.Location.Center))
+                    {
+                        FailedRuns = 0;
+                        RunParams.Iterations--;
+                        return true;
+                    }
+                    break;  //Don't keep trying after a failed catch attempt.
                 }
             }
 
             FailedRuns++;
-            KebbitSearchRadius *= 2;
-            return FailedRuns < 25;
+            if (FailedRuns >= 5)
+            {
+                if (FailedRuns % 10 == 0)
+                {
+                    Minimap.MoveToPosition(225, 0.95, true, 3, 2500, null, 10000);
+                    WaitDuringPlayerAnimation(6000);
+                }
+                else if (FailedRuns % 5 == 0)
+                {
+                    Minimap.MoveToPosition(315, 0.95, true, 3, 2500, null, 10000);
+                    WaitDuringPlayerAnimation(6000);
+                }
+            }
+            return FailedRuns < 60 && !FalconRanAway;
         }
 
         /// <summary>
@@ -84,29 +103,55 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if the falcon catches the kebbit and is successfully retrieved.</returns>
         protected bool RetrieveFalcon(Point target)
         {
-            if (!WaitForCatch(ref target) || !WaitForFalconToStop(ref target))
-            {
-                return false;
-            }
-
-            //Find an inventory slot that should fill when we retrieve the falcon.
-            Point? nextEmptyInventorySlot = Inventory.FirstEmptySlot(false);
+            //Find the second inventory slot that should fill when we retrieve the falcon so as not to confuse with accidentally picking up an item from the ground.
+            Point? nextEmptyInventorySlot = Inventory.FirstEmptySlot(false, 2);
             if (nextEmptyInventorySlot == null)
             {
                 return false;
             }
 
-            do
+            if (!WaitForCatch(ref target) || !WaitForFalconToStop(ref target, (Point)nextEmptyInventorySlot))
             {
-                target = ArrowToFalcon(target);
-                if (MouseOverNPC(new Blob(target), true, 4))
+                return false;
+            }
+
+            Stopwatch retrieveWatch = new Stopwatch();
+            retrieveWatch.Start();
+            while (retrieveWatch.ElapsedMilliseconds < 60000 && !StopFlag)
+            {
+                if (MouseOverNPC(new Blob(target), true, 0))
                 {
                     SafeWait((int)(RunTime(target) / 2));
-                    WaitDuringPlayerAnimation(5000);
+                    if (Inventory.WaitForSlotToFill((Point)nextEmptyInventorySlot, 5000))
+                    {
+                        return true;
+                    }
+                }
+                else if (MouseOverStationaryObject(new Blob(target), false, 0, 0))
+                {
+                    //LeftClick(target.X, target.Y, 12);
+                    //WaitDuringPlayerAnimation((int) (RunTime(target) * 1.5));
+
+                    RightClick(target.X, target.Y, 0);
+                    RightClick falconMenu = new RightClick(target.X, target.Y, RSClient);
+                    falconMenu.WaitForPopup();
+                    falconMenu.CustomOption(1);
+                    if (SafeWait(1000)) { return false; }
+                    //TODO Search for the first row in the popup with NPC yellow text instead of picking the second row.
+                }
+
+                //We accidentally collected the falcon at some point.
+                if (!Inventory.SlotIsEmpty(nextEmptyInventorySlot.Value, true))
+                {
                     return true;
                 }
+                //The falcon ran away.
+                else if (!LocateFlashingArrow(ref target))
+                {
+                    FalconRanAway = true;
+                    return false;
+                }
             }
-            while (Inventory.SlotIsEmpty(nextEmptyInventorySlot.Value) && !StopFlag);
 
             return false;
         }
@@ -126,25 +171,32 @@ namespace RunescapeBot.BotPrograms
         /// Collects the Gyr falcon after it kills a kebbit.
         /// </summary>
         /// <returns>true if the falcon catches a kebbit </returns>
-        protected bool WaitForFalconToStop(ref Point target)
+        protected bool WaitForFalconToStop(ref Point target, Point nextEmptyInventorySlot)
         {
-            Point falcon;
-            Point arrowLocation = new Point(-1000, -1000);
+            Point lastFalcon = new Point(-1000, -1000);
             Stopwatch watch = new Stopwatch();
             watch.Start();
             while (watch.ElapsedMilliseconds < 12000 && !StopFlag)
             {
                 if (LocateFlashingArrow(ref target))
                 {
-                    if (Geometry.DistanceBetweenPoints(arrowLocation, target) < ArtifactLength(0.01))
+                    if (Geometry.DistanceBetweenPoints(lastFalcon, target) < ArtifactLength(0.01))
                     {
                         return true;
                     }
                     else
                     {
-                        arrowLocation = target;
-                        falcon = ArrowToFalcon(target);
-                        MoveMouse(falcon.X, falcon.Y);
+                        lastFalcon = target;
+                        if (Geometry.DistanceBetweenPoints(Center, target) > ArtifactLength(0.25))
+                        {
+                            LeftClick(target.X, target.Y, 0);
+                            if (SafeWait((long)(RunTime(target) / 2))) { return false; }
+                            WaitDuringPlayerAnimation(3000);
+                            if (!Inventory.SlotIsEmpty(nextEmptyInventorySlot, true))
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
@@ -181,9 +233,9 @@ namespace RunescapeBot.BotPrograms
         protected bool LocateFlashingArrow(ref Point target)
         {
             Blob arrow;
-            if (LocateObject(FlashingArrow, out arrow, target, ArtifactLength(0.75), 1, int.MaxValue))
+            if (LocateObject(FlashingArrow, out arrow, target, ArtifactLength(1), 1, int.MaxValue))
             {
-                target = arrow.Center;
+                target = ArrowToFalcon(arrow.Center);
                 return true;
             }
             return false;
@@ -198,8 +250,6 @@ namespace RunescapeBot.BotPrograms
             ReadWindow();
             bool[,] blackSpotMatches = ColorFilter(Kebbit.KebbitBlackSpot);
             EraseClientUIFromMask(ref blackSpotMatches);
-            int playerExclusionOffset = ArtifactLength(0.02988);    //ex -27, +22, -27 +21
-            EraseFromMask(ref blackSpotMatches, Center.X - playerExclusionOffset, Center.X + playerExclusionOffset, Center.Y - playerExclusionOffset, Center.Y + playerExclusionOffset);
             List<Blob> blackSpots = ImageProcessing.FindBlobs(blackSpotMatches, false, 1, ArtifactArea(0.00002183));    //ex 1-11 (0.000000992-0.00001091)
             List<Cluster> kebbitLocations = ImageProcessing.ClusterBlobs(blackSpots, ArtifactLength(0.0349));
 
@@ -225,6 +275,12 @@ namespace RunescapeBot.BotPrograms
             //Remove undesired kebbits(not selected by user).
             for (int i = 0; i < kebbits.Count; i++)
             {
+                //Reject kebbits that are probably the player.
+                if (Geometry.DistanceBetweenPoints(Center, kebbits[i].Location.Center) < ArtifactLength(0.028))
+                {
+                    continue;
+                }
+
                 switch (kebbits[i].Type)
                 {
                     case Kebbit.KebbitType.Spotted:

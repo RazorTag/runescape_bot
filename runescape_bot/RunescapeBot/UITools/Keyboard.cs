@@ -1,15 +1,26 @@
 ﻿using RunescapeBot.BotPrograms;
-using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System.Diagnostics;
-using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using static RunescapeBot.UITools.User32;
 
 namespace RunescapeBot.UITools
 {
     public class Keyboard
     {
+        #region interops
+
+        const int PauseBetweenStrokes = 50;
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+
+        const int KEY_DOWN_EVENT = 0x0001; //Key down flag
+        const int KEY_UP_EVENT = 0x0002; //Key up flag
+
+        #endregion
+
         private const int KEY_SPAM_INTERVAL = 1;
         private Process RSClient;
 
@@ -114,6 +125,34 @@ namespace RunescapeBot.UITools
             {
                 SendKeys.SendWait("{ENTER}");
             }
+        }
+
+        /// <summary>
+        /// Holds a key down for a set time.
+        /// </summary>
+        /// <param name="key">System.Windows.Forms.Keys to specify a key to hold down.</param>
+        /// <param name="milliseconds">Number of milliseconds to hold down the key.</param>
+        public void HoldKey(Keys key, int milliseconds)
+        {
+            keybd_event((byte)key, 0, KEY_DOWN_EVENT, 0);
+            BotProgram.SafeWait(milliseconds);
+            keybd_event((byte)key, 0, KEY_UP_EVENT, 0);
+        }
+
+        /// <summary>
+        /// Holds the shift key down until released.
+        /// </summary>
+        public void ShiftDown()
+        {
+            keybd_event((byte)Keys.ShiftKey, 0, KEY_DOWN_EVENT, 0);
+        }
+
+        /// <summary>
+        /// Releases the shift key.
+        /// </summary>
+        public void ShiftUp()
+        {
+            keybd_event((byte)Keys.ShiftKey, 0, KEY_UP_EVENT, 0);
         }
 
         /// <summary>

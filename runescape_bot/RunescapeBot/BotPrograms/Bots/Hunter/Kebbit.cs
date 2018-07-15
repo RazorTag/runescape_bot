@@ -59,11 +59,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (_type == KebbitType.Unidentified)
                 {
-                    //IdentifyKebbit();
-                    for (int i = 0; i < 25; i++)
-                    {
-                        IdentifyKebbit();
-                    }
+                    IdentifyKebbit();
                 }
                 return _type;
             }
@@ -178,9 +174,9 @@ namespace RunescapeBot.BotPrograms
         {
             get
             {
-                Point idealLocation = new Point(PlayerLocation.X, (int)(PlayerLocation.Y + 0.2 * GameScreen.GetLength(1)));
+                Point idealLocation = new Point((int)(PlayerLocation.X + 0.2 * GameScreen.GetLength(1)), (int)(PlayerLocation.Y + 0.1 * GameScreen.GetLength(1)));
                 double distance = Geometry.DistanceBetweenPoints(Location.Center, idealLocation);
-                double distanceCost = 1 + (0.04 * GameScreen.GetLength(1)) + distance;
+                double distanceCost = 0.2 * GameScreen.GetLength(1) + distance;
                 double value = (1 / distanceCost) * Experience;
                 return value;
             }

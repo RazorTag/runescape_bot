@@ -29,6 +29,11 @@ namespace RunescapeBot.UITools
         private const double MOUSE_MOVE_RATE = 125.0;
 
         /// <summary>
+        /// Standard minimum time in milliseconds to hover at a point before clicking
+        /// </summary>
+        public const int HOVER_DELAY = 150;
+
+        /// <summary>
         /// RuneScape client process
         /// </summary>
         public static Process RSClient { get; set; }
@@ -78,7 +83,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static Point LeftClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
+        public static Point LeftClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = HOVER_DELAY)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
@@ -92,7 +97,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static Point RightClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = 200)
+        public static Point RightClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = HOVER_DELAY)
         {
             if (ScreenScraper.ProcessExists(rsClient))
             {
@@ -121,7 +126,7 @@ namespace RunescapeBot.UITools
             if (BotProgram.StopFlag) { return new Point(0, 0); }
             NaturalMove(x, y);
 
-            BotProgram.SafeWaitPlus(hoverDelay, 0.3 * hoverDelay);  //wait for RS client to recognize the cursor hover
+            BotProgram.SafeWaitPlus(hoverDelay, 0.25 * hoverDelay);  //wait for RS client to recognize the cursor hover
             if (!BotProgram.StopFlag)
             {
                 mouse_event(clickTypeDown, x, y, 0, 0);
