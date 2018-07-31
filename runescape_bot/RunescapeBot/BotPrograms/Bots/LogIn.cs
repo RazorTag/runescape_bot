@@ -19,7 +19,7 @@ namespace RunescapeBot.BotPrograms
         /// If the bot does not have valid login information, then it will quit.
         /// </summary>
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
-        protected override bool CheckLogIn()
+        protected override bool CheckLogIn(bool readWindow)
         {
             if (!IsLoggedOut())
             {

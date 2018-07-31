@@ -29,7 +29,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool WithdrawItems(Bank bank)
         {
             bank.DepositAll(FirstHidesInventorySlot);
-            bank.WithdrawAll(HidesBankSlot.X, HidesBankSlot.Y);
+            bank.WithdrawX(HidesBankSlot.X, HidesBankSlot.Y, 25);
             return true;
         }
 

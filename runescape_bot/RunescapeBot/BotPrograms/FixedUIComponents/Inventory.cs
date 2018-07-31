@@ -548,6 +548,24 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// Converts inventory coordinates to game screen coordinates.
+        /// </summary>
+        /// <param name="inventory">Inventory coordinates to convert.</param>
+        /// <returns>True if successful.</returns>
+        public bool InventoryToScreen(ref Point inventory)
+        {
+            int x = inventory.X;
+            int y = inventory.Y;
+            if (!InventoryToScreen(ref x, ref y))
+            {
+                return false;
+            }
+            inventory.X = x;
+            inventory.Y = y;
+            return true;
+        }
+
+        /// <summary>
         /// Mirrors an inventory slot across the horzontal midline of the inventory.
         /// Slots in the middle row of an odd number of rows are mirrored horizontally.
         /// </summary>

@@ -26,6 +26,7 @@ namespace RunescapeBot.BotPrograms
         protected Blob LastDemon;
         protected bool PickUpStackables;
         protected bool PickUpAlchables;
+        protected bool AlchAlchables;
         protected int RuneMinSize { get { return ArtifactArea(0.0000694); } }
         protected int MithrilMinSize { get { return ArtifactArea(0.0000992); } }
         protected int MinDemonSize { get { return ArtifactArea(0.000944); } }
@@ -41,11 +42,12 @@ namespace RunescapeBot.BotPrograms
         private DateTime LastDemonTime;
 
 
-        public LesserDemon(RunParams startParams, bool pickUpAlchables = true, bool pickUpStackables = true) : base(startParams)
+        public LesserDemon(RunParams startParams) : base(startParams)
         {
             GetReferenceColors();
-            PickUpStackables = pickUpStackables;
-            PickUpAlchables = pickUpAlchables;
+            PickUpStackables = RunParams.CustomSettingsData.LesserDemon.Telegrab;
+            PickUpAlchables = RunParams.CustomSettingsData.LesserDemon.Telegrab && RunParams.CustomSettingsData.LesserDemon.HighAlch;
+            AlchAlchables = RunParams.CustomSettingsData.LesserDemon.HighAlch;
             LastDemonTime = DateTime.Now;
         }
 
@@ -229,16 +231,24 @@ namespace RunescapeBot.BotPrograms
             bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
 
-            if (biggestBlob.Size > minimumSize)
+            if (biggestBlob.Size < minimumSize)
             {
-                Point blobCenter = biggestBlob.Center;
-                if (Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y))
-                {
-                    Inventory.OpenInventory();
-                    return true;
-                }
+                return false;   //Nothing to grab.
             }
-            return false;
+
+            Point blobCenter = biggestBlob.Center;
+            if (AlchAlchables)
+            {
+                Inventory.GrabAndAlch(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                Inventory.OpenInventory();
+            }
+            else
+            {
+                Inventory.Telegrab(blobCenter.X + offset.X, blobCenter.Y + offset.Y);
+                Inventory.OpenInventory();
+            }
+                
+            return true;
         }
 
         /// <summary>

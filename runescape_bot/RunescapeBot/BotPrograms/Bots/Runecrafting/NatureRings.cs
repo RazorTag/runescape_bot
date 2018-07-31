@@ -127,6 +127,10 @@ namespace RunescapeBot.BotPrograms
             //RepairPouches();
             //EvaluateStamina();
 
+            //Point expectedFairyRingLocation = new Point(Center.X, Center.Y + 100);
+            //MoveMouse(expectedFairyRingLocation.X, expectedFairyRingLocation.Y, 68);
+            //SafeWaitPlus(1000, 100);
+
             return true;
         }
 
@@ -215,12 +219,12 @@ namespace RunescapeBot.BotPrograms
             SafeWait(Inventory.TELEPORT_DURATION);
 
             //Start moving to bank booth
-            Point bankIconOffsetTarget = new Point(2 * MinimapGauge.GRID_SQUARE_SIZE, MinimapGauge.GRID_SQUARE_SIZE/2);
+            Point bankIconOffsetTarget = new Point(2 * MinimapGauge.GRID_SQUARE_SIZE, MinimapGauge.GRID_SQUARE_SIZE / 2);
             if (!MoveToBank(0, true, 4, 2, bankIconOffsetTarget)) { return false; }
 
             CheckItems();
             Inventory.OpenInventory();
-            MoveMouse(Center.X, Center.Y + 35, 25);
+            MoveMouse(Center.X, Center.Y + 30, 15);
             return true;
         }
 
@@ -296,14 +300,12 @@ namespace RunescapeBot.BotPrograms
             EvaluateStamina();  //determine if the player should drink a dose of stamina potion
 
             //Fill small-large pouches. Service if not using all four pouches.
-            bool earlyService = LowStamina && UserSelections.NumberOfPouches <= 3;
             if (StopFlag || !FillSmallMediumLargePouches())
             {
                 return false;
             }
 
             //Fill huge pouch
-            bool lateService = LowStamina && !earlyService;
             if (StopFlag || UserSelections.NumberOfPouches >= 4 && !FillHugePouch())
             {
                 return false;
@@ -479,6 +481,11 @@ namespace RunescapeBot.BotPrograms
             Bank bank;
 
             if (!OpenBank(out bank)) { return false; }
+            if (LowStamina)
+            {
+                bank.DepositItem(InventorySlotStaminaPotion);
+                LowStamina = false;
+            }
             bank.WithdrawAll(BankSlotPureEssence.X, BankSlotPureEssence.Y);
             bank.Close();
             Inventory.ClickInventory(InventorySlotGiantPouch);
@@ -527,7 +534,7 @@ namespace RunescapeBot.BotPrograms
             for (int searchRadius = 250; searchRadius < 1000; searchRadius += 100)
             {
                 if (SafeWait(waitTime)) { return false; }
-                if (EnterFairyRing(expectedFairyRingLocation, 250))
+                if (EnterFairyRing(expectedFairyRingLocation, searchRadius))
                 {
                     return true;
                 }
@@ -658,7 +665,7 @@ namespace RunescapeBot.BotPrograms
             waypoints.Add(new MinimapWaypoint(10, 1, 10000));
             waypoints.Add(new MinimapWaypoint(0, 1, 0));
             waypoints.Add(new MinimapWaypoint(-5, 1, 0));
-            waypoints.Add(new MinimapWaypoint(30, 0.94, 0));
+            waypoints.Add(new MinimapWaypoint(23, 0.8, 0));
             if (!Minimap.MoveAlongPath(waypoints, 3, null))
             {
                 return false;
@@ -701,6 +708,7 @@ namespace RunescapeBot.BotPrograms
             Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.120));
             if (UserSelections.NumberOfPouches > 3)
             {
+                Inventory.InventoryToScreen(ref InventorySlotGiantPouch);
                 CraftInventory(altarLocation, InventorySlotGiantPouch);
                 WaitForRunesToCraft();
             }
@@ -740,7 +748,7 @@ namespace RunescapeBot.BotPrograms
         {
             int minimumSize = ArtifactArea(0.01);   //ex 0.0236
             Blob exteriorAltar;
-            Point searchCenter = new Point(Center.X + ArtifactLength(0.1), Center.Y - ArtifactLength(0.15));
+            Point searchCenter = new Point(Center.X + ArtifactLength(0.25), Center.Y - ArtifactLength(0.24));
 
             if (!MouseOverStationaryObject(new Blob(searchCenter), true, 10, 1000))  //click on the exterior nature altar to enter
             {
@@ -754,7 +762,7 @@ namespace RunescapeBot.BotPrograms
                     return false;
                 }
             }
-            SafeWaitPlus((2 * BotRegistry.GAME_TICK), 150);
+            SafeWaitPlus((int)(2.5 * BotRegistry.GAME_TICK), 150);
 
             //click on the interior nature altar to craft inventory by guessing the location
             Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.311));
@@ -775,7 +783,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Looks for the exterior of interior of a runecrafting altar
+        /// Looks for the exterior or interior of a runecrafting altar
         /// </summary>
         /// <param name="altar">returns the altar blob if found</param>
         /// <param name="searchCenter">center of area to look at in first pass</param>
@@ -815,10 +823,10 @@ namespace RunescapeBot.BotPrograms
                 ReadWindow();
                 if (Inventory.SlotIsEmpty(InventorySlotEssenceCheck, true))
                 {
-                    SafeWait(BotRegistry.GAME_TICK + 100);
+                    if (SafeWait((int) (1.5 * BotRegistry.GAME_TICK))) { return false; }
                     return true;
                 }
-                if (SafeWait(100)) { return false; }
+                else if (SafeWait(100)) { return false; }
             }
             return false;
         }

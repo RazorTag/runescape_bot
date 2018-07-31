@@ -104,6 +104,11 @@
     <Compile Include="BotPrograms\Bots\Hunter\Falconry.cs" />
     <Compile Include="BotPrograms\Bots\Hunter\Kebbit.cs" />
     <Compile Include="BotPrograms\Bots\LogIn.cs" />
+    <Compile Include="BotPrograms\Bots\MageTrainingArena\AlchemistPlayground.cs" />
+    <Compile Include="BotPrograms\Bots\MageTrainingArena\CreatureGraveyard.cs" />
+    <Compile Include="BotPrograms\Bots\MageTrainingArena\EnchantingChamber.cs" />
+    <Compile Include="BotPrograms\Bots\MageTrainingArena\MageTrainingArena.cs" />
+    <Compile Include="BotPrograms\Bots\MageTrainingArena\TelekineticTheater.cs" />
     <Compile Include="BotPrograms\Bots\Mining\IronPowerMining.cs" />
     <Compile Include="BotPrograms\Bots\Mining\MotherlodeMine.cs" />
     <Compile Include="BotPrograms\Bots\Phasmatys\BankPhasmatys.cs" />

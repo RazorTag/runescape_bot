@@ -4,6 +4,7 @@
 -Brightness to full.
 -Set inventory to opaque.
 -Keep the bank set to the default tab.
+-Enable shift-click drop.
 -Do not wear animated clothing.
 -For combat bots, set [Options -> Controls -> NPC 'Attack' options] to Left-click where available
 -For OSBuddy, turn off Current Boosts, Item Overlay Text and Mouseover Text.

@@ -334,7 +334,7 @@ namespace RunescapeBot.BotPrograms
         protected virtual void ManageBot()
         {
             MakeSureWindowHasBeenRead();
-            if ((RunParams.RunLoggedIn && !CheckLogIn()) || !Run())
+            if ((RunParams.RunLoggedIn && !CheckLogIn(true)) || !Run())
             {
                 return;
             }
@@ -449,15 +449,13 @@ namespace RunescapeBot.BotPrograms
             {
                 if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
                 iterationWatch.Restart();
-                if (!ReadWindow() || BotWorldCheck()) { continue; }   //We had to switch out of a bot world
+                if (!ReadWindow() || BotWorldCheck(false)) { continue; }   //We had to switch out of a bot world
 
                 //Only do the actual botting if we are logged in
-                if (CheckLogIn())
+                if (CheckLogIn(false))
                 {
                     if (Bitmap != null) //Make sure the read is successful before using the bitmap values
                     {
-                        ReadWindow();
-
                         if (RunParams.AutoEat)
                         {
                             ManageHitpoints(false);
@@ -1362,12 +1360,12 @@ namespace RunescapeBot.BotPrograms
         /// If the bot does not have valid login information, then it will quit.
         /// </summary>
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
-        protected virtual bool CheckLogIn()
+        protected virtual bool CheckLogIn(bool readWindow)
         {
             //Check several times over several seconds to make sure that we are logged out before trying to log in
             for (int i = 0; i < 6; i++)
             {
-                if (!IsLoggedOut(true))
+                if (!IsLoggedOut(readWindow))
                 {
                     return true;    //already logged in
                 }

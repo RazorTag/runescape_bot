@@ -116,9 +116,9 @@ namespace RunescapeBot.BotPrograms.Popups
             {
                 if (BotProgram.SafeWait(200)) { return false; }
                 screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
-                if (PopupExists(screen))
+                if (PopupExists(screen) && PopupIsCorrectHeight(screen, checkHeight))
                 {
-                    return PopupIsCorrectHeight(screen, checkHeight);
+                    return true;
                 }
             }
             
