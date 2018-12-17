@@ -126,6 +126,7 @@
     <Compile Include="BotPrograms\Bots\Thieving\SummerGarden.cs" />
     <Compile Include="BotPrograms\Bots\Thieving\TeaStall.cs" />
     <Compile Include="BotPrograms\Bots\Woodcutting\WillowChopping.cs" />
+    <Compile Include="BotPrograms\Chat\Conversation.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\MinimapGauge.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\MinimapWaypoint.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\TextBoxTool.cs" />
