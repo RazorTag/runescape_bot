@@ -14,6 +14,8 @@ namespace RunescapeBot.Common
         public int Top { get; set; }
         public int Bottom { get; set; }
 
+        public RectangleBounds() { }
+
         public RectangleBounds(int left, int right, int top, int bottom)
         {
             Left = left;

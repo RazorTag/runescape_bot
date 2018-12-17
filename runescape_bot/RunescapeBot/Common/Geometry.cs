@@ -193,5 +193,17 @@ namespace RunescapeBot.Common
                 }
             }
         }
+
+        /// <summary>
+        /// Calculates the area of a rectangle based on its bounds.
+        /// </summary>
+        /// <param name="rectangle">Left, right, top, and bottom bounds of a rectangle.</param>
+        /// <returns>Area of the rectange.</returns>
+        public static int RectangleArea(RectangleBounds rectangle)
+        {
+            int width = rectangle.Right - rectangle.Left + 1;
+            int height = rectangle.Bottom - rectangle.Top + 1;
+            return width * height;
+        }
     }
 }

@@ -16,10 +16,22 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class TextBoxTool
     {
+        public TextBoxTool(Process rsClient, Keyboard keyboard)
+        {
+            RSClient = rsClient;
+            Keyboard = keyboard;
+        }
+
+
+        #region properties
+
         protected Process RSClient;
         protected Color[,] Screen;
         protected Keyboard Keyboard;
 
+        public static RGBHSBRange PlayerChatText = RGBHSBRangeFactory.GenericColor(Color.Blue);
+
+        public const int ROW_HEIGHT = 14;
         public int Left { get { return Screen == null ? 0 : 0; } }
         public int Right { get { return Screen == null ? 0 : Left + 518; } }
         public int Top { get { return Screen == null ? 0 : Screen.GetLength(1) - 165; } }
@@ -27,10 +39,19 @@ namespace RunescapeBot.BotPrograms
         public int Area { get { return (Right - Left) * (Bottom - Top); } }
         private double PixelSize { get { return 1 / Area; } }
 
-        public TextBoxTool(Process rsClient, Keyboard keyboard)
+        /// <summary>
+        /// Determines the area corresponding to a row of text.
+        /// </summary>
+        /// <param name="rowIndex">The index of the the row to locate (0-7, bottom to top).</param>
+        /// <returns>The bounds of the area containing the text for the specified row.</returns>
+        public RectangleBounds ChatRowLocation(int rowIndex)
         {
-            RSClient = rsClient;
-            Keyboard = keyboard;
+            RectangleBounds rowLocation = new RectangleBounds();
+            rowLocation.Left = Left + 57;
+            rowLocation.Right = Right - 23;
+            rowLocation.Top = Bottom + 35 + (rowIndex * ROW_HEIGHT);
+            rowLocation.Bottom = Bottom + 22 + (rowIndex * ROW_HEIGHT);
+            return null;
         }
 
         /// <summary>
@@ -50,6 +71,10 @@ namespace RunescapeBot.BotPrograms
         {
             RSClient = rsClient;
         }
+
+        #endregion
+
+        #region NPC dialog
 
         /// <summary>
         /// Takes a hash of the textbox dialog area
@@ -136,5 +161,7 @@ namespace RunescapeBot.BotPrograms
 
             return screensClicked == screenCount;
         }
+
+        #endregion
     }
 }

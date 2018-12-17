@@ -293,31 +293,31 @@ namespace RunescapeBot.BotPrograms
         public bool AutoEat { get; set; }
 
         /// <summary>
-        /// Fraction of total hitpoints below which the bot will automaticall eat the next food if AutoEat is set to true
+        /// Fraction of total hitpoints below which the bot will automaticall eat the next food if AutoEat is set to true.
         /// </summary>
         [XmlIgnore]
         public double StartEatingBelow { get; set; }
 
         /// <summary>
-        /// Fraction of total hitpoints above which the bot will stop automatically eating
+        /// Fraction of total hitpoints above which the bot will stop automatically eating.
         /// </summary>
         [XmlIgnore]
         public double StopEatingAbove { get; set; }
 
         /// <summary>
-        /// Run the bot with the chat box closed so that the bot can see that area of the screen
+        /// Run the bot with the chat box closed so that the bot can see that area of the screen.
         /// </summary>
         [XmlIgnore]
         public bool ClosedChatBox { get; set; }
 
         /// <summary>
-        /// Do not turn on run below this threshold
+        /// Do not turn on run below this threshold.
         /// </summary>
         [XmlIgnore]
         public double RunAbove { get; set; }
 
         /// <summary>
-        /// How to set the camera after logging in
+        /// How to set the camera after logging in.
         /// </summary>
         [XmlIgnore]
         public CameraPosition DefaultCameraPosition { get; set; }
@@ -326,6 +326,13 @@ namespace RunescapeBot.BotPrograms
             AsIs,
             NorthAerial
         }
+
+        /// <summary>
+        /// The result of the most recent check of the clien't slogged in status.
+        /// Should default to false when the results of a login state check are uncertain.
+        /// </summary>
+        [XmlIgnore]
+        public bool LoggedIn { get; set; }
 
         /// <summary>
         /// Indicates which tab is currently running a bot

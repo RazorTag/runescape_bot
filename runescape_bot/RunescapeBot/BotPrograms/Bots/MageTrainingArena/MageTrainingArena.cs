@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms.Bots.MageTrainingArena
 {
-    class MageTrainingArena
+    public class MageTrainingArena
     {
     }
 }

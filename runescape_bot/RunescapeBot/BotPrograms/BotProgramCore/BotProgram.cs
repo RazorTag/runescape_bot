@@ -25,8 +25,6 @@ namespace RunescapeBot.BotPrograms
     {
         #region properties
 
-        private const long LOGIN_LOGO_COLOR_SUM = 15456063;
-
         /// <summary>
         /// Used to provide the current state of the bot for the start menu
         /// </summary>
@@ -144,17 +142,22 @@ namespace RunescapeBot.BotPrograms
         protected TextBoxTool Textbox { get; set; }
 
         /// <summary>
-        /// Expected time to complete a single iteration
+        /// Text chat between the player and other players via the chat textbox.
+        /// </summary>
+        protected Conversation Conversation { get; set; }
+
+        /// <summary>
+        /// Expected time to complete a single iteration.
         /// </summary>
         protected int SingleMakeTime;
 
         /// <summary>
-        /// Number of iterations in a single execution
+        /// Number of iterations in a single execution.
         /// </summary>
         protected int MakeQuantity;
 
         /// <summary>
-        /// Stock random number generator
+        /// Reusable random number generator.
         /// </summary>
         protected Random RNG { get; set; }
 
@@ -258,6 +261,7 @@ namespace RunescapeBot.BotPrograms
             Inventory = new Inventory(RSClient, Keyboard);
             Minimap = new MinimapGauge(RSClient, Keyboard);
             Textbox = new TextBoxTool(RSClient, Keyboard);
+            Conversation = new Conversation(Textbox);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
             RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
             RunParams.LoginWorld = 0;
@@ -284,7 +288,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Handles the sequential calling of the methods used to do bot work
+        /// Handles the sequential calling of the methods used to do bot work.
         /// </summary>
         private void Process()
         {
@@ -300,7 +304,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 catch (Exception e)
                 {
-                    LogError.SimpleLog(e);  //log an error raised during a bot's execution
+                    LogError.SimpleLog(e);  //Log an error raised during a bot's execution.
                     MessageBox.Show("See " + LogError.FilePath + " for details.", "Critical Error");
                     throw e;
                 }
@@ -509,10 +513,12 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Clean up
+        /// Clean up.
         /// </summary>
         private void Done()
         {
+            Conversation.Stop();
+
             if (LogoutWhenDone)
             {
                 Logout();
@@ -523,6 +529,7 @@ namespace RunescapeBot.BotPrograms
             {
                 Bitmap.Dispose();
             }
+
             RunParams.TaskComplete();
         }
 
@@ -1326,18 +1333,14 @@ namespace RunescapeBot.BotPrograms
                     SafeWait(UnitConversions.SecondsToMilliseconds(5));
                     if (ReadWindow(false) && (IsLoggedOut(false) || IsLoggedIn()))
                     {
-                        BroadcastConnection();
                         return true;
                     }
                 }
                 while ((watch.ElapsedMilliseconds < UnitConversions.MinutesToMilliseconds(5)) && !StopFlag);
-
-                BroadcastDisconnect();
             }
 
             if (!StopFlag)
             {
-                BroadcastFailure();
                 const string errorMessage = "Client did not start correctly";
                 MessageBox.Show(errorMessage);
             }
@@ -1506,14 +1509,12 @@ namespace RunescapeBot.BotPrograms
             //verify the log in
             if (ConfirmLogin())
             {
-                BroadcastLogin();
                 DefaultCamera();
                 ChatBox();
                 return true;
             }
             else
             {
-                BroadcastLogout();
                 return false;
             }
         }
@@ -1610,10 +1611,10 @@ namespace RunescapeBot.BotPrograms
             long expectedColumnSum = 133405;
             if (columnSum > (1.01 * expectedColumnSum) || columnSum < (0.99 * expectedColumnSum))
             {
-                return false;
+                return RunParams.LoggedIn = false;
             }
 
-            return true;
+            return RunParams.LoggedIn = true;
         }
 
         /// <summary>
@@ -1647,7 +1648,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we are verifiably logged out</returns>
         protected bool IsLoggedOut(bool readWindow = false)
         {
-            if (readWindow && !ReadWindow()) { return false; }
+            if (readWindow && !ReadWindow())
+            {
+                RunParams.LoggedIn = false;
+                return false;
+            }
 
             Color color;
             Point loginOffset = LoginScreenOffset();
@@ -1708,6 +1713,7 @@ namespace RunescapeBot.BotPrograms
                 }
             }
 
+            RunParams.LoggedIn = false;
             return true;
         }
 
@@ -1716,6 +1722,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void Logout()
         {
+            RunParams.LoggedIn = false; //Signal our intent to logout immediately to anything else that is checking the login state.
             const int maxLogoutAttempts = 10;
             int logoutAttempts = 0;
 
@@ -1728,8 +1735,6 @@ namespace RunescapeBot.BotPrograms
                 LeftClick(ScreenWidth - 120, ScreenHeight - 71, 5); //click here to logout
                 SafeWait(2000, 400);
             }
-
-            BroadcastLogout();
         }
 
         /// <summary>
@@ -2406,35 +2411,6 @@ namespace RunescapeBot.BotPrograms
             }
             double travelTime = (tiles / 2.0) * BotRegistry.GAME_TICK;
             return travelTime + (2 * BotRegistry.GAME_TICK);
-        }
-
-        #endregion
-
-        #region broadcasting
-
-        private void BroadcastConnection()
-        {
-
-        }
-
-        private void BroadcastDisconnect()
-        {
-
-        }
-
-        private void BroadcastFailure()
-        {
-
-        }
-
-        private void BroadcastLogin()
-        {
-
-        }
-
-        private void BroadcastLogout()
-        {
-
         }
 
         #endregion
