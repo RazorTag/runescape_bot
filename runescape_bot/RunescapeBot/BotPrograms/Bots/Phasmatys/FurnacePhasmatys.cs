@@ -31,7 +31,7 @@ namespace RunescapeBot.BotPrograms
 
             //Refresh inventory to a bracelet mould and 27 gold bars
             if (StopFlag) { return false; }
-            BankPopup = new Bank(RSClient, Inventory);
+            BankPopup = new Bank(RSClient, Inventory, Keyboard);
             if (!BankPopup.WaitForPopup(BotUtilities.WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
                 failedRuns++;
@@ -52,7 +52,7 @@ namespace RunescapeBot.BotPrograms
                 return true;
             }
             Inventory.ClickInventory(1, 0, false);
-            ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000, 1000);
+            HandEye.ClickStationaryObject(Furnace, STATIONARY_OBJECT_TOLERANCE, 100, 12000, 1000);
 
             //Do the bot-specific actions at the furnace
             if (StopFlag) { return false; }

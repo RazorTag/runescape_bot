@@ -62,11 +62,11 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool FurnaceActions()
         {
-            ReadWindow();
+            Screen.ReadWindow();
 
             //make 27 bars and wait
             if (StopFlag) { return false; }
-            CraftPopup = new FurnaceCrafting(RSClient);
+            CraftPopup = new FurnaceCrafting(RSClient, Keyboard);
             if (!CraftPopup.WaitForPopup(WAIT_FOR_CRAFTING_WINDOW_TIMEOUT))
             {
                 return false;

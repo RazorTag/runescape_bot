@@ -21,23 +21,18 @@ namespace RunescapeBot.UITools
 
         #endregion
 
+        #region properties
+
         private const int KEY_SPAM_INTERVAL = 1;
-        private Process RSClient;
+        private RSClient RSClient;
+
+        #endregion
 
         /// <summary>
         /// Creates a keyboard controller
         /// </summary>
         /// <param name="rsClient"></param>
-        public Keyboard(Process rsClient)
-        {
-            RSClient = rsClient;
-        }
-
-        /// <summary>
-        /// Sets the client for he keyboard to use
-        /// </summary>
-        /// <param name="rsClient"></param>
-        public void SetClient(Process rsClient)
+        public Keyboard(RSClient rsClient)
         {
             RSClient = rsClient;
         }
@@ -54,7 +49,7 @@ namespace RunescapeBot.UITools
             }
             if (ScreenScraper.ProcessExists(RSClient))
             {
-                ScreenScraper.BringToForeGround(RSClient);
+                ScreenScraper.BringToForeGround();
                 return true;
             }
             else

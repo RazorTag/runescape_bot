@@ -20,7 +20,7 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.Run = true;
             RunParams.FrameTime = 1800;
-            minIronBlobPxSize = ArtifactArea(0.00025);
+            minIronBlobPxSize = Screen.ArtifactArea(0.00025);
             missedRocks = 0;
         }
 
@@ -47,7 +47,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected override bool Execute()
         {
-            ReadWindow();
+            Screen.ReadWindow();
             if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 4))
             {
                 Inventory.DropInventory(false, true);
@@ -82,7 +82,7 @@ namespace RunescapeBot.BotPrograms
         protected Blob StationaryLocateUnminedOre()
         {
             Blob rockLocation;
-            LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, 5*minIronBlobPxSize, LocateUnminedOre);
+            Vision.LocateStationaryObject(IronFilter, out rockLocation, 15, 5000, minIronBlobPxSize, 5*minIronBlobPxSize, LocateUnminedOre);
             return rockLocation;
         }
 
@@ -95,9 +95,9 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if an ore rock is found</returns>
         protected bool LocateUnminedOre(ColorFilter ironFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
         {
-            ReadWindow();
-            bool[,] ironBoolArray = ColorFilter(ironFilter);
-            foundObject = ImageProcessing.ClosestBlob(ironBoolArray, Center, minimumSize);
+            Screen.ReadWindow();
+            bool[,] ironBoolArray = Vision.ColorFilter(ironFilter);
+            foundObject = ImageProcessing.ClosestBlob(ironBoolArray, Screen.Center, minimumSize);
             return foundObject != null;
         }
     }

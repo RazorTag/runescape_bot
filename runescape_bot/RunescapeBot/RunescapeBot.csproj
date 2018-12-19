@@ -84,8 +84,14 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotManagers\PhasmatysRotation.cs" />
     <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
+    <Compile Include="BotPrograms\Chat\ChatRow.cs" />
+    <Compile Include="BotPrograms\Controllers\Banking.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotProgram.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotRegistry.cs" />
+    <Compile Include="BotPrograms\Controllers\GameScreen.cs" />
+    <Compile Include="BotPrograms\Controllers\HandEye.cs" />
+    <Compile Include="BotPrograms\Controllers\RSClient.cs" />
+    <Compile Include="BotPrograms\Controllers\Vision.cs" />
     <Compile Include="BotPrograms\Bots\Agility\Agility.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilityGnomeStronghold.cs" />
     <Compile Include="BotPrograms\Bots\Agility\AgilitySeersVillage.cs" />

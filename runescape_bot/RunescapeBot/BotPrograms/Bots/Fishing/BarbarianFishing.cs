@@ -23,7 +23,7 @@ namespace RunescapeBot.BotPrograms
         {
             RunParams.Run = true;
             RunParams.FrameTime = 5000;
-            maxFishingPoleDistance = ArtifactLength(0.0597);
+            maxFishingPoleDistance = Screen.ArtifactLength(0.0597);
             emptySlotsSet = false;
         }
 
@@ -75,7 +75,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 emptySlotsSet = true;
             }
-            ReadWindow();
+            Screen.ReadWindow();
             if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 3, true))
             {
                 Inventory.DropInventory(false, true);
@@ -84,7 +84,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (!IsCurrentlyFishing())
                 {
-                    Blob fishLocation = LocateClosestObject(FishTileFilter);
+                    Blob fishLocation = Vision.LocateClosestObject(FishTileFilter);
                     if (fishLocation != null)
                     {
                         if (fishLocation.Center.X != 0 && fishLocation.Center.Y != 0)
@@ -145,16 +145,16 @@ namespace RunescapeBot.BotPrograms
         protected bool LocateFishingTile(ColorFilter fishFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
         {
             foundObject = new Blob();
-            ReadWindow();
-            bool[,] fishBoolArray = ColorFilter(fishFilter);
+            Screen.ReadWindow();
+            bool[,] fishBoolArray = Vision.ColorFilter(fishFilter);
             List<Blob> allMatches = ImageProcessing.FindBlobs(fishBoolArray);
 
             if (allMatches == null || allMatches.Count == 0)
             {
                 return false;
             }
-            allMatches.Sort(new BlobProximityComparer(Center));
-            foundObject = Geometry.ClosestBlobToPoint(allMatches, Center);
+            allMatches.Sort(new BlobProximityComparer(Screen.Center));
+            foundObject = Geometry.ClosestBlobToPoint(allMatches, Screen.Center);
 
             return foundObject != null;
         }
@@ -167,14 +167,14 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool IsCurrentlyFishing()
         {
-            ReadWindow();
-            bool[,] poleBoolArray = ColorFilter(FishingPoleFilter);
+            Screen.ReadWindow();
+            bool[,] poleBoolArray = Vision.ColorFilter(FishingPoleFilter);
             Blob closestObject;
-            closestObject = ImageProcessing.ClosestBlob(poleBoolArray, Center, 7);
+            closestObject = ImageProcessing.ClosestBlob(poleBoolArray, Screen.Center, 7);
 
             if (closestObject != null)
             {
-                if (Geometry.DistanceBetweenPoints(closestObject.Center, Center) <= maxFishingPoleDistance)
+                if (Geometry.DistanceBetweenPoints(closestObject.Center, Screen.Center) <= maxFishingPoleDistance)
                 {
                     return true;
                 }

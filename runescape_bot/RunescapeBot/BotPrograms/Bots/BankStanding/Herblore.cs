@@ -128,7 +128,7 @@ namespace RunescapeBot.BotPrograms
         protected bool WithdrawHerbsAndVials()
         {
             Bank bank;
-            if (!OpenBank(out bank, 2)) { return false; }
+            if (!Banking.OpenBank(out bank, 2)) { return false; }
             bank.DepositInventory();
             bank.WithdrawX(HerbBankSlot.X, HerbBankSlot.Y, HALF_INVENTORY);
             bank.WithdrawX(VialOfWaterBankSlot.X, VialOfWaterBankSlot.Y, HALF_INVENTORY);
@@ -156,7 +156,7 @@ namespace RunescapeBot.BotPrograms
         protected bool WithdrawSecondaryIngredients()
         {
             Bank bank;
-            if (!OpenBank(out bank)) { return false; }
+            if (!Banking.OpenBank(out bank)) { return false; }
             bank.WithdrawX(SecondaryIngredientBankSlot.X, SecondaryIngredientBankSlot.Y, HALF_INVENTORY);
             bank.Close();
             return true;

@@ -18,6 +18,7 @@ namespace RunescapeBot.BotPrograms.Popups
         public static int NAmount { get; set; }
 
         Process RSClient;
+        Keyboard Keyboard;
         Inventory InventoryItems;
         public int Left { get; set; }
         public int Right { get; set; }
@@ -28,9 +29,10 @@ namespace RunescapeBot.BotPrograms.Popups
 
         #region constructors
 
-        public Bank(Process rsClient, Inventory inventory)
+        public Bank(Process rsClient, Inventory inventory, Keyboard keyboard)
         {
             RSClient = rsClient;
+            Keyboard = keyboard;
             Point screenSize = ScreenScraper.GetWindowSize(rsClient);
             InventoryItems = inventory;
             SetLeft(screenSize.X);
@@ -100,7 +102,7 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             int x = Left + 469;
             int y = Top + 17;
-            Mouse.LeftClick(x, y, RSClient, 7);
+            Mouse.LeftClick(x, y, 7);
         }
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace RunescapeBot.BotPrograms.Popups
             int bottom = Top + 25;
             
             Color[,] screen;
-            screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
             screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
             titleMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRangeFactory.BankTitle());
             
@@ -210,7 +212,7 @@ namespace RunescapeBot.BotPrograms.Popups
 
             if (screen == null)
             {
-                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
             }
             screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
             double slotCounterMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRangeFactory.BankSlotPlaceholderZero());
@@ -228,7 +230,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="screenHeight">height of the game screen in pixels</param>
         public void DepositInventory()
         {
-            Mouse.LeftClick(Left + 427, Bottom - 22, RSClient, 10);
+            Mouse.LeftClick(Left + 427, Bottom - 22, 10);
             BotProgram.SafeWaitPlus(200, 20);
         }
 
@@ -258,7 +260,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         public void WithdrawAsNotes()
         {
-            Mouse.LeftClick(Left + 279, Bottom - 15, RSClient, 5);
+            Mouse.LeftClick(Left + 279, Bottom - 15, 5);
             BotProgram.SafeWaitPlus(200, 20);
         }
 
@@ -276,7 +278,7 @@ namespace RunescapeBot.BotPrograms.Popups
             }
 
             Point click = Probability.GaussianCircle(new Point(itemSlot.Value.X, itemSlot.Value.Y), 4, 0, 360, 11);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
+            Mouse.LeftClick(click.X, click.Y);
         }
 
         /// <summary>
@@ -309,7 +311,7 @@ namespace RunescapeBot.BotPrograms.Popups
             WithdrawMenuClick(column, row, yOffset);
             if (WaitForEnterAmount(5000))
             {
-                BotUtilities.EnterAmount(RSClient, quantity);
+                BotUtilities.EnterAmount(Keyboard, quantity);
                 NAmount = quantity;
             }
         }
@@ -342,14 +344,14 @@ namespace RunescapeBot.BotPrograms.Popups
 
             //open the withdraw right-click menu
             Point click = Probability.GaussianCircle(new Point(itemSlot.Value.X, itemSlot.Value.Y), 4, 0, 360, 11);
-            Mouse.RightClick(click.X, click.Y, RSClient);
+            Mouse.RightClick(click.X, click.Y);
             BotProgram.SafeWaitPlus(200, 100);
             RightClick menu = new RightClick(click.X, click.Y, RSClient, 9);
             menu.WaitForPopup();
 
             //click on Withdraw-All
             click = Probability.GaussianRectangle(click.X - 90, click.X + 90, click.Y + yOffset - 2, click.Y + yOffset + 2);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
+            Mouse.LeftClick(click.X, click.Y);
             BotProgram.SafeWaitPlus(200, 100);
         }
 

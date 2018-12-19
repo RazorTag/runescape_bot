@@ -51,6 +51,7 @@ namespace RunescapeBot.BotPrograms
             ClosedChatBox = false;
             RunLoggedIn = true;
             RunAbove = 0.2;
+            Conversation = false;
             CustomSettingsData = new CustomSettingsData();
         }
 
@@ -328,11 +329,17 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// The result of the most recent check of the clien't slogged in status.
+        /// The result of the most recent check of the client's logged in status.
         /// Should default to false when the results of a login state check are uncertain.
         /// </summary>
         [XmlIgnore]
         public bool LoggedIn { get; set; }
+
+        /// <summary>
+        /// Set to true to enable text scanning and conversation with other players.
+        /// </summary>
+        [XmlIgnore]
+        public bool Conversation { get; set; }
 
         /// <summary>
         /// Indicates which tab is currently running a bot

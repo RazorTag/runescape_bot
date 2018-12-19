@@ -106,7 +106,7 @@ namespace RunescapeBot.BotPrograms.Popups
         {
             int x = Left + 482;
             int y = Top + 17;
-            Mouse.LeftClick(x, y, RSClient, 7);
+            Mouse.LeftClick(x, y, 7);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace RunescapeBot.BotPrograms.Popups
             int bottom = Top + 25;
 
             Color[,] screen;
-            screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
             screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
             double titleMatch = ImageProcessing.FractionalMatch(screen, RGBHSBRangeFactory.BankTitle());
 
@@ -157,7 +157,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <returns>true if successful</returns>
         public bool RepairPouches(TextBoxTool textBox)
         {
-            Mouse.LeftClick(Left + 240, Top + 102, RSClient, 10);
+            Mouse.LeftClick(Left + 240, Top + 102, 10);
             BotProgram.SafeWait(NPC_CONTACT_CAST_TIME);
             return textBox.ClickThroughTextScreens(4, 5000);
         }

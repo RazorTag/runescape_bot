@@ -43,7 +43,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             Bank bank;
-            if (!OpenBank(out bank) || !WithdrawItems(bank))
+            if (!Banking.OpenBank(out bank) || !WithdrawItems(bank))
             {
                 return false;
             }

@@ -73,42 +73,45 @@ namespace RunescapeBot.ImageTools
             OSBuddy
         }
 
-        #endregion
-
         /// <summary>
         /// THe client type most recently found
         /// </summary>
         public static Client ClientType { get; set; }
 
+        /// <summary>
+        /// The client currently in use.
+        /// </summary>
+        public static RSClient RSClient;
+
+        #endregion
+
         #region screenreader
+
         /// <summary>
         /// Brings the client window to the foreground and shows it
         /// </summary>
-        /// <param name="rsHandle"></param>
-        public static void BringToForeGround(Process rsClient)
+        public static void BringToForeGround()
         {
-            if (!ProcessExists(rsClient)) { return; }
+            if (!ProcessExists(RSClient)) { return; }
             
-            int rsHandle = (int)rsClient.MainWindowHandle;
+            int rsHandle = (int)RSClient.Value.MainWindowHandle;
             if (IsIconic(rsHandle))
             {
                 ShowWindow(rsHandle, SW_RESTORE);
             }
             SetForegroundWindow(rsHandle);
-            MaximizeWindow(rsClient);
+            MaximizeWindow();
         }
 
         /// <summary>
         /// Maximizes a window if it isn't already
         /// </summary>
-        /// <param name="rsClient"></param>
-        /// <returns></returns>
-        private static void MaximizeWindow(Process rsClient)
+        private static void MaximizeWindow()
         {
-            int style = GetWindowLong(rsClient.MainWindowHandle, GWL_STYLE);
+            int style = GetWindowLong(RSClient.Value.MainWindowHandle, GWL_STYLE);
             if ((style & WS_MAXIMIZE) != WS_MAXIMIZE)
             {
-                ShowWindow((int)rsClient.MainWindowHandle, SW_MAXIMIZE);
+                ShowWindow((int)RSClient.Value.MainWindowHandle, SW_MAXIMIZE);
                 Thread.Sleep(1000);  //wait for the window to maximize
             }
         }
@@ -116,15 +119,14 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Gets the game screen size of the client
         /// </summary>
-        /// <param name="rsClient"></param>
         /// <returns></returns>
-        public static Point? GetScreenSize(Process rsClient)
+        public static Point? GetScreenSize()
         {
-            if (!ProcessExists(rsClient)) { return null; }
+            if (!ProcessExists(RSClient)) { return null; }
 
-            BringToForeGround(rsClient);
+            BringToForeGround();
             RECT windowRect = new RECT();
-            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            GetWindowRect(RSClient.Value.MainWindowHandle, ref windowRect);
             if (!TrimClient(ref windowRect))
             {
                 return null;
@@ -140,13 +142,13 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="handle">The handle to the window. (In windows forms, this is obtained by the Handle property)</param>
         /// <returns></returns>
-        public static Bitmap CaptureWindow(Process rsClient, bool fastCapture = false)
+        public static Bitmap CaptureWindow(bool fastCapture = false)
         {
-            if (!ProcessExists(rsClient)) { return null; }
+            if (!ProcessExists(RSClient)) { return null; }
 
-            BringToForeGround(rsClient);
+            BringToForeGround();
             RECT windowRect = new RECT();
-            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            GetWindowRect(RSClient.Value.MainWindowHandle, ref windowRect);
             if (!TrimClient(ref windowRect))
             {
                 return null;
@@ -165,13 +167,13 @@ namespace RunescapeBot.ImageTools
         /// <summary>
         /// Wrapper for ScreenScraper.CaptureWindow
         /// </summary>
-        public static Color[,] ReadWindow(Process rsClient, bool fastCapture = false)
+        public static Color[,] ReadWindow(bool fastCapture = false)
         {
             Bitmap screenshot;
             Color[,] screen;
             try
             {
-                screenshot = CaptureWindow(rsClient, fastCapture);
+                screenshot = CaptureWindow(fastCapture);
                 screen = GetRGB(screenshot);
             }
             catch
@@ -315,12 +317,10 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="x">goes from left to right</param>
         /// <param name="y">goes from top to bottom</param>
-        /// <param name="rsClient">RuneScape client process</param>
-        /// <returns></returns>
-        public static void GameScreenToWindow(ref int x, ref int y, Process rsClient)
+        public static void GameScreenToWindow(ref int x, ref int y)
         {
             RECT windowRect = new RECT();
-            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            GetWindowRect(RSClient.Value.MainWindowHandle, ref windowRect);
             TrimClient(ref windowRect);
             x += windowRect.left;
             y += windowRect.top;
@@ -331,11 +331,10 @@ namespace RunescapeBot.ImageTools
         /// </summary>
         /// <param name="x">goes from left to right</param>
         /// <param name="y">goes from top to bottom</param>
-        /// <param name="rsClient">RuneScape client process</param>
-        public static void WindowToGameScreen(ref int x, ref int y, Process rsClient)
+        public static void WindowToGameScreen(ref int x, ref int y)
         {
             RECT windowRect = new RECT();
-            GetWindowRect(rsClient.MainWindowHandle, ref windowRect);
+            GetWindowRect(RSClient.Value.MainWindowHandle, ref windowRect);
             TrimClient(ref windowRect);
             x -= windowRect.left;
             y -= windowRect.top;

@@ -1,13 +1,8 @@
 ﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -16,28 +11,36 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class TextBoxTool
     {
-        public TextBoxTool(Process rsClient, Keyboard keyboard)
-        {
-            RSClient = rsClient;
-            Keyboard = keyboard;
-        }
-
-
         #region properties
 
-        protected Process RSClient;
-        protected Color[,] Screen;
+        private RSClient RSClient;
         protected Keyboard Keyboard;
+        private GameScreen Screen;
 
         public static RGBHSBRange PlayerChatText = RGBHSBRangeFactory.GenericColor(Color.Blue);
 
         public const int ROW_HEIGHT = 14;
         public int Left { get { return Screen == null ? 0 : 0; } }
         public int Right { get { return Screen == null ? 0 : Left + 518; } }
-        public int Top { get { return Screen == null ? 0 : Screen.GetLength(1) - 165; } }
+        public int Top { get { return Screen == null ? 0 : Screen.Height - 165; } }
         public int Bottom { get { return Screen == null ? 0 : Top + 141; } }
         public int Area { get { return (Right - Left) * (Bottom - Top); } }
         private double PixelSize { get { return 1 / Area; } }
+
+        #endregion
+
+        #region constructors
+
+        public TextBoxTool(RSClient rsClient, Keyboard keyboard, GameScreen screen)
+        {
+            RSClient = rsClient;
+            Keyboard = keyboard;
+            Screen = screen;
+        }
+
+        #endregion
+
+        #region NPC dialog
 
         /// <summary>
         /// Determines the area corresponding to a row of text.
@@ -51,30 +54,8 @@ namespace RunescapeBot.BotPrograms
             rowLocation.Right = Right - 23;
             rowLocation.Top = Bottom + 35 + (rowIndex * ROW_HEIGHT);
             rowLocation.Bottom = Bottom + 22 + (rowIndex * ROW_HEIGHT);
-            return null;
+            return rowLocation;
         }
-
-        /// <summary>
-        /// Updates the game screen image.
-        /// </summary>
-        /// <param name="screen">new image of the entire game screen</param>
-        public void SetScreen(Color[,] screen)
-        {
-            Screen = screen;
-        }
-
-        /// <summary>
-        /// Called by BotProgram to update with the most current client process.
-        /// </summary>
-        /// <param name="colorArray">the newest screenshot</param>
-        public void SetClient(Process rsClient)
-        {
-            RSClient = rsClient;
-        }
-
-        #endregion
-
-        #region NPC dialog
 
         /// <summary>
         /// Takes a hash of the textbox dialog area
@@ -83,7 +64,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the portion of the dialog text area filled with text color</returns>
         public double DialogBodyText()
         {
-            Screen = ScreenScraper.ReadWindow(RSClient, true);
+            Screen.Value = ScreenScraper.ReadWindow(true);
             ColorFilter filter = RGBHSBRangeGroupFactory.DialogText();
             double match = ImageProcessing.FractionalMatchPiece(Screen, filter, Left + 126, Right - 126, Top + 46, Bottom - 38);
             return match;
@@ -119,7 +100,7 @@ namespace RunescapeBot.BotPrograms
             watch.Start();
             while (watch.ElapsedMilliseconds < timeout && !BotProgram.StopFlag)
             {
-                Screen = ScreenScraper.ReadWindow(RSClient, true);
+                Screen.Value = ScreenScraper.ReadWindow(true);
                 if (DialogBodyTextMatch(expectedText, allowedPixelDifference))
                 {
                     return true;

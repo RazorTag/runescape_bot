@@ -13,10 +13,10 @@ namespace RunescapeBot.BotPrograms
     {
         #region properties
 
-        private Color[,] Screen;
+        private RSClient RSClient;
         private Keyboard Keyboard;
+        private GameScreen Screen;
         private Random RNG;
-        private Process RSClient;
 
         /// <summary>
         /// Inventory slots to be dropped when more space is needed
@@ -32,31 +32,14 @@ namespace RunescapeBot.BotPrograms
 
         #region constructors
 
-        public Inventory(Process rsClient, Keyboard keyboard)
+        public Inventory(RSClient rsClient, Keyboard keyboard, GameScreen screen)
         {
-            RNG = new Random();
             RSClient = rsClient;
-            SelectedTab = TabSelect.Unknown;
             Keyboard = keyboard;
-            EmptySlots = new bool[INVENTORY_COLUMNS, INVENTORY_ROWS];
-        }
-
-        /// <summary>
-        /// Sets the client to use
-        /// </summary>
-        /// <param name="rsClient"></param>
-        public void SetClient(Process rsClient)
-        {
-            RSClient = rsClient;
-        }
-
-        /// <summary>
-        /// Sets the latest screenshot
-        /// </summary>
-        /// <param name="screen"></param>
-        public void SetScreen(Color[,] screen)
-        {
             Screen = screen;
+            RNG = new Random();
+            SelectedTab = TabSelect.Unknown;
+            EmptySlots = new bool[INVENTORY_COLUMNS, INVENTORY_ROWS];
         }
 
         /// <summary>
@@ -67,7 +50,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (overwrite || Screen == null)
             {
-                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient, true));
+                Screen.Value = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(true));
             }
         }
 
@@ -89,7 +72,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
+            Point? screenSize = ScreenScraper.GetScreenSize();
             if (screenSize == null)
             {
                 return false;
@@ -97,7 +80,7 @@ namespace RunescapeBot.BotPrograms
 
             int x = screenSize.Value.X - offsetRight;
             int y = screenSize.Value.Y - offsetBottom;
-            Mouse.LeftClick(x, y, RSClient, 10);
+            Mouse.LeftClick(x, y, 10);
             BotProgram.SafeWait(TAB_SWITCH_WAIT);
             SelectedTab = tab;
             return true;
@@ -165,15 +148,15 @@ namespace RunescapeBot.BotPrograms
             Bitmap screenshot;
             try
             {
-                screenshot = ScreenScraper.CaptureWindow(RSClient, fastCapture);
-                Screen = ScreenScraper.GetRGB(screenshot);
+                screenshot = ScreenScraper.CaptureWindow(fastCapture);
+                Screen.Value = ScreenScraper.GetRGB(screenshot);
             }
             catch
             {
                 return false;
             }
 
-            bool success = (screenshot != null) && (Screen.GetLength(0) > 0) && (Screen.GetLength(1) > 0);
+            bool success = (screenshot != null) && (Screen.Width > 0) && (Screen.Height > 0);
             screenshot.Dispose();
             return success;
         }
@@ -212,7 +195,7 @@ namespace RunescapeBot.BotPrograms
         {
             InventoryToScreen(ref x, ref y);
             OpenInventory(safeTab);
-            Mouse.LeftClick(x, y, RSClient, 5);
+            Mouse.LeftClick(x, y, 5);
         }
 
         /// <summary>
@@ -243,7 +226,7 @@ namespace RunescapeBot.BotPrograms
         {
             InventoryToScreen(ref x, ref y);
             Keyboard.ShiftDown();
-            Mouse.LeftClick(x, y, RSClient, 10);
+            Mouse.LeftClick(x, y, 10);
             Keyboard.ShiftUp();
             return true;
         }
@@ -269,7 +252,7 @@ namespace RunescapeBot.BotPrograms
         public void SetEmptySlots()
         {
             OpenInventory();
-            Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            Screen.Value = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
             EmptySlots = new bool[INVENTORY_COLUMNS, INVENTORY_ROWS];
 
             for (int x = 0; x < INVENTORY_COLUMNS; x++)
@@ -301,7 +284,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="safeTab"></param>
         public void DropInventory(bool safeTab = true, bool onlyDropPreviouslyEmptySlots = true)
         {
-            Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+            Screen.Value = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
             OpenInventory(safeTab);
             int effectiveY;
 
@@ -361,7 +344,7 @@ namespace RunescapeBot.BotPrograms
             emptySlotNumber = (int) Numerical.LimitToRange(emptySlotNumber, 1, INVENTORY_CAPACITY);
             if (OpenInventory(safeTab))
             {
-                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                Screen.Value = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
             }
             Point? inventorySlot;
 
@@ -411,7 +394,7 @@ namespace RunescapeBot.BotPrograms
             InventoryToScreen(ref x, ref y);
             if (OpenInventory(safeTab) || readScreen)
             {
-                Screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient, true));
+                Screen.Value = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(true));
             }
 
             int xOffset = (INVENTORY_GAP_X / 2) - 1;
@@ -514,8 +497,8 @@ namespace RunescapeBot.BotPrograms
             if (x >= INVENTORY_COLUMNS && y >= INVENTORY_ROWS)
             {
                 //convert screen coordinates to inventory coordinates
-                int inventoryLeft = Screen.GetLength(0) - INVENTORY_OFFSET_LEFT;
-                int inventoryTop = Screen.GetLength(1) - INVENTORY_OFFSET_TOP;
+                int inventoryLeft = Screen.Width - INVENTORY_OFFSET_LEFT;
+                int inventoryTop = Screen.Height - INVENTORY_OFFSET_TOP;
                 x = (int)Math.Round((x - inventoryLeft) / ((double)INVENTORY_GAP_X));
                 y = (int)Math.Round((y - inventoryTop) / ((double)INVENTORY_GAP_Y));
             }
@@ -542,8 +525,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
 
-            x = Screen.GetLength(0) - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X);
-            y = Screen.GetLength(1) - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y);
+            x = Screen.Width - INVENTORY_OFFSET_LEFT + (x * INVENTORY_GAP_X);
+            y = Screen.Height - INVENTORY_OFFSET_TOP + (y * INVENTORY_GAP_Y);
             return true;
         }
 
@@ -668,8 +651,8 @@ namespace RunescapeBot.BotPrograms
                 if (BotProgram.StopFlag) { return false; }
 
                 click = Probability.GaussianCircle(new Point(itemLocation.X, itemLocation.Y), 4.0, 0, 360, 10);
-                Mouse.RightClick(click.X, click.Y, RSClient, 0);
-                popup = new RightClickInventory(click.X, click.Y, RSClient, null);
+                Mouse.RightClick(click.X, click.Y, 0);
+                popup = new RightClickInventory(click.X, click.Y, RSClient, Keyboard, null);
                 if (popup.WaitForPopup(1500))
                 {
                     popup.CustomOption(option);
@@ -691,8 +674,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the screen coordinates in the middle of the equipmnt slot specified by the given equipment coordinates</returns>
         public Point EquipmentLocation(double column, double row)
         {
-            int x = (int) (Screen.GetLength(0) - EQUIPMENT_LEFT_OFFSET_RIGHT + column * EQUIPMENT_HORIZONTAL_GAP);
-            int y = (int)(Screen.GetLength(1) - EQUIPMENT_TOP_OFFSET_BOTTOM + row * EQUIPMENT_VERTICAL_GAP);
+            int x = (int) (Screen.Width - EQUIPMENT_LEFT_OFFSET_RIGHT + column * EQUIPMENT_HORIZONTAL_GAP);
+            int y = (int)(Screen.Height - EQUIPMENT_TOP_OFFSET_BOTTOM + row * EQUIPMENT_VERTICAL_GAP);
             return new Point(x, y);
         }
 
@@ -817,7 +800,7 @@ namespace RunescapeBot.BotPrograms
         {
             OpenSpellbook(safeTab);
             SpellbookStandardToScreen(ref x, ref y);
-            Mouse.LeftClick(x, y, RSClient, 5);
+            Mouse.LeftClick(x, y, 5);
         }
         /// <summary>
         /// Clicks a slot in the standard spellbook.
@@ -830,7 +813,7 @@ namespace RunescapeBot.BotPrograms
         {
             OpenSpellbook(safeTab);
             SpellbookStandardToScreen(ref x, ref y);
-            Mouse.Move(x, y, RSClient);
+            Mouse.Move(x, y);
         }
 
         /// <summary>
@@ -844,7 +827,7 @@ namespace RunescapeBot.BotPrograms
         {
             OpenSpellbook(safeTab);
             SpellbookLunarToScreen(ref x, ref y);
-            Mouse.LeftClick(x, y, RSClient, 5);
+            Mouse.LeftClick(x, y, 5);
         }
 
         /// <summary>
@@ -856,7 +839,7 @@ namespace RunescapeBot.BotPrograms
         public void Telegrab(int x, int y, bool safeTab = true, bool autoWait = true)
         {
             ClickSpellbookStandard(5, 2, safeTab);
-            Mouse.LeftClick(x, y, RSClient, 1);
+            Mouse.LeftClick(x, y, 1);
             if (autoWait)
             {
                 BotProgram.SafeWait(5000, 300); //telegrab takes about 5 seconds
@@ -984,8 +967,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             ManuallySetScreen(false);
-            x = Screen.GetLength(0) - SPELLBOOK_STANDARD_OFFSET_LEFT + (x * SPELLBOOK_STANDARD_GAP_X);
-            y = Screen.GetLength(1) - SPELLBOOK_STANDARD_OFFSET_TOP + (y * SPELLBOOK_STANDARD_GAP_Y);
+            x = Screen.Width - SPELLBOOK_STANDARD_OFFSET_LEFT + (x * SPELLBOOK_STANDARD_GAP_X);
+            y = Screen.Height - SPELLBOOK_STANDARD_OFFSET_TOP + (y * SPELLBOOK_STANDARD_GAP_Y);
             return true;
         }
 
@@ -1003,8 +986,8 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             ManuallySetScreen(false);
-            x = Screen.GetLength(0) - SPELLBOOK_LUNAR_OFFSET_LEFT + (x * SPELLBOOK_LUNAR_GAP_X);
-            y = Screen.GetLength(1) - SPELLBOOK_LUNAR_OFFSET_TOP + (y * SPELLBOOK_LUNAR_GAP_Y);
+            x = Screen.Width - SPELLBOOK_LUNAR_OFFSET_LEFT + (x * SPELLBOOK_LUNAR_GAP_X);
+            y = Screen.Height - SPELLBOOK_LUNAR_OFFSET_TOP + (y * SPELLBOOK_LUNAR_GAP_Y);
             return true;
         }
 

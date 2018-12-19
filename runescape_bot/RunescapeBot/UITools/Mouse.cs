@@ -36,7 +36,7 @@ namespace RunescapeBot.UITools
         /// <summary>
         /// RuneScape client process
         /// </summary>
-        public static Process RSClient { get; set; }
+        public static RSClient RSClient;
 
         /// <summary>
         /// Gets the cursor's current location in operating system coordinates
@@ -61,7 +61,7 @@ namespace RunescapeBot.UITools
                 POINT location;
                 GetCursorPos(out location);
                 int x = location.X, y = location.Y;
-                ScreenScraper.WindowToGameScreen(ref x, ref y, RSClient);
+                ScreenScraper.WindowToGameScreen(ref x, ref y);
                 return new Point(x, y);
             }
         }
@@ -83,11 +83,11 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static Point LeftClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = HOVER_DELAY)
+        public static Point LeftClick(int x, int y, int randomize = 0, int hoverDelay = HOVER_DELAY)
         {
-            if (ScreenScraper.ProcessExists(rsClient))
+            if (ScreenScraper.ProcessExists(RSClient))
             {
-                return Click(x, y, rsClient, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
+                return Click(x, y, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, hoverDelay, randomize);
             }
             return new Point(0, 0);
         }
@@ -97,11 +97,11 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">pixels from left of client</param>
         /// <param name="y">pixels from top of client</param>
-        public static Point RightClick(int x, int y, Process rsClient, int randomize = 0, int hoverDelay = HOVER_DELAY)
+        public static Point RightClick(int x, int y, int randomize = 0, int hoverDelay = HOVER_DELAY)
         {
-            if (ScreenScraper.ProcessExists(rsClient))
+            if (ScreenScraper.ProcessExists(RSClient))
             {
-                return Click(x, y, rsClient, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
+                return Click(x, y, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, hoverDelay, randomize);
             }
             return new Point(0, 0);
         }
@@ -111,18 +111,17 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <param name="rsClient"></param>
         /// <param name="clickTypeDown"></param>
         /// <param name="clickTypeUp"></param>
-        private static Point Click(int x, int y, Process rsClient, int clickTypeDown, int clickTypeUp, int hoverDelay, int randomize)
+        private static Point Click(int x, int y, int clickTypeDown, int clickTypeUp, int hoverDelay, int randomize)
         {
             Random rng = new Random();
             Point clickPoint = Probability.GaussianCircle(new Point(x, y), 0.35 * randomize, 0, 360, randomize);
             x = clickPoint.X;
             y = clickPoint.Y;
 
-            ScreenScraper.BringToForeGround(rsClient);
-            ScreenScraper.GameScreenToWindow(ref x, ref y, rsClient);
+            ScreenScraper.BringToForeGround();
+            ScreenScraper.GameScreenToWindow(ref x, ref y);
             if (BotProgram.StopFlag) { return new Point(0, 0); }
             NaturalMove(x, y);
 
@@ -156,7 +155,7 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        private static void Move(int x, int y)
+        private static void ForceMove(int x, int y)
         {
             int discreteMovements, sleepTime;
             double xDistance, yDistance, totalDistance, xMoveDistance, yMoveDistance, moveDistance, currentX, currentY;
@@ -282,7 +281,7 @@ namespace RunescapeBot.UITools
                 SetCursorPos((int)currentX, (int)currentY);
                 Thread.Sleep(Math.Max(0, sleepTime - (int)watch.ElapsedMilliseconds));
             }
-            Move(x, y);
+            ForceMove(x, y);
         }
 
         /// <summary>
@@ -311,10 +310,10 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">x-coordinate within the game screen</param>
         /// <param name="y">y-coordinate within the game screen</param>
-        public static void Move(Point? location, Process rsClient)
+        public static void Move(Point? location)
         {
             if (location == null) { return; }
-            Move(location.Value.X, location.Value.Y, rsClient);
+            Move(location.Value.X, location.Value.Y);
         }
 
         /// <summary>
@@ -322,11 +321,11 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">x-coordinate within the game screen</param>
         /// <param name="y">y-coordinate within the game screen</param>
-        public static void Move(int x, int y, Process rsClient)
+        public static void Move(int x, int y)
         {
-            if (ScreenScraper.ProcessExists(rsClient))
+            if (ScreenScraper.ProcessExists(RSClient))
             {
-                ScreenScraper.GameScreenToWindow(ref x, ref y, rsClient);
+                ScreenScraper.GameScreenToWindow(ref x, ref y);
                 NaturalMove(x, y);
             }
         }
@@ -337,10 +336,9 @@ namespace RunescapeBot.UITools
         /// </summary>
         /// <param name="x">x-coordinate within the game screen</param>
         /// <param name="y">y-coordinate within the game screen</param>
-        /// <param name="rsClient">RuneScape client in which to move the mouse</param>
-        public static void MoveMouseAsynchronous(int x, int y, Process rsClient)
+        public static void MoveMouseAsynchronous(int x, int y)
         {
-            Thread moveMouse = new Thread(unused => Move(x, y, rsClient));
+            Thread moveMouse = new Thread(unused => Move(x, y));
             moveMouse.Start();
         }
         #endregion

@@ -16,9 +16,9 @@ namespace RunescapeBot.BotPrograms
     {
         #region properties
 
-        Color[,] Screen;
-        private Process RSClient;
+        private RSClient RSClient;
         private Keyboard Keyboard;
+        private GameScreen Screen;
 
         private int ScreenWidth
         {
@@ -26,7 +26,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (Screen != null)
                 {
-                    return Screen.GetLength(0);
+                    return Screen.Width;
                 }
                 else
                 {
@@ -41,7 +41,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (Screen != null)
                 {
-                    return Screen.GetLength(1);
+                    return Screen.Height;
                 }
                 else
                 {
@@ -82,28 +82,11 @@ namespace RunescapeBot.BotPrograms
 
         #region constructors
 
-        public MinimapGauge(Process rsClient, Keyboard keyboard)
+        public MinimapGauge(RSClient rsClient, Keyboard keyboard, GameScreen screen)
         {
             RSClient = rsClient;
             Keyboard = keyboard;
-        }
-
-        /// <summary>
-        /// Called by BotProgram to update with the most current screenshot
-        /// </summary>
-        /// <param name="colorArray">the newest screenshot</param>
-        public void SetScreen(Color[,] colorArray)
-        {
-            Screen = colorArray;
-        }
-
-        /// <summary>
-        /// Called by BotProgram to update with the most current client process.
-        /// </summary>
-        /// <param name="colorArray">the newest screenshot</param>
-        public void SetClient(Process rsClient)
-        {
-            RSClient = rsClient;
+            Screen = screen;
         }
 
         #endregion
@@ -118,15 +101,15 @@ namespace RunescapeBot.BotPrograms
             Bitmap screenshot;
             try
             {
-                screenshot = ScreenScraper.CaptureWindow(RSClient, fastCapture);
-                Screen = ScreenScraper.GetRGB(screenshot);
+                screenshot = ScreenScraper.CaptureWindow(fastCapture);
+                Screen.Value = ScreenScraper.GetRGB(screenshot);
             }
             catch
             {
                 return false;
             }
 
-            bool success = (screenshot != null) && (Screen.GetLength(0) > 0) && (Screen.GetLength(1) > 0);
+            bool success = (screenshot != null) && (Screen.Width > 0) && (Screen.Height > 0);
             screenshot.Dispose();
             return success;
         }
@@ -170,7 +153,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true for the pixels on the minimap that match the filter</returns>
         public bool[,] MinimapFilter(ColorFilter filter, out Point offset)
         {
-            if (Screen.GetLength(0) < 1)    //the screen has not been read yet
+            if (Screen.Width < 1)    //the screen has not been read yet
             {
                 offset = new Point(0, 0);
                 return null;
@@ -307,7 +290,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             Point runOrb = RunOrbSamplePoint();
-            Mouse.LeftClick(runOrb.X, runOrb.Y, RSClient, 5);
+            Mouse.LeftClick(runOrb.X, runOrb.Y, 5);
             return true;
         }
 
@@ -430,7 +413,7 @@ namespace RunescapeBot.BotPrograms
         {
             radius = Numerical.LimitToRange(radius, 0, 1);
             Point click = RadialToRectangular(angle, radius);
-            Mouse.LeftClick(click.X, click.Y, RSClient, randomization);
+            Mouse.LeftClick(click.X, click.Y, randomization);
             if (waitToArrive)
             {
                 //safe minimum time before we expect the red flag to disappear
@@ -439,10 +422,10 @@ namespace RunescapeBot.BotPrograms
                 watch.Start();
                 int waitTime = Math.Max(minimumWaitTime, (int) (500 + radius * 2500 - watch.ElapsedMilliseconds));
                 if (BotProgram.SafeWait(waitTime)) { return false; }
-                Mouse.Move(restMouse, RSClient);
+                Mouse.Move(restMouse);
                 return WaitDuringMovement(timeout);
             }
-            Mouse.Move(restMouse, RSClient);
+            Mouse.Move(restMouse);
             return true;
         }
 

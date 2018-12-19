@@ -1,4 +1,5 @@
 ﻿using RunescapeBot.Common;
+using RunescapeBot.FileIO;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
 using System;
@@ -7,8 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using RunescapeBot.FileIO;
-using RunescapeBot.BotPrograms.Popups;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -43,35 +42,22 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Process to which this bot program is attached
         /// </summary>
-        private Process client;
-        protected Process RSClient
-        {
-            get
-            {
-                return client;
-            }
-            set
-            {
-                client = value;
-                Mouse.RSClient = client;
-                if (Keyboard != null)
-                {
-                    Keyboard.SetClient(client);
-                }
-                if (Inventory != null)
-                {
-                    Inventory.SetClient(client);
-                }
-                if (Minimap != null)
-                {
-                    Minimap.SetClient(client);
-                }
-                if (Textbox != null)
-                {
-                    Textbox.SetClient(client);
-                }
-            }
-        }
+        protected RSClient RSClient;
+
+        /// <summary>
+        /// Stores a Color array of the client window
+        /// </summary>
+        protected GameScreen Screen;
+
+        /// <summary>
+        /// Image processing.
+        /// </summary>
+        protected Vision Vision;
+
+        /// <summary>
+        /// Handles actions requiring both sight and input (mouse/keyboard) in tight coordination.
+        /// </summary>
+        protected HandEye HandEye;
 
         /// <summary>
         /// Keyboard controller
@@ -84,47 +70,14 @@ namespace RunescapeBot.BotPrograms
         protected Thread RunThread { get; set; }
 
         /// <summary>
-        /// Stores a bitmap of the client window
-        /// </summary>
-        protected Bitmap Bitmap { get; set; }
-
-        /// <summary>
-        /// Stores a Color array of the client window
-        /// </summary>
-        private Color[,] _gameScreen;
-        protected Color[,] GameScreen
-        {
-            get
-            {
-                return _gameScreen;
-            }
-            set
-            {
-                _gameScreen = value;
-                if (Inventory != null)
-                {
-                    Inventory.SetScreen(_gameScreen);
-                }
-                if (Minimap != null)
-                {
-                    Minimap.SetScreen(_gameScreen);
-                }
-                if(Textbox != null)
-                {
-                    Textbox.SetScreen(_gameScreen);
-                }
-            }
-        }
-
-        /// <summary>
-        /// The time that the last screenshot was taken
-        /// </summary>
-        protected DateTime LastScreenShot { get; set; }
-
-        /// <summary>
         /// The last time that we checked if we are in a bot world
         /// </summary>
         protected DateTime LastBotWorldCheck { get; set; }
+
+        /// <summary>
+        /// Handles locating and using banks.
+        /// </summary>
+        protected Banking Banking;
 
         /// <summary>
         /// The sidebar including the inventory and spellbook.
@@ -174,67 +127,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Set to true after the bot stops naturally
         /// </summary>
-        public bool BotIsDone { get; set; }
-
-        /// <summary>
-        /// Center of the screen
-        /// </summary>
-        protected Point Center
-        {
-            get
-            {
-                if (GameScreen == null)
-                {
-                    return new Point(0, 0);
-                }
-                else
-                {
-                    return new Point(ScreenWidth / 2, ScreenHeight / 2);
-                }
-            }
-        }
-
-        /// <summary>
-        /// The width in pixels of the most recent image of the game screen
-        /// </summary>
-        protected int ScreenWidth
-        {
-            get
-            {
-                if (GameScreen != null)
-                {
-                    return GameScreen.GetLength(0);
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The width in pixels of the most recent image of the game screen
-        /// </summary>
-        protected int ScreenHeight
-        {
-            get
-            {
-                if (GameScreen != null)
-                {
-                    return GameScreen.GetLength(1);
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-        }
-
-        //Banking
-        protected const int WAIT_FOR_BANK_WINDOW_TIMEOUT = 2500;
-        protected const int WAIT_FOR_BANK_LOCATION = 8000;
-        protected List<BankLocator> PossibleBankTypes;
-        protected BankLocator BankBoothLocator;
+        public bool BotIsDone { get; set; }        
 
         //Eating
         protected const int EAT_TIME = 3 * BotRegistry.GAME_TICK;
@@ -243,7 +136,7 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Gets the approximate width/height of a square tile near the center of the game screen.
         /// </summary>
-        public double TileWidth { get { return ArtifactLength(0.06); } }
+        public double TileWidth { get { return Screen.ArtifactLength(0.06); } }
 
         #endregion
 
@@ -254,25 +147,26 @@ namespace RunescapeBot.BotPrograms
         /// <param name="startParams">specifies how to run the bot</param>
         protected BotProgram(RunParams startParams)
         {
-            RSClient = ScreenScraper.GetClient();
             RunParams = startParams;
-            RNG = new Random();
-            Keyboard = new Keyboard(RSClient);
-            Inventory = new Inventory(RSClient, Keyboard);
-            Minimap = new MinimapGauge(RSClient, Keyboard);
-            Textbox = new TextBoxTool(RSClient, Keyboard);
-            Conversation = new Conversation(Textbox);
             RunParams.ClientType = ScreenScraper.Client.Jagex;
             RunParams.DefaultCameraPosition = RunParams.CameraPosition.NorthAerial;
             RunParams.LoginWorld = 0;
 
-            PossibleBankTypes = new List<BankLocator>();
-            PossibleBankTypes.Add(LocateBankBoothVarrock);
-            PossibleBankTypes.Add(LocateBankBoothSeersVillage);
-            PossibleBankTypes.Add(LocateBankBoothPhasmatys);
-            PossibleBankTypes.Add(LocateBankBoothEdgeville);
+            RSClient = new RSClient(RunParams);
+            Screen = new GameScreen(RSClient, RunParams);
+            RSClient.AddScreen(Screen);
 
-            Bank.ResetNAmount();
+            Vision = new Vision(Screen, RunParams);
+            Keyboard = new Keyboard(RSClient);
+            Mouse.RSClient = RSClient;
+            HandEye = new HandEye(Vision, Screen);
+            Inventory = new Inventory(RSClient, Keyboard, Screen);
+            Minimap = new MinimapGauge(RSClient, Keyboard, Screen);
+            Textbox = new TextBoxTool(RSClient, Keyboard, Screen);
+            Banking = new Banking(Screen, Vision, HandEye, RSClient, Keyboard, Inventory, Minimap);
+            Conversation = new Conversation(Textbox, Screen, RunParams.Conversation);
+            
+            RNG = new Random();
         }
        
         /// <summary>
@@ -337,7 +231,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void ManageBot()
         {
-            MakeSureWindowHasBeenRead();
+            Screen.MakeSureWindowHasBeenRead();
             if ((RunParams.RunLoggedIn && !CheckLogIn(true)) || !Run())
             {
                 return;
@@ -442,7 +336,7 @@ namespace RunescapeBot.BotPrograms
             RunParams.BotState = BotState.Running;
             long workInterval = RunParams.SlaveDriver ? (long)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds : RandomWorkTime();
             RunParams.SetNewState(workInterval);
-            ScreenScraper.BringToForeGround(RSClient);
+            ScreenScraper.BringToForeGround();
             SafeWait(1000); //give the client time to show up on screen
 
             Stopwatch iterationWatch = new Stopwatch();
@@ -453,12 +347,12 @@ namespace RunescapeBot.BotPrograms
             {
                 if (StopFlag) { return true; }   //quit immediately if the stop flag has been raised or we can't log back in
                 iterationWatch.Restart();
-                if (!ReadWindow() || BotWorldCheck(false)) { continue; }   //We had to switch out of a bot world
+                if (!Screen.ReadWindow() || BotWorldCheck(false)) { continue; }   //We had to switch out of a bot world
 
                 //Only do the actual botting if we are logged in
                 if (CheckLogIn(false))
                 {
-                    if (Bitmap != null) //Make sure the read is successful before using the bitmap values
+                    if (Screen.LooksValid()) //Make sure the read is successful before using the bitmap values
                     {
                         if (RunParams.AutoEat)
                         {
@@ -472,7 +366,7 @@ namespace RunescapeBot.BotPrograms
                         
                         if (!Execute() && !StopFlag) //quit by a bot program
                         {
-                            LogError.ScreenShot(GameScreen, "bot-quit");
+                            LogError.ScreenShot(Screen, "bot-quit");
                             return true;
                         }
                         if (StopFlag) { return true; }
@@ -525,10 +419,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             BotIsDone = true;
-            if (Bitmap != null)
-            {
-                Bitmap.Dispose();
-            }
+            Screen.Dispose();
 
             RunParams.TaskComplete();
         }
@@ -630,9 +521,9 @@ namespace RunescapeBot.BotPrograms
         {
             if (!StopFlag)
             {
-                randomize = (int)((ScreenHeight / 1000.0) * randomize);
+                randomize = (int)((Screen.Height / 1000.0) * randomize);
                 Point moveLocation = Probability.GaussianCircle(new Point(x, y), stdRatio * randomize, 0, 360, randomize);
-                Mouse.Move(moveLocation.X, moveLocation.Y, RSClient);
+                Mouse.Move(moveLocation.X, moveLocation.Y);
             }
         }
 
@@ -643,10 +534,10 @@ namespace RunescapeBot.BotPrograms
         /// <param name="y"></param>
         /// <param name="hoverDelay"></param>
         /// <param name="randomize">maximum number of pixels in each direction by which to randomize the click location</param>
-        protected Point LeftClick(int x, int y, int randomize = 0, int hoverDelay = Mouse.HOVER_DELAY)
+        protected Point LeftClick(int x, int y, int randomize = 5, int hoverDelay = Mouse.HOVER_DELAY)
         {
-            randomize = (int)((ScreenHeight / 1000.0) * randomize);
-            return Mouse.LeftClick(x, y, RSClient, randomize, hoverDelay);
+            randomize = (int)((Screen.Height / 1000.0) * randomize);
+            return Mouse.LeftClick(x, y, randomize, hoverDelay);
         }
 
         /// <summary>
@@ -654,365 +545,10 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        protected Point RightClick(int x, int y, int randomize = 0, int hoverDelay = Mouse.HOVER_DELAY)
+        protected Point RightClick(int x, int y, int randomize = 5, int hoverDelay = Mouse.HOVER_DELAY)
         {
-            randomize = (int)((ScreenHeight / 1000.0) * randomize);
-            return Mouse.RightClick(x, y, RSClient, randomize, hoverDelay);
-        }
-
-        /// <summary>
-        /// Clicks on a stationary object
-        /// </summary>
-        /// <param name="stationaryObject">color filter for the stationary object</param>
-        /// <param name="tolerance">maximum allowable distance between two subsequent checks to consider both objects the same object</param>
-        /// <param name="afterClickWait">time to wait after clicking on the stationary object</param>
-        /// <param name="maxWaitTime">maximum time to wait before giving up</param>
-        /// <returns></returns>
-        protected bool ClickStationaryObject(ColorFilter stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
-        {
-            Blob foundObject;
-
-            if (LocateStationaryObject(stationaryObject, out foundObject, tolerance, maxWaitTime, minimumSize))
-            {
-                LeftClick(foundObject.Center.X, foundObject.Center.Y);
-                SafeWaitPlus(afterClickWait, 0.2 * afterClickWait);
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Looks for an object that isn't moving (meaning the player isn't moving)
-        /// </summary>
-        /// <param name="stationaryObject">color filter used to locate the stationary object</param>
-        /// <param name="foundObject">returns the Blob if it is found or null if not found</param>
-        /// <param name="tolerance">maximum allowed distance in pixels between subsequent object locations</param>
-        /// <param name="maxWaitTime">time to wait before gving up</param>
-        /// <param name="minimumSize">minimum required size of the object in pixels</param>
-        /// <param name="findObject">custom method to locate the object</param>
-        /// <param name="verificationPasses">number of times to verify the position of the object after finding it</param>
-        /// <returns>True if the object is found</returns>
-        protected bool LocateStationaryObject(ColorFilter stationaryObject, out Blob foundObject, double tolerance, int maxWaitTime, int minimumSize = 1, int maximumSize = int.MaxValue, FindObject findObject = null, int verificationPasses = 1)
-        {
-            findObject = findObject ?? LocateObject;
-
-            foundObject = null;
-            Point? lastPosition = null;
-            int effectivePasses = 0;
-            int totalPasses = 0;
-            Stopwatch giveUpWatch = new Stopwatch();
-            giveUpWatch.Start();
-
-            while (giveUpWatch.ElapsedMilliseconds < maxWaitTime || totalPasses <= verificationPasses)
-            {
-                if (StopFlag) { return false; }
-
-                Blob objectBlob = null;
-                findObject(stationaryObject, out objectBlob, minimumSize, maximumSize);
-
-                if (objectBlob != null)
-                {
-                    if (Geometry.DistanceBetweenPoints(objectBlob.Center, lastPosition) <= tolerance)
-                    {
-                        effectivePasses++;
-                    }
-                    else
-                    {
-                        effectivePasses = 0;
-                        lastPosition = objectBlob.Center;
-                    }
-
-                    if (effectivePasses >= verificationPasses)
-                    {
-                        foundObject = objectBlob;
-                        return true;
-                    }
-                }
-                else
-                {
-                    lastPosition = null;
-                }
-                totalPasses++;
-            }
-
-            return false;
-        }
-        protected delegate bool FindObject(ColorFilter stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue);
-
-        /// <summary>
-        /// Locates all of the matching objects on the game screen (minus UI) that fit within the given size constraints
-        /// </summary>
-        /// <param name="objectFilter">color filter for the object type to search for</param>
-        /// <param name="minSize">minimum required pixels</param>
-        /// <param name="maxSize">maximum allowed pixels</param>
-        /// <returns>List of blobs sorted from biggest to smallest</returns>
-        protected List<Blob> LocateObjects(ColorFilter objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            ReadWindow();
-            bool[,] objectPixels = ColorFilter(objectFilter);
-            EraseClientUIFromMask(ref objectPixels);
-            List<Blob> objects = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
-            return objects;
-        }
-
-        /// <summary>
-        /// Locates all of the matching objects on the game screen (minus UI) that fit within the given size constraints
-        /// </summary>
-        /// <param name="objectFilter">color filter for the object type to search for</param>
-        /// <param name="left">left bound of the search area</param>
-        /// <param name="right">right bound of the search area</param>
-        /// <param name="top">top bound of the search area</param>
-        /// <param name="bottom">bottom bound of the search area</param>
-        /// <param name="shiftBlobs">when true, moves all of the found blobs to their position on the original screen rather than the sub piece being scanned</param>
-        /// <param name="minimumSize">minimum required pixels</param>
-        /// <param name="maximumSize">maximum allowed pixels</param>
-        /// <returns></returns>
-        protected List<Blob> LocateObjects(ColorFilter objectFilter, int left, int right, int top, int bottom, bool shiftBlobs = true, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            ReadWindow();
-            bool[,] objectPixels = ColorFilterPiece(objectFilter, left, right, top, bottom);
-            EraseClientUIFromMask(ref objectPixels);
-            List<Blob> foundObjects = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
-            if (shiftBlobs)
-            {
-                foreach (Blob foundObject in foundObjects)
-                {
-                    foundObject.ShiftPixels(left, top);
-                }
-            }
-            return foundObjects;
-        }
-
-        /// <summary>
-        /// Finds the object closest to the center of the screen that matches the given criteria
-        /// </summary>
-        /// <param name="objectFilter">color filter for the object</param>
-        /// <param name="minimumSize">minimum required size for the object in pixels</param>
-        /// <param name="maximumSize">maximum allowed size for the object in pixels</param>
-        /// <returns>the found object or null if none is found</returns>
-        protected Blob LocateClosestObject(ColorFilter objectFilter, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
-            Blob closestObject = Geometry.ClosestBlobToPoint(objects, Center);
-            return closestObject;
-        }
-
-        /// <summary>
-        /// Finds the object closest to the center of the screen that matches the given criteria
-        /// </summary>
-        /// <param name="objectFilter">color filter for the object</param>
-        /// <param name="minimumSize">minimum required size for the object in pixels</param>
-        /// <param name="maximumSize">maximum allowed size for the object in pixels</param>
-        /// <returns>the found object or null if none is found</returns>
-        protected bool LocateClosestObject(ColorFilter objectFilter, out Blob closestObject, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            List<Blob> objects = LocateObjects(objectFilter, minimumSize, maximumSize);
-            closestObject = Geometry.ClosestBlobToPoint(objects, Center);
-            return closestObject != null;
-        }
-
-        /// <summary>
-        /// Looks for an object that matches a filter
-        /// </summary>
-        /// <param name="stationaryObject"></param>
-        /// <param name="foundObject"></param>
-        /// <param name="minimumSize"></param>
-        /// <returns></returns>
-        protected bool LocateObject(ColorFilter stationaryObject, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            ReadWindow();
-            bool[,] objectPixels = ColorFilter(stationaryObject);
-            EraseClientUIFromMask(ref objectPixels);
-            return LocateObject(objectPixels, out foundObject, minimumSize, maximumSize);
-        }
-
-        /// <summary>
-        /// Looks for an object that matches a filter in a particular region of the screen
-        /// </summary>
-        /// <param name="stationaryObject"></param>
-        /// <param name="foundObject"></param>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
-        /// <param name="minimumSize"></param>
-        /// <returns></returns>
-        protected bool LocateObject(ColorFilter stationaryObject, out Blob foundObject, int left, int right, int top, int bottom, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            ReadWindow();
-            bool[,] objectPixels = ColorFilterPiece(stationaryObject, left, right, top, bottom);
-            if (LocateObject(objectPixels, out foundObject, minimumSize, maximumSize))
-            {
-                foundObject.ShiftPixels(Math.Max(0, left), Math.Max(0, top));
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Looks for an object that matches a filter in a particular region of the screen
-        /// </summary>
-        /// <param name="stationaryObject"></param>
-        /// <param name="foundObject"></param>
-        /// <param name="center"></param>
-        /// <param name="searchRadius"></param>
-        /// <param name="minimumSize"></param>
-        /// <param name="maximumSize"></param>
-        /// <returns></returns>
-        protected bool LocateObject(ColorFilter stationaryObject, out Blob foundObject, Point center, int searchRadius, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            int left = center.X - searchRadius;
-            int right = center.X + searchRadius;
-            int top = center.Y - searchRadius;
-            int bottom = center.Y + searchRadius;
-            return LocateObject(stationaryObject, out foundObject, left, right, top, bottom, minimumSize, maximumSize);
-        }
-
-        /// <summary>
-        /// Finds the biggest blob in a binary image
-        /// </summary>
-        /// <param name="objectPixels"></param>
-        /// <param name="foundObject"></param>
-        /// <param name="minimumSize"></param>
-        /// <returns></returns>
-        protected bool LocateObject(bool[,] objectPixels, out Blob foundObject, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            foundObject = null;
-            List<Blob> objectBlobs = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
-
-            if (objectBlobs != null && objectBlobs.Count > 0)
-            {
-                foreach (Blob blob in objectBlobs)
-                {
-                    if (blob.Size < minimumSize)
-                    {
-                        return false;
-                    }
-                    if (blob.Size <= maximumSize)
-                    {
-                        foundObject = blob;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Waits for a specified type of mouseover text to appear
-        /// </summary>
-        /// <param name="textColor">the color of the mousover text to wait for</param>
-        /// <param name="timeout">time to wait before giving up</param>
-        /// <returns>true if the specified type of mouseover text is found</returns>
-        protected bool WaitForMouseOverText(ColorFilter textColor, int timeout = 5000)
-        {
-            const int left = 5;
-            const int right = 500;
-            const int top = 5;
-            const int bottom = 18;
-
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            Blob mouseoverText = null;
-
-            do
-            {
-                if (LocateObject(textColor, out mouseoverText, left, right, top, bottom, 10))
-                {
-                    return true;
-                }
-            }
-            while ((watch.ElapsedMilliseconds < timeout) && !StopFlag);
-
-            return false;
-        }
-
-        /// <summary>
-        /// Mouses over an alleged stationary object. Left-clicks if the stationary object text appears.
-        /// </summary>
-        /// <param name="stationaryObject">alleged stationary object</param>
-        /// <param name="click">set to false to skip clicking on the stationary object</param>
-        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
-        /// <returns>true if a matching stationary object is found and clicked on</returns>
-        protected bool MouseOverStationaryObject(Blob stationaryObject, bool click = true, int randomization = 5, int maxWait = 1000)
-        {
-            return MouseOver(stationaryObject.Center, RGBHSBRangeFactory.MouseoverTextStationaryObject(), click, randomization, maxWait);
-        }
-
-        /// <summary>
-        /// Mouses over an alleged NPC. Left-clicks if the NPC text appears.
-        /// </summary>
-        /// <param name="ObjectsToCheck">alleged NPC</param
-        /// <param name="click">set to false to skip clicking on the NPC</param>
-        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
-        /// <returns>true if a matching NPC is found and clicked on</returns>
-        protected bool MouseOverNPC(Blob npc, bool click = true, int randomization = 5, int maxWait = 1000)
-        {
-            return MouseOver(npc.Center, RGBHSBRangeFactory.MouseoverTextNPC(), click, randomization, maxWait);
-        }
-
-        /// <summary>
-        /// Mouses over an alleged NPC. Left-clicks if the NPC text appears.
-        /// </summary>
-        /// <param name="ObjectsToCheck">alleged NPC</param
-        /// <param name="click">set to false to skip clicking on the NPC</param>
-        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
-        /// <returns>true if a matching NPC is found and clicked on</returns>
-        protected bool MouseOverDroppedItem(Blob item, bool click = true, int randomization = 5, int maxWait = 1000)
-        {
-            return MouseOver(item.Center, RGBHSBRangeFactory.MouseoverTextDroppedItem(), click, randomization, maxWait);
-        }
-
-        /// <summary>
-        /// Mouses over each object in a list of blobs. Left-clicks the first object with mouseover text matching textColor.
-        /// </summary>
-        /// <param name="ObjectsToCheck">list of objects to mouse over</param>
-        /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
-        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
-        /// <returns>true if a matching object is found and clicked on</returns>
-        protected bool MouseOver(List<Blob> ObjectsToCheck, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000)
-        {
-            randomization = (int)((ScreenHeight / 1000.0) * randomization);
-            Point clickLocation;
-
-            foreach (Blob objectCheck in ObjectsToCheck)
-            {
-                if (StopFlag) { return false; }
-
-                clickLocation = objectCheck.Center;
-
-                if (MouseOver(clickLocation, textColor, click, randomization, maxWait))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Mouses over a single point and left-clicks it if it matches the specified mouseover text color.
-        /// </summary>
-        /// <param name="mouseover">point to mouse over</param>
-        /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
-        /// <param name="click">set to false to hover and check without clicking</param>
-        /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
-        /// <param name="maxWait">max time to wait before concluding that the mouse over failed</param>
-        /// <param name="lagTime">time to wait before checking and clicking after mousing over</param>
-        /// <returns>true if a matching object is found and clicked on</returns>
-        protected bool MouseOver(Point mouseover, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 250)
-        {
-            randomization = (int)((ScreenHeight / 1000.0) * randomization);
-            mouseover = Probability.GaussianCircle(mouseover, randomization);
-            Mouse.Move(mouseover.X, mouseover.Y, RSClient);
-            if (SafeWait(lagTime)) { return false; }
-
-            if (WaitForMouseOverText(textColor, maxWait))
-            {
-                if (click) { LeftClick(mouseover.X, mouseover.Y, 0, 0); }
-                return true;
-            }
-            return false;
+            randomize = (int)((Screen.Height / 1000.0) * randomize);
+            return Mouse.RightClick(x, y, randomize, hoverDelay);
         }
 
         /// <summary>
@@ -1030,324 +566,14 @@ namespace RunescapeBot.BotPrograms
             Point leftClick = new Point(X, Y);
             Blob clickBlob = new Blob(leftClick);
 
-            MouseOverDroppedItem(clickBlob,true, 20, 5000);
-            //Thread.Sleep(CHATBOX_OPTION_RIGHT_CLICK_HOVER_DELAY);
-            //Mouse.LeftClick(leftClick.X, leftClick.Y, rsClient);
+            HandEye.MouseOverDroppedItem(clickBlob,true, 20, 5000);
 
             return true;
         }
 
         #endregion
 
-        #region vision utilities
-        /// <summary>
-        /// Wrapper for ScreenScraper.CaptureWindow
-        /// </summary>
-        protected bool ReadWindow(bool checkClient = true, bool fastCapture = false)
-        {
-            if (StopFlag || checkClient && !PrepareClient()) { return false; }
-
-            if (Bitmap != null)
-            {
-                Bitmap.Dispose();
-            }
-
-            try
-            {
-                LastScreenShot = DateTime.Now;
-                Bitmap = ScreenScraper.CaptureWindow(RSClient, fastCapture);
-                GameScreen = ScreenScraper.GetRGB(Bitmap);
-            }
-            catch
-            {
-                return false;
-            }   
-
-            return (Bitmap != null) && (ScreenHeight > 0) && (ScreenWidth > 0);
-        }
-
-        /// <summary>
-        /// Gets the time since the last screenshot
-        /// </summary>
-        /// <returns>time elapsed since the most recent screenshot</returns>
-        protected int TimeSinceLastScreenShot()
-        {
-            TimeSpan elapsedTime = DateTime.Now - LastScreenShot;
-            return (int)elapsedTime.TotalMilliseconds;
-        }
-
-        /// <summary>
-        /// Takes a new screenshot if the current one is too old
-        /// </summary>
-        /// <param name="maxScreenShotAge">the maximum usable age of an old screenshot in milliseconds</param>
-        protected void UpdateScreenshot(int maxScreenshotAge = 500)
-        {
-            if (TimeSinceLastScreenShot() <= maxScreenshotAge)
-            {
-                ReadWindow();
-            }
-        }
-
-        /// <summary>
-        /// Retrieve the color of a single pixel
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        protected Color GetPixel(int x, int y)
-        {
-            if (x < 0 || x >= ScreenWidth || y < 0 || y >= ScreenHeight)
-            {
-                return Color.Black;
-            }
-            return GameScreen[x, y];
-        }
-
-        /// <summary>
-        /// Creates a boolean array to represent a color filter match
-        /// </summary>
-        /// <param name="artifactColor"></param>
-        /// <returns></returns>
-        protected bool[,] ColorFilter(ColorFilter artifactColor)
-        {
-            return ColorFilter(GameScreen, artifactColor);
-        }
-
-        /// <summary>
-        /// Creates a boolean array to represent a color filter match
-        /// </summary>
-        /// <param name="artifactColor"></param>
-        /// <returns></returns>
-        protected bool[,] ColorFilter(Color[,] image, ColorFilter artifactColor)
-        {
-            if (GameScreen == null)
-            {
-                return null;
-            }
-            return ImageProcessing.ColorFilter(image, artifactColor);
-        }
-
-        /// <summary>
-        /// Creates a boolean array of a portion of the screen to represent a color filter match
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
-        /// <returns></returns>
-        protected bool[,] ColorFilterPiece(ColorFilter filter, int left, int right, int top, int bottom, out Point trimOffset)
-        {
-            Color[,] colorArray = ScreenPiece(left, right, top, bottom, out trimOffset);
-            if (GameScreen == null)
-            {
-                return null;
-            }
-            return ImageProcessing.ColorFilter(colorArray, filter);
-        }
-
-        /// <summary>
-        /// Creates a boolean array of a portion of the screen to represent a color filter match
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
-        /// <returns></returns>
-        protected bool[,] ColorFilterPiece(ColorFilter filter, int left, int right, int top, int bottom)
-        {
-            Point empty;
-            return ColorFilterPiece(filter, left, right, top, bottom, out empty);
-        }
-
-        /// <summary>
-        /// Filters in a square within the screen shot
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="center"></param>
-        /// <param name="radius"></param>
-        /// <param name="offset"></param>
-        /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
-        protected bool[,] ColorFilterPiece(ColorFilter filter, Point center, int radius, out Point offset)
-        {
-            int left = center.X - radius;
-            int right = center.X + radius;
-            int top = center.Y - radius;
-            int bottom = center.Y + radius;
-            return ColorFilterPiece(filter, left, right, top, bottom, out offset);
-        }
-
-        /// <summary>
-        /// Filters in a square within the screen shot
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="center"></param>
-        /// <param name="radius"></param>
-        /// <returns>The filtered screenshot cropped to the edges of the circle</returns>
-        protected bool[,] ColorFilterPiece(ColorFilter filter, Point center, int radius)
-        {
-            Point offset;
-            return ColorFilterPiece(filter, center, radius, out offset);
-        }
-
-        /// <summary>
-        /// Determines the fraction of piece of an RGB image that matches a color filter
-        /// </summary>
-        /// <param name="filter">filter to use for matching</param>
-        /// <param name="left">left bound (inclusive)</param>
-        /// <param name="right">right bound (inclusive)</param>
-        /// <param name="top">top bound (inclusive)</param>
-        /// <param name="bottom">bottom bound (inclusive)</param>
-        /// <returns>The fraction (0-1) of the image that matches the filter</returns>
-        protected double FractionalMatchPiece(ColorFilter filter, int left, int right, int top, int bottom)
-        {
-            bool[,] binaryImage = ColorFilterPiece(filter, left, right, top, bottom);
-            return ImageProcessing.FractionalMatch(binaryImage);
-        }
-
-        /// <summary>
-        /// Gets a rectangle from ColorArray
-        /// </summary>
-        /// <param name="topLeft"></param>
-        /// <param name="bottomRight"></param>
-        /// <returns></returns>
-        protected Color[,] ScreenPiece(int left, int right, int top, int bottom, out Point trimOffset)
-        {
-            return ImageProcessing.ScreenPiece(GameScreen, left, right, top, bottom, out trimOffset);
-        }
-
-        /// <summary>
-        /// Gets a rectangle from ColorArray
-        /// </summary>
-        /// <param name="topLeft"></param>
-        /// <param name="bottomRight"></param>
-        /// <returns></returns>
-        protected Color[,] ScreenPiece(int left, int right, int top, int bottom)
-        {
-            Point empty;
-            return ScreenPiece(left, right, top, bottom, out empty);
-        }
-
-        /// <summary>
-        /// Determines the pixels on the screen taken up by an artifact of a known fraction of the screen
-        /// </summary>
-        /// <param name="artifactSize">the size of an artifact in terms of fraction of the square of the screen height</param>
-        /// <returns>the number of pixels taken up by an artifact</returns>
-        protected int ArtifactArea(double artifactSize)
-        {
-            if (!MakeSureWindowHasBeenRead()) { return 0; }
-            double pixels = artifactSize * ScreenHeight * ScreenHeight;
-            return (int) Math.Round(pixels);
-        }
-
-        /// <summary>
-        /// Determines the pixel length of an artifact of a known fraction of the screen's height
-        /// </summary>
-        /// <param name="artifactLength">the fraction of the screen height taken up by the artifact</param>
-        /// <returns>the pixel length of the artifact</returns>
-        protected int ArtifactLength(double artifactLength)
-        {
-            if (!MakeSureWindowHasBeenRead()) { return 0; }
-            double length = artifactLength * ScreenHeight;
-            return (int)Math.Round(length);
-        }
-
-        /// <summary>
-        /// Sets the pixels in client UI areas to false.
-        /// This should only be used with untrimmed images.
-        /// </summary>
-        /// <param name="mask"></param>
-        protected void EraseClientUIFromMask(ref bool[,] mask)
-        {
-            if (mask == null) { return; }
-
-            const int chatBoxWidth = 518;
-            const int chatBoxHeight = 158;
-            const int inventoryWidth = 240;
-            const int inventoryHeight = 335;
-            const int minimapWidth = 210;
-            const int minimapHeight = 192;
-
-            int width = mask.GetLength(0);
-            int height = mask.GetLength(1);
-            int requiredWidth = Math.Max(Math.Max(chatBoxWidth, inventoryWidth), minimapWidth);
-            int requiredHeight = Math.Max(Math.Max(chatBoxHeight, inventoryHeight), minimapHeight);
-            if ((width < requiredWidth) || (height < requiredHeight)) { return; }
-
-            if (!RunParams.ClosedChatBox)   //do not erase chat box if the chat box is supposed to be closed
-            {
-                EraseFromMask(ref mask, 0, chatBoxWidth, height - chatBoxHeight, height);              //erase chat box
-            }
-            EraseFromMask(ref mask, width - inventoryWidth, width, height - inventoryHeight, height);  //erase inventory
-            EraseFromMask(ref mask, width - minimapWidth, width, 0, minimapHeight);                //erase minimap
-        }
-
-        /// <summary>
-        /// Clears a rectangle from a boolean mask
-        /// </summary>
-        /// <param name="mask"></param>
-        /// <param name="xMin">Inclusive</param>
-        /// <param name="xMax">Exclusive</param>
-        /// <param name="yMin">Inclusive</param>
-        /// <param name="yMax">Exclusive</param>
-        protected void EraseFromMask(ref bool[,] mask, int xMin, int xMax, int yMin, int yMax)
-        {
-            for (int x = Math.Max(0, xMin); x < Math.Min(xMax, mask.GetLength(0) - 1); x++)
-            {
-                for (int y = Math.Max(0, yMin); y < Math.Min(yMax, mask.GetLength(1) - 1); y++)
-                {
-                    mask[x, y] = false;
-                }
-            }
-        }
-
-        #endregion
-
-        #region login/restart
-
-        /// <summary>
-        /// Makes sure that a client is running and starts it if it isn't
-        /// </summary>
-        /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
-        /// <returns>true if client is successfully prepared</returns>
-        protected bool PrepareClient(bool forceRestart = false)
-        {
-            if (!forceRestart && ScreenScraper.ProcessExists(RSClient)) { return true; }
-
-            Stopwatch longWatch = new Stopwatch();
-            longWatch.Start();
-            while (longWatch.ElapsedMilliseconds < UnitConversions.HoursToMilliseconds(24) && !StopFlag)
-            {
-                if (!ScreenScraper.RestartClient(ref client, RunParams.RuneScapeClient, RunParams.ClientFlags))
-                {
-                    SafeWait(5000);
-                    continue;
-                }
-                RSClient = client;
-
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
-                do
-                {
-                    SafeWait(UnitConversions.SecondsToMilliseconds(5));
-                    if (ReadWindow(false) && (IsLoggedOut(false) || IsLoggedIn()))
-                    {
-                        return true;
-                    }
-                }
-                while ((watch.ElapsedMilliseconds < UnitConversions.MinutesToMilliseconds(5)) && !StopFlag);
-            }
-
-            if (!StopFlag)
-            {
-                const string errorMessage = "Client did not start correctly";
-                MessageBox.Show(errorMessage);
-            }
-            
-            client = null;
-            return false;
-        }
+        #region login/logout
 
         /// <summary>
         /// Respond to a failed attempt to log in
@@ -1355,7 +581,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the failed login is handled satisfactorily. false if the bot should stop</returns>
         private bool HandleFailedLogIn()
         {
-            return PrepareClient(true);
+            return RSClient.PrepareClient(true);
         }
 
         /// <summary>
@@ -1368,7 +594,7 @@ namespace RunescapeBot.BotPrograms
             //Check several times over several seconds to make sure that we are logged out before trying to log in
             for (int i = 0; i < 6; i++)
             {
-                if (!IsLoggedOut(readWindow))
+                if (!Screen.IsLoggedOut(readWindow))
                 {
                     return true;    //already logged in
                 }
@@ -1388,26 +614,12 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Finds the offset for the login screen
-        /// </summary>
-        /// <returns></returns>
-        private Point LoginScreenOffset()
-        {
-            int yOffset = 0;
-            while (ImageProcessing.ColorsAreEqual(GetPixel(Center.X, yOffset), Color.Black) && (yOffset < ScreenHeight))
-            {
-                yOffset++;
-            }
-            return new Point(0, yOffset);
-        }
-
-        /// <summary>
         /// Opens the world selector on the login screen
         /// </summary>
         /// <returns>true if successful</returns>
         protected bool OpenWorldSelector(Point loginOffset)
         {
-            int x = loginOffset.X + (Center.X - 326);
+            int x = loginOffset.X + (Screen.Center.X - 326);
             int y = loginOffset.Y + 481;
             LeftClick(x, y);
             SafeWait(500);
@@ -1432,7 +644,7 @@ namespace RunescapeBot.BotPrograms
                 return true;
             }
 
-            Point offset = (loginOffset ?? LoginScreenOffset());
+            Point offset = (loginOffset ?? Screen.LoginScreenOffset());
             if (!OpenWorldSelector(offset)) { return false; }
             SafeWait(2000);
             int worldIndex = world - lowestWorld;
@@ -1444,7 +656,7 @@ namespace RunescapeBot.BotPrograms
 
             int column = worldIndex / rowCount;
             int row = worldIndex % rowCount;
-            int x = offset.X + (Center.X - 182) + (column * columnWidth);
+            int x = offset.X + (Screen.Center.X - 182) + (column * columnWidth);
             int y = offset.Y + 46 + (row * rowHeight);
             LeftClick(x, y, 5);
             SafeWait(500);
@@ -1459,10 +671,10 @@ namespace RunescapeBot.BotPrograms
         protected bool LogIn()
         {
             Point? clickLocation;
-            Point loginOffset = LoginScreenOffset();
+            Point loginOffset = Screen.LoginScreenOffset();
 
             //log in at the login screen
-            if (!IsWelcomeScreen(out clickLocation))
+            if (!Screen.IsWelcomeScreen(out clickLocation))
             {
                 if (!SelectLoginWorld(RunParams.LoginWorld, loginOffset))
                 {
@@ -1470,16 +682,16 @@ namespace RunescapeBot.BotPrograms
                 }
 
                 //Click existing account. Clicks in a dead space if we are already on the login screen.
-                LeftClick(Center.X + 16 + loginOffset.X, 288 + loginOffset.Y);
+                LeftClick(Screen.Center.X + 16 + loginOffset.X, 288 + loginOffset.Y);
 
                 if (RunParams.LoginWorld > 0)
                 {
-                    LeftClick(Center.X - 78 + loginOffset.X, 320 + loginOffset.Y);
+                    LeftClick(Screen.Center.X - 78 + loginOffset.X, 320 + loginOffset.Y);
                     SafeWait(500);
                 }
 
                 //fill in login
-                LeftClick(Center.X + 137 + loginOffset.X, 249 + loginOffset.Y);
+                LeftClick(Screen.Center.X + 137 + loginOffset.X, 249 + loginOffset.Y);
                 Keyboard.Backspace(350);
                 Keyboard.WriteLine(RunParams.Login);
 
@@ -1496,7 +708,7 @@ namespace RunescapeBot.BotPrograms
             if (!PvPWorldSet())
             {
                 //click the "CLICK HERE TO PLAY" button on the welcome screen
-                if (ConfirmWelcomeScreen(out clickLocation))
+                if (Screen.ConfirmWelcomeScreen(out clickLocation))
                 {
                     LeftClick(clickLocation.Value.X, clickLocation.Value.Y);
                 }
@@ -1507,7 +719,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             //verify the log in
-            if (ConfirmLogin())
+            if (Screen.ConfirmLogin())
             {
                 DefaultCamera();
                 ChatBox();
@@ -1517,68 +729,6 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Determines if the last screenshot was of the welcome screen
-        /// </summary>
-        /// <returns>true if we are on the welcome screen, false otherwise</returns>
-        private bool IsWelcomeScreen(out Point? clickLocation)
-        {
-            int centerX = Center.X;
-            const int centerY = 337;
-            const int width = 220;
-            const int height = 80;
-            int left = centerX - (width / 2);
-            int right = centerX + (width / 2);
-            int top = centerY - (height / 2);
-            int bottom = centerY + (height / 2);
-            int totalSize = width * height;
-            int redBlobSize;
-
-            RGBHSBRange red = RGBHSBRangeFactory.WelcomeScreenClickHere();
-            bool[,] clickHere = ColorFilterPiece(red, left, right, top, bottom);
-            Blob enterGame = ImageProcessing.BiggestBlob(clickHere);
-            redBlobSize = enterGame.Size;
-
-            if (redBlobSize > (totalSize / 2))
-            {
-                clickLocation = enterGame.RandomBlobPixel();
-                clickLocation = new Point(clickLocation.Value.X + left, clickLocation.Value.Y + top);
-                return true;
-            }
-            else
-            {
-                clickLocation = null;
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Determines if the welcome screen has been reached
-        /// </summary>
-        /// <returns>true if the welcome screen has been reached, false if not or if the StopFlag is raised</returns>
-        private bool ConfirmWelcomeScreen(out Point? clickLocation)
-        {
-            clickLocation = null;
-
-            //Wait up to 60 seconds
-            for (int i = 0; i < 60; i++)
-            {
-                if (StopFlag) { return false; }
-                ReadWindow();
-                
-                if (IsWelcomeScreen(out clickLocation))
-                {
-                    return true;
-                }
-                else
-                {
-                    if (StopFlag) { return false; }
-                    SafeWait(1000);
-                }
-            }
-            return false;   //We timed out waiting.
         }
 
         /// <summary>
@@ -1592,132 +742,6 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines if  the client is logged in
-        /// </summary>
-        /// <returns>true if we are verifiably logged in</returns>
-        private bool IsLoggedIn(bool readWindow = true)
-        {
-            if (readWindow) { ReadWindow(); }
-
-            //Get a piece of the column from the right of the inventory
-            int right = ScreenWidth - 10;
-            int left = right - 12;
-            int bottom = ScreenHeight - 105;
-            int top = bottom - 45;
-            Color[,] inventoryColumn = ScreenPiece(left, right, top, bottom);
-
-            //Compare the column against the expected value
-            long columnSum = ImageProcessing.ColorSum(inventoryColumn);
-            long expectedColumnSum = 133405;
-            if (columnSum > (1.01 * expectedColumnSum) || columnSum < (0.99 * expectedColumnSum))
-            {
-                return RunParams.LoggedIn = false;
-            }
-
-            return RunParams.LoggedIn = true;
-        }
-
-        /// <summary>
-        /// Waits on the client to log in after clicking through the welcome screen
-        /// </summary>
-        /// <returns>true if the log in is verified, false if we time out waiting</returns>
-        private bool ConfirmLogin()
-        {
-            //Wait for up to 60 seconds
-            for (int i = 0; i < 60; i++)
-            {
-                if (StopFlag) { return false; }
-                ReadWindow();
-                if (IsLoggedIn())
-                {
-                    return true;
-                }
-                else
-                {
-                    if (StopFlag) { return false; }
-                    SafeWait(1000);
-                }
-            }
-
-            return false;   //We timed out waiting.
-        }
-
-        /// <summary>
-        /// Determines if the client is logged out
-        /// </summary>
-        /// <returns>true if we are verifiably logged out</returns>
-        protected bool IsLoggedOut(bool readWindow = false)
-        {
-            if (readWindow && !ReadWindow())
-            {
-                RunParams.LoggedIn = false;
-                return false;
-            }
-
-            Color color;
-            Point loginOffset = LoginScreenOffset();
-            int height = ScreenHeight;
-            int top = loginOffset.Y;
-            int centerX = Center.X + loginOffset.X;
-            int checkRow = Math.Min(Math.Max(0, height - 1), loginOffset.Y + ScreenScraper.LOGIN_WINDOW_HEIGHT + 1);    //1 pixel below where the bottom of the login window should be
-            int xOffset = (ScreenScraper.LOGIN_WINDOW_WIDTH / 2) + 2;
-            int blackPixels = 0;
-            int totalPixels = 0;
-
-            for (int x = centerX - xOffset; x < centerX + xOffset; x++)
-            {
-                //check bottom of login box
-                color = GameScreen[x, checkRow];
-                blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
-                totalPixels++;
-            }
-            for (int y = top; y < checkRow; y++)  //check sides
-            {
-                //check left of login box
-                color = GameScreen[centerX - xOffset, y];
-                blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
-                totalPixels++;
-
-                //check right of login box
-                color = GameScreen[centerX + xOffset, y];
-                blackPixels += ImageProcessing.ColorsAreEqual(color, Color.Black) ? 1 : 0;
-                totalPixels++;
-            }
-            //assume we are logged out if a majority off the border pixels are perfectly black
-            if ((blackPixels / ((double)totalPixels)) < 0.25)
-            {
-                return false;
-            }
-
-            //Check for "Welcome to RuneScape" yellow text. We are probably logged out at this point.
-            int topWelcome = top + 241;
-            int bottomWelcome = topWelcome + 13;
-            int leftWelcome = Center.X - 75;
-            int rightWelcome = leftWelcome + 146;
-            bool[,] welcomeText = ColorFilterPiece(RGBHSBRangeFactory.Yellow(), leftWelcome, rightWelcome, topWelcome, bottomWelcome);
-            double welcomeMatch = ImageProcessing.FractionalMatch(welcomeText);
-
-            if (!Numerical.WithinRange(welcomeMatch, 0.23275, 0.01)) //ex 0.23275
-            {
-                //Check for the "Enter your username/email & password." text.
-                leftWelcome = Center.X - 140;
-                rightWelcome = leftWelcome + 280;
-                topWelcome = top + 206;
-                bottomWelcome = topWelcome + 10;
-                welcomeText = ColorFilterPiece(RGBHSBRangeFactory.Yellow(), leftWelcome, rightWelcome, topWelcome, bottomWelcome);
-                welcomeMatch = ImageProcessing.FractionalMatch(welcomeText);
-
-                if (!Numerical.WithinRange(welcomeMatch, 0.25234, 0.01)) //ex. 0.2523
-                {
-                    return false;   //Could not find the welcome text or the enter text.
-                }
-            }
-
-            RunParams.LoggedIn = false;
-            return true;
-        }
-
-        /// <summary>
         /// Logs out of the game
         /// </summary>
         protected void Logout()
@@ -1726,13 +750,13 @@ namespace RunescapeBot.BotPrograms
             const int maxLogoutAttempts = 10;
             int logoutAttempts = 0;
 
-            while (!IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts) && !StopFlag)
+            while (!Screen.IsLoggedOut(true) && (logoutAttempts++ < maxLogoutAttempts) && !StopFlag)
             {
                 Inventory.OpenLogout();
                 SafeWait(800, 200);
-                LeftClick(ScreenWidth - 38, ScreenHeight - 286);    //close out of world switcher
+                LeftClick(Screen.Width - 38, Screen.Height - 286);    //close out of world switcher
                 SafeWait(2000, 400);
-                LeftClick(ScreenWidth - 120, ScreenHeight - 71, 5); //click here to logout
+                LeftClick(Screen.Width - 120, Screen.Height - 71, 5); //click here to logout
                 SafeWait(2000, 400);
             }
         }
@@ -1750,9 +774,9 @@ namespace RunescapeBot.BotPrograms
 
             //restart client if set to a bot world
             int loginWorld = (RunParams.LoginWorld > 0) ? RunParams.LoginWorld : 340;
-            if (IsLoggedOut(readWindow))
+            if (Screen.IsLoggedOut(readWindow))
             {
-                if (LoginSetForBotWorld(false))
+                if (Screen.LoginSetForBotWorld(false))
                 {
                     SelectLoginWorld(loginWorld, null);
                     return true;
@@ -1785,31 +809,31 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the client is logged into world 385 or 386</returns>
         protected bool LoggedIntoBotWorld(bool readWindow = false)
         {
-            MakeSureWindowHasBeenRead(readWindow);
+            Screen.MakeSureWindowHasBeenRead(readWindow);
             Inventory.OpenLogout();
             SafeWaitPlus(1000, 150);
-            ReadWindow();
-            if (!WorldSwitcherIsOpen())
+            Screen.ReadWindow();
+            if (!Screen.WorldSwitcherIsOpen())
             {
                 ClickWorldSwitcher();
                 SafeWaitPlus(1500, 500);
-                ReadWindow();
+                Screen.ReadWindow();
             }
 
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            while (!WorldSwitcherIsOpen() && (watch.ElapsedMilliseconds < 3000) && !StopFlag)
+            while (!Screen.WorldSwitcherIsOpen() && (watch.ElapsedMilliseconds < 3000) && !StopFlag)
             {
                 ClickWorldSwitcher();
                 SafeWait(600, 200);
-                ReadWindow();
+                Screen.ReadWindow();
             }
 
-            int left = ScreenWidth - 84;
+            int left = Screen.Width - 84;
             int right = left + 30;
-            int top = ScreenHeight - 297;
+            int top = Screen.Height - 297;
             int bottom = top + 20;
-            long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
+            long colorSum = ImageProcessing.ColorSum(Vision.ScreenPiece(left, right, top, bottom));
             bool freeBotWorld = Numerical.CloseEnough(120452, colorSum, 0.00001);
             bool memberBotWorld = Numerical.CloseEnough(121998, colorSum, 0.00001);
             return memberBotWorld || freeBotWorld;
@@ -1821,286 +845,12 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void ClickWorldSwitcher()
         {
-            int left = ScreenWidth - 180;
+            int left = Screen.Width - 180;
             int right = left + 110;
-            int top = ScreenHeight - 123;
+            int top = Screen.Height - 123;
             int bottom = top + 15;
             Point click = Probability.GaussianRectangle(left, right, top, bottom);
             LeftClick(click.X, click.Y);
-        }
-
-        /// <summary>
-        /// Determines if the world switcher is open
-        /// </summary>
-        /// <returns>true if the world switcher is open</returns>
-        protected bool WorldSwitcherIsOpen()
-        {
-            int left = ScreenWidth - 200;
-            int right = left + 150;
-            int top = ScreenHeight - 297;
-            int bottom = top + 20;
-            Color[,] currentWorldTitle = ScreenPiece(left, right, top, bottom);
-            double worldTextMatch = ImageProcessing.FractionalMatch(currentWorldTitle, RGBHSBRangeFactory.BankTitle());
-            const double worldTextMinimumMatch = 0.05;
-            return worldTextMatch > worldTextMinimumMatch;
-        }
-
-        /// <summary>
-        /// Determines if one of the two bot worlds is selected on the login screen.
-        /// Assumes that the client is on the login screen.
-        /// </summary>
-        /// <param name="readWindow">Set to true to force a new screen read</param>
-        /// <returns>true if the world is set to 385 or 386. May also hit on 358 and 368</returns>
-        protected bool LoginSetForBotWorld(bool readWindow = false)
-        {
-            MakeSureWindowHasBeenRead(readWindow);
-            Point loginOffset = LoginScreenOffset();
-            int left = Center.X - 323 + loginOffset.X;
-            int right = left + 30;
-            int top = 466 + loginOffset.Y;
-            int bottom = top + 14;
-            long colorSum = ImageProcessing.ColorSum(ScreenPiece(left, right, top, bottom));
-            bool freeBotWorld = Numerical.CloseEnough(LOGIN_BOT_WORLD_385, colorSum, 0.0005);
-            bool memberBotWorld = Numerical.CloseEnough(LOGIN_BOT_WORLD_386, colorSum, 0.00005);
-            return memberBotWorld || freeBotWorld;
-        }
-        private const int LOGIN_BOT_WORLD_385 = 130228;
-        private const int LOGIN_BOT_WORLD_386 = 133468;
-
-        #endregion
-
-        #region banking
-
-        /// <summary>
-        /// Locates and opens an unknown bank type
-        /// Refer to member PossibleBankBooths for a list of possible bank types
-        /// </summary>
-        /// <returns>true if the bank is opened</returns>
-        protected bool OpenBank(out Bank bankPopup, int allowedAttempts = 1)
-        {
-            bankPopup = null;
-
-            if (OpenKnownBank(out bankPopup, allowedAttempts))
-            {
-                return true;
-            }
-            return IdentifyBank() && OpenKnownBank(out bankPopup, 1);
-        }
-
-        /// <summary>
-        /// Locates and opens a nown bank type
-        /// </summary>
-        /// <param name="bankPopup"></param>
-        /// <returns></returns>
-        protected bool OpenKnownBank(out Bank bankPopup, int allowedAttempts = 1)
-        {
-            bankPopup = null;
-            if (BankBoothLocator == null) { return false; }
-
-            Blob bankBooth;
-            for (int i = 0; i < allowedAttempts; i++)
-            {
-                if (BankBoothLocator(out bankBooth) && MouseOverStationaryObject(bankBooth, true, 10))
-                {
-                    bankPopup = new Bank(RSClient, Inventory);
-                    if (bankPopup.WaitForPopup(WAIT_FOR_BANK_WINDOW_TIMEOUT))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Determines if any of the possible bank types appear on screen.
-        /// Sets BankBoothCounter to the first match found.
-        /// </summary>
-        /// <returns>true if any of them do</returns>
-        protected bool IdentifyBank()
-        {
-            Blob booth;
-            ReadWindow();
-            foreach (BankLocator bankLocator in PossibleBankTypes)
-            {
-                if (bankLocator(out booth))
-                {
-                    BankBoothLocator = bankLocator;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Finds the closest bank booth counter that matches a given color
-        /// </summary>
-        /// <param name="bankBoothColor">not used</param>
-        /// <param name="bankBooth">returns the found bank booth blob</param>
-        /// <returns>true if a bank booth is found</returns>
-        protected bool LocateBankBooth(ColorFilter bankBoothColor, out Blob bankBooth)
-        {
-            bankBooth = null;
-
-            if (!ReadWindow()) { return false; }
-            bool[,] bankBooths = ColorFilter(bankBoothColor);
-            List<Blob> potentialBoothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);
-            List<Blob> booths = new List<Blob>();
-
-            foreach(Blob potentialBooth in potentialBoothBlobs)
-            {
-                if (Geometry.Rectangularity(potentialBooth) > 0.8)
-                {
-                    booths.Add(potentialBooth);
-                }
-            }
-
-            bankBooth = Blob.ClosestBlob(Center, booths);
-
-            return bankBooth != null;
-        }
-
-        /// <summary>
-        /// Delegate for custom bank locators
-        /// </summary>
-        /// <param name="bankBooth"></param>
-        /// <returns></returns>
-        protected delegate bool BankLocator(out Blob bankBooth);
-
-        protected int MinBankBoothSize { get { return ArtifactArea(0.000292); } } //ex 0.000583
-        protected int MaxBankBoothSize { get { return ArtifactArea(0.001145); } } //ex 0.001045
-
-        /// <summary>
-        /// Locates a bank booth with the counter color from the Varrock west bank
-        /// </summary>
-        /// <param name="bankBooth"></param>
-        /// <returns>true if a bank booth is found</returns>
-        protected bool LocateBankBoothVarrock(out Blob bankBooth)
-        {
-            return LocateBankBooth(RGBHSBRangeFactory.BankBoothVarrockWest(), out bankBooth);
-        }
-
-        /// <summary>
-        /// Locates a bank booth in the Seers' Village bank
-        /// </summary>
-        /// <param name="bankBooth"></param>
-        /// <returns>true if a bank booth is found</returns>
-        protected bool LocateBankBoothSeersVillage(out Blob bankBooth)
-        {
-            bankBooth = null;
-            List<Blob> possibleBankBooths = LocateObjects(RGBHSBRangeFactory.BankBoothSeersVillage(), MinBankBoothSize, MaxBankBoothSize);
-            if (possibleBankBooths == null) { return false; }
-
-            List<Blob> bankBooths = new List<Blob>();
-            foreach (Blob booth in possibleBankBooths)
-            {
-                double widthToHeight = booth.Width / (double)booth.Height;
-                if (Numerical.WithinBounds(widthToHeight, 2.3, 3.2))
-                {
-                    bankBooths.Add(booth);
-                }
-            }
-
-            if (bankBooths.Count != 9)
-            {
-                return false;
-            }
-            bankBooths.Sort(new BlobHorizontalComparer());
-            bankBooths.RemoveAt(5); //remove closed bank booths
-            bankBooths.RemoveAt(4);
-            bankBooths.RemoveAt(2);
-            bankBooth = Blob.ClosestBlob(Center, bankBooths);
-            return true;
-        }
-
-        /// <summary>
-        /// Finds the closest bank booth in the Port Phasmatys bank
-        /// </summary>
-        /// <returns>True if the bank booths are found</returns>
-        protected bool LocateBankBoothPhasmatys(out Blob bankBooth)
-        {
-            bankBooth = null;
-            const int numberOfBankBooths = 6;
-            const double minBoothWidthToHeightRatio = 2.3667;   //ex 2.6667
-            const double maxBoothWidthToHeightRatio = 3.1333;   //ex 2.8333
-            int left = Center.X - ArtifactLength(0.5);
-            int right = Center.X + ArtifactLength(0.3);
-            int top = Center.Y - ArtifactLength(0.15);
-            int bottom = Center.Y + ArtifactLength(0.2);
-
-            ReadWindow();
-            Point offset;
-            bool[,] bankBooths = ColorFilterPiece(RGBHSBRangeFactory.BankBoothPhasmatys(), left, right, top, bottom, out offset);
-            List<Blob> boothBlobs = new List<Blob>();
-            List<Blob> possibleBoothBlobs = ImageProcessing.FindBlobs(bankBooths, false, MinBankBoothSize, MaxBankBoothSize);  //list of blobs from biggest to smallest
-            possibleBoothBlobs.Sort(new BlobProximityComparer(Center));
-            double widthToHeightRatio, rectangularity;
-
-            //Remove blobs that aren't bank booths
-            foreach(Blob possibleBooth in possibleBoothBlobs)
-            {
-                widthToHeightRatio = (possibleBooth.Width / (double)possibleBooth.Height);
-                rectangularity = Geometry.Rectangularity(possibleBooth);
-                if (Numerical.WithinBounds(widthToHeightRatio, minBoothWidthToHeightRatio, maxBoothWidthToHeightRatio) && rectangularity > 0.75)
-                {
-                    boothBlobs.Add(possibleBooth);
-                }
-            }
-
-            if (boothBlobs.Count != numberOfBankBooths)
-            {
-                return false;   //We either failed to locate all of the booths or identified something that was not actually a booth.
-            }
-
-            //Reduce the blob list to the bank booths
-            boothBlobs.Sort(new BlobHorizontalComparer());  //sort from left to right
-            boothBlobs.RemoveAt(3); //remove the unusable booths without tellers
-            boothBlobs.RemoveAt(0);
-            bankBooth = Blob.ClosestBlob(new Point(Center.X - left, Center.Y - top), boothBlobs);
-            bankBooth.ShiftPixels(offset.X, offset.Y);
-            return true;
-        }
-
-        /// <summary>
-        /// Finds the closest bank booth in the Port Phasmatys bank
-        /// </summary>
-        /// <returns>True if a bank booths is found</returns>
-        protected bool LocateBankBoothPhasmatys(ColorFilter bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
-        {
-            return LocateBankBoothPhasmatys(out bankBooth);
-        }
-
-        /// <summary>
-        /// Finds the closest bank booth in the Edgeville bank out of the northern two booths
-        /// </summary>
-        /// <param name="bankBooth">returns a blob for a found bank booth</param>
-        /// <returns>True if a bank booth is found</returns>
-        protected bool LocateBankBoothEdgeville(out Blob bankBooth)
-        {
-            int searchRadius = ArtifactLength(0.1475);  //ex 150 pixels on a 1080p screen
-            int left = Center.X - searchRadius;
-            int right = Center.X + searchRadius;
-            int top = Center.Y - searchRadius;
-            int bottom = Center.Y + searchRadius;
-            List<Blob> bankBooths = LocateObjects(RGBHSBRangeFactory.BankBoothEdgeville(), left, right, top, bottom, true, ArtifactArea(0.0000754), ArtifactArea(0.0004));   //ex 0.000151 - 0.000211
-            
-            if (bankBooths.Count == 0)
-            {
-                bankBooth = null;
-                return false;
-            }
-            bankBooths.Sort(new BlobProximityComparer(Center));
-            bankBooth = bankBooths[0];
-            if (bankBooth.Width > bankBooth.Height)
-            {
-                bankBooth.ShiftPixels(0, 24);
-            }
-            else
-            {
-                bankBooth.ShiftPixels(15, 0);
-            }
-
-            return true;
         }
 
         #endregion
@@ -2121,7 +871,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if hitpoints are succesfully restored, false if hitpoints cannot be restored and bot should stop</returns>
         protected virtual bool ManageHitpoints(bool readWindow = false)
         {
-            if (readWindow) { ReadWindow(); }
+            if (readWindow) { Screen.ReadWindow(); }
 
             double hitpoints = Minimap.Hitpoints();
             if (hitpoints < RunParams.StartEatingBelow)
@@ -2134,7 +884,7 @@ namespace RunescapeBot.BotPrograms
                     }
                     if (SafeWait(EAT_TIME)) { return false; }
                     hitpoints = Minimap.Hitpoints();
-                    ReadWindow();
+                    Screen.ReadWindow();
                 }
             }
 
@@ -2223,44 +973,11 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Waits until the player stops moving
-        /// </summary>
-        /// <param name="timeout">maximum time in milliseconds to wait</param>
-        /// <returns>true if player stops moving, false if we give up</returns>
-        protected bool WaitDuringPlayerAnimation(int timeout = 180000, double colorStrictness = 0.95, double locationStrictness = 0.99)
-        {
-            int xOffset = ArtifactLength(0.06);
-            int yOffset = ArtifactLength(0.06);
-            Color[,] pastImage = null;
-            Color[,] presentImage = null;
-            Color[,] futureImage = null;
-
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-
-            while (!ImageProcessing.ImageMatch(pastImage, presentImage, colorStrictness, locationStrictness)
-                || !ImageProcessing.ImageMatch(presentImage, futureImage, colorStrictness, locationStrictness))
-            {
-                if (StopFlag || watch.ElapsedMilliseconds >= timeout || SafeWait(100))
-                {
-                    return false;   //timeout
-                }
-
-                ReadWindow(true, true);
-                pastImage = presentImage;
-                presentImage = futureImage;
-                futureImage = ScreenPiece(Center.X - xOffset, Center.X + xOffset, Center.Y - yOffset, Center.Y + yOffset);
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Positions the camera facing north and as high as possible
         /// </summary>
         protected void DefaultCamera()
         {
-            int compassX = ScreenWidth - 159;
+            int compassX = Screen.Width - 159;
             int compassY = 21;
 
             switch (RunParams.DefaultCameraPosition)
@@ -2282,7 +999,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (RunParams.ClosedChatBox && ChatBoxIsOpen(readWindow))
             {
-                LeftClick(34, ScreenHeight - 13, 5);
+                LeftClick(34, Screen.Height - 13, 5);
                 if (waitToClose) { SafeWait(3000); }
             }
         }
@@ -2293,53 +1010,18 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool ChatBoxIsOpen(bool readWindow = false)
         {
-            if (readWindow) { ReadWindow(); }
+            if (readWindow) { Screen.ReadWindow(); }
             
             int left = 11;
             int right = left + 30;
-            int top = ScreenHeight - 43;
+            int top = Screen.Height - 43;
             int bottom = top + 13;
 
-            Color[,] chatName = ScreenPiece(left, right, top, bottom);
+            Color[,] chatName = Vision.ScreenPiece(left, right, top, bottom);
             double textMatch = ImageProcessing.FractionalMatch(chatName, RGBHSBRangeFactory.Black());
             double backgroundMatch = ImageProcessing.FractionalMatch(chatName, RGBHSBRangeFactory.ChatBoxBackground());
 
             return textMatch > 0.05 && backgroundMatch > 0.5;
-        }
-
-        /// <summary>
-        /// Calls ReadWindow if the current screen image is unsatisfactory
-        /// </summary>
-        /// <param name="readWindow">Set to true to always read the window</param>
-        /// <returns>true unless the window needs to be read but can't</returns>
-        private bool MakeSureWindowHasBeenRead(bool readWindow = false)
-        {
-            if (readWindow || (ScreenWidth == 0) || (ScreenHeight == 0))
-            {
-                return ReadWindow();
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Moves the character to a bank icon on the minimap
-        /// </summary>
-        /// <returns>true if the bank icon is found</returns>
-        protected virtual bool MoveToBank(int maxRunTimeToBank = 10000, bool readWindow = true, int minBankIconSize = 4, int randomization = 3, Point? moveTarget = null)
-        {
-            if (readWindow) { ReadWindow(); }
-            if (moveTarget == null) { moveTarget = new Point(0, 0); }
-            
-            Point offset;
-            bool[,] minimapBankIcon = Minimap.MinimapFilter(RGBHSBRangeFactory.BankIconDollar(), out offset);
-            Blob bankBlob = ImageProcessing.BiggestBlob(minimapBankIcon);
-            if (bankBlob == null || bankBlob.Size < minBankIconSize) { return false; }
-
-            Point clickLocation = new Point(offset.X + bankBlob.Center.X + moveTarget.Value.X, offset.Y + bankBlob.Center.Y + moveTarget.Value.Y);
-            LeftClick(clickLocation.X, clickLocation.Y, randomization);
-            SafeWait(maxRunTimeToBank);
-
-            return true;
         }
 
         /// <summary>
@@ -2378,7 +1060,7 @@ namespace RunescapeBot.BotPrograms
         {
             int x = -ScreenScraper.BorderWidth;
             int y = (int)Probability.RandomGaussian(Mouse.Y + yOffset, 100);
-            Mouse.MoveMouseAsynchronous(x, y, RSClient);
+            Mouse.MoveMouseAsynchronous(x, y);
         }
 
         /// <summary>
@@ -2390,9 +1072,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="readWindow">Set to true to always read the window</param>
         protected void MaskTest(ColorFilter filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", bool readWindow = false)
         {
-            MakeSureWindowHasBeenRead();
-            bool[,] thing = ColorFilter(filter);
-            DebugUtilities.TestMask(Bitmap, GameScreen, filter, thing, directory, name);
+            Screen.MakeSureWindowHasBeenRead();
+            bool[,] thing = Vision.ColorFilter(filter);
+            DebugUtilities.TestMask(Screen.Bitmap, Screen, filter, thing, directory, name);
         }
 
         /// <summary>
@@ -2403,7 +1085,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>The estimated time to run to the target location.</returns>
         public double RunTime(Point target)
         {
-            double tiles = Geometry.DistanceBetweenPoints(target, Center) / TileWidth;
+            double tiles = Geometry.DistanceBetweenPoints(target, Screen.Center) / TileWidth;
             int effectiveTiles = (int)Math.Round(tiles);
             if (effectiveTiles % 2 == 1)
             {

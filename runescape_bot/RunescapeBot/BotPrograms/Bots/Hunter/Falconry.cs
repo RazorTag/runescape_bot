@@ -67,7 +67,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (StopFlag) { return false; }
 
-                if (MouseOverNPC(new Blob(kebbit.Location.Center), true, 1, 500))
+                if (HandEye.MouseOverNPC(new Blob(kebbit.Location.Center), true, 1, 500))
                 {
                     if (RetrieveFalcon(kebbit.Location.Center))
                     {
@@ -85,12 +85,12 @@ namespace RunescapeBot.BotPrograms
                 if (FailedRuns % 10 == 0)
                 {
                     Minimap.MoveToPosition(225, 0.95, true, 3, 2500, null, 10000);
-                    WaitDuringPlayerAnimation(6000);
+                    Vision.WaitDuringPlayerAnimation(6000);
                 }
                 else if (FailedRuns % 5 == 0)
                 {
                     Minimap.MoveToPosition(315, 0.95, true, 3, 2500, null, 10000);
-                    WaitDuringPlayerAnimation(6000);
+                    Vision.WaitDuringPlayerAnimation(6000);
                 }
             }
             return FailedRuns < 60 && !FalconRanAway;
@@ -119,7 +119,7 @@ namespace RunescapeBot.BotPrograms
             retrieveWatch.Start();
             while (retrieveWatch.ElapsedMilliseconds < 60000 && !StopFlag)
             {
-                if (MouseOverNPC(new Blob(target), true, 0))
+                if (HandEye.MouseOverNPC(new Blob(target), true, 0))
                 {
                     SafeWait((int)(RunTime(target) / 2));
                     if (Inventory.WaitForSlotToFill((Point)nextEmptyInventorySlot, 5000))
@@ -127,13 +127,13 @@ namespace RunescapeBot.BotPrograms
                         return true;
                     }
                 }
-                else if (MouseOverStationaryObject(new Blob(target), false, 0, 0))
+                else if (HandEye.MouseOverStationaryObject(new Blob(target), false, 0, 0))
                 {
                     //LeftClick(target.X, target.Y, 12);
                     //WaitDuringPlayerAnimation((int) (RunTime(target) * 1.5));
 
                     RightClick(target.X, target.Y, 0);
-                    RightClick falconMenu = new RightClick(target.X, target.Y, RSClient);
+                    RightClick falconMenu = new RightClick(target.X, target.Y, RSClient, Keyboard);
                     falconMenu.WaitForPopup();
                     falconMenu.CustomOption(1);
                     if (SafeWait(1000)) { return false; }
@@ -163,7 +163,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>Position of a falcon that has caught a kebbit.</returns>
         protected Point ArrowToFalcon(Point arrow)
         {
-            Point falcon = new Point(arrow.X, arrow.Y + ArtifactLength(0.0229));
+            Point falcon = new Point(arrow.X, arrow.Y + Screen.ArtifactLength(0.0229));
             return falcon;
         }
 
@@ -180,18 +180,18 @@ namespace RunescapeBot.BotPrograms
             {
                 if (LocateFlashingArrow(ref target))
                 {
-                    if (Geometry.DistanceBetweenPoints(lastFalcon, target) < ArtifactLength(0.01))
+                    if (Geometry.DistanceBetweenPoints(lastFalcon, target) < Screen.ArtifactLength(0.01))
                     {
                         return true;
                     }
                     else
                     {
                         lastFalcon = target;
-                        if (Geometry.DistanceBetweenPoints(Center, target) > ArtifactLength(0.25))
+                        if (Geometry.DistanceBetweenPoints(Screen.Center, target) > Screen.ArtifactLength(0.25))
                         {
                             LeftClick(target.X, target.Y, 0);
                             if (SafeWait((long)(RunTime(target) / 2))) { return false; }
-                            WaitDuringPlayerAnimation(3000);
+                            Vision.WaitDuringPlayerAnimation(3000);
                             if (!Inventory.SlotIsEmpty(nextEmptyInventorySlot, true))
                             {
                                 return true;
@@ -233,7 +233,7 @@ namespace RunescapeBot.BotPrograms
         protected bool LocateFlashingArrow(ref Point target)
         {
             Blob arrow;
-            if (LocateObject(FlashingArrow, out arrow, target, ArtifactLength(1), 1, int.MaxValue))
+            if (Vision.LocateObject(FlashingArrow, out arrow, target, Screen.ArtifactLength(1), 1, int.MaxValue))
             {
                 target = ArrowToFalcon(arrow.Center);
                 return true;
@@ -247,16 +247,16 @@ namespace RunescapeBot.BotPrograms
         /// <returns>A list of kebbits in the order that they should be checked.</returns>
         protected List<Kebbit> LocateKebbits()
         {
-            ReadWindow();
-            bool[,] blackSpotMatches = ColorFilter(Kebbit.KebbitBlackSpot);
-            EraseClientUIFromMask(ref blackSpotMatches);
-            List<Blob> blackSpots = ImageProcessing.FindBlobs(blackSpotMatches, false, 1, ArtifactArea(0.00002183));    //ex 1-11 (0.000000992-0.00001091)
-            List<Cluster> kebbitLocations = ImageProcessing.ClusterBlobs(blackSpots, ArtifactLength(0.0349));
+            Screen.ReadWindow();
+            bool[,] blackSpotMatches = Vision.ColorFilter(Kebbit.KebbitBlackSpot);
+            Vision.EraseClientUIFromMask(ref blackSpotMatches);
+            List<Blob> blackSpots = ImageProcessing.FindBlobs(blackSpotMatches, false, 1, Screen.ArtifactArea(0.00002183));    //ex 1-11 (0.000000992-0.00001091)
+            List<Cluster> kebbitLocations = ImageProcessing.ClusterBlobs(blackSpots, Screen.ArtifactLength(0.0349));
 
             List<Kebbit> kebbits = new List<Kebbit>();
             foreach (Cluster kebbitSpots in kebbitLocations)
             {
-                kebbits.Add(new Kebbit(GameScreen, kebbitSpots, Center));
+                kebbits.Add(new Kebbit(Screen, kebbitSpots, Screen.Center));
             }
 
             return kebbits;
@@ -276,7 +276,7 @@ namespace RunescapeBot.BotPrograms
             for (int i = 0; i < kebbits.Count; i++)
             {
                 //Reject kebbits that are probably the player.
-                if (Geometry.DistanceBetweenPoints(Center, kebbits[i].Location.Center) < ArtifactLength(0.028))
+                if (Geometry.DistanceBetweenPoints(Screen.Center, kebbits[i].Location.Center) < Screen.ArtifactLength(0.028))
                 {
                     continue;
                 }

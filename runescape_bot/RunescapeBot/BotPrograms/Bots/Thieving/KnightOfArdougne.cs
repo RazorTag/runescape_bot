@@ -29,9 +29,9 @@ namespace RunescapeBot.BotPrograms
             RunParams.StartEatingBelow = 0.5;
             RunParams.StopEatingAbove = 0.8;
             FailedCloakSearches = 0;
-            MinPurpleCloakSize = ArtifactArea(0.00002);
-            KnightSearchRadius = ArtifactArea(0.0003);
-            GridSquareHeight = ArtifactLength(0.055);
+            MinPurpleCloakSize = Screen.ArtifactArea(0.00002);
+            KnightSearchRadius = Screen.ArtifactArea(0.0003);
+            GridSquareHeight = Screen.ArtifactLength(0.055);
             BlindSpot = new Point(0, 0);
         }
 
@@ -84,12 +84,12 @@ namespace RunescapeBot.BotPrograms
                 watch.Restart();
 
                 if (StopFlag) { return false; }
-                if (LocateStationaryObject(KnightPurple, out purpleCloak, ArtifactLength(0.015), 10000, MinPurpleCloakSize, int.MaxValue, LocateClosestObject, 1))
+                if (Vision.LocateStationaryObject(KnightPurple, out purpleCloak, Screen.ArtifactLength(0.015), 10000, MinPurpleCloakSize, int.MaxValue, Vision.LocateClosestObject, 1))
                 {
                     if (CheckPosition(purpleCloak.Center))
                     {
                         if (StopFlag) { return false; }
-                        if (MouseOver(purpleCloak.Center, NPCMouseover, true, 0))
+                        if (HandEye.MouseOver(purpleCloak.Center, NPCMouseover, true, 0))
                         {
                             FailedCloakSearches = 0;
                         }
@@ -119,7 +119,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>false if the player's position needs to be adjusted</returns>
         protected bool CheckPosition(Point knight)
         {
-            if (knight.Y - Center.Y < GridSquareHeight / 2)
+            if (knight.Y - Screen.Center.Y < GridSquareHeight / 2)
             {
                 AdjustLocation(0, -1);
                 return false;
@@ -134,8 +134,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool BlindSearch()
         {
-            Point guess = new Point(Center.X + (BlindSpot.X * GridSquareHeight), Center.Y + (BlindSpot.Y * GridSquareHeight));
-            if (MouseOver(guess, NPCMouseover, true, NPCClickRandomization))
+            Point guess = new Point(Screen.Center.X + (BlindSpot.X * GridSquareHeight), Screen.Center.Y + (BlindSpot.Y * GridSquareHeight));
+            if (HandEye.MouseOver(guess, NPCMouseover, true, NPCClickRandomization))
             {
                 return true;
             }
@@ -146,8 +146,8 @@ namespace RunescapeBot.BotPrograms
                 {
                     if (StopFlag) { return false; }
 
-                    guess = new Point(Center.X + (x * GridSquareHeight), Center.Y + (y * GridSquareHeight));
-                    if (MouseOver(guess, NPCMouseover, true, NPCClickRandomization))
+                    guess = new Point(Screen.Center.X + (x * GridSquareHeight), Screen.Center.Y + (y * GridSquareHeight));
+                    if (HandEye.MouseOver(guess, NPCMouseover, true, NPCClickRandomization))
                     {
                         BlindSpot = new Point(x, y);
                         return true;
@@ -166,7 +166,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="down">number of grid squares to move south</param>
         protected void AdjustLocation(int east, int south)
         {
-            Point click = Center;
+            Point click = Screen.Center;
             click.X += east * GridSquareHeight;
             click.Y += south * GridSquareHeight;
             LeftClick(click.X, click.Y, 5);

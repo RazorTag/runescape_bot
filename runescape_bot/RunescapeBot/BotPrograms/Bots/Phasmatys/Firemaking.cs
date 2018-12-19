@@ -56,7 +56,7 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             //Move to the bank and open it
-            if (!MoveToBank(7000, true, BankIconMinSize))
+            if (!Banking.MoveToBank(7000, true, BankIconMinSize))
             {
                 if (StopFlag) { return false; }
 
@@ -66,7 +66,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     return false;
                 }
-                WaitDuringPlayerAnimation(10000);
+                Vision.WaitDuringPlayerAnimation(10000);
                 if (!MoveToBankPhasmatys(2700))
                 {
                     return false;
@@ -85,7 +85,7 @@ namespace RunescapeBot.BotPrograms
                 return false;
             }
             if (SafeWait(5000)) { return false; }
-            WaitDuringPlayerAnimation(10000);
+            Vision.WaitDuringPlayerAnimation(10000);
 
             if (!SetFires() || StopFlag)
             {
@@ -117,7 +117,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool MoveToFireLine()
         {
-            ReadWindow();
+            Screen.ReadWindow();
             Blob bridge = Minimap.LocateObject(BridgeIcon, BridgeIconMinSize);
             if (bridge == null)
             {
@@ -157,7 +157,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void BankItems()
         {
-            Bank bankPopup = new Bank(RSClient, Inventory);
+            Bank bankPopup = new Bank(RSClient, Inventory, Keyboard);
             bankPopup.DepositInventory();
             SafeWaitPlus(500, 200);
             bankPopup.WithdrawOne(7, 0);

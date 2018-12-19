@@ -65,7 +65,7 @@ namespace RunescapeBot.BotPrograms
 
                 if (!StopFlag)
                 {
-                    PrepareClient(true);    //restart the client to get a random new world
+                    RSClient.PrepareClient(true);    //restart the client to get a random new world
                 }
             }
         }

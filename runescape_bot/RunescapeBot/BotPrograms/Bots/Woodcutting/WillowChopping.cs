@@ -21,7 +21,7 @@ namespace RunescapeBot.BotPrograms
         public WillowChopping(RunParams startParams) : base(startParams)
         {
             RunParams.Run = true;
-            MinTreeSize = ArtifactArea(0.00006768);
+            MinTreeSize = Screen.ArtifactArea(0.00006768);
             FailedTreeSearches = 0;
         }
 
@@ -59,7 +59,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             SafeWait(2000); //Give the player time to start the chopping animation
-            WaitDuringPlayerAnimation();
+            Vision.WaitDuringPlayerAnimation();
 
             //Drop logs when inventory fills up. Use the second from bottom row to avoid looking at the Windows 10 watermark.
             if (!Inventory.SlotIsEmpty(Inventory.INVENTORY_COLUMNS - 1, Inventory.INVENTORY_ROWS - 4))
@@ -75,10 +75,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if any trees are located</returns>
         protected bool LocateTrees()
         {
-            Trees = LocateObjects(WillowTrunk, MinTreeSize);
-            //Trees.Sort(new BlobSizeComparer());
-            //Trees.Reverse();
-            Trees.Sort(new BlobProximityComparer(Center));
+            Trees = Vision.LocateObjects(WillowTrunk, MinTreeSize);
+            Trees.Sort(new BlobProximityComparer(Screen.Center));
             return Trees.Count > 0;
         }
 
@@ -96,9 +94,9 @@ namespace RunescapeBot.BotPrograms
 
                 click = tree.Center;
                 click = Probability.GaussianCircle(click, 3);
-                Mouse.Move(click.X, click.Y, RSClient);
+                Mouse.Move(click.X, click.Y);
 
-                if (WaitForMouseOverText(RGBHSBRangeFactory.MouseoverTextStationaryObject(), 1000))
+                if (Vision.WaitForMouseOverText(RGBHSBRangeFactory.MouseoverTextStationaryObject(), 1000))
                 {
                     LeftClick(click.X, click.Y, 0, 0);
                     FailedTreeSearches = 0;

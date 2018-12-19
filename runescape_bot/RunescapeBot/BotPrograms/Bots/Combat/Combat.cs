@@ -32,9 +32,9 @@ namespace RunescapeBot.BotPrograms
             const double minBackground = 0.1;
 
             RGBHSBRange background = RGBHSBRangeFactory.OSBuddyEnemyHitpointsBackground();
-            UpdateScreenshot();
+            Screen.UpdateScreenshot();
 
-            bool[,] targetBackground = ColorFilterPiece(background, TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
+            bool[,] targetBackground = Vision.ColorFilterPiece(background, TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
             double backgroundMatch = ImageProcessing.FractionalMatch(targetBackground);
             if (backgroundMatch >= minBackground)
             {
@@ -55,13 +55,13 @@ namespace RunescapeBot.BotPrograms
         {
             if (!InCombat()) { return double.MaxValue; }
 
-            UpdateScreenshot();
-            Color[,] targetHitpoints = ScreenPiece(TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
+            Screen.UpdateScreenshot();
+            Color[,] targetHitpoints = Vision.ScreenPiece(TARGET_HP_LEFT, TARGET_HP_RIGHT, TARGET_HP_TOP, TARGET_HP_BOTTOM);
             RGBHSBRange greenHPBar = RGBHSBRangeFactory.OSBuddyEnemyHitpointsGreen();
-            bool[,] greenHP = ColorFilter(targetHitpoints, greenHPBar);
+            bool[,] greenHP = Vision.ColorFilter(targetHitpoints, greenHPBar);
             double greenWidth = ImageProcessing.BiggestBlob(greenHP).Width;
             RGBHSBRange redHPBar = RGBHSBRangeFactory.OSBuddyEnemyHitpointsRed();
-            bool[,] redHP = ColorFilter(targetHitpoints, redHPBar);
+            bool[,] redHP = Vision.ColorFilter(targetHitpoints, redHPBar);
             double redWidth = ImageProcessing.BiggestBlob(redHP).Width;
 
             return greenWidth / Numerical.NonZero(greenWidth + redWidth);

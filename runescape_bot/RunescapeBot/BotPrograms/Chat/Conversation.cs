@@ -14,17 +14,6 @@ namespace RunescapeBot.BotPrograms
 {
     public class Conversation
     {
-        public Conversation(TextBoxTool textBox)
-        {
-            TextBox = textBox;
-            OtherPlayerChatRows = new bool[CHAT_ROW_COUNT];
-
-            _scanChat = true;
-            Thread scanChat = new Thread(ScanChat);
-            scanChat.Start();
-        }
-
-
         #region properties
 
         /// <summary>
@@ -45,28 +34,55 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// The latest image of the game screen.
         /// </summary>
-        private Color[,] GameScreen { get; set; }
+        private GameScreen Screen;
 
         /// <summary>
-        /// Only scan the chat when set to true;
+        /// Only scan the chat when set to true.
         /// </summary>
         private bool _scanChat { get; set; }
 
         /// <summary>
-        /// True for the indices corresponding with rows populated with text from other players.
+        /// The different "speakers" for a line of text for the most recent check.
         /// </summary>
-        private bool[] OtherPlayerChatRows { get; set; }
-        private bool[] _previousChatRows { get; set; }
+        private ChatRowType[] OtherPlayerChatRows { get; set; }
+
+        /// <summary>
+        /// The different "speakers" for a line of text for the penultimate check.
+        /// </summary>
+        private ChatRowType[] _previousChatRows { get; set; }
+
+        /// <summary>
+        /// The different "speakers" for a line of text.
+        /// </summary>
+        private enum ChatRowType
+        {
+            Unknown,
+            Empty,
+            Game,
+            Player,
+            OtherPlayer
+        }
 
         #endregion
 
-        /// <summary>
-        /// Updates the local reference to the game screen.
-        /// </summary>
-        /// <param name="gameScreen">New reference to the latest game screen image.</param>
-        public void SetScreen(Color[,] gameScreen)
+        public Conversation(TextBoxTool textBox, GameScreen screen, bool conversate)
         {
-            GameScreen = gameScreen;
+            TextBox = textBox;
+            Screen = screen;
+            OtherPlayerChatRows = new ChatRowType[CHAT_ROW_COUNT];
+
+            if (_scanChat = conversate)
+                StartConversation();
+        }
+
+        /// <summary>
+        /// Begins scanning chat and responding to other players.
+        /// </summary>
+        public void StartConversation()
+        {
+            _scanChat = true;
+            Thread scanChat = new Thread(ScanChat);
+            scanChat.Start();
         }
 
         /// <summary>
@@ -78,31 +94,54 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        private void RunChatScanner()
+        {
+            while (_scanChat == true && !BotProgram.StopFlag)
+            {
+                if (Screen.LooksValid() && Screen.IsLoggedIn())
+                    ScanChat();
+
+                BotProgram.SafeWait(10000);
+            }
+        }
+
+        /// <summary>
         /// Periodically scans the chat to determine if the player needs to say something to another player.
         /// </summary>
         private void ScanChat()
         {
-            while (_scanChat == true && !BotProgram.StopFlag)
+            DetermineChatRowSpeakers();
+            if (MatchCurrentWithPreviousChat())
             {
-                DetermineOtherPlayerChatRows();
-                if (MatchCurrentWithPreviousChat())
-                {
-                    //TODO alert the server
-                }
+                //TODO alert the server
             }
         }
 
         /// <summary>
         /// Determines which rows in the public chat history are populated by chat from other players.
         /// </summary>
-        private void DetermineOtherPlayerChatRows()
+        private void DetermineChatRowSpeakers()
         {
             _previousChatRows = OtherPlayerChatRows;
 
             for (int i = 0; i < CHAT_ROW_COUNT; i++)
             {
-                OtherPlayerChatRows[i] = PlayerChatRow(i);
+                OtherPlayerChatRows[i] = ChatRowSpeaker(i);
             }
+        }
+
+        
+        private ChatRowType ChatRowSpeaker(int row)
+        {
+            RectangleBounds chatRow = TextBox.ChatRowLocation(row);
+            if (PlayerChatRow(chatRow))
+            {
+                return OtherPlayer(chatRow) ? ChatRowType.OtherPlayer : ChatRowType.Player;
+            }
+
+            return ChatRowType.Unknown;
         }
 
         /// <summary>
@@ -110,10 +149,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="row">The row to check for chat from a player.</param>
         /// <returns>True if the specified row contains chat from a player.</returns>
-        private bool PlayerChatRow(int row)
+        private bool PlayerChatRow(RectangleBounds chatRow)
         {
-            RectangleBounds chatRow = TextBox.ChatRowLocation(row);
-            double playerChatTextMatch = ImageProcessing.FractionalMatchPiece(GameScreen, TextBoxTool.PlayerChatText, chatRow.Left, chatRow.Right, chatRow.Top, chatRow.Bottom);
+            double playerChatTextMatch = ImageProcessing.FractionalMatchPiece(Screen, TextBoxTool.PlayerChatText, chatRow.Left, chatRow.Right, chatRow.Top, chatRow.Bottom);
             bool containsPlayerText = playerChatTextMatch > 0.001;
             return containsPlayerText;
         }
@@ -122,10 +160,10 @@ namespace RunescapeBot.BotPrograms
         /// Determines if the first row of chat is another player's message.
         /// </summary>
         /// <returns>True if the first row of chat is another's player's text.</returns>
-        private bool OtherPlayerHasTalked()
+        private bool OtherPlayer(RectangleBounds chatRow)
         {
             //TODO
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -134,27 +172,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if another player has spoken last.</returns>
         private bool MatchCurrentWithPreviousChat()
         {
-            //Determine the most recent time that a player had talked previously.
-            int firstPreviousChat = FirstTrue(_previousChatRows);
-            int firstCurrentChat = FirstTrue(OtherPlayerChatRows);
-
-            //If a chat message shows up more recently than the most recent prior message, then another player has talked.
-            if (firstCurrentChat < firstPreviousChat)
-            {
-                return true;
-            }
-
-            //Determine if the current chat is a scrolled up version of the prior chat
-            int scroll = firstCurrentChat - firstPreviousChat;
-            for (int i = firstCurrentChat; i < CHAT_ROW_COUNT; i++)
-            {
-                if (OtherPlayerChatRows[i] != _previousChatRows[i - scroll])
-                {
-                    return false;
-                }
-            }
-
-            return true;    //Current chat appears to be a scrolled up version of the prior chat.
+            return false;
         }
 
         /// <summary>

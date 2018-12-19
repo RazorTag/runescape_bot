@@ -21,7 +21,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if we are already logged in or we are able to log in, false if we can't log in</returns>
         protected override bool CheckLogIn(bool readWindow)
         {
-            if (!IsLoggedOut())
+            if (!Screen.IsLoggedOut())
             {
                 return true;    //already logged in
             }

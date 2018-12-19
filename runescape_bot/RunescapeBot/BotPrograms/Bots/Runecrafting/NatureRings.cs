@@ -220,11 +220,11 @@ namespace RunescapeBot.BotPrograms
 
             //Start moving to bank booth
             Point bankIconOffsetTarget = new Point(2 * MinimapGauge.GRID_SQUARE_SIZE, MinimapGauge.GRID_SQUARE_SIZE / 2);
-            if (!MoveToBank(0, true, 4, 2, bankIconOffsetTarget)) { return false; }
+            if (!Banking.MoveToBank(0, true, 4, 2, bankIconOffsetTarget)) { return false; }
 
             CheckItems();
             Inventory.OpenInventory();
-            MoveMouse(Center.X, Center.Y + 30, 15);
+            MoveMouse(Screen.Center.X, Screen.Center.Y + 30, 15);
             return true;
         }
 
@@ -233,7 +233,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected void CheckItems()
         {
-            ReadWindow();
+            Screen.ReadWindow();
 
             for (int i = 0; i < PouchSlots.Length; i++)
             {
@@ -315,7 +315,7 @@ namespace RunescapeBot.BotPrograms
             if (UserSelections.NumberOfPouches > 0 || LowStamina)
             {
                 Bank bank;
-                if (!OpenBank(out bank)) { return false; }
+                if (!Banking.OpenBank(out bank)) { return false; }
                 if (LowStamina)
                 {
                     bank.DepositItem(InventorySlotStaminaPotion);
@@ -357,10 +357,10 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool WithdrawStaminaPotion(Bank bank)
         {
-            ReadWindow();
+            Screen.ReadWindow();
             for (int i = 0; i < Math.Min(3, UserSelections.NumberOfPouches); i++)
             {
-                if (!bank.SlotIsEmpty(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y, GameScreen))
+                if (!bank.SlotIsEmpty(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y, Screen))
                 {
                     bank.WithdrawOne(BankSlotStaminaPotions[i].X, BankSlotStaminaPotions[i].Y);
                     return true;
@@ -392,15 +392,15 @@ namespace RunescapeBot.BotPrograms
             Point cursorLocation = new Point(Mouse.X, Mouse.Y);
             Bank bank;
 
-            if (MouseOverStationaryObject(new Blob(cursorLocation), true, 0, 0))    //try mousing over the default guess location first
+            if (HandEye.MouseOverStationaryObject(new Blob(cursorLocation), true, 0, 0))    //try mousing over the default guess location first
             {
-                bank = new Bank(RSClient, Inventory);
+                bank = new Bank(RSClient, Inventory, Keyboard);
                 if (!bank.WaitForPopup(6000))
                 {
                     return false;
                 }
             }    
-            else if (!OpenBank(out bank, 3))    //Look for the bank if guessing fails
+            else if (!Banking.OpenBank(out bank, 3))    //Look for the bank if guessing fails
             {
                 return false;
             }
@@ -480,7 +480,7 @@ namespace RunescapeBot.BotPrograms
         {
             Bank bank;
 
-            if (!OpenBank(out bank)) { return false; }
+            if (!Banking.OpenBank(out bank)) { return false; }
             if (LowStamina)
             {
                 bank.DepositItem(InventorySlotStaminaPotion);
@@ -526,7 +526,7 @@ namespace RunescapeBot.BotPrograms
             {
                 return false;
             }
-            Point expectedFairyRingLocation = new Point(Center.X, Center.Y + 100);
+            Point expectedFairyRingLocation = new Point(Screen.Center.X, Screen.Center.Y + 100);
             MoveMouse(expectedFairyRingLocation.X, expectedFairyRingLocation.Y, 68);
             SafeWaitPlus(1000, 100);
 
@@ -561,7 +561,7 @@ namespace RunescapeBot.BotPrograms
             int top = expectedLocation.Y - searchRadius - fairyRingRadius;
             int bottom = expectedLocation.Y + searchRadius + fairyRingRadius;
 
-            List<Blob> mushrooms = LocateObjects(FairyRingWhite, left, right, top, bottom, true, 1, ArtifactArea(0.0000326));   //ex 0.0000261
+            List<Blob> mushrooms = Vision.LocateObjects(FairyRingWhite, left, right, top, bottom, true, 1, Screen.ArtifactArea(0.0000326));   //ex 0.0000261
             if (mushrooms == null)
             {
                 return null;
@@ -619,7 +619,7 @@ namespace RunescapeBot.BotPrograms
         {
             fairyRingOptions.CustomOption(1);   //open the configuration popup
             SafeWaitPlus(2000, 400);
-            FairyRingsConfigure menu = new FairyRingsConfigure(GameScreen, RSClient);
+            FairyRingsConfigure menu = new FairyRingsConfigure(Screen, RSClient);
             menu.SetConfiguration('c', 'k', 'r');
             menu.Teleport(false);
             FairyRingConfigured = true;
@@ -636,8 +636,8 @@ namespace RunescapeBot.BotPrograms
             double match;
             while (watch.ElapsedMilliseconds < 4000 && !StopFlag)
             {
-                ReadWindow();
-                bool[,] portal = ColorFilterPiece(FairyRingTeleport, Center, 50);
+                Screen.ReadWindow();
+                bool[,] portal = Vision.ColorFilterPiece(FairyRingTeleport, Screen.Center, 50);
                 match = ImageProcessing.FractionalMatch(portal);
 
                 if (match > 0.001)
@@ -705,7 +705,7 @@ namespace RunescapeBot.BotPrograms
                 Inventory.RightClickInventoryOption(PouchSlots[i].X, PouchSlots[i].Y, 1);
             }
 
-            Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.120));
+            Point altarLocation = new Point(Screen.Center.X, Screen.Center.Y - Screen.ArtifactLength(0.120));
             if (UserSelections.NumberOfPouches > 3)
             {
                 Inventory.InventoryToScreen(ref InventorySlotGiantPouch);
@@ -734,8 +734,8 @@ namespace RunescapeBot.BotPrograms
             }
 
             Inventory.RightClickInventoryOption(InventorySlotGiantPouch.X, InventorySlotGiantPouch.Y, 1);
-            Point equipmentSlot = new Point(ScreenWidth - Inventory.TAB_RIGHT_OFFSET_RIGHT - 2 * Inventory.TAB_HORIZONTAL_GAP);
-            CraftInventory(new Point(Center.X, Center.Y - ArtifactLength(0.120)), null);
+            Point equipmentSlot = new Point(Screen.Width - Inventory.TAB_RIGHT_OFFSET_RIGHT - 2 * Inventory.TAB_HORIZONTAL_GAP);
+            CraftInventory(new Point(Screen.Center.X, Screen.Center.Y - Screen.ArtifactLength(0.120)), null);
             WaitForRunesToCraft(true);
             return true;
         }
@@ -746,18 +746,18 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         protected bool EnterAltar()
         {
-            int minimumSize = ArtifactArea(0.01);   //ex 0.0236
+            int minimumSize = Screen.ArtifactArea(0.01);   //ex 0.0236
             Blob exteriorAltar;
-            Point searchCenter = new Point(Center.X + ArtifactLength(0.25), Center.Y - ArtifactLength(0.24));
+            Point searchCenter = new Point(Screen.Center.X + Screen.ArtifactLength(0.25), Screen.Center.Y - Screen.ArtifactLength(0.24));
 
-            if (!MouseOverStationaryObject(new Blob(searchCenter), true, 10, 1000))  //click on the exterior nature altar to enter
+            if (!HandEye.MouseOverStationaryObject(new Blob(searchCenter), true, 10, 1000))  //click on the exterior nature altar to enter
             {
-                if (!LocateAltar(out exteriorAltar, searchCenter, ArtifactLength(0.3)))
+                if (!LocateAltar(out exteriorAltar, searchCenter, Screen.ArtifactLength(0.3)))
                 {
                     return false;
                 }
-                WaitDuringPlayerAnimation(3000);
-                if (!MouseOverStationaryObject(exteriorAltar, true, 10, 2000))
+                Vision.WaitDuringPlayerAnimation(3000);
+                if (!HandEye.MouseOverStationaryObject(exteriorAltar, true, 10, 2000))
                 {
                     return false;
                 }
@@ -765,7 +765,7 @@ namespace RunescapeBot.BotPrograms
             SafeWaitPlus((int)(2.5 * BotRegistry.GAME_TICK), 150);
 
             //click on the interior nature altar to craft inventory by guessing the location
-            Point altarLocation = new Point(Center.X, Center.Y - ArtifactLength(0.311));
+            Point altarLocation = new Point(Screen.Center.X, Screen.Center.Y - Screen.ArtifactLength(0.311));
             int x = InventorySlotSmallPouch.X, y = InventorySlotSmallPouch.Y;
             Inventory.InventoryToScreen(ref x, ref y);
 
@@ -791,12 +791,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if an altar is found</returns>
         protected bool LocateAltar(out Blob altar, Point? searchCenter = null, int searchRadius = int.MaxValue)
         {
-            searchCenter = searchCenter ?? Center;
-            int minimumSize = ArtifactArea(0.01);   //ex 0.0236
+            searchCenter = searchCenter ?? Screen.Center;
+            int minimumSize = Screen.ArtifactArea(0.01);   //ex 0.0236
 
-            if (!LocateObject(NatureAltar, out altar, searchCenter.Value, ArtifactLength(0.3), minimumSize))
+            if (!Vision.LocateObject(NatureAltar, out altar, searchCenter.Value, Screen.ArtifactLength(0.3), minimumSize))
             {
-                return LocateObject(NatureAltar, out altar);
+                return Vision.LocateObject(NatureAltar, out altar);
             }
             return true;
         }
@@ -820,7 +820,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < timeout)
             {
-                ReadWindow();
+                Screen.ReadWindow();
                 if (Inventory.SlotIsEmpty(InventorySlotEssenceCheck, true))
                 {
                     if (SafeWait((int) (1.5 * BotRegistry.GAME_TICK))) { return false; }
@@ -842,9 +842,9 @@ namespace RunescapeBot.BotPrograms
             Blob interiorAltar = new Blob(altarLocation);
 
             //guess the location before searching
-            if (!MouseOverStationaryObject(interiorAltar, true, 20, 5000))
+            if (!HandEye.MouseOverStationaryObject(interiorAltar, true, 20, 5000))
             {
-                if (!LocateAltar(out interiorAltar) || !MouseOverStationaryObject(interiorAltar, true, 20, 3000))
+                if (!LocateAltar(out interiorAltar) || !HandEye.MouseOverStationaryObject(interiorAltar, true, 20, 3000))
                 {
                     return false;
                 }

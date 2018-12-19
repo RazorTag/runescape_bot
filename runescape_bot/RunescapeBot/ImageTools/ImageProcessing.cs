@@ -103,6 +103,21 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
+        /// Creates a boolean array of a portion of the screen to represent a color filter match
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
+        /// <returns></returns>
+        public static bool[,] ColorFilterPiece(Color[,] image, ColorFilter filter, int left, int right, int top, int bottom)
+        {
+            Color[,] colorArray = ScreenPiece(image, left, right, top, bottom);
+            return ColorFilter(colorArray, filter);
+        }
+
+        /// <summary>
         /// Determines if two colors have the same RGB values
         /// </summary>
         /// <param name="color1"></param>

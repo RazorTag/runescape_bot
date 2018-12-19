@@ -27,9 +27,9 @@ namespace RunescapeBot.BotPrograms
         protected bool PickUpStackables;
         protected bool PickUpAlchables;
         protected bool AlchAlchables;
-        protected int RuneMinSize { get { return ArtifactArea(0.0000694); } }
-        protected int MithrilMinSize { get { return ArtifactArea(0.0000992); } }
-        protected int MinDemonSize { get { return ArtifactArea(0.000944); } }
+        protected int RuneMinSize { get { return Screen.ArtifactArea(0.0000694); } }
+        protected int MithrilMinSize { get { return Screen.ArtifactArea(0.0000992); } }
+        protected int MinDemonSize { get { return Screen.ArtifactArea(0.000944); } }
 
         /// <summary>
         /// Count of the number of consecutive prior frames where no demon has been found
@@ -118,9 +118,9 @@ namespace RunescapeBot.BotPrograms
         protected override bool Execute()
         {
             Blob demon;
-            double cloveRange = Math.Max(2.0 * Math.Sqrt(MinDemonSize), ArtifactLength(0.05));
+            double cloveRange = Math.Max(2.0 * Math.Sqrt(MinDemonSize), Screen.ArtifactLength(0.05));
 
-            if (LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
+            if (Vision.LocateObject(LesserDemonSkin, out demon, MinDemonSize) && ClovesWithinRange(demon.Center, cloveRange))
             {                
                 if (InCombat() && HitpointsHaveDecreased())    //engage the demon
                 {
@@ -128,8 +128,8 @@ namespace RunescapeBot.BotPrograms
                     return true;
                 }
 
-                Mouse.Move(demon.Center.X, demon.Center.Y, RSClient);
-                if (WaitForMouseOverText(MouseoverTextNPC, 3000))
+                Mouse.Move(demon.Center.X, demon.Center.Y);
+                if (Vision.WaitForMouseOverText(MouseoverTextNPC, 3000))
                 {
                     FoundDemon(demon);
                     LeftClick(demon.Center.X, demon.Center.Y, 0, 0);
@@ -170,14 +170,14 @@ namespace RunescapeBot.BotPrograms
             //Reduce the minimum required size of the demon in a desperate attempt to find a demon
             if ((DateTime.Now - LastDemonTime).TotalMilliseconds > MAX_DEMON_SPAWN_TIME)
             {
-                LogError.ScreenShot(GameScreen, "long-spawn-" + (DateTime.Now - LastDemonTime).TotalMilliseconds);
+                LogError.ScreenShot(Screen, "long-spawn-" + (DateTime.Now - LastDemonTime).TotalMilliseconds);
                 DefaultCamera();
             }
 
             //Give up, log out of the game, go outside and play
             if ((MissedDemons * RunParams.FrameTime) > (5 * MAX_DEMON_SPAWN_TIME))
             {
-                LogError.ScreenShot(GameScreen, MissedDemons + "-missed-demons");
+                LogError.ScreenShot(Screen, MissedDemons + "-missed-demons");
                 Logout();
                 return false;
             }
@@ -194,7 +194,7 @@ namespace RunescapeBot.BotPrograms
         {
             if (LastDemon == null) { return false; }    //No demon has been found yet
 
-            ReadWindow();
+            Screen.ReadWindow();
 
             int dropRange = (int) (4 * Math.Sqrt(MinDemonSize));
             int dropRangeLeft = (int) (LastDemon.Center.X - 1.18 * dropRange);
@@ -202,7 +202,7 @@ namespace RunescapeBot.BotPrograms
             int dropRangeTop = (int) (LastDemon.Center.Y - 0.24 * dropRange);
             int dropRangeBottom = (int) (LastDemon.Center.Y + 0.76 * dropRange);
             Point trimOffset;
-            Color[,] screenDropArea = ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
+            Color[,] screenDropArea = Vision.ScreenPiece(dropRangeLeft, dropRangeRight, dropRangeTop, dropRangeBottom, out trimOffset);
 
             if (PickUpStackables)
             {
@@ -228,7 +228,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if an item is found, picked up, and alched. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
         private bool FindAndAlch(Color[,] screenDropArea, Point offset, ColorFilter referenceColor, int minimumSize)
         {
-            bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
+            bool[,] matchedPixels = Vision.ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
 
             if (biggestBlob.Size < minimumSize)
@@ -260,7 +260,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
         private bool FindAndGrab(Color[,] screenDropArea, Point offset, ColorFilter referenceColor, int minimumSize = 50)
         {
-            bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
+            bool[,] matchedPixels = Vision.ColorFilter(screenDropArea, referenceColor);
             Blob biggestBlob = ImageProcessing.BiggestBlob(matchedPixels);
 
             if (biggestBlob.Size > minimumSize)
@@ -282,7 +282,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>True if an item is found and telegrabbed. May be false if no item is found or if there isn't inventory space to pick it up.</returns>
         private bool FindAndGrabChaosRune(Color[,] screenDropArea, Point offset, ColorFilter referenceColor, int minimumSize = 50)
         {
-            bool[,] matchedPixels = ColorFilter(screenDropArea, referenceColor);
+            bool[,] matchedPixels = Vision.ColorFilter(screenDropArea, referenceColor);
             List<Blob> chaosRunes = ImageProcessing.FindBlobs(matchedPixels, true);
 
             for (int i = 0; i < Math.Min(10, chaosRunes.Count); i++)
@@ -309,7 +309,7 @@ namespace RunescapeBot.BotPrograms
         {
             int requiredCloves = 1;
             int minCloveSize = MinDemonSize / 400;
-            bool[,] cloves = ColorFilterPiece(LesserDemonHorn, demonCenter, (int)cloveRange);
+            bool[,] cloves = Vision.ColorFilterPiece(LesserDemonHorn, demonCenter, (int)cloveRange);
             List<Blob> demonCloves = ImageProcessing.FindBlobs(cloves, true);
             if (demonCloves.Count >= requiredCloves)
             {

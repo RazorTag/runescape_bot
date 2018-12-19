@@ -19,6 +19,7 @@ namespace RunescapeBot.BotPrograms.Popups
         private const int BRACELET_Y_OFFSET = 264;
 
         private Process RSClient;
+        private Keyboard Keyboard;
         private int Left;
         private int Top;
 
@@ -35,9 +36,10 @@ namespace RunescapeBot.BotPrograms.Popups
             Zenyte = 7
         }
 
-        public FurnaceCrafting(Process rsClient)
+        public FurnaceCrafting(Process rsClient, Keyboard keyboard)
         {
             this.RSClient = rsClient;
+            this.Keyboard = keyboard;
             Point screenSize = ScreenScraper.GetWindowSize(RSClient);
             SetLeft(screenSize.X);
             SetTop(screenSize.Y);
@@ -84,7 +86,7 @@ namespace RunescapeBot.BotPrograms.Popups
             {
                 if (BotProgram.StopFlag) { return false; }
 
-                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 titleHash = ImageProcessing.ColorSum(screen);
                 
@@ -109,8 +111,8 @@ namespace RunescapeBot.BotPrograms.Popups
             int top = Top + BRACELET_Y_OFFSET - 4;
             int bottom = Top + BRACELET_Y_OFFSET + 4;
             Point click = Probability.GaussianRectangle(left, right, top, bottom);
-            Mouse.RightClick(click.X, click.Y, RSClient);
-            MakeAll makeAll = new MakeAll(click.X, click.Y, RSClient);
+            Mouse.RightClick(click.X, click.Y);
+            MakeAll makeAll = new MakeAll(click.X, click.Y, RSClient, Keyboard);
             makeAll.WaitForPopup(timeout);
             makeAll.MakeAllItems();
         }
@@ -123,7 +125,7 @@ namespace RunescapeBot.BotPrograms.Popups
             const int xOffset = 474;
             const int yOffset = 17;
             Point click = Probability.GaussianRectangle(Left + xOffset - 6, Left + xOffset + 6, Top + yOffset - 5, Top + yOffset + 5);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
+            Mouse.LeftClick(click.X, click.Y);
         }
     }
 }

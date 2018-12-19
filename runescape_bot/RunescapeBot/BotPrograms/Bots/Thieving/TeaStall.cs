@@ -36,7 +36,7 @@ namespace RunescapeBot.BotPrograms
             //DebugUtilities.TestMask(Bitmap, ColorArray, MouseOverText, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "mouseoverText");
 
 
-            minTeaStallSize = ArtifactArea(0.00283);
+            minTeaStallSize = Screen.ArtifactArea(0.00283);
             Point? teaSlot = Inventory.FirstEmptySlot();
             if (teaSlot == null)
             {
@@ -51,17 +51,17 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            if (!ReadWindow()) { return false; }
+            if (!Screen.ReadWindow()) { return false; }
             Blob teaStall;
-            if (!LocateObject(TeaStallRoof, out teaStall, minTeaStallSize))
+            if (!Vision.LocateObject(TeaStallRoof, out teaStall, minTeaStallSize))
             {
                 MessageBox.Show("Unable to locate a tea stall");
                 return false;
             }
             Point click = (Point) teaStall.RandomBlobPixel();
-            Mouse.Move(click.X, click.Y, RSClient);
+            Mouse.Move(click.X, click.Y);
             SafeWait(2000);
-            if (!WaitForMouseOverText(MouseOverText))
+            if (!Vision.WaitForMouseOverText(MouseOverText))
             {
                 return (++FailedRuns < FAIL_LIMIT);
             }

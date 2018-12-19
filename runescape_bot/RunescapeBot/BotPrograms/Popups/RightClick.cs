@@ -15,6 +15,7 @@ namespace RunescapeBot.BotPrograms.Popups
         protected const int ROW_HEIGHT = 15;
         protected const int MIN_WIDTH = 103;
         protected Process RSClient;
+        protected Keyboard Keyboard;
         protected int XClick;
         protected int YClick;
         protected int Height;
@@ -32,9 +33,10 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="xClick">the x-coordinate of the click that opened the Make-X popup</param>
         /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
         /// <param name="rsClient"></param>
-        public RightClick(int xClick, int yClick, Process rsClient)
+        public RightClick(int xClick, int yClick, Process rsClient, Keyboard keyboard)
         {
             this.RSClient = rsClient;
+            this.Keyboard = keyboard;
             this.XClick = xClick;
             this.YClick = yClick;
             SetSize();
@@ -88,7 +90,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         protected void AdjustPosition()
         {
-            Point? screenSize = ScreenScraper.GetScreenSize(RSClient);
+            Point? screenSize = ScreenScraper.GetScreenSize();
             if (screenSize != null)
             {
                 //adjust for hitting the bottom of the screen
@@ -115,7 +117,7 @@ namespace RunescapeBot.BotPrograms.Popups
             while (watch.ElapsedMilliseconds < timeout)
             {
                 if (BotProgram.SafeWait(200)) { return false; }
-                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(RSClient));
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
                 if (PopupExists(screen) && PopupIsCorrectHeight(screen, checkHeight))
                 {
                     return true;
@@ -218,7 +220,7 @@ namespace RunescapeBot.BotPrograms.Popups
             int yRandomization = 2;
             Point clickOffset = Probability.GaussianRectangle(-xRandomization, xRandomization, yOffset - yRandomization, yOffset + yRandomization);
             Point click = new Point(XClick + clickOffset.X, YClick + clickOffset.Y);
-            Mouse.LeftClick(click.X, click.Y, RSClient);
+            Mouse.LeftClick(click.X, click.Y);
         }
 
         /// <summary>

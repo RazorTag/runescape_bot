@@ -21,7 +21,7 @@ namespace RunescapeBot.BotPrograms
 
         RGBHSBRange YellowMouseOverText;
 
-        int DemonHeadSize { get { return ArtifactArea(0.0001); } }
+        int DemonHeadSize { get { return Screen.ArtifactArea(0.0001); } }
 
         public ButlerSawmill(RunParams startParams) : base(startParams)
         {
@@ -56,7 +56,7 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.OpenOptions(false);
             Point houseOptions = Probability.GaussianCircle(HouseOptionsLocation(), 5, 0, 360, 12);
-            Mouse.Move(houseOptions.X, houseOptions.Y, RSClient);
+            Mouse.Move(houseOptions.X, houseOptions.Y);
             if (WaitForTeleport()) { return false; }
             if (!WaitFor(IsAtHouse) || !CallServant() || !InitiateDemonDialog())
             {
@@ -164,11 +164,11 @@ namespace RunescapeBot.BotPrograms
             int radius = 15;
             int x = Inventory.INVENTORY_TAB_OFFSET_RIGHT;
             int y = Inventory.TAB_TOP_OFFSET_BOTTOM;
-            int left = ScreenWidth - x - radius;
+            int left = Screen.Width - x - radius;
             int right = left + 2 * radius;
-            int top = ScreenHeight - y - radius;
+            int top = Screen.Height - y - radius;
             int bottom = top + 2 * radius;
-            return LocateObject(BackpackBrown, out backpack, left, right, top, bottom, 5);
+            return Vision.LocateObject(BackpackBrown, out backpack, left, right, top, bottom, 5);
         }
 
         /// <summary>
@@ -181,10 +181,10 @@ namespace RunescapeBot.BotPrograms
             while (!StopFlag && !WaitFor(AnyDialog, 1500))
             {
                 Blob demon;
-                if (LocateStationaryObject(DemonHead, out demon, ArtifactLength(0.015), 3000, ArtifactArea(0.00005), ArtifactArea(0.0005)))
+                if (Vision.LocateStationaryObject(DemonHead, out demon, Screen.ArtifactLength(0.015), 3000, Screen.ArtifactArea(0.00005), Screen.ArtifactArea(0.0005)))
                 {
-                    Mouse.Move(demon.Center.X, demon.Center.Y, RSClient);
-                    if (WaitForMouseOverText(YellowMouseOverText))
+                    Mouse.Move(demon.Center.X, demon.Center.Y);
+                    if (Vision.WaitForMouseOverText(YellowMouseOverText))
                     {
                         LeftClick(demon.Center.X, demon.Center.Y);
                         if (SafeWait(500)) { return false; }
@@ -210,7 +210,7 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.ClickInventory(FirstLogSlot, true);
             Blob demon;
-            if (!LocateObject(DemonHead, out demon, 100))
+            if (!Vision.LocateObject(DemonHead, out demon, 100))
             {
                 return false;
             }
@@ -226,14 +226,14 @@ namespace RunescapeBot.BotPrograms
         {
             Inventory.OpenInventory();
             SafeWait(500);
-            ReadWindow();
+            Screen.ReadWindow();
             if (InventoryIsReady())
             {
                 return true;
             }
 
             Inventory.ClickInventory(InventoryLogSlot, true);
-            Mouse.Move(Center.X, Center.Y, RSClient);
+            Mouse.Move(Screen.Center.X, Screen.Center.Y);
             if (WaitForTeleport())
             {
                 return false;
@@ -298,7 +298,7 @@ namespace RunescapeBot.BotPrograms
             }
 
             LeftClick(bankChest.X, bankChest.Y);
-            Bank bankPopup = new Bank(RSClient, Inventory);
+            Bank bankPopup = new Bank(RSClient, Inventory, Keyboard);
             if (!bankPopup.WaitForPopup(BotUtilities.WAIT_FOR_BANK_WINDOW_TIMEOUT))
             {
                 return false;

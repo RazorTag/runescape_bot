@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RunescapeBot.UITools;
+using System;
 using System.Diagnostics;
 
 namespace RunescapeBot.BotPrograms.Popups
@@ -14,7 +15,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
         /// <param name="rsClient">RS client process</param>
         /// <param name="extraOptions">specifies the order of extra options in the right-click menu</param>
-        public RightClickInventory(int xClick, int yClick, Process rsClient, int[] extraOptions) : base(xClick, yClick, rsClient)
+        public RightClickInventory(int xClick, int yClick, Process rsClient, Keyboard keyboard, int[] extraOptions) : base(xClick, yClick, rsClient, keyboard)
         {
             ExtraOptions = extraOptions;
             if (ExtraOptions != null)

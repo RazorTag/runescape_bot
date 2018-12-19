@@ -69,7 +69,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the icon is probably found correctly, false otherwise</returns>
         protected Point? BankClickLocation()
         {
-            ReadWindow();
+            Screen.ReadWindow();
             Point offset;
             Blob bankIcon, bankFloor;
             int bankX, bankY;
@@ -145,7 +145,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the icon is probably found correctly, false otherwise</returns>
         protected Point? FurnaceClickLocation()
         {
-            ReadWindow();
+            Screen.ReadWindow();
             Point offset;
             Blob furnaceIcon, furnaceFloor;
             if (!FurnaceLocation(out furnaceIcon, out furnaceFloor, out offset, BuildingFloor))
@@ -217,14 +217,14 @@ namespace RunescapeBot.BotPrograms
         {
             Blob bankBooth;
             const int maxWaitTime = 12000;
-            if (!LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, MinBankBoothSize, int.MaxValue, LocateBankBoothPhasmatys))
+            if (!Vision.LocateStationaryObject(BankBooth, out bankBooth, 15, maxWaitTime, Banking.MinBankBoothSize, int.MaxValue, Banking.LocateBankBoothPhasmatys))
             {
                 return false;
             }
             
             LeftClick(bankBooth.Center.X, bankBooth.Center.Y, 10);
             SafeWait(200, 120);
-            Bank bankPopup = new Bank(RSClient, Inventory);
+            Bank bankPopup = new Bank(RSClient, Inventory, Keyboard);
             bool bankOpened = bankPopup.WaitForPopup();
             return bankOpened;
         }

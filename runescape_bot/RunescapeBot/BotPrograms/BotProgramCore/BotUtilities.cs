@@ -40,7 +40,7 @@ namespace RunescapeBot.BotPrograms
             {
                 if (BotProgram.StopFlag) { return false; }
 
-                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(rsClient));
+                screen = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow());
                 screen = ImageProcessing.ScreenPiece(screen, left, right, top, bottom);
                 asteriskHash = ImageProcessing.ColorSum(screen);
                 if (Numerical.CloseEnough(asterisk, asteriskHash, 0.01))
@@ -57,9 +57,8 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="rsClient"></param>
         /// <param name="amount"></param>
-        public static void EnterAmount(Process rsClient, int amount)
+        public static void EnterAmount(Keyboard keyboard, int amount)
         {
-            Keyboard keyboard = new Keyboard(rsClient);
             keyboard.WriteNumber(amount);
             Thread.Sleep(500);
             keyboard.Enter();

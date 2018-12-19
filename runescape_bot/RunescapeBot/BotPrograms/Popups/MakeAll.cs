@@ -18,7 +18,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// <param name="xClick">the x-coordinate of the click that opened the Make-X popup</param>
         /// <param name="yClick">the y-coordinate of the click that opened the Make-X popup</param>
         /// <param name="rsClient"></param>
-        public MakeAll(int xClick, int yClick, Process rsClient) : base(xClick, yClick, rsClient)
+        public MakeAll(int xClick, int yClick, Process rsClient, Keyboard keyboard) : base(xClick, yClick, rsClient, keyboard)
         {
             
         }
@@ -71,7 +71,7 @@ namespace RunescapeBot.BotPrograms.Popups
             if (WaitForEnterAmount(5000))
             {
                 BotProgram.SafeWaitPlus(200, 100);
-                BotUtilities.EnterAmount(RSClient, itemsToMake);
+                BotUtilities.EnterAmount(Keyboard, itemsToMake);
             }
         }
 

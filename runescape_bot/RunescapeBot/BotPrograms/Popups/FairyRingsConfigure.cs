@@ -94,7 +94,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         public void Close()
         {
-            Mouse.LeftClick(CloseButton.X, CloseButton.Y, RSClient, 5);
+            Mouse.LeftClick(CloseButton.X, CloseButton.Y, 5);
         }
 
         #endregion
@@ -126,14 +126,14 @@ namespace RunescapeBot.BotPrograms.Popups
                 case 'a':
                     break;
                 case 'b':
-                    Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y, RSClient);
+                    Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y);
                     break;
                 case 'd':
-                    Mouse.LeftClick(LeftDial.X + CLICK_DIRECTIONAL_OFFSET, LeftDial.Y, RSClient);
+                    Mouse.LeftClick(LeftDial.X + CLICK_DIRECTIONAL_OFFSET, LeftDial.Y);
                     break;
                 case 'c':
-                    Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y, RSClient);
-                    Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y, RSClient);
+                    Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y);
+                    Mouse.LeftClick(LeftDial.X - CLICK_DIRECTIONAL_OFFSET, LeftDial.Y);
                     break;
             }
         }
@@ -149,14 +149,14 @@ namespace RunescapeBot.BotPrograms.Popups
                 case 'i':
                     break;
                 case 'j':
-                    Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y, RSClient);
+                    Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y);
                     break;
                 case 'l':
-                    Mouse.LeftClick(CenterDial.X + CLICK_DIRECTIONAL_OFFSET, CenterDial.Y, RSClient);
+                    Mouse.LeftClick(CenterDial.X + CLICK_DIRECTIONAL_OFFSET, CenterDial.Y);
                     break;
                 case 'k':
-                    Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y, RSClient);
-                    Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y, RSClient);
+                    Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y);
+                    Mouse.LeftClick(CenterDial.X - CLICK_DIRECTIONAL_OFFSET, CenterDial.Y);
                     break;
             }
         }
@@ -172,14 +172,14 @@ namespace RunescapeBot.BotPrograms.Popups
                 case 'p':
                     break;
                 case 'q':
-                    Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y, RSClient);
+                    Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y);
                     break;
                 case 's':
-                    Mouse.LeftClick(RightDial.X + CLICK_DIRECTIONAL_OFFSET, RightDial.Y, RSClient);
+                    Mouse.LeftClick(RightDial.X + CLICK_DIRECTIONAL_OFFSET, RightDial.Y);
                     break;
                 case 'r':
-                    Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y, RSClient);
-                    Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y, RSClient);
+                    Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y);
+                    Mouse.LeftClick(RightDial.X - CLICK_DIRECTIONAL_OFFSET, RightDial.Y);
                     break;
             }
         }
@@ -198,7 +198,7 @@ namespace RunescapeBot.BotPrograms.Popups
         /// </summary>
         public void Teleport(bool waitForTeleport)
         {
-            Mouse.LeftClick(TeleportButton.X, TeleportButton.Y, RSClient, 8);
+            Mouse.LeftClick(TeleportButton.X, TeleportButton.Y, 8);
             if (waitForTeleport)
             {
                 BotProgram.SafeWait(2000);

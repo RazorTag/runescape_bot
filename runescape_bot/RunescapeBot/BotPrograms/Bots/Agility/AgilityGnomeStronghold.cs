@@ -22,13 +22,13 @@ namespace RunescapeBot.BotPrograms
         private RGBHSBRange DrainPipe;
         private RGBHSBRange Black;
 
-        private int MinLogSize { get { return ArtifactArea(0.00049); } }
-        private int MinCargoNetSize { get { return ArtifactArea(0.0002); } }
-        private int MinTreeBranchSize { get { return ArtifactArea(0.00113); } }
-        private int MinTreeTrunkSize { get { return ArtifactArea(0.000189); } }
-        private int MaxTreeTrunkSize { get { return ArtifactArea(0.000378); } }
-        private int MinTightropeSize { get { return ArtifactArea(0.000189); } }
-        private int MinDrainPipeSize { get { return ArtifactArea(0.000566); } }
+        private int MinLogSize { get { return Screen.ArtifactArea(0.00049); } }
+        private int MinCargoNetSize { get { return Screen.ArtifactArea(0.0002); } }
+        private int MinTreeBranchSize { get { return Screen.ArtifactArea(0.00113); } }
+        private int MinTreeTrunkSize { get { return Screen.ArtifactArea(0.000189); } }
+        private int MaxTreeTrunkSize { get { return Screen.ArtifactArea(0.000378); } }
+        private int MinTightropeSize { get { return Screen.ArtifactArea(0.000189); } }
+        private int MinDrainPipeSize { get { return Screen.ArtifactArea(0.000566); } }
 
 
         public AgilityGnomeStronghold(RunParams startParams) : base(startParams)
@@ -104,7 +104,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassLogBalance()
         {
             Blob log;
-            if (!LocateStationaryObject(LogBalance, out log, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinLogSize, int.MaxValue, null, 2))
+            if (!Vision.LocateStationaryObject(LogBalance, out log, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinLogSize, int.MaxValue, null, 2))
             {
                 return false;   //unable to locate the log balance
             }
@@ -131,7 +131,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                if (LocateObject(LogBalance, out log, MinLogSize) && (log.Center.Y < Center.Y))
+                if (Vision.LocateObject(LogBalance, out log, MinLogSize) && (log.Center.Y < Screen.Center.Y))
                 {
                     return true;
                 }
@@ -146,7 +146,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassCargoNet()
         {
             Blob cargoNet;
-            if (!LocateStationaryObject(CargoNet, out cargoNet, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinCargoNetSize, int.MaxValue, LocateMiddleCargoNet))
+            if (!Vision.LocateStationaryObject(CargoNet, out cargoNet, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinCargoNetSize, int.MaxValue, LocateMiddleCargoNet))
             {
                 return false;   //unable to locate a set of cargo net frames
             }
@@ -169,7 +169,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                if (LocateObject(CargoNet, out net, MinCargoNetSize) && (net.Center.Y < Center.Y))
+                if (Vision.LocateObject(CargoNet, out net, MinCargoNetSize) && (net.Center.Y < Screen.Center.Y))
                 {
                     return true;
                 }
@@ -189,7 +189,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                if (LocateObject(CargoNet, out net, MinCargoNetSize) && (net.Center.Y > Center.Y))
+                if (Vision.LocateObject(CargoNet, out net, MinCargoNetSize) && (net.Center.Y > Screen.Center.Y))
                 {
                     return true;
                 }
@@ -207,9 +207,9 @@ namespace RunescapeBot.BotPrograms
         private bool LocateMiddleCargoNet(ColorFilter cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             cargoNet = null;
-            ReadWindow();
-            bool[,] cargoNetFrame = ColorFilter(CargoNet);
-            EraseClientUIFromMask(ref cargoNetFrame);
+            Screen.ReadWindow();
+            bool[,] cargoNetFrame = Vision.ColorFilter(CargoNet);
+            Vision.EraseClientUIFromMask(ref cargoNetFrame);
             List<Blob> cargoNetFrames = ImageProcessing.FindBlobs(cargoNetFrame, false, MinCargoNetSize);
             if (cargoNetFrames.Count < 3)
             {
@@ -230,7 +230,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>a list of the closest three blobs from cargoNetFrames</returns>
         private List<Blob> ClosestFrameSet(List<Blob> cargoNetFrames)
         {
-            cargoNetFrames.Sort(new BlobProximityComparer(Center));
+            cargoNetFrames.Sort(new BlobProximityComparer(Screen.Center));
             List<Blob> closestFrames = new List<Blob>();
             for (int i = 0; i < 3; i++)
             {
@@ -257,7 +257,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassTreeBranch()
         {
             Blob treeTrunk;
-            if (!LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, int.MaxValue, FindTreeTrunk))
+            if (!Vision.LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, int.MaxValue, FindTreeTrunk))
             {
                 return false;   //unable to locate a tree trunk
             }
@@ -267,7 +267,7 @@ namespace RunescapeBot.BotPrograms
 
             Point branchEnd = treeBranches.GetTop();
             Line topBranch = new Line(treeTrunk.Center, branchEnd);
-            Point click = topBranch.OffsetFromEnd(0.0447 * ScreenHeight);   //~45 pixels in from the end of the branch on a full HD screen
+            Point click = topBranch.OffsetFromEnd(0.0447 * Screen.Height);   //~45 pixels in from the end of the branch on a full HD screen
             LeftClick(click.X, click.Y);
 
             SafeWait(1000); //wait for the player to climb the tree
@@ -288,7 +288,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                ReadWindow();
+                Screen.ReadWindow();
                 minimap = Minimap.MinimapFilter(Black);
                 blackMatch = ImageProcessing.FractionalMatch(minimap);
                 if (blackMatch >= minBlackMatch)
@@ -313,7 +313,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                ReadWindow();
+                Screen.ReadWindow();
                 minimap = Minimap.MinimapFilter(Black);
                 blackMatch = ImageProcessing.FractionalMatch(minimap);
                 if (blackMatch <= maxBlackMatch)
@@ -334,9 +334,9 @@ namespace RunescapeBot.BotPrograms
         private bool FindTreeTrunk(ColorFilter trunkColor, out Blob trunk, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             trunk = null;
-            ReadWindow();
-            bool[,] objectPixels = ColorFilter(trunkColor);
-            EraseClientUIFromMask(ref objectPixels);
+            Screen.ReadWindow();
+            bool[,] objectPixels = Vision.ColorFilter(trunkColor);
+            Vision.EraseClientUIFromMask(ref objectPixels);
             List<Blob> possibleTrunks = ImageProcessing.FindBlobs(objectPixels, false, MinTreeTrunkSize, MaxTreeTrunkSize);
             if (possibleTrunks.Count == 0) {
                 return false;
@@ -367,9 +367,9 @@ namespace RunescapeBot.BotPrograms
         private bool FindTreeBranches(out Blob tree, Point treeTrunk)
         {
             tree = null;
-            ReadWindow();
-            bool[,] objectPixels = ColorFilter(TreeBranch);
-            EraseClientUIFromMask(ref objectPixels);
+            Screen.ReadWindow();
+            bool[,] objectPixels = Vision.ColorFilter(TreeBranch);
+            Vision.EraseClientUIFromMask(ref objectPixels);
             List<Blob> branches = ImageProcessing.FindBlobs(objectPixels, false, MinTreeBranchSize);
             if (branches.Count == 0) { return false; }
 
@@ -395,7 +395,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassTightRope()
         {
             Blob tightrope;
-            if (!LocateStationaryObject(Tightrope, out tightrope, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinTightropeSize))
+            if (!Vision.LocateStationaryObject(Tightrope, out tightrope, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinTightropeSize))
             {
                 return false;
             }
@@ -420,7 +420,7 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                if (LocateObject(Tightrope, out tightrope, MinTightropeSize) && (tightrope.Center.X < Center.X))
+                if (Vision.LocateObject(Tightrope, out tightrope, MinTightropeSize) && (tightrope.Center.X < Screen.Center.X))
                 {
                     return true;
                 }
@@ -435,12 +435,12 @@ namespace RunescapeBot.BotPrograms
         private bool PassTreeTrunk()
         {
             Blob treeTrunk;
-            if (!LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, int.MaxValue, FindTreeTrunk))
+            if (!Vision.LocateStationaryObject(TreeTrunk, out treeTrunk, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, 0, int.MaxValue, FindTreeTrunk))
             {
                 return false;   //unable to locate a tree trunk
             }
 
-            Point branchOffset = new Point(-ArtifactLength(0.0914), ArtifactLength(0.0177));
+            Point branchOffset = new Point(-Screen.ArtifactLength(0.0914), Screen.ArtifactLength(0.0177));
             Point click = Geometry.AddPoints(treeTrunk.Center, branchOffset);   //~45 pixels in from the end of the branch on a full HD screen
             LeftClick(click.X, click.Y, 6);
             SafeWait(1500); //wait for the player to climb the tree
@@ -454,7 +454,7 @@ namespace RunescapeBot.BotPrograms
         private bool PassDrainPipe()
         {
             Blob drainPipe;
-            if (!LocateStationaryObject(DrainPipe, out drainPipe, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinDrainPipeSize, int.MaxValue, LocateDrainPipe, 2))
+            if (!Vision.LocateStationaryObject(DrainPipe, out drainPipe, STATIONARY_OBJECT_TOLERANCE, WAIT_FOR_NEXT_OBSTACLE, MinDrainPipeSize, int.MaxValue, LocateDrainPipe, 2))
             {
                 return false;
             }
@@ -474,8 +474,8 @@ namespace RunescapeBot.BotPrograms
         private bool LocateDrainPipe(ColorFilter drainPipeColor, out Blob drainPipe, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             drainPipe = null;
-            ReadWindow();
-            bool[,] drains = ColorFilter(DrainPipe);
+            Screen.ReadWindow();
+            bool[,] drains = Vision.ColorFilter(DrainPipe);
             List<Blob> drainPipes = ImageProcessing.FindBlobs(drains, false, MinDrainPipeSize);
             if (drainPipes.Count == 0)
             {
@@ -501,14 +501,14 @@ namespace RunescapeBot.BotPrograms
 
             while (watch.ElapsedMilliseconds < WAIT_FOR_VERIFICATION && !StopFlag)
             {
-                ReadWindow();
-                drain = ColorFilter(DrainPipe);
+                Screen.ReadWindow();
+                drain = Vision.ColorFilter(DrainPipe);
                 drainPipes = ImageProcessing.FindBlobs(drain, false, MinDrainPipeSize);
                 if (drainPipes.Count > 0)
                 {
                     drainPipes.Sort(new BlobVerticalComparer());
                     lowestBlob = drainPipes[drainPipes.Count - 1];
-                    if (lowestBlob.Center.Y > Center.Y)
+                    if (lowestBlob.Center.Y > Screen.Center.Y)
                     {
                         return true;
                     }

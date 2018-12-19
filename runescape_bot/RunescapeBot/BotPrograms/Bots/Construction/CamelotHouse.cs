@@ -22,17 +22,17 @@ namespace RunescapeBot.BotPrograms
 
         protected int DialogTitleLeft { get { return 128; } }
         protected int DialogTitleRight { get { return DialogTitleLeft + 370; } }
-        protected int DialogTitleTop { get { return ScreenHeight - 142; } }
+        protected int DialogTitleTop { get { return Screen.Height - 142; } }
         protected int DialogTitleBottom { get { return DialogTitleTop + 21; } }
 
         protected int DialogTextLeft { get { return 128; } }
         protected int DialogTextRight { get { return DialogTextLeft + 370; } }
-        protected int DialogTextTop { get { return ScreenHeight - 123; } }
+        protected int DialogTextTop { get { return Screen.Height - 123; } }
         protected int DialogTextBottom { get { return DialogTextTop + 60; } }
 
         protected int DialogLeft { get { return 128; } }
         protected int DialogRight { get { return DialogLeft + 370; } }
-        protected int DialogTop { get { return ScreenHeight - 142; } }
+        protected int DialogTop { get { return Screen.Height - 142; } }
         protected int DialogBottom { get { return DialogTop + 82; } }
 
         protected int FailedRuns;
@@ -136,9 +136,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         protected virtual void GeneralTroubleShoot()
         {
-            ReadWindow();
+            Screen.ReadWindow();
 
-            Bank bank = new Bank(RSClient, Inventory);
+            Bank bank = new Bank(RSClient, Inventory, Keyboard);
             if (bank.BankIsOpen())
             {
                 bank.Close();
@@ -147,7 +147,7 @@ namespace RunescapeBot.BotPrograms
 
             if (HouseOptionsIsOpen())
             {
-                LeftClick(ScreenWidth - 40, ScreenHeight - 282);    //close out of House Options
+                LeftClick(Screen.Width - 40, Screen.Height - 282);    //close out of House Options
                 if (SafeWait(1000)) { return; }
             }
         }
@@ -200,8 +200,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool IsAtHouse()
         {
-            ReadWindow();
-            bool[,] portal = ColorFilterPiece(HousePortalPurple, Center, 200);
+            Screen.ReadWindow();
+            bool[,] portal = Vision.ColorFilterPiece(HousePortalPurple, Screen.Center, 200);
             double match = ImageProcessing.FractionalMatch(portal);
             return match > 0.001;
         }
@@ -240,7 +240,7 @@ namespace RunescapeBot.BotPrograms
                     if (SafeWait(500)) { return false; }
                     if (HouseOptionsIsOpen())
                     {
-                        LeftClick(houseOptions.X, ScreenHeight - 76, 12);    //click on call servant
+                        LeftClick(houseOptions.X, Screen.Height - 76, 12);    //click on call servant
                         return true;
                     }
                     else
@@ -250,7 +250,7 @@ namespace RunescapeBot.BotPrograms
                 }
                 LeftClick(houseOptions.X, houseOptions.Y, 10);    //click on house options
             }
-            LeftClick(houseOptions.X, ScreenHeight - 76, 12);    //click on call servant
+            LeftClick(houseOptions.X, Screen.Height - 76, 12);    //click on call servant
             return true;
         }
 
@@ -260,7 +260,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the location of the middle of House Options</returns>
         protected Point HouseOptionsLocation()
         {
-            return new Point(ScreenWidth - 97, ScreenHeight - 58);
+            return new Point(Screen.Width - 97, Screen.Height - 58);
         }
 
         /// <summary>
@@ -278,10 +278,10 @@ namespace RunescapeBot.BotPrograms
             Point bankChestClick;
             if (BankChestClickLocation(out bankChestClick))
             {
-                Mouse.Move(bankChestClick.X, bankChestClick.Y, RSClient);
-                if (WaitForMouseOverText(BlueMouseOverText))
+                Mouse.Move(bankChestClick.X, bankChestClick.Y);
+                if (Vision.WaitForMouseOverText(BlueMouseOverText))
                 {
-                    Mouse.LeftClick(bankChestClick.X, bankChestClick.Y, RSClient);
+                    Mouse.LeftClick(bankChestClick.X, bankChestClick.Y);
                     if (WaitFor(UnNoteTheBanknotes))
                     {
                         Keyboard.WriteNumber(1);
@@ -325,9 +325,9 @@ namespace RunescapeBot.BotPrograms
         protected bool BankChestClickLocation(out Point clickLocation)
         {
             Blob bankChest;
-            if (LocateStationaryObject(BankChest, out bankChest, 0, 5000, 1, int.MaxValue, FindBankChest))
+            if (Vision.LocateStationaryObject(BankChest, out bankChest, 0, 5000, 1, int.MaxValue, FindBankChest))
             {
-                Point clickOffset = new Point(-ArtifactLength(0.012), -ArtifactLength(0.006));
+                Point clickOffset = new Point(-Screen.ArtifactLength(0.012), -Screen.ArtifactLength(0.006));
                 clickLocation = Geometry.AddPoints(bankChest.Center, clickOffset);
                 clickLocation = Probability.GaussianCircle(clickLocation, 1, 0, 360, 3);
                 return true;
@@ -346,13 +346,13 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected bool FindBankChest(ColorFilter stationaryObject, out Blob foundObject, int minimumSize, int maximumSize)
         {
-            int widthRadius = ArtifactLength(0.35);
-            int heightRadius = ArtifactLength(0.25);
-            int left = Center.X - widthRadius;
-            int right = Center.X + widthRadius;
-            int top = Center.Y - heightRadius;
-            int bottom = Center.Y + heightRadius;
-            return LocateObject(BankChest, out foundObject, left, right, top, bottom, ArtifactArea(0.0004), ArtifactArea(0.0015));
+            int widthRadius = Screen.ArtifactLength(0.35);
+            int heightRadius = Screen.ArtifactLength(0.25);
+            int left = Screen.Center.X - widthRadius;
+            int right = Screen.Center.X + widthRadius;
+            int top = Screen.Center.Y - heightRadius;
+            int bottom = Screen.Center.Y + heightRadius;
+            return Vision.LocateObject(BankChest, out foundObject, left, right, top, bottom, Screen.ArtifactArea(0.0004), Screen.ArtifactArea(0.0015));
         }
 
         /// <summary>
@@ -362,12 +362,12 @@ namespace RunescapeBot.BotPrograms
         protected bool HouseOptionsIsOpen()
         {
             Inventory.OpenOptions(false);
-            ReadWindow();
-            int left = ScreenWidth - 169;
+            Screen.ReadWindow();
+            int left = Screen.Width - 169;
             int right = left + 100;
-            int top = ScreenHeight - 296;
+            int top = Screen.Height - 296;
             int bottom = top + 20;
-            Color[,] houseOptionsTitle = ScreenPiece(left, right, top, bottom);
+            Color[,] houseOptionsTitle = Vision.ScreenPiece(left, right, top, bottom);
             double houseOptionsMatch = ImageProcessing.FractionalMatch(houseOptionsTitle, RGBHSBRangeFactory.BankTitle());
             const double houseOptionsMinimumMatch = 0.05;
             return houseOptionsMatch > houseOptionsMinimumMatch;
@@ -401,8 +401,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         protected long DialogTitleHash()
         {
-            ReadWindow();
-            Color[,] dialogTitle = ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
+            Screen.ReadWindow();
+            Color[,] dialogTitle = Vision.ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
             return ImageProcessing.ColorSum(dialogTitle);
         }
 
@@ -412,8 +412,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>the number of pixels of text in the dialog body</returns>
         protected int DialogBodyText()
         {
-            ReadWindow();
-            bool[,] dialogBody = ColorFilterPiece(DialogBody, DialogTextLeft, DialogTextRight, DialogTextTop, DialogTextBottom);
+            Screen.ReadWindow();
+            bool[,] dialogBody = Vision.ColorFilterPiece(DialogBody, DialogTextLeft, DialogTextRight, DialogTextTop, DialogTextBottom);
             return ImageProcessing.MatchCount(dialogBody);
         }
 
@@ -425,9 +425,9 @@ namespace RunescapeBot.BotPrograms
         {
             if (readWindow)
             {
-                ReadWindow();
+                Screen.ReadWindow();
             }
-            Color[,] dialogTitle = ScreenPiece(DialogLeft, DialogRight, DialogTop, DialogBottom);
+            Color[,] dialogTitle = Vision.ScreenPiece(DialogLeft, DialogRight, DialogTop, DialogBottom);
             return ImageProcessing.ColorSum(dialogTitle);
         }
 
@@ -439,9 +439,9 @@ namespace RunescapeBot.BotPrograms
         {
             int left = 233;
             int right = left + 144;
-            int top = ScreenHeight - 59;
+            int top = Screen.Height - 59;
             int bottom = top + 10;
-            bool[,] continueBar = ColorFilterPiece(ContinueBarBlue, left, right, top, bottom);
+            bool[,] continueBar = Vision.ColorFilterPiece(ContinueBarBlue, left, right, top, bottom);
             int textSize = ImageProcessing.MatchCount(continueBar);
             return Numerical.CloseEnough(285, textSize, 0.01);
         }
@@ -452,11 +452,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if an NPC dialog shows up</returns>
         protected bool AnyDialog(bool readWindow = true)
         {
-            if (readWindow && !ReadWindow())
+            if (readWindow && !Screen.ReadWindow())
             {
                 return false;
             }
-            Color[,] dialogTitle = ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
+            Color[,] dialogTitle = Vision.ScreenPiece(DialogTitleLeft, DialogTitleRight, DialogTitleTop, DialogTitleBottom);
             double dialogMatch = ImageProcessing.FractionalMatch(dialogTitle, DialogTitle);
             return dialogMatch > 0.005;
         }

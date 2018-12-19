@@ -80,7 +80,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            ReadWindow();
+            Screen.ReadWindow();
 
             if ((Minimap.Hitpoints() < RunParams.StartEatingBelow) && !BankAndHeal()) //Heal if hitpoints are low
             {
@@ -141,7 +141,7 @@ namespace RunescapeBot.BotPrograms
                 {
                     bank.DepositAll(slot);
                     SafeWait(3 * BotRegistry.GAME_TICK);
-                    ReadWindow();
+                    Screen.ReadWindow();
                 }
             }
         }
@@ -154,13 +154,13 @@ namespace RunescapeBot.BotPrograms
         {
             Bank bank;
             SetFoodSlots(); //Record which inventory slots are currenty empty and will be occupied by food
-            if (!MoveToBank(5000) || !OpenBank(out bank))
+            if (!Banking.MoveToBank(5000) || !Banking.OpenBank(out bank))
             {
                 return false;
             }
             bank.WithdrawAll(FoodBankSlot.X, FoodBankSlot.Y);
             bank.Close();
-            if (!ManageHitpoints() || !OpenBank(out bank))  //Eat food from initially empty inventory slots until we have very high health.
+            if (!ManageHitpoints() || !Banking.OpenBank(out bank))  //Eat food from initially empty inventory slots until we have very high health.
             {
                 return false;
             }
@@ -180,11 +180,11 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         private bool ClimbBank()
         {
-            int left = Center.X;
-            int right = ScreenWidth - 1;
+            int left = Screen.Center.X;
+            int right = Screen.Width - 1;
             int top = 0;
-            int bottom = Center.Y;
-            List<Blob> possibleBankWalls = LocateObjects(BankWall, left, right, top, bottom, true, ArtifactArea(0.00004), ArtifactArea(0.0004));    //ex 0.0000803, 0.0004
+            int bottom = Screen.Center.Y;
+            List<Blob> possibleBankWalls = Vision.LocateObjects(BankWall, left, right, top, bottom, true, Screen.ArtifactArea(0.00004), Screen.ArtifactArea(0.0004));    //ex 0.0000803, 0.0004
             Point? expectedWallLocation = ExpectedBankWallLocation();
             if (expectedWallLocation == null)
             {
@@ -192,10 +192,10 @@ namespace RunescapeBot.BotPrograms
             }
 
             possibleBankWalls.Sort(new BlobProximityComparer((Point)expectedWallLocation));
-            if (MouseOver(possibleBankWalls, StationaryObjectText, true, 6, 1600))
+            if (HandEye.MouseOver(possibleBankWalls, StationaryObjectText, true, 6, 1600))
             {
                 SafeWait(4500);
-                MoveMouse(Center.X - ArtifactLength(0.511), Center.Y - ArtifactLength(0.065));
+                MoveMouse(Screen.Center.X - Screen.ArtifactLength(0.511), Screen.Center.Y - Screen.ArtifactLength(0.065));
                 return true;
             }
             return false;
@@ -207,7 +207,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         private Point? ExpectedBankWallLocation()
         {
-            Blob agilityIcon = Minimap.LocateObject(AgilityIcon, ArtifactArea(0.00002), ArtifactArea(0.00008), false);   //ex 0.00004
+            Blob agilityIcon = Minimap.LocateObject(AgilityIcon, Screen.ArtifactArea(0.00002), Screen.ArtifactArea(0.00008), false);   //ex 0.00004
             if (agilityIcon == null || agilityIcon.Size == 0)
             {
                 return null;
@@ -226,15 +226,15 @@ namespace RunescapeBot.BotPrograms
         private bool JumpToTightrope()
         {
             Blob whiteFlag;
-            if (LocateStationaryObject(WhiteFlag, out whiteFlag, 20, 7000, ArtifactArea(0.000065), ArtifactArea(0.000260))) //ex 0.000130
+            if (Vision.LocateStationaryObject(WhiteFlag, out whiteFlag, 20, 7000, Screen.ArtifactArea(0.000065), Screen.ArtifactArea(0.000260))) //ex 0.000130
             {
                 ScanForMarkOfGrace();
-                Point expectedLocation = new Point(whiteFlag.Center.X - ArtifactLength(0.337), whiteFlag.Center.Y + ArtifactLength(0.0688));
-                if (MouseOverStationaryObject(new Blob(expectedLocation), true, 25, 3000))
+                Point expectedLocation = new Point(whiteFlag.Center.X - Screen.ArtifactLength(0.337), whiteFlag.Center.Y + Screen.ArtifactLength(0.0688));
+                if (HandEye.MouseOverStationaryObject(new Blob(expectedLocation), true, 25, 3000))
                 {
                     SafeWait(5500);
-                    MoveMouse(Center.X - ArtifactLength(0.207), Center.Y + ArtifactLength(0.34));
-                    WaitDuringPlayerAnimation(4000);
+                    MoveMouse(Screen.Center.X - Screen.ArtifactLength(0.207), Screen.Center.Y + Screen.ArtifactLength(0.34));
+                    Vision.WaitDuringPlayerAnimation(4000);
                     return true;
                 }
             }
@@ -252,11 +252,11 @@ namespace RunescapeBot.BotPrograms
             
             for (int i = 0; i < 3; i++) //finding the tightrope and failing the mouseover probably means that another player was blocking view of the tightrope during the screen capture
             {
-                if (LocateObject(Tightrope, out tightrope, ArtifactArea(0.00009), ArtifactArea(0.714)))    //ex 0.000357
+                if (Vision.LocateObject(Tightrope, out tightrope, Screen.ArtifactArea(0.00009), Screen.ArtifactArea(0.714)))    //ex 0.000357
                 {
                     Point tightropeStart = tightrope.GetTop();
-                    Point hitboxCenter = new Point(tightropeStart.X, tightropeStart.Y - ArtifactLength(0.0269));
-                    if (MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
+                    Point hitboxCenter = new Point(tightropeStart.X, tightropeStart.Y - Screen.ArtifactLength(0.0269));
+                    if (HandEye.MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
                     {
                         SafeWait(8000);
                         return true;
@@ -276,12 +276,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         private bool JumpToLadderRoof()
         {
-            Point hitboxCenter = new Point(Center.X, Center.Y + ArtifactLength(0.283));
+            Point hitboxCenter = new Point(Screen.Center.X, Screen.Center.Y + Screen.ArtifactLength(0.283));
             Blob hitboxBlob = new Blob(hitboxCenter);
-            if (MouseOverStationaryObject(hitboxBlob, false, 10, 4000))
+            if (HandEye.MouseOverStationaryObject(hitboxBlob, false, 10, 4000))
             {
                 ScanForMarkOfGrace();
-                if (MouseOverStationaryObject(hitboxBlob, true, 10, 3000))
+                if (HandEye.MouseOverStationaryObject(hitboxBlob, true, 10, 3000))
                 {
                     SafeWait(3500);
                     return true;
@@ -296,12 +296,12 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         private bool JumpToChurchRoof()
         {
-            Point hitboxCenter = new Point(Center.X - ArtifactLength(0.498), Center.Y + ArtifactLength(0.200));
+            Point hitboxCenter = new Point(Screen.Center.X - Screen.ArtifactLength(0.498), Screen.Center.Y + Screen.ArtifactLength(0.200));
             Blob hitboxBlob = new Blob(hitboxCenter);
-            if (MouseOverStationaryObject(hitboxBlob, false, 10, 2500))
+            if (HandEye.MouseOverStationaryObject(hitboxBlob, false, 10, 2500))
             {
                 ScanForMarkOfGrace();
-                if (MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
+                if (HandEye.MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
                 {
                     SafeWait(5000);
                     return true;
@@ -316,16 +316,16 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if successful</returns>
         private bool JumpOffTreeRoof()
         {
-            Point hitboxCenter = new Point(Center.X + ArtifactLength(0.069), Center.Y + ArtifactLength(0.069));
+            Point hitboxCenter = new Point(Screen.Center.X + Screen.ArtifactLength(0.069), Screen.Center.Y + Screen.ArtifactLength(0.069));
             Blob hitboxBlob = new Blob(hitboxCenter);
-            if (MouseOverStationaryObject(hitboxBlob, false, 10, 3500))
+            if (HandEye.MouseOverStationaryObject(hitboxBlob, false, 10, 3500))
             {
                 ScanForMarkOfGrace();
-                if (MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
+                if (HandEye.MouseOverStationaryObject(new Blob(hitboxCenter), true, 10, 3000))
                 {
                     SafeWait(3000);
                     Inventory.HoverStandardTeleport(Inventory.StandardTeleports.Camelot, false, false);
-                    WaitDuringPlayerAnimation(3000);
+                    Vision.WaitDuringPlayerAnimation(3000);
                     return true;
                 }
             }
@@ -340,19 +340,19 @@ namespace RunescapeBot.BotPrograms
         private bool ScanForMarkOfGrace(bool returnToOriginalPosition = true)
         {
             Blob markOfGraceBackground, markOfGraceFigure;
-            if (LocateObject(MarkOfGraceBackground, out markOfGraceBackground, ArtifactArea(0.000355), ArtifactArea(0.00142))   //ex 0.000710
-                && LocateObject(MarkOfGraceFigure, out markOfGraceFigure, markOfGraceBackground.LeftBound, markOfGraceBackground.RightBound, markOfGraceBackground.TopBound, markOfGraceBackground.BottomBound, ArtifactArea(0.0000402)))
+            if (Vision.LocateObject(MarkOfGraceBackground, out markOfGraceBackground, Screen.ArtifactArea(0.000355), Screen.ArtifactArea(0.00142))   //ex 0.000710
+                && Vision.LocateObject(MarkOfGraceFigure, out markOfGraceFigure, markOfGraceBackground.LeftBound, markOfGraceBackground.RightBound, markOfGraceBackground.TopBound, markOfGraceBackground.BottomBound, Screen.ArtifactArea(0.0000402)))
             {
                 markOfGraceBackground.AddBlob(markOfGraceFigure);
-                if (MouseOverDroppedItem(markOfGraceBackground, true, 5, 3000))
+                if (HandEye.MouseOverDroppedItem(markOfGraceBackground, true, 5, 3000))
                 {
                     SafeWait(2000);
-                    WaitDuringPlayerAnimation(8000);
+                    Vision.WaitDuringPlayerAnimation(8000);
                     if (returnToOriginalPosition)
                     {
-                        LeftClick(2 * Center.X - markOfGraceBackground.Center.X, 2 * Center.Y - markOfGraceBackground.Center.Y);
+                        LeftClick(2 * Screen.Center.X - markOfGraceBackground.Center.X, 2 * Screen.Center.Y - markOfGraceBackground.Center.Y);
                         SafeWait(2000);
-                        WaitDuringPlayerAnimation(8000);
+                        Vision.WaitDuringPlayerAnimation(8000);
                     }
                 }
             }

@@ -71,7 +71,7 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Execute()
         {
-            ReadWindow();
+            Screen.ReadWindow();
 
             if (Minimap.Hitpoints() > 0.9)
             {
@@ -82,9 +82,9 @@ namespace RunescapeBot.BotPrograms
             if (Overload() || Hitpoints() || Absorption())
             {
                 if (StopFlag) { return false; }
-                Point inventoryCorner = new Point(ScreenWidth - Inventory.INVENTORY_OFFSET_LEFT - Inventory.INVENTORY_GAP_X, ScreenHeight - Inventory.INVENTORY_OFFSET_TOP - Inventory.INVENTORY_GAP_Y);
-                int acceptableAreaRadius = (int) Geometry.DistanceBetweenPoints(Center, inventoryCorner);
-                MouseOverNPC(new Blob(new Point(Center.X, Center.Y)), true, acceptableAreaRadius, 1000);
+                Point inventoryCorner = new Point(Screen.Width - Inventory.INVENTORY_OFFSET_LEFT - Inventory.INVENTORY_GAP_X, Screen.Height - Inventory.INVENTORY_OFFSET_TOP - Inventory.INVENTORY_GAP_Y);
+                int acceptableAreaRadius = (int) Geometry.DistanceBetweenPoints(Screen.Center, inventoryCorner);
+                HandEye.MouseOverNPC(new Blob(new Point(Screen.Center.X, Screen.Center.Y)), true, acceptableAreaRadius, 1000);
             }
 
             return true;
@@ -103,7 +103,7 @@ namespace RunescapeBot.BotPrograms
 
             const double oneHitpoint = 0.035714285714285712;
             RectangleBounds hitpoints = Minimap.HitpointsDigitsArea();
-            double redHitpointsMatch = FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
+            double redHitpointsMatch = Vision.FractionalMatchPiece(HitpointsRed, hitpoints.Left, hitpoints.Right, hitpoints.Top, hitpoints.Bottom);
 
             if (Numerical.WithinRange(redHitpointsMatch, oneHitpoint, 0.01 * oneHitpoint) || (Minimap.Hitpoints() > 0.25))
             {
@@ -148,7 +148,7 @@ namespace RunescapeBot.BotPrograms
             int top = 25;
             int bottom = 59;
 
-            double hundredsPlaceWhite = FractionalMatchPiece(RGBHSBRangeFactory.White(), left, right, top, bottom);
+            double hundredsPlaceWhite = Vision.FractionalMatchPiece(RGBHSBRangeFactory.White(), left, right, top, bottom);
             return Numerical.WithinRange(hundredsPlaceWhite, 0.1476, 0.0005);    //TODO determine good values for range
         }
 
@@ -187,10 +187,10 @@ namespace RunescapeBot.BotPrograms
 
             int left = 478;
             int right = left + 37;
-            int top = ScreenHeight - 198;
+            int top = Screen.Height - 198;
             int bottom = top + 29;
 
-            bool[,] potionTimerSlot = potionTimerSlot = ColorFilterPiece(PotionTimerBackground, left, right, top, bottom);
+            bool[,] potionTimerSlot = potionTimerSlot = Vision.ColorFilterPiece(PotionTimerBackground, left, right, top, bottom);
             double overloadTimerMatch = overloadTimerMatch = ImageProcessing.FractionalMatch(potionTimerSlot);
             return overloadTimerMatch > 0.5;
         }

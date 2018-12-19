@@ -34,7 +34,7 @@ namespace RunescapeBot.BotPrograms
         protected bool WithdrawAshesAndPotions()
         {
             Bank bank;
-            if (!OpenBank(out bank, 2)) { return false; }
+            if (!Banking.OpenBank(out bank, 2)) { return false; }
             bank.DepositInventory();
             bank.WithdrawX(HerbBankSlot.X, HerbBankSlot.Y, HALF_INVENTORY);
             bank.WithdrawX(VialOfWaterBankSlot.X, VialOfWaterBankSlot.Y, HALF_INVENTORY);
