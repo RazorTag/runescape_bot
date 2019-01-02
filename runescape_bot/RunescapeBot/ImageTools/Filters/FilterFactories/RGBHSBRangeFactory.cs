@@ -775,7 +775,6 @@ namespace RunescapeBot.ImageTools
         }
         #endregion
 
-
         #region mouseover description
 
         /// <summary>

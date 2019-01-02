@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RunescapeBot.BotPrograms
+namespace RunescapeBot.BotPrograms.Chat
 {
     public class Conversation
     {
@@ -24,12 +24,12 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// The text box container that hosts player conversations.
         /// </summary>
-        private TextBoxTool TextBox { get; set; }
+        private TextBoxTool TextBox;
 
         /// <summary>
         /// Run parameters that describe the state of the bot program.
         /// </summary>
-        private RunParams RunParams { get; set; }
+        private RunParams RunParams;
 
         /// <summary>
         /// The latest image of the game screen.
@@ -37,31 +37,40 @@ namespace RunescapeBot.BotPrograms
         private GameScreen Screen;
 
         /// <summary>
+        /// Translates images of chat rows into their string values.
+        /// </summary>
+        private ChatReader ChatReader;
+
+        /// <summary>
         /// Only scan the chat when set to true.
         /// </summary>
-        private bool _scanChat { get; set; }
+        private bool _scanChat;
 
         /// <summary>
         /// The different "speakers" for a line of text for the most recent check.
         /// </summary>
-        private ChatRowType[] OtherPlayerChatRows { get; set; }
+        private ChatRow[] OtherPlayerChatRows;
 
         /// <summary>
         /// The different "speakers" for a line of text for the penultimate check.
         /// </summary>
-        private ChatRowType[] _previousChatRows { get; set; }
+        private ChatRow[] _previousChatRows;
 
         /// <summary>
-        /// The different "speakers" for a line of text.
+        /// Identifier for the name tag of the player.
         /// </summary>
-        private enum ChatRowType
+        private string PlayerName
         {
-            Unknown,
-            Empty,
-            Game,
-            Player,
-            OtherPlayer
+            get
+            {
+                if (string.IsNullOrEmpty(_playerName))
+                {
+                    _playerName = DeterminePlayerName();
+                }
+                return _playerName;
+            }
         }
+        private string _playerName;
 
         #endregion
 
@@ -69,8 +78,7 @@ namespace RunescapeBot.BotPrograms
         {
             TextBox = textBox;
             Screen = screen;
-            OtherPlayerChatRows = new ChatRowType[CHAT_ROW_COUNT];
-
+            
             if (_scanChat = conversate)
                 StartConversation();
         }
@@ -81,6 +89,8 @@ namespace RunescapeBot.BotPrograms
         public void StartConversation()
         {
             _scanChat = true;
+            OtherPlayerChatRows = new ChatRow[CHAT_ROW_COUNT];
+            _playerName = "";
             Thread scanChat = new Thread(ScanChat);
             scanChat.Start();
         }
@@ -94,7 +104,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// 
+        /// Keep scanning the chat until told to stop.
         /// </summary>
         private void RunChatScanner()
         {
@@ -112,7 +122,9 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         private void ScanChat()
         {
-            DetermineChatRowSpeakers();
+            Color[,] chatBody = TextBox.ChatBody;
+
+            IdentifyChatRows(chatBody);
             if (MatchCurrentWithPreviousChat())
             {
                 //TODO alert the server
@@ -122,48 +134,30 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Determines which rows in the public chat history are populated by chat from other players.
         /// </summary>
-        private void DetermineChatRowSpeakers()
+        private void IdentifyChatRows(Color[,] chatBody)
         {
             _previousChatRows = OtherPlayerChatRows;
+            RectangleBounds chatRowBounds;
+            Color[,] chatRowImage;
 
-            for (int i = 0; i < CHAT_ROW_COUNT; i++)
+            for (int row = 0; row < CHAT_ROW_COUNT; row++)
             {
-                OtherPlayerChatRows[i] = ChatRowSpeaker(i);
+                chatRowBounds = TextBox.ChatRowLocation(row);
+                chatRowImage = Screen.SubScreen(chatRowBounds);
+                OtherPlayerChatRows[row] = new ChatRow(chatRowImage, PlayerName);
             }
         }
 
-        
-        private ChatRowType ChatRowSpeaker(int row)
-        {
-            RectangleBounds chatRow = TextBox.ChatRowLocation(row);
-            if (PlayerChatRow(chatRow))
-            {
-                return OtherPlayer(chatRow) ? ChatRowType.OtherPlayer : ChatRowType.Player;
-            }
-
-            return ChatRowType.Unknown;
-        }
-
         /// <summary>
-        /// Determines if a row contains chat from a player (including the player).
+        /// Determines the display name of the player.
         /// </summary>
-        /// <param name="row">The row to check for chat from a player.</param>
-        /// <returns>True if the specified row contains chat from a player.</returns>
-        private bool PlayerChatRow(RectangleBounds chatRow)
+        /// <returns>The player's name</returns>
+        private string DeterminePlayerName()
         {
-            double playerChatTextMatch = ImageProcessing.FractionalMatchPiece(Screen, TextBoxTool.PlayerChatText, chatRow.Left, chatRow.Right, chatRow.Top, chatRow.Bottom);
-            bool containsPlayerText = playerChatTextMatch > 0.001;
-            return containsPlayerText;
-        }
-
-        /// <summary>
-        /// Determines if the first row of chat is another player's message.
-        /// </summary>
-        /// <returns>True if the first row of chat is another's player's text.</returns>
-        private bool OtherPlayer(RectangleBounds chatRow)
-        {
-            //TODO
-            return true;
+            RectangleBounds playerRow = TextBox.ChatEntryLocation();
+            Color[,] playerText = Screen.SubScreen(playerRow);
+            //TODO run player chat row through ChatReader to get player name
+            return "";
         }
 
         /// <summary>
@@ -173,24 +167,6 @@ namespace RunescapeBot.BotPrograms
         private bool MatchCurrentWithPreviousChat()
         {
             return false;
-        }
-
-        /// <summary>
-        /// Finds the index of the first true value in a boolean array.
-        /// </summary>
-        /// <param name="array">Arbitrary boolean array.</param>
-        /// <returns>The first true index.</returns>
-        private int FirstTrue(bool[] array)
-        {
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (array[i])
-                {
-                    return i;
-                }
-            }
-
-            return -1;
         }
     }
 }

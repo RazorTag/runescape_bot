@@ -17,9 +17,6 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         public Process Value { get; set; }
 
-
-        private GameScreen Screen;
-
         /// <summary>
         /// Defines how the bot should be run.
         /// </summary>
@@ -30,11 +27,6 @@ namespace RunescapeBot.BotPrograms
             RunParams = runParams;
             Value = ScreenScraper.GetClient();
             ScreenScraper.RSClient = this;
-        }
-
-        public void AddScreen(GameScreen screen)
-        {
-            Screen = screen;
         }
 
         /// <summary>
@@ -53,7 +45,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="forceRestart">Set to true to force a client restart even if the client is already running</param>
         /// <returns>true if client is successfully prepared</returns>
-        public bool PrepareClient(bool forceRestart = false)
+        public bool PrepareClient(GameScreen screen, bool forceRestart = false)
         {
             if (!forceRestart && ScreenScraper.ProcessExists(Value)) { return true; }
 
@@ -76,7 +68,7 @@ namespace RunescapeBot.BotPrograms
                 do
                 {
                     BotProgram.SafeWait(UnitConversions.SecondsToMilliseconds(5));
-                    if (Screen.ReadWindow(false) && (Screen.IsLoggedOut(false) || Screen.IsLoggedIn(false)))
+                    if (screen.ReadWindow(false) && (screen.IsLoggedOut(false) || screen.IsLoggedIn(false)))
                     {
                         return true;
                     }

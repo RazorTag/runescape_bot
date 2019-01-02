@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotManagers\PhasmatysRotation.cs" />
     <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
+    <Compile Include="BotPrograms\Chat\ChatReader.cs" />
     <Compile Include="BotPrograms\Chat\ChatRow.cs" />
     <Compile Include="BotPrograms\Controllers\Banking.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotProgram.cs" />

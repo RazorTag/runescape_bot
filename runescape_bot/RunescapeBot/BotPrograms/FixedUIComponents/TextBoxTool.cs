@@ -20,12 +20,22 @@ namespace RunescapeBot.BotPrograms
         public static RGBHSBRange PlayerChatText = RGBHSBRangeFactory.GenericColor(Color.Blue);
 
         public const int ROW_HEIGHT = 14;
-        public int Left { get { return Screen == null ? 0 : 0; } }
-        public int Right { get { return Screen == null ? 0 : Left + 518; } }
-        public int Top { get { return Screen == null ? 0 : Screen.Height - 165; } }
-        public int Bottom { get { return Screen == null ? 0 : Top + 141; } }
+
+        /// <summary>
+        /// Bounds of the text box (inside the frame of the text box).
+        /// Right boun is inside of the scroll bar.
+        /// </summary>
+        public int Left { get { return Screen.LooksValid() ? 7 : 0; } }
+        public int Right { get { return Screen.LooksValid() ? Left + 488 : 0; } }
+        public int Top { get { return Screen.LooksValid() ? Bottom - 128 : 0; } }
+        public int Bottom { get { return Screen.LooksValid() ? Screen.Height - 30 : 0; } }
         public int Area { get { return (Right - Left) * (Bottom - Top); } }
-        private double PixelSize { get { return 1 / Area; } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Color[,] ChatBody { get { return Screen.SubScreen(Left, Right, Top, Bottom); } }
+        private double PixelSize { get { return 1.0 / Area; } }
 
         #endregion
 
@@ -50,10 +60,21 @@ namespace RunescapeBot.BotPrograms
         public RectangleBounds ChatRowLocation(int rowIndex)
         {
             RectangleBounds rowLocation = new RectangleBounds();
-            rowLocation.Left = Left + 57;
-            rowLocation.Right = Right - 23;
-            rowLocation.Top = Bottom + 35 + (rowIndex * ROW_HEIGHT);
-            rowLocation.Bottom = Bottom + 22 + (rowIndex * ROW_HEIGHT);
+            //TODO
+            return rowLocation;
+        }
+
+        /// <summary>
+        /// Determines the area where the player's display name and typing text appear.
+        /// </summary>
+        /// <returns></returns>
+        public RectangleBounds ChatEntryLocation()
+        {
+            RectangleBounds rowLocation = new RectangleBounds();
+            rowLocation.Left = Left + 4;
+            rowLocation.Right = Right;
+            rowLocation.Top = Bottom - 13;
+            rowLocation.Bottom = rowLocation.Top + ROW_HEIGHT;
             return rowLocation;
         }
 
@@ -66,7 +87,7 @@ namespace RunescapeBot.BotPrograms
         {
             Screen.Value = ScreenScraper.ReadWindow(true);
             ColorFilter filter = RGBHSBRangeGroupFactory.DialogText();
-            double match = ImageProcessing.FractionalMatchPiece(Screen, filter, Left + 126, Right - 126, Top + 46, Bottom - 38);
+            double match = ImageProcessing.FractionalMatchPiece(Screen, filter, Left + 119, Right - 103, Top + 39, Bottom - 32);
             return match;
         }
 

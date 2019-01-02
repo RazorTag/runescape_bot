@@ -48,7 +48,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         internal bool[,] ColorFilter(Color[,] image, ColorFilter artifactColor)
         {
-            if (Screen == null)
+            if (!Screen.LooksValid())
             {
                 return null;
             }
@@ -66,7 +66,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns></returns>
         internal bool[,] ColorFilterPiece(ColorFilter filter, int left, int right, int top, int bottom, out Point trimOffset)
         {
-            if (Screen == null)
+            if (!Screen.LooksValid())
             {
                 trimOffset = new Point(0, 0);
                 return null;

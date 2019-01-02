@@ -1,4 +1,5 @@
-﻿using RunescapeBot.Common;
+﻿using RunescapeBot.BotPrograms.Chat;
+using RunescapeBot.Common;
 using RunescapeBot.FileIO;
 using RunescapeBot.ImageTools;
 using RunescapeBot.UITools;
@@ -154,7 +155,6 @@ namespace RunescapeBot.BotPrograms
 
             RSClient = new RSClient(RunParams);
             Screen = new GameScreen(RSClient, RunParams);
-            RSClient.AddScreen(Screen);
 
             Vision = new Vision(Screen, RunParams);
             Keyboard = new Keyboard(RSClient);
@@ -581,7 +581,7 @@ namespace RunescapeBot.BotPrograms
         /// <returns>true if the failed login is handled satisfactorily. false if the bot should stop</returns>
         private bool HandleFailedLogIn()
         {
-            return RSClient.PrepareClient(true);
+            return RSClient.PrepareClient(Screen, true);
         }
 
         /// <summary>

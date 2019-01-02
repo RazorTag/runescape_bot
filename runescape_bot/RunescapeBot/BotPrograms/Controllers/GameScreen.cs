@@ -1,11 +1,7 @@
 ﻿using RunescapeBot.Common;
 using RunescapeBot.ImageTools;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms
 {
@@ -142,7 +138,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         internal bool ReadWindow(bool checkClient = true, bool fastCapture = false)
         {
-            if (BotProgram.StopFlag || checkClient && !RSClient.PrepareClient()) { return false; }
+            if (BotProgram.StopFlag || checkClient && !RSClient.PrepareClient(this)) { return false; }
 
             Value = null;
 
@@ -187,6 +183,29 @@ namespace RunescapeBot.BotPrograms
             {
                 ReadWindow();
             }
+        }
+
+        /// <summary>
+        /// Gets the specified rectangle of the game screen.
+        /// </summary>
+        /// <param name="left">left bound (inclusive)</param>
+        /// <param name="right">right bound (inclusive)</param>
+        /// <param name="top">top bound (inclusive)</param>
+        /// <param name="bottom">bottom bound (inclusive)</param>
+        /// <returns>A subsection of the game screen.</returns>
+        public Color[,] SubScreen(int left, int right, int top, int bottom)
+        {
+            return ImageProcessing.ScreenPiece(Value, left, right, top, bottom);
+        }
+
+        /// <summary>
+        /// Gets the specified rectangle of the game screen.
+        /// </summary>
+        /// <param name="bounds">Bounds for the four sides of the rectangle (inclusive) that defines a subsection of the screen.</param>
+        /// <returns>A subsection of the game screen.</returns>
+        public Color[,] SubScreen(RectangleBounds bounds)
+        {
+            return SubScreen(bounds.Left, bounds.Right, bounds.Top, bounds.Bottom);
         }
 
         #endregion

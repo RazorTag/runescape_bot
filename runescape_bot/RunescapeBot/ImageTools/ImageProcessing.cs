@@ -281,14 +281,14 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Gets a rectangle from ColorArray
+        /// Gets a rectangle from an image.
         /// </summary>
         /// <param name="image"></param>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
-        /// <returns></returns>
+        /// <param name="left">left bound (inclusive)</param>
+        /// <param name="right">right bound (inclusive)</param>
+        /// <param name="top">top bound (inclusive)</param>
+        /// <param name="bottom">bottom bound (inclusive)</param>
+        /// <returns>A subsection of the screen.</returns>
         public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom, out Point trimOffset)
         {
             if (image == null)
@@ -320,14 +320,14 @@ namespace RunescapeBot.ImageTools
         }
 
         /// <summary>
-        /// Gets a rectangle from ColorArray
+        /// Gets a rectangle from an image.
         /// </summary>
         /// <param name="image"></param>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
-        /// <returns></returns>
+        /// <param name="left">left bound (inclusive)</param>
+        /// <param name="right">right bound (inclusive)</param>
+        /// <param name="top">top bound (inclusive)</param>
+        /// <param name="bottom">bottom bound (inclusive)</param>
+        /// <returns>A subsection of the screen.</returns>
         public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom)
         {
             Point empty;

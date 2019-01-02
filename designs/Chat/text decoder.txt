@@ -1,0 +1,14 @@
+-The first character of the first word is capitalized if it is a letter.
+	*word word -> Word word
+
+-For each word after the first word, each letter after the first letter is coerced to lower case.
+	*WORD WORD word -> Word Word word
+
+-Names are allowed to contain [A-Z], [a-z], '-', and '_'.
+-A row is 14 pixels tall. There is no space between rows.
+-An apostrophe overlaps the bottom two characters of the row above.
+-The two colon dots appear at y=5 and y=9 where y=0 is the top row for a capital letter.
+-5 pixel gap between colon and first letter of chat text.
+-Open parenthesis reduces white space after by 1 (2->1).
+-lose parenthesis reduces white space before by 1 (2->1).
+-Open parenthesis followed by close parenthesis has no white space between.

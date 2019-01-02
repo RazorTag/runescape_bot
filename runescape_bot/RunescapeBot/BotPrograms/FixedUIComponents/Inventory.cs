@@ -48,9 +48,9 @@ namespace RunescapeBot.BotPrograms
         /// <param name="overwrite">set to true to take a screenshot even if one already exists</param>
         private void ManuallySetScreen(bool overwrite)
         {
-            if (overwrite || Screen == null)
+            if (overwrite || !Screen.LooksValid())
             {
-                Screen.Value = ScreenScraper.GetRGB(ScreenScraper.CaptureWindow(true));
+                Screen.ReadWindow();
             }
         }
 
