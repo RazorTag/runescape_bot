@@ -41,6 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -50,6 +51,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>D1492A7859BD53D9B9BE9FF3EFE8C3A0BCA6FE8D</ManifestCertificateThumbprint>
@@ -84,8 +86,10 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotManagers\PhasmatysRotation.cs" />
     <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
-    <Compile Include="BotPrograms\Chat\ChatReader.cs" />
+    <Compile Include="BotPrograms\Chat\Letter.cs" />
+    <Compile Include="BotPrograms\Chat\LetterReader.cs" />
     <Compile Include="BotPrograms\Chat\ChatRow.cs" />
+    <Compile Include="BotPrograms\Chat\Letters.cs" />
     <Compile Include="BotPrograms\Controllers\Banking.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotProgram.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotRegistry.cs" />
@@ -193,6 +197,7 @@
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
     <Compile Include="ImageTools\Cluster.cs" />
     <Compile Include="ImageTools\Filters\ColorFilter.cs" />
+    <Compile Include="ImageTools\Filters\FilterFactories\RGBExactFactory.cs" />
     <Compile Include="ImageTools\Filters\FilterFactories\RGBHSBRangeFactory.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
     <Compile Include="BotPrograms\FixedUIComponents\Inventory.cs" />
@@ -210,6 +215,7 @@
     <Compile Include="BotPrograms\Bots\Phasmatys\GoldBracelets.cs" />
     <Compile Include="BotPrograms\Bots\Combat\LesserDemon.cs" />
     <Compile Include="ImageTools\Filters\FilterFactories\RGBHSBRangeGroupFactory.cs" />
+    <Compile Include="ImageTools\Filters\RGBExact.cs" />
     <Compile Include="ImageTools\Filters\RGBHSBRange.cs" />
     <Compile Include="ImageTools\Filters\HSBRange.cs" />
     <Compile Include="ImageTools\Filters\RGBHSBRangeGroup.cs" />

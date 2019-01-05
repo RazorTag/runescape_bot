@@ -39,7 +39,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Translates images of chat rows into their string values.
         /// </summary>
-        private ChatReader ChatReader;
+        private LetterReader ChatReader;
 
         /// <summary>
         /// Only scan the chat when set to true.
@@ -65,7 +65,8 @@ namespace RunescapeBot.BotPrograms.Chat
             {
                 if (string.IsNullOrEmpty(_playerName))
                 {
-                    _playerName = DeterminePlayerName();
+                    var chatRow = new ChatRow(TextBox.InputImage, "");
+                    _playerName = chatRow.SpeakerName;
                 }
                 return _playerName;
             }
@@ -122,9 +123,9 @@ namespace RunescapeBot.BotPrograms.Chat
         /// </summary>
         private void ScanChat()
         {
-            Color[,] chatBody = TextBox.ChatBody;
+            Color[,] chatBody = TextBox.TextBoxImage;
 
-            IdentifyChatRows(chatBody);
+            ReadChatRows(chatBody);
             if (MatchCurrentWithPreviousChat())
             {
                 //TODO alert the server
@@ -134,30 +135,16 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Determines which rows in the public chat history are populated by chat from other players.
         /// </summary>
-        private void IdentifyChatRows(Color[,] chatBody)
+        private void ReadChatRows(Color[,] chatBody)
         {
             _previousChatRows = OtherPlayerChatRows;
-            RectangleBounds chatRowBounds;
             Color[,] chatRowImage;
 
             for (int row = 0; row < CHAT_ROW_COUNT; row++)
             {
-                chatRowBounds = TextBox.ChatRowLocation(row);
-                chatRowImage = Screen.SubScreen(chatRowBounds);
+                chatRowImage = TextBox.ChatRowImage(row);
                 OtherPlayerChatRows[row] = new ChatRow(chatRowImage, PlayerName);
             }
-        }
-
-        /// <summary>
-        /// Determines the display name of the player.
-        /// </summary>
-        /// <returns>The player's name</returns>
-        private string DeterminePlayerName()
-        {
-            RectangleBounds playerRow = TextBox.ChatEntryLocation();
-            Color[,] playerText = Screen.SubScreen(playerRow);
-            //TODO run player chat row through ChatReader to get player name
-            return "";
         }
 
         /// <summary>

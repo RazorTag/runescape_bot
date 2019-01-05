@@ -23,19 +23,52 @@ namespace RunescapeBot.BotPrograms
 
         /// <summary>
         /// Bounds of the text box (inside the frame of the text box).
-        /// Right boun is inside of the scroll bar.
+        /// Right bound is inside of the scroll bar.
         /// </summary>
         public int Left { get { return Screen.LooksValid() ? 7 : 0; } }
         public int Right { get { return Screen.LooksValid() ? Left + 488 : 0; } }
         public int Top { get { return Screen.LooksValid() ? Bottom - 128 : 0; } }
         public int Bottom { get { return Screen.LooksValid() ? Screen.Height - 30 : 0; } }
-        public int Area { get { return (Right - Left) * (Bottom - Top); } }
 
         /// <summary>
-        /// 
+        /// The y-coordinate of the lin that divides the input box from the chat history box.
         /// </summary>
-        public Color[,] ChatBody { get { return Screen.SubScreen(Left, Right, Top, Bottom); } }
+        public int InputDivider { get { return Screen.LooksValid() ? Bottom - 15 : 0; } }
+
+        /// <summary>
+        /// Area of the full text box.
+        /// </summary>
+        public int Area { get { return (Right - Left + 1) * (Bottom - Top + 1); } }
         private double PixelSize { get { return 1.0 / Area; } }
+
+        /// <summary>
+        /// Image of the full text box
+        /// </summary>
+        public Color[,] TextBoxImage { get { return Screen.SubScreen(Left, Right, Top, Bottom); } }
+
+        /// <summary>
+        /// The location of the chat row within the input box.
+        /// </summary>
+        public RectangleBounds InputLocation
+        {
+            get
+            {
+                int top = InputDivider + 2;
+                int bottom = top + (ROW_HEIGHT - 1);
+                return new RectangleBounds(Left, Right, top, bottom);
+            }
+        }
+
+        /// <summary>
+        /// Image of the chat row within the input box.
+        /// </summary>
+        public Color[,] InputImage
+        {
+            get
+            {
+                return Screen.SubScreen(InputLocation);
+            }
+        }
 
         #endregion
 
@@ -59,9 +92,21 @@ namespace RunescapeBot.BotPrograms
         /// <returns>The bounds of the area containing the text for the specified row.</returns>
         public RectangleBounds ChatRowLocation(int rowIndex)
         {
-            RectangleBounds rowLocation = new RectangleBounds();
-            //TODO
+            int bottom = InputDivider - 1;
+            int top = bottom - (ROW_HEIGHT - 1);
+            RectangleBounds rowLocation = new RectangleBounds(Left, Right, top, bottom);
             return rowLocation;
+        }
+
+        /// <summary>
+        /// Gets an image of the specified chat row.
+        /// </summary>
+        /// <param name="rowIndex"></param>
+        /// <returns></returns>
+        public Color[,] ChatRowImage(int rowIndex)
+        {
+            RectangleBounds bounds = ChatRowLocation(rowIndex);
+            return Screen.SubScreen(bounds);
         }
 
         /// <summary>
@@ -74,7 +119,7 @@ namespace RunescapeBot.BotPrograms
             rowLocation.Left = Left + 4;
             rowLocation.Right = Right;
             rowLocation.Top = Bottom - 13;
-            rowLocation.Bottom = rowLocation.Top + ROW_HEIGHT;
+            rowLocation.Bottom = rowLocation.Top + (ROW_HEIGHT - 1);
             return rowLocation;
         }
 

@@ -1,7 +1,15 @@
-﻿namespace RunescapeBot.BotPrograms.Chat
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RunescapeBot.BotPrograms.Chat
 {
     public static class Letters
     {
+        #region characters
+
         //Capital letters
         static readonly int[] A = { 0b_0011_1111_1100, 0b_0100_1000_0000, 0b_1000_1000_0000, 0b_1000_1000_0000, 0b_0100_1000_0000, 0b_0011_1111_1100 };
         static readonly int[] B = { 0b_1111_1111_1100, 0b_1000_1000_0100, 0b_1000_1000_0100, 0b_1000_1000_0100, 0b_0111_0111_1000 };
@@ -86,9 +94,74 @@
         static readonly int[] closeAngleBracket = { 0b_0100_0001_0000, 0b_0010_0010_0000, 0b_0010_0010_0000, 0b_0010_0010_0000, 0b_0001_0100_0000, 0b_0000_1000_0000 }; //>
         static readonly int[] comma = { 0b_0000_0001_0010, 0b_0000_0001_1100 }; //,
         static readonly int[] period = { 0b_0000_0000_0100 }; //.
-        static readonly int[] question = { 0b_1000_0000_0000, 0b_0000_0000_0000, 0b_0000_0000_0000, 0b_0000_0111, 0100, 0b_0000_1000_0000, 0b_0001_0000_0000, 0b_1110_0000_0000 }; //?
+        static readonly int[] question = { 0b_1000_0000_0000, 0b_0000_0000_0000, 0b_0000_0000_0000, 0b_0000_0111_0100, 0b_0000_1000_0000, 0b_0001_0000_0000, 0b_1110_0000_0000 }; //?
         static readonly int[] forwardSlash = { 0b_0000_0001_1100, 0b_0000_1110_0000, 0b_0111_0000_0000, 0b_1000_0000_0000 }; //"/"
         static readonly int[] backslash = { 0b_1000_0000_0000, 0b_0111_0000_0000, 0b_0000_1110_0000, 0b_0000_0001_1100 }; //"\"
         static readonly int[] pipe = { 0b_1111_1111_1100 }; //|
+
+        #endregion
+
+        #region accumulators
+
+        /// <summary>
+        /// Adds all characters to a list of Character.
+        /// </summary>
+        /// <param name="charList">A list to store Character.</param>
+        public static void AddAllCharacters(List<Letter> letterList)
+        {
+            AddLetters(letterList);
+            AddSymbols(letterList);
+        }
+
+        /// <summary>
+        /// Adds all letters to a list of Character.
+        /// </summary>
+        /// <param name="charList">A list to store Character.</param>
+        public static void AddLetters(List<Letter> letterList)
+        {
+            AddUpperLetters(letterList);
+            AddLowerLetters(letterList);
+        }
+
+        /// <summary>
+        /// Adds uppercase letters to a list of Character.
+        /// </summary>
+        /// <param name="charList">A list to store Character.</param>
+        public static void AddUpperLetters(List<Letter> letterList)
+        {
+            AddLetter(letterList, A, "A");
+            //TODO
+        }
+
+        /// <summary>
+        /// Adds lowercase letters to a list of Character.
+        /// </summary>
+        /// <param name="charList">A list to store Character.</param>
+        public static void AddLowerLetters(List<Letter> letterList)
+        {
+            //TODO
+        }
+
+        /// <summary>
+        /// Adds punctuation and symbols to a list of Character.
+        /// </summary>
+        /// <param name="charList">A list to store Character.</param>
+        public static void AddSymbols(List<Letter> letterList)
+        {
+            //TODO
+        }
+
+        /// <summary>
+        /// Adds a Letter to a list.
+        /// </summary>
+        /// <param name="letterList">the list to add to</param>
+        /// <param name="bitmap">column values for the letter</param>
+        /// <param name="value">the letter's string value</param>
+        private static void AddLetter(List<Letter> letterList, int[] bitmap, string value)
+        {
+            letterList.Add(new Letter(bitmap, value));
+        }
+
+        #endregion
     }
 }
