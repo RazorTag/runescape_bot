@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Windows.Forms;
 
 namespace RunescapeBot.BotPrograms
@@ -14,7 +15,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bitmap"></param>
         /// <param name="filePath"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(Bitmap bitmap, string filePath = "C:\\Projects\\Roboport\\debug_pictures\\test.png")
+        public static void SaveImageToFile(Bitmap bitmap, string filePath)
         {
             if (System.IO.File.Exists(filePath))
             {
@@ -40,7 +41,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="rgbArray"></param>
         /// <param name="filePath"></param>
         /// <param name="format"></param>
-        public static void SaveImageToFile(Color[,] rgbArray, string filePath = "C:\\Projects\\Roboport\\debug_pictures\\test.png")
+        public static void SaveImageToFile(Color[,] rgbArray, string filePath)
         {
             Bitmap bitmap = new Bitmap(rgbArray.GetLength(0), rgbArray.GetLength(1));
             for (int x = 0; x < rgbArray.GetLength(0); x++)
@@ -58,9 +59,30 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>a color array of an image</returns>
-        public static Color[,] LoadImageFromFile(string filePath = "C:\\Projects\\Roboport\\debug_pictures\\test.png")
+        public static Color[,] LoadImageFromFile(string filePath)
         {
             Bitmap bitmap = (Bitmap)Image.FromFile(filePath);
+            return BitmapToColorArray(bitmap);
+        }
+
+        /// <summary>
+        /// Loads an image from a Stream.
+        /// </summary>
+        /// <param name="stream">Stream to load from</param>
+        /// <returns>a color array of an image</returns>
+        public static Color[,] LoadImageFromStream(Stream stream)
+        {
+            Bitmap bitmap = (Bitmap)Image.FromStream(stream);
+            return BitmapToColorArray(bitmap);
+        }
+
+        /// <summary>
+        /// Converts a bitmap to color array image.
+        /// </summary>
+        /// <param name="bitmap">bitmap to convert</param>
+        /// <returns>a color array image</returns>
+        public static Color[,] BitmapToColorArray(Bitmap bitmap)
+        {
             Color[,] image = new Color[bitmap.Width, bitmap.Height];
             for (int x = 0; x < bitmap.Width; x++)
             {

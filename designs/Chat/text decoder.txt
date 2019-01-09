@@ -10,5 +10,5 @@
 -The two colon dots appear at y=5 and y=9 where y=0 is the top row for a capital letter.
 -5 pixel gap between colon and first letter of chat text.
 -Open parenthesis reduces white space after by 1 (2->1).
--lose parenthesis reduces white space before by 1 (2->1).
+-Close parenthesis reduces white space before by 1 (2->1).
 -Open parenthesis followed by close parenthesis has no white space between.

@@ -27,19 +27,9 @@ namespace RunescapeBot.BotPrograms.Chat
         private TextBoxTool TextBox;
 
         /// <summary>
-        /// Run parameters that describe the state of the bot program.
-        /// </summary>
-        private RunParams RunParams;
-
-        /// <summary>
         /// The latest image of the game screen.
         /// </summary>
         private GameScreen Screen;
-
-        /// <summary>
-        /// Translates images of chat rows into their string values.
-        /// </summary>
-        private LetterReader ChatReader;
 
         /// <summary>
         /// Only scan the chat when set to true.

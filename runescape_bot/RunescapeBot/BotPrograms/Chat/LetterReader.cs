@@ -54,14 +54,14 @@ namespace RunescapeBot.BotPrograms.Chat
         /// </summary>
         /// <param name="pixelColumns"></param>
         /// <returns>The identified letter. Empty string if letter is unknown.</returns>
-        public string ReadLetter(int[] pixelColumns)
+        public string ReadLetter(List<int> pixelColumns)
         {
             TrieNode node = TrieHead;
-            for (int i = 0; i < pixelColumns.Length; i++)
+            for (int i = 0; i < pixelColumns.Count; i++)
             {
-                if (!node.NextColumn(node, pixelColumns[i]))
+                if (!node.NextColumn(ref node, pixelColumns[i]))
                 {
-                    break;
+                    return "";
                 }
             }
 
@@ -132,6 +132,8 @@ namespace RunescapeBot.BotPrograms.Chat
             /// <param name="letter">The letter that ends here.</param>
             public void MarkEndOfLetter(string letter)
             {
+                if (!string.IsNullOrEmpty(Letter))
+                    throw new Exception("Duplicate letters " + Letter + " and " + letter);
                 Letter = letter;
             }
 
@@ -141,7 +143,7 @@ namespace RunescapeBot.BotPrograms.Chat
             /// <param name="node">the current pixel column node</param>
             /// <param name="pixelColumn">the next pixel column</param>
             /// <returns>True if a node exists for the next pixel column</returns>
-            public bool NextColumn(TrieNode node, int pixelColumn)
+            public bool NextColumn(ref TrieNode node, int pixelColumn)
             {
                 TrieNode nextNode;
                 bool nextNodeExists;

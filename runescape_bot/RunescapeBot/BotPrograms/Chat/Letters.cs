@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
-    public static class Letters
+    internal static class Letters
     {
         #region characters
 
@@ -82,8 +78,9 @@ namespace RunescapeBot.BotPrograms.Chat
         static readonly int[] underscore = { 0b_0000_0000_0100, 0b_0000_0000_0100, 0b_0000_0000_0100, 0b_0000_0000_0100, 0b_0000_0000_0100, 0b_0000_0000_0100, 0b_0000_0000_0100 }; //_
         static readonly int[] minus = { 0b_0000_0100_0000, 0b_0000_0100_0000, 0b_0000_0100_0000, 0b_0000_0100_0000 }; //-
         static readonly int[] plus = { 0b_0000_0100_0000, 0b_0000_0100_0000, 0b_0000_0100_0000, 0b_0011_1111_1000, 0b_0000_0100_0000, 0b_0000_0100_0000, 0b_0000_0100_0000 }; //+
+        static readonly int[] equal = { 0b_0000_1001_0000, 0b_0000_1001_0000, 0b_0000_1001_0000, 0b_0000_1001_0000, 0b_0000_1001_0000, 0b_0000_1001_0000 }; //=
         static readonly int[] openCurlyBracket = { 0b_0000_0100_0000, 0b_0000_1010_0000, 0b_0111_0001_1100, 0b_1000_0000_0010, 0b_1000_0000_0010 }; //{
-        static readonly int[] closeCurlyBracet = { 0b_1000_0000_0010, 0b_1000_0000_0010, 0b_0111_0001_1100, 0b_0000_1010_0000, 0b_0000_0100_0000 }; //}
+        static readonly int[] closeCurlyBracket = { 0b_1000_0000_0010, 0b_1000_0000_0010, 0b_0111_0001_1100, 0b_0000_1010_0000, 0b_0000_0100_0000 }; //}
         static readonly int[] openSquareBracket = { 0b_1111_1111_1110, 0b_1000_0000_0010, 0b_1000_0000_0010, 0b_1000_0000_0010 }; //[
         static readonly int[] closeSquareBracket = { 0b_1000_0000_0010, 0b_1000_0000_0010, 0b_1000_0000_0010, 0b_1111_1111_1110 }; //]
         static readonly int[] colon = { 0b_0000_1000_0100 }; //:
@@ -97,7 +94,13 @@ namespace RunescapeBot.BotPrograms.Chat
         static readonly int[] question = { 0b_1000_0000_0000, 0b_0000_0000_0000, 0b_0000_0000_0000, 0b_0000_0111_0100, 0b_0000_1000_0000, 0b_0001_0000_0000, 0b_1110_0000_0000 }; //?
         static readonly int[] forwardSlash = { 0b_0000_0001_1100, 0b_0000_1110_0000, 0b_0111_0000_0000, 0b_1000_0000_0000 }; //"/"
         static readonly int[] backslash = { 0b_1000_0000_0000, 0b_0111_0000_0000, 0b_0000_1110_0000, 0b_0000_0001_1100 }; //"\"
-        static readonly int[] pipe = { 0b_1111_1111_1100 }; //|
+        //static readonly int[] pipe = { 0b_1111_1111_1100 }; //|   cannot be used since it matches a lowercase l
+
+        //Combination letters
+        static int[] openCloseParenthesis = ConcatenateLetters(openParenthesis, closeParenthesis); //()
+        static int[] openCloseCurlyBrackets = ConcatenateLetters(openCurlyBracket, closeCurlyBracket); //{}
+        static int[] openCloseSquareBrackets = ConcatenateLetters(openSquareBracket, closeSquareBracket); //[]
+        static int[] openCloseAngleBrackets = ConcatenateLetters(openAngleBracket, closeAngleBracket); //<>
 
         #endregion
 
@@ -107,7 +110,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// Adds all characters to a list of Character.
         /// </summary>
         /// <param name="charList">A list to store Character.</param>
-        public static void AddAllCharacters(List<Letter> letterList)
+        internal static void AddAllCharacters(List<Letter> letterList)
         {
             AddLetters(letterList);
             AddSymbols(letterList);
@@ -117,7 +120,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// Adds all letters to a list of Character.
         /// </summary>
         /// <param name="charList">A list to store Character.</param>
-        public static void AddLetters(List<Letter> letterList)
+        internal static void AddLetters(List<Letter> letterList)
         {
             AddUpperLetters(letterList);
             AddLowerLetters(letterList);
@@ -127,28 +130,108 @@ namespace RunescapeBot.BotPrograms.Chat
         /// Adds uppercase letters to a list of Character.
         /// </summary>
         /// <param name="charList">A list to store Character.</param>
-        public static void AddUpperLetters(List<Letter> letterList)
+        internal static void AddUpperLetters(List<Letter> letterList)
         {
             AddLetter(letterList, A, "A");
-            //TODO
+            AddLetter(letterList, B, "B");
+            AddLetter(letterList, C, "C");
+            AddLetter(letterList, D, "D");
+            AddLetter(letterList, E, "E");
+            AddLetter(letterList, F, "F");
+            AddLetter(letterList, G, "G");
+            AddLetter(letterList, H, "H");
+            AddLetter(letterList, I, "I");
+            AddLetter(letterList, J, "J");
+            AddLetter(letterList, K, "K");
+            AddLetter(letterList, L, "L");
+            AddLetter(letterList, M, "M");
+            AddLetter(letterList, N, "N");
+            AddLetter(letterList, O, "O");
+            AddLetter(letterList, P, "P");
+            AddLetter(letterList, Q, "Q");
+            AddLetter(letterList, R, "R");
+            AddLetter(letterList, S, "S");
+            AddLetter(letterList, T, "T");
+            AddLetter(letterList, U, "U");
+            AddLetter(letterList, V, "V");
+            AddLetter(letterList, W, "W");
+            AddLetter(letterList, X, "X");
+            AddLetter(letterList, Y, "Y");
+            AddLetter(letterList, Z, "Z");
         }
 
         /// <summary>
         /// Adds lowercase letters to a list of Character.
         /// </summary>
         /// <param name="charList">A list to store Character.</param>
-        public static void AddLowerLetters(List<Letter> letterList)
+        internal static void AddLowerLetters(List<Letter> letterList)
         {
-            //TODO
+            AddLetter(letterList, a, "a");
+            AddLetter(letterList, b, "b");
+            AddLetter(letterList, c, "c");
+            AddLetter(letterList, d, "d");
+            AddLetter(letterList, e, "e");
+            AddLetter(letterList, f, "f");
+            AddLetter(letterList, g, "g");
+            AddLetter(letterList, h, "h");
+            AddLetter(letterList, i, "i");
+            AddLetter(letterList, j, "j");
+            AddLetter(letterList, k, "l");
+            AddLetter(letterList, l, "l");
+            AddLetter(letterList, m, "m");
+            AddLetter(letterList, n, "n");
+            AddLetter(letterList, o, "o");
+            AddLetter(letterList, p, "p");
+            AddLetter(letterList, q, "q");
+            AddLetter(letterList, r, "r");
+            AddLetter(letterList, s, "s");
+            AddLetter(letterList, t, "t");
+            AddLetter(letterList, u, "u");
+            AddLetter(letterList, v, "v");
+            AddLetter(letterList, w, "w");
+            AddLetter(letterList, x, "x");
+            AddLetter(letterList, y, "y");
+            AddLetter(letterList, z, "z");
         }
 
         /// <summary>
         /// Adds punctuation and symbols to a list of Character.
         /// </summary>
         /// <param name="charList">A list to store Character.</param>
-        public static void AddSymbols(List<Letter> letterList)
+        internal static void AddSymbols(List<Letter> letterList)
         {
-            //TODO
+            AddLetter(letterList, openSingleQuote, "`");
+            AddLetter(letterList, tilde, "~");
+            AddLetter(letterList, exclamation, "!");
+            AddLetter(letterList, at, "@");
+            AddLetter(letterList, pound, "#");
+            AddLetter(letterList, dollar, "$");
+            AddLetter(letterList, percent, "%");
+            AddLetter(letterList, caret, "^");
+            AddLetter(letterList, ampersand, "&");
+            AddLetter(letterList, asterisk, "*");
+            AddLetter(letterList, openParenthesis, "(");
+            AddLetter(letterList, closeParenthesis, ")");
+            AddLetter(letterList, openCloseParenthesis, "()");
+            AddLetter(letterList, underscore, "_");
+            AddLetter(letterList, minus, "-");
+            AddLetter(letterList, plus, "+");
+            AddLetter(letterList, equal, "=");
+            AddLetter(letterList, openCurlyBracket, "{");
+            AddLetter(letterList, closeCurlyBracket, "}");
+            AddLetter(letterList, openSquareBracket, "[");
+            AddLetter(letterList, closeSquareBracket, "]");
+            AddLetter(letterList, colon, ":");
+            AddLetter(letterList, semicolon, ";");
+            AddLetter(letterList, apostrophe, "\'");
+            AddLetter(letterList, doubleQuote, "\"");
+            AddLetter(letterList, openAngleBracket, "<");
+            AddLetter(letterList, closeAngleBracket, ">");
+            AddLetter(letterList, comma, ",");
+            AddLetter(letterList, period, ".");
+            AddLetter(letterList, question, "?");
+            AddLetter(letterList, forwardSlash, "/");
+            AddLetter(letterList, backslash, "\\");
         }
 
         /// <summary>
@@ -160,6 +243,24 @@ namespace RunescapeBot.BotPrograms.Chat
         private static void AddLetter(List<Letter> letterList, int[] bitmap, string value)
         {
             letterList.Add(new Letter(bitmap, value));
+        }
+
+        /// <summary>
+        /// Concatenates the pixel columns for multiple letters.
+        /// </summary>
+        /// <param name="letters">List of pixel column arrays for multiple letters.</param>
+        /// <returns>Concatenated pixel column arrays.</returns>
+        private static int[] ConcatenateLetters(params int[][] letters)
+        {
+            var combinedLetter = new List<int>();
+            for (int letter = 0; letter < letters.Length; letter++)
+            {
+                for (int column = 0; column < letters[letter].Length; column++)
+                {
+                    combinedLetter.Add(column);
+                }
+            }
+            return combinedLetter.ToArray();
         }
 
         #endregion

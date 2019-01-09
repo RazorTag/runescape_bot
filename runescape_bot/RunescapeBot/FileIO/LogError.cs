@@ -33,6 +33,15 @@ namespace RunescapeBot.FileIO
         }
 
         /// <summary>
+        /// Logs a simple message.
+        /// </summary>
+        /// <param name="message">message to log</param>
+        public static void LogMessage(string message)
+        {
+            File.WriteAllText(FilePath, message);
+        }
+
+        /// <summary>
         /// Logs basic error information. This will overwrite an existing error log.
         /// </summary>
         /// <param name="e">the exception to log an error for</param>

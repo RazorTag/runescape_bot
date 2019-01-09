@@ -51,7 +51,7 @@ namespace RunescapeBot.BotPrograms.Chat
             int pow = 1;
             int value = 0;
 
-            for (int i = 0; i < pixelColumn.Length; i++)
+            for (int i = pixelColumn.Length-1; i >= 0; i--)
             {
                 if (pixelColumn[i])
                     value += pow;

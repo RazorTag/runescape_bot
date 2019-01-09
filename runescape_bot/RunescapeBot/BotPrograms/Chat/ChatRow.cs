@@ -16,18 +16,14 @@ namespace RunescapeBot.BotPrograms.Chat
         #region properties
 
         /// <summary>
-        /// The color of a player name tag
-        /// </summary>
-        public Color NameColor = Color.Black;
-
-        /// <summary>
         /// The different "speakers" for a line of text.
         /// </summary>
         public enum ChatRowType
         {
+            Undetermined,
             Unknown,
             Empty,
-            Player,         //blue
+            ThisPlayer,         //blue
             OtherPlayer,    //blue
             GameMessage,    //black
             PlayerAlert     //purple
@@ -36,7 +32,20 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// The type of speaker that wrote the chat row.
         /// </summary>
-        public ChatRowType SpeakerType;
+        public ChatRowType Type
+        {
+            get
+            {
+                if (_speakerType == ChatRowType.Undetermined)
+                    ChatRowSpeaker();
+                return _speakerType;
+            }
+            private set
+            {
+                _speakerType = value;
+            }
+        }
+        private ChatRowType _speakerType;
 
         /// <summary>
         /// Image of this chat row.
@@ -58,6 +67,20 @@ namespace RunescapeBot.BotPrograms.Chat
         private string _speakerName;
 
         /// <summary>
+        /// Chat message.
+        /// </summary>
+        public string Message
+        {
+            get
+            {
+                if (_message == null)
+                    _message = GetMessage();
+                return _message;
+            }
+        }
+        private string _message;
+
+        /// <summary>
         /// Display name of the player being controlled by this bot.
         /// </summary>
         public string PlayerName;
@@ -65,7 +88,17 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// The distance in pixels from the left edge (inclusive) of the chat row to the start of chat text (exclusive).
         /// </summary>
-        private int SpeakerNameWidth;
+        private int SpeakerNameWidth
+        {
+            get
+            {
+                if (Type != ChatRowType.OtherPlayer && Type != ChatRowType.ThisPlayer)
+                    return 0;
+                return _speakerNameWidth;
+            }
+            set { _speakerNameWidth = value; }
+        }
+        private int _speakerNameWidth;
 
         /// <summary>
         /// Reads individual letters in the chat row.
@@ -92,7 +125,15 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Leftmost column where text can appear.
         /// </summary>
-        private const int LEFT = 4;
+        private const int LEFT = 0;
+
+        /// <summary>
+        /// Minimum number of empty columns required for a space between words.
+        /// </summary>
+        private const int MIN_SPACE_WIDTH = 3;
+
+        //Empty column value
+        static readonly int EMPTY = 0;
 
         #endregion
 
@@ -118,15 +159,20 @@ namespace RunescapeBot.BotPrograms.Chat
         /// Determines the type of speaker for this chat row.
         /// </summary>
         /// <returns>The speaker type</returns>
-        private ChatRowType ChatRowSpeaker()
+        private void ChatRowSpeaker()
         {
+            ChatRowType speaker;
+
             if (PlayerChatRow())
             {
-                GetSpeakerName();
-                return OtherPlayer() ? ChatRowType.OtherPlayer : ChatRowType.Player;
+                speaker = OtherPlayer() ? ChatRowType.OtherPlayer : ChatRowType.ThisPlayer;
+            }
+            else
+            {
+                speaker = ChatRowType.Unknown;
             }
 
-            return ChatRowType.Unknown;
+            Type = speaker;
         }
 
         /// <summary>
@@ -169,12 +215,21 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <returns>speaker name tag</returns>
         private string GetSpeakerName()
         {
-            Color[,] readableArea = ImageProcessing.ScreenPiece(RowImage, LEFT, RowImage.Length - 1, 0, ROWS_TO_READ - 1);
+            Color[,] readableArea = ImageProcessing.ScreenPiece(RowImage, LEFT, RowImage.GetLength(0), 0, ROWS_TO_READ - 1);
             bool[,] nameTag = ImageProcessing.ColorFilter(readableArea, RGBExactFactory.PlayerChatName);
             string name = ReadText(nameTag);
+            return name.Trim(' ', ':');
+        }
 
-            name.Trim(' ', ':');
-            return name;
+        /// <summary>
+        /// Gets the chat message for this chat row.
+        /// </summary>
+        /// <returns>chat message string representation</returns>
+        private string GetMessage()
+        {
+            Color[,] readableArea = ImageProcessing.ScreenPiece(RowImage, SpeakerNameWidth + 1, RowImage.GetLength(0), 0, ROWS_TO_READ - 1);
+            bool[,] message = ImageProcessing.ColorFilter(RowImage, RGBExactFactory.PlayerChatText);
+            return ReadText(message);
         }
 
         /// <summary>
@@ -184,7 +239,80 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <returns>translated text string</returns>
         private string ReadText(bool[,] text)
         {
-            return "";  //TODO
+            int blanks = 0;
+            int[] columns = GetColumnValues(text);
+            var letterColumns = new List<int>();
+            var letters = new List<string>();
+
+            for (int i = 0; i < columns.Length; i++)
+            {
+                if (columns[i] == EMPTY)
+                {
+                    AddLetterColumns(letterColumns, letters);
+                    blanks++;
+                }
+                else
+                {
+                    if (blanks >= MIN_SPACE_WIDTH)
+                        letters.Add(" ");
+                    blanks = 0;
+                    letterColumns.Add(columns[i]);
+                }
+            }
+
+            return string.Concat(letters);
+        }
+
+        /// <summary>
+        /// Adds the letter represented by the list of letter columns to the list of letters.
+        /// Does nothing if the columns do not match a recorded letter.
+        /// </summary>
+        /// <param name="letterColumns">list of column values that might represent a letter</param>
+        /// <param name="letters">list of letters</param>
+        private void AddLetterColumns(List<int> letterColumns, List<string> letters)
+        {
+            if (letterColumns.Count > 0)
+            {
+                letters.Add(Reader.ReadLetter(letterColumns));
+                letterColumns.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Adds a letter to the list if it is valid.
+        /// </summary>
+        /// <param name="letters">list of letters</param>
+        /// <param name="letter">letter to add</param>
+        private static void AddLetter(List<string> letters, string letter)
+        {
+            if (!string.IsNullOrEmpty(letter))
+            {
+                letters.Add(letter);
+            }
+        }
+
+        /// <summary>
+        /// Calculates the column values for a binary image of text.
+        /// </summary>
+        /// <param name="filteredImage">binary image of text</param>
+        /// <returns>Column values for he image (left to right)</returns>
+        private static int[] GetColumnValues(bool[,] filteredImage)
+        {
+            int columns = filteredImage.GetLength(0);
+            int rows = filteredImage.GetLength(1);
+            bool[] column = new bool[rows];
+            int[] columnValues = new int[columns];
+
+            for (int x = 0; x < columns; x++)
+            {
+                for (int y = 0; y < rows; y++)
+                {
+                    column[y] = filteredImage[x, y];
+                }
+                columnValues[x] = Letter.ColumnValue(column);
+            }
+
+            return columnValues;
         }
 
         #endregion

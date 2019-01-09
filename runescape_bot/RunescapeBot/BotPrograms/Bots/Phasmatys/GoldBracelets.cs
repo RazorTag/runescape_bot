@@ -25,38 +25,6 @@ namespace RunescapeBot.BotPrograms
 
         protected override bool Run()
         {
-            //ReadWindow();
-            //DebugUtilities.SaveImageToFile(Bitmap);
-
-            //ReadWindow();
-            //bool[,] furnaceIcon = ColorFilter(FurnaceIconOrange);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, FurnaceIconOrange, furnaceIcon, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnaceIcon");
-
-            //ReadWindow();
-            //MaskTest(BankIconDollar);
-
-            //ReadWindow();
-            //bool[,] furnace = ColorFilter(Furnace);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, Furnace, furnace, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "furnace");
-
-            //MaskTest(RGBHSBRangeFactory.BankBoothPhasmatys());
-
-            //ReadWindow();
-            //bankPopup = new Bank(ScreenWidth, ScreenHeight);
-
-            //ReadWindow();
-            //MakeX makeX = new MakeX(0, 0, RSClient);
-            //bool test = makeX.WaitForEnterAmount(60000);
-
-            //ReadWindow();
-            //FurnaceCrafting crafting = new FurnaceCrafting(RSClient);
-            //crafting.MakeBracelets(FurnaceCrafting.Jewel.None, 27, 60000);
-
-            //ReadWindow();
-            //RGBHSBRange floor = RGBHSBRangeFactory.PhasmatysBuildingFloorLight();
-            //bool[,] mask = ColorFilter(floor);
-            //DebugUtilities.TestMask(Bitmap, ColorArray, floor, mask, "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", "floor");
-
             return true;
         }
 

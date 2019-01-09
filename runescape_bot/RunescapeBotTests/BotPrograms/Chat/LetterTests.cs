@@ -12,14 +12,13 @@ namespace RunescapeBot.BotPrograms.Chat.Tests
     public class LetterTests
     {
         [TestMethod()]
-        [DataRow(new bool[] { false }, 0)]
-        [DataRow(new bool[] { true, false, true, true, false }, 13)]
         [DataRow(new bool[] { false, false, false, false, false, false }, 0)]
         [DataRow(new bool[] { true, true, true, true }, 15)]
+        [DataRow(new bool[] { true, true, true, true, true, true, true, true, true, true, false, false }, 4092)]
         public void ColumnValueTest(bool[] column, int expected)
         {
             int value = Letter.ColumnValue(column);
-            Assert.AreEqual(value, expected);
+            Assert.AreEqual(expected, value);
         }
     }
 }
