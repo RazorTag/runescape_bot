@@ -206,7 +206,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <returns>True if the first row of chat is another's player's text.</returns>
         private bool OtherPlayer()
         {
-            return SpeakerName == PlayerName;
+            return SpeakerName != PlayerName;
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace RunescapeBot.BotPrograms.Chat
         private string GetMessage()
         {
             Color[,] readableArea = ImageProcessing.ScreenPiece(RowImage, SpeakerNameWidth + 1, RowImage.GetLength(0), 0, ROWS_TO_READ - 1);
-            bool[,] message = ImageProcessing.ColorFilter(RowImage, RGBExactFactory.PlayerChatText);
+            bool[,] message = ImageProcessing.ColorFilter(readableArea, RGBExactFactory.PlayerChatText);
             return ReadText(message);
         }
 

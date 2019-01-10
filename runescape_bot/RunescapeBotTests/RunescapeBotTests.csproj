@@ -102,6 +102,12 @@
   <ItemGroup>
     <None Include="Resources\capital-letters.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\digits.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\punctuation-and-symbols.png" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

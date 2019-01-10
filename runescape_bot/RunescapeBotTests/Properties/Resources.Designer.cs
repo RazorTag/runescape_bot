@@ -73,9 +73,29 @@ namespace RunescapeBotTests.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap digits {
+            get {
+                object obj = ResourceManager.GetObject("digits", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap lowercase_letters {
             get {
                 object obj = ResourceManager.GetObject("lowercase_letters", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap punctuation_and_symbols {
+            get {
+                object obj = ResourceManager.GetObject("punctuation_and_symbols", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
