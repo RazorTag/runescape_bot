@@ -260,6 +260,7 @@ namespace RunescapeBot
         /// <returns></returns>
         private void CollectStartParams()
         {
+            ValidateChanges();
             CollectGeneralSettings();
             if (Numerical.WithinBounds(RotationBotSelection, 0, RunParams.RotationParams.Count - 1))
             {
@@ -362,6 +363,7 @@ namespace RunescapeBot
         /// </summary>
         private void SaveBot()
         {
+            ValidateChanges();
             RunParams.SelectedTab = BotManagerType.SelectedIndex;
             RunParams.SelectedPhasmatysBot = PhasmatysBotSelection;
             RunParams.SelectedRotationBot = RotationBotSelection;
@@ -801,25 +803,36 @@ namespace RunescapeBot
         /// <summary>
         /// Enables or disables the custom settings button depending on whether the selected bot has custom settings associated with it
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void BotActionSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (RunParams == null || RunParams.CustomSettingsData == null)
-            {
-                return;
-            }
+            ValidateBotAction();
+        }
 
-            RunParams.BotAction = (BotRegistry.BotActions)BotActionSelect.SelectedIndex;
+        /// <summary>
+        /// Validates any unsaved changes and reverts them if they fail validation.
+        /// </summary>
+        private void ValidateChanges()
+        {
+            ValidateBotAction();
+        }
+
+        /// <summary>
+        /// Enables or disables the custom settings button depending on whether the selected bot has custom settings associated with it
+        /// </summary>
+        private void ValidateBotAction()
+        {
+            if (RunParams == null || RunParams.CustomSettingsData == null)
+                return;
+
+            if (BotActionSelect.SelectedIndex >= 0)
+                RunParams.BotAction = (BotRegistry.BotActions)BotActionSelect.SelectedIndex;
+            else
+                BotActionSelect.SelectedIndex = (int)RunParams.BotAction;
 
             if (GetCustomSettingsForm(RunParams.CustomSettingsData) == null)
-            {
                 ShowSettings.Enabled = false;
-            }
             else
-            {
                 ShowSettings.Enabled = true;
-            }
         }
     }
 }

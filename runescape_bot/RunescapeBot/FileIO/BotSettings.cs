@@ -68,9 +68,7 @@ namespace RunescapeBot.FileIO
             finally
             {
                 if (stream != null)
-                {
                     stream.Close();
-                }
             }
 
             return runParams;
@@ -79,6 +77,8 @@ namespace RunescapeBot.FileIO
         /// <summary>
         /// Saves the last used settings for all bot programs to disk
         /// </summary>
+        /// <param name="runParams">Settings to save</param>
+        /// <param name="failSafe">Set to true to save a backup copy of the existing settings before attempting to save.</param>
         /// <returns>true if the save is successful</returns>
         public bool SaveSettings(RunParams runParams)
         {
@@ -90,17 +90,18 @@ namespace RunescapeBot.FileIO
             try
             {
                 Directory.CreateDirectory(directoryPath);   //create the directory if it doesn't already exist
-                stream = File.Open(filePath, FileMode.Create);
+                stream = File.Open(filePath, FileMode.OpenOrCreate);
                 serializer.Serialize(stream, runParams);
                 success = true;
             }
-            catch
+            catch (Exception e)
             {
                 //TODO
             }
             finally
             {
-                stream.Close();
+                if (stream != null)
+                    stream.Close();
             }
             return success;
         }

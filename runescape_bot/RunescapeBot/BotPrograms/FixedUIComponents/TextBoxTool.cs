@@ -13,13 +13,24 @@ namespace RunescapeBot.BotPrograms
     {
         #region properties
 
-        private RSClient RSClient;
         protected Keyboard Keyboard;
         private GameScreen Screen;
 
         public static RGBHSBRange PlayerChatText = RGBHSBRangeFactory.GenericColor(Color.Blue);
 
         public const int ROW_HEIGHT = 14;
+        public const int INPUT_ROW_HEIGHT = ROW_HEIGHT + 1;
+        public const int INPUT_DIVIDER_WIDTH = 1;
+
+        /// <summary>
+        /// Number of rows visible in the public chat history.
+        /// </summary>
+        public const int CHAT_ROW_COUNT = 8;
+
+        /// <summary>
+        /// Offset from the bottom of the textbox tool to the bottom of the output area.
+        /// </summary>
+        public const int INPUT_OFFSET = INPUT_ROW_HEIGHT + INPUT_DIVIDER_WIDTH;
 
         /// <summary>
         /// Bounds of the text box (inside the frame of the text box).
@@ -31,7 +42,7 @@ namespace RunescapeBot.BotPrograms
         public int Bottom { get { return Screen.LooksValid() ? Screen.Height - 30 : 0; } }
 
         /// <summary>
-        /// The y-coordinate of the lin that divides the input box from the chat history box.
+        /// The y-coordinate of the line that divides the input box from the chat history box.
         /// </summary>
         public int InputDivider { get { return Screen.LooksValid() ? Bottom - 15 : 0; } }
 
@@ -60,7 +71,7 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Image of the chat row within the input box.
+        /// Image of the implicit chat row within the input box.
         /// </summary>
         public Color[,] InputImage
         {
@@ -74,9 +85,8 @@ namespace RunescapeBot.BotPrograms
 
         #region constructors
 
-        public TextBoxTool(RSClient rsClient, Keyboard keyboard, GameScreen screen)
+        public TextBoxTool( Keyboard keyboard, GameScreen screen)
         {
-            RSClient = rsClient;
             Keyboard = keyboard;
             Screen = screen;
         }
@@ -86,7 +96,7 @@ namespace RunescapeBot.BotPrograms
         #region NPC dialog
 
         /// <summary>
-        /// Determines the area corresponding to a row of text.
+        /// Determines the area corresponding to a row of text within the TextBoxTool area.
         /// </summary>
         /// <param name="rowIndex">The index of the the row to locate (0-7, bottom to top).</param>
         /// <returns>The bounds of the area containing the text for the specified row.</returns>
@@ -110,7 +120,20 @@ namespace RunescapeBot.BotPrograms
         }
 
         /// <summary>
-        /// Determines the area where the player's display name and typing text appear.
+        /// Gets an image of the specified chat row.
+        /// </summary>
+        /// <param name="rowIndex">Starts at 0. Goes from bottom to top. Does not include the input row.</param>
+        /// <returns></returns>
+        public static Color[,] ChatRowImage(Color[,] textBoxImage, int rowIndex)
+        {
+            int bottom = (textBoxImage.GetLength(1) - 1) - INPUT_OFFSET - (rowIndex * ROW_HEIGHT);
+            int top = bottom - (ROW_HEIGHT - 1);
+            Color[,] chatRowImage = ImageProcessing.ScreenPiece(textBoxImage, 0, textBoxImage.GetLength(0), top, bottom);
+            return chatRowImage;
+        }
+
+        /// <summary>
+        /// Determines the area where the player's display name and currently typing text appear.
         /// </summary>
         /// <returns></returns>
         public RectangleBounds ChatEntryLocation()
@@ -118,8 +141,8 @@ namespace RunescapeBot.BotPrograms
             RectangleBounds rowLocation = new RectangleBounds();
             rowLocation.Left = Left + 4;
             rowLocation.Right = Right;
-            rowLocation.Top = Bottom - 13;
-            rowLocation.Bottom = rowLocation.Top + (ROW_HEIGHT - 1);
+            rowLocation.Bottom = Bottom;
+            rowLocation.Top = rowLocation.Bottom - (ROW_HEIGHT - 1);
             return rowLocation;
         }
 

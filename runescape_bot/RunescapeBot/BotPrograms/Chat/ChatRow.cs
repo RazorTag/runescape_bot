@@ -1,13 +1,7 @@
-﻿using RunescapeBot.Common;
-using RunescapeBot.ImageTools;
+﻿using RunescapeBot.ImageTools;
 using RunescapeBot.ImageTools.Filters.FilterFactories;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
@@ -48,6 +42,27 @@ namespace RunescapeBot.BotPrograms.Chat
         private ChatRowType _speakerType;
 
         /// <summary>
+        /// True if this chat row was spoken by this player or another player.
+        /// </summary>
+        public bool IsPlayer
+        {
+            get
+            {
+                if (!_isPlayerDetermined)
+                    IsPlayer = PlayerChatRow();
+                return _isPlayer;
+            }
+            private set
+            {
+                _isPlayer = value;
+                _isPlayerDetermined = true;
+            }
+        }
+        private bool _isPlayer;
+        private bool _isPlayerDetermined;
+
+
+        /// <summary>
         /// Image of this chat row.
         /// </summary>
         private Color[,] RowImage;
@@ -59,7 +74,7 @@ namespace RunescapeBot.BotPrograms.Chat
         {
             get
             {
-                if (string.IsNullOrEmpty(_speakerName))
+                if (_speakerName == null)
                     _speakerName = GetSpeakerName();
                 return _speakerName;
             }
@@ -74,7 +89,7 @@ namespace RunescapeBot.BotPrograms.Chat
             get
             {
                 if (_message == null)
-                    _message = GetMessage();
+                    _message = GetChatMessage();
                 return _message;
             }
         }
@@ -163,7 +178,7 @@ namespace RunescapeBot.BotPrograms.Chat
         {
             ChatRowType speaker;
 
-            if (PlayerChatRow())
+            if (IsPlayer)
             {
                 speaker = OtherPlayer() ? ChatRowType.OtherPlayer : ChatRowType.ThisPlayer;
             }
@@ -191,6 +206,7 @@ namespace RunescapeBot.BotPrograms.Chat
                     if (chatTextColor.ColorInRange(RowImage[x, y]))
                     {
                         SpeakerNameWidth = x - 1;
+                        IsPlayer = true;
                         return true;
                     }
                 }
@@ -201,12 +217,11 @@ namespace RunescapeBot.BotPrograms.Chat
 
         /// <summary>
         /// Determines if the first row of chat is another player's message.
-        /// Assumes that this row is spoken by either this player or another player.
         /// </summary>
         /// <returns>True if the first row of chat is another's player's text.</returns>
         private bool OtherPlayer()
         {
-            return SpeakerName != PlayerName;
+            return (IsPlayer && SpeakerName != PlayerName);
         }
 
         /// <summary>
@@ -215,6 +230,9 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <returns>speaker name tag</returns>
         private string GetSpeakerName()
         {
+            if (!IsPlayer)
+                return "";
+
             Color[,] readableArea = ImageProcessing.ScreenPiece(RowImage, LEFT, RowImage.GetLength(0), 0, ROWS_TO_READ - 1);
             bool[,] nameTag = ImageProcessing.ColorFilter(readableArea, RGBExactFactory.PlayerChatName);
             string name = ReadText(nameTag);
@@ -222,11 +240,13 @@ namespace RunescapeBot.BotPrograms.Chat
         }
 
         /// <summary>
-        /// Gets the chat message for this chat row.
+        /// Gets the player chat message for this chat row.
         /// </summary>
         /// <returns>chat message string representation</returns>
-        private string GetMessage()
+        private string GetChatMessage()
         {
+            if (!IsPlayer) { return ""; }
+
             Color[,] readableArea = ImageProcessing.ScreenPiece(RowImage, SpeakerNameWidth + 1, RowImage.GetLength(0), 0, ROWS_TO_READ - 1);
             bool[,] message = ImageProcessing.ColorFilter(readableArea, RGBExactFactory.PlayerChatText);
             return ReadText(message);

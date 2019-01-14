@@ -16,6 +16,8 @@ namespace RunescapeBot.BotPrograms
         /// <returns>returns false to stop the bot program</returns>
         protected override bool Run()
         {
+            //DebugUtilities.SaveImageToFile(Screen, "C:\\Projects\\Roboport\\test_pictures\\chat\\test.png");
+
             RunParams.ActiveBot.BotState = BotState.Running;
             int timeToRun = (int)(RunParams.RunUntil - DateTime.Now).TotalMilliseconds;
             RunParams.SetNewState(timeToRun);

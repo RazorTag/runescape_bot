@@ -61,6 +61,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="BotPrograms\Chat\ChatRowTests.cs" />
+    <Compile Include="BotPrograms\Chat\ConversationTests.cs" />
     <Compile Include="BotPrograms\Chat\LetterReaderTests.cs" />
     <Compile Include="BotPrograms\Chat\LetterTests.cs" />
     <Compile Include="BotPrograms\Popups\RightClickInventoryTests.cs" />
@@ -107,6 +108,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\punctuation-and-symbols.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chatbox-1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chatbox-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chatbox-3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\non-player-row.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\full-1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\full-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\full-3.png" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

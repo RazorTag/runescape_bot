@@ -8,7 +8,10 @@ namespace RunescapeBot.BotPrograms.Bots.MageTrainingArena
 {
     public class EnchantingChamber : BotProgram
     {
-        public EnchantingChamber(RunParams startParams) : base(startParams) { }
+        public EnchantingChamber(RunParams startParams) : base(startParams)
+        {
+            RunParams.Conversation = true;
+        }
 
         protected override bool Run()
         {

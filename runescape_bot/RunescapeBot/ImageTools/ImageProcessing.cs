@@ -331,7 +331,8 @@ namespace RunescapeBot.ImageTools
         public static Color[,] ScreenPiece(Color[,] image, int left, int right, int top, int bottom)
         {
             Point empty;
-            return ScreenPiece(image, left, right, top, bottom, out empty);
+            Color[,] screenPiece = ScreenPiece(image, left, right, top, bottom, out empty);
+            return screenPiece;
         }
 
         /// <summary>

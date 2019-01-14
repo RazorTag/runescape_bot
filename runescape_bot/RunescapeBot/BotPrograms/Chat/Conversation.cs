@@ -1,14 +1,5 @@
-﻿using RunescapeBot.BotPrograms;
-using RunescapeBot.Common;
-using RunescapeBot.ImageTools;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
@@ -19,7 +10,12 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Number of rows visible in the public chat history.
         /// </summary>
-        public const int CHAT_ROW_COUNT = 8;
+        public const int CHAT_ROW_COUNT = TextBoxTool.CHAT_ROW_COUNT;
+
+        /// <summary>
+        /// Only scan the chat when set to true.
+        /// </summary>
+        private bool _scanChat;
 
         /// <summary>
         /// The text box container that hosts player conversations.
@@ -32,24 +28,19 @@ namespace RunescapeBot.BotPrograms.Chat
         private GameScreen Screen;
 
         /// <summary>
-        /// Only scan the chat when set to true.
-        /// </summary>
-        private bool _scanChat;
-
-        /// <summary>
         /// The different "speakers" for a line of text for the most recent check.
         /// </summary>
-        private ChatRow[] OtherPlayerChatRows;
+        public ChatRow[] ChatRows;
 
         /// <summary>
         /// The different "speakers" for a line of text for the penultimate check.
         /// </summary>
-        private ChatRow[] _previousChatRows;
+        public ChatRow[] _previousChatRows;
 
         /// <summary>
         /// Identifier for the name tag of the player.
         /// </summary>
-        private string PlayerName
+        public string PlayerName
         {
             get
             {
@@ -80,7 +71,7 @@ namespace RunescapeBot.BotPrograms.Chat
         public void StartConversation()
         {
             _scanChat = true;
-            OtherPlayerChatRows = new ChatRow[CHAT_ROW_COUNT];
+            ChatRows = new ChatRow[CHAT_ROW_COUNT];
             _playerName = "";
             Thread scanChat = new Thread(ScanChat);
             scanChat.Start();
@@ -113,9 +104,8 @@ namespace RunescapeBot.BotPrograms.Chat
         /// </summary>
         private void ScanChat()
         {
-            Color[,] chatBody = TextBox.TextBoxImage;
+            ReadChatRows();
 
-            ReadChatRows(chatBody);
             if (MatchCurrentWithPreviousChat())
             {
                 //TODO alert the server
@@ -125,15 +115,16 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Determines which rows in the public chat history are populated by chat from other players.
         /// </summary>
-        private void ReadChatRows(Color[,] chatBody)
+        public void ReadChatRows()
         {
-            _previousChatRows = OtherPlayerChatRows;
+            _previousChatRows = ChatRows;
+            ChatRows = new ChatRow[CHAT_ROW_COUNT];
             Color[,] chatRowImage;
 
             for (int row = 0; row < CHAT_ROW_COUNT; row++)
             {
-                chatRowImage = TextBox.ChatRowImage(row);
-                OtherPlayerChatRows[row] = new ChatRow(chatRowImage, PlayerName);
+                chatRowImage = TextBoxTool.ChatRowImage(TextBox.TextBoxImage, row);
+                ChatRows[row] = new ChatRow(chatRowImage, PlayerName);
             }
         }
 
@@ -141,7 +132,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// Determines if another player has spoken since the player last spoke.
         /// </summary>
         /// <returns>True if another player has spoken last.</returns>
-        private bool MatchCurrentWithPreviousChat()
+        public bool MatchCurrentWithPreviousChat()
         {
             return false;
         }

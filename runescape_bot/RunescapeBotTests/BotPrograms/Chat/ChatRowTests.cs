@@ -1,14 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RunescapeBot.BotPrograms.Chat;
-using RunescapeBot.FileIO;
-using System;
-using System.Collections.Generic;
+using RunescapeBot.ImageTools;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace RunescapeBot.BotPrograms.Chat.Tests
 {
@@ -23,21 +15,24 @@ namespace RunescapeBot.BotPrograms.Chat.Tests
             RunescapeBotTests.Properties.Resources.capital_letters,
             RunescapeBotTests.Properties.Resources.lowercase_letters,
             RunescapeBotTests.Properties.Resources.digits,
-            RunescapeBotTests.Properties.Resources.punctuation_and_symbols
+            RunescapeBotTests.Properties.Resources.punctuation_and_symbols,
+            RunescapeBotTests.Properties.Resources.non_player_row
         };
 
         [TestMethod()]
-        [DataRow(0, "BioGalt", "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z", "OtherPlayer", ChatRow.ChatRowType.OtherPlayer)]
-        [DataRow(1, "BioGalt", "~abcdefghijklmnopqrstuvwxyz", "BioGalt", ChatRow.ChatRowType.ThisPlayer)]
-        [DataRow(2, "BioGalt", "0123456789", "BioGalt", ChatRow.ChatRowType.ThisPlayer)]
-        [DataRow(3, "BioGalt", "`~!@#$%^&*()_-+={}[]:;\'<>,.?/\\", "BioGalt", ChatRow.ChatRowType.ThisPlayer)]
-        public void ChatRowTest(int rowImageIndex, string speakerName, string text, string playerName, ChatRow.ChatRowType rowType)
+        [DataRow(0, "BioGalt", "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z", "OtherPlayer", ChatRow.ChatRowType.OtherPlayer, true)]
+        [DataRow(1, "BioGalt", "~abcdefghijklmnopqrstuvwxyz", "BioGalt", ChatRow.ChatRowType.ThisPlayer, true)]
+        [DataRow(2, "BioGalt", "0123456789", "BioGalt", ChatRow.ChatRowType.ThisPlayer, true)]
+        [DataRow(3, "BioGalt", "`~!@#$%^&*()_-+={}[]:;\'<>,.?/\\", "BioGalt", ChatRow.ChatRowType.ThisPlayer, true)]
+        [DataRow(4, "", "", "", ChatRow.ChatRowType.Unknown, false)]
+        public void ChatRowTest(int rowImageIndex, string speakerName, string text, string playerName, ChatRow.ChatRowType rowType, bool isPlayer)
         {
-            Color[,] rowImage = DebugUtilities.BitmapToColorArray(rowImages[rowImageIndex]);
+            Color[,] rowImage = ScreenScraper.GetRGB(rowImages[rowImageIndex]);
             ChatRow chatRow = new ChatRow(rowImage, playerName);
             Assert.AreEqual(speakerName, chatRow.SpeakerName);
             Assert.AreEqual(text, chatRow.Message);
             Assert.AreEqual(rowType, chatRow.Type);
+            Assert.AreEqual(isPlayer, chatRow.IsPlayer);
         }
     }
 }

@@ -162,7 +162,7 @@ namespace RunescapeBot.BotPrograms
             HandEye = new HandEye(Vision, Screen);
             Inventory = new Inventory(RSClient, Keyboard, Screen);
             Minimap = new MinimapGauge(RSClient, Keyboard, Screen);
-            Textbox = new TextBoxTool(RSClient, Keyboard, Screen);
+            Textbox = new TextBoxTool(Keyboard, Screen);
             Banking = new Banking(Screen, Vision, HandEye, RSClient, Keyboard, Inventory, Minimap);
             Conversation = new Conversation(Textbox, Screen, RunParams.Conversation);
             

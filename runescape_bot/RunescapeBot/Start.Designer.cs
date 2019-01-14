@@ -162,6 +162,7 @@ namespace RunescapeBot
             // 
             // JagexClientLocation
             // 
+            this.JagexClientLocation.Enabled = false;
             this.JagexClientLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.JagexClientLocation.Location = new System.Drawing.Point(84, 6);
             this.JagexClientLocation.Name = "JagexClientLocation";
@@ -213,6 +214,7 @@ namespace RunescapeBot
             // 
             // OSBuddyClientLocation
             // 
+            this.OSBuddyClientLocation.Enabled = false;
             this.OSBuddyClientLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.OSBuddyClientLocation.Location = new System.Drawing.Point(84, 45);
             this.OSBuddyClientLocation.Name = "OSBuddyClientLocation";
@@ -243,6 +245,8 @@ namespace RunescapeBot
             // 
             // BotActionSelect
             // 
+            this.BotActionSelect.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.BotActionSelect.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.BotActionSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BotActionSelect.FormattingEnabled = true;
             this.BotActionSelect.Location = new System.Drawing.Point(84, 168);
