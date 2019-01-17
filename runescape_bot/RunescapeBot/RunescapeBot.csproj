@@ -86,10 +86,12 @@
   <ItemGroup>
     <Compile Include="BotPrograms\BotManagers\PhasmatysRotation.cs" />
     <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
+    <Compile Include="BotPrograms\Chat\ChatAssemblyLine.cs" />
     <Compile Include="BotPrograms\Chat\Letter.cs" />
     <Compile Include="BotPrograms\Chat\LetterReader.cs" />
     <Compile Include="BotPrograms\Chat\ChatRow.cs" />
     <Compile Include="BotPrograms\Chat\Letters.cs" />
+    <Compile Include="BotPrograms\Chat\Response.cs" />
     <Compile Include="BotPrograms\Controllers\Banking.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotProgram.cs" />
     <Compile Include="BotPrograms\BotProgramCore\BotRegistry.cs" />
@@ -221,6 +223,7 @@
     <Compile Include="ImageTools\Filters\RGBHSBRangeGroup.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />
+    <Compile Include="Networking\Networking.cs" />
     <Compile Include="UITools\Spline\ArrayUtil.cs" />
     <Compile Include="UITools\Spline\CubicSpline.cs" />
     <Compile Include="UITools\Spline\TriDiagonalMatrix.cs" />

@@ -143,6 +143,16 @@ namespace RunescapeBotTests.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap full_other_players {
+            get {
+                object obj = ResourceManager.GetObject("full_other_players", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap lowercase_letters {
             get {
                 object obj = ResourceManager.GetObject("lowercase_letters", resourceCulture);

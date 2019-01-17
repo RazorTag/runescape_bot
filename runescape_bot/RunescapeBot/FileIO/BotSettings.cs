@@ -94,10 +94,7 @@ namespace RunescapeBot.FileIO
                 serializer.Serialize(stream, runParams);
                 success = true;
             }
-            catch (Exception e)
-            {
-                //TODO
-            }
+            catch { }
             finally
             {
                 if (stream != null)

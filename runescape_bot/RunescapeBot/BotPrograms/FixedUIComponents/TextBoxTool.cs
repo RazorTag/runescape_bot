@@ -21,6 +21,8 @@ namespace RunescapeBot.BotPrograms
         public const int ROW_HEIGHT = 14;
         public const int INPUT_ROW_HEIGHT = ROW_HEIGHT + 1;
         public const int INPUT_DIVIDER_WIDTH = 1;
+        public const int WIDTH = 489;
+        public const int HEIGHT = 129;
 
         /// <summary>
         /// Number of rows visible in the public chat history.
@@ -37,8 +39,8 @@ namespace RunescapeBot.BotPrograms
         /// Right bound is inside of the scroll bar.
         /// </summary>
         public int Left { get { return Screen.LooksValid() ? 7 : 0; } }
-        public int Right { get { return Screen.LooksValid() ? Left + 488 : 0; } }
-        public int Top { get { return Screen.LooksValid() ? Bottom - 128 : 0; } }
+        public int Right { get { return Screen.LooksValid() ? Left + (WIDTH - 1) : 0; } }
+        public int Top { get { return Screen.LooksValid() ? Bottom - (HEIGHT - 1) : 0; } }
         public int Bottom { get { return Screen.LooksValid() ? Screen.Height - 30 : 0; } }
 
         /// <summary>
@@ -55,7 +57,14 @@ namespace RunescapeBot.BotPrograms
         /// <summary>
         /// Image of the full text box
         /// </summary>
-        public Color[,] TextBoxImage { get { return Screen.SubScreen(Left, Right, Top, Bottom); } }
+        public Color[,] TextBoxImage
+        {
+            get
+            {
+                Color[,] image = Screen.SubScreen(Left, Right, Top, Bottom);
+                return (image.GetLength(0) == WIDTH && image.GetLength(1) == HEIGHT) ? image : null;
+            }
+        }
 
         /// <summary>
         /// The location of the chat row within the input box.

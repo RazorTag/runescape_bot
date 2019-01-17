@@ -43,19 +43,11 @@ namespace RunescapeBot.UITools
         /// <returns></returns>
         private bool PrepareClientForInput()
         {
-            if (BotProgram.StopFlag)
-            {
+            if (BotProgram.StopFlag || !ScreenScraper.ProcessExists(RSClient))
                 return false;
-            }
-            if (ScreenScraper.ProcessExists(RSClient))
-            {
-                ScreenScraper.BringToForeGround();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            ScreenScraper.BringToForeGround();
+            return true;
         }
 
         /// <summary>

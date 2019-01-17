@@ -164,7 +164,7 @@ namespace RunescapeBot.BotPrograms
             Minimap = new MinimapGauge(RSClient, Keyboard, Screen);
             Textbox = new TextBoxTool(Keyboard, Screen);
             Banking = new Banking(Screen, Vision, HandEye, RSClient, Keyboard, Inventory, Minimap);
-            Conversation = new Conversation(Textbox, Screen, RunParams.Conversation);
+            Conversation = new Conversation(Textbox, Screen, Keyboard, RunParams.Conversation);
             
             RNG = new Random();
         }

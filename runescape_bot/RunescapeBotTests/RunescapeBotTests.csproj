@@ -60,6 +60,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BotPrograms\Chat\ChatAssemblyLineTests.cs" />
     <Compile Include="BotPrograms\Chat\ChatRowTests.cs" />
     <Compile Include="BotPrograms\Chat\ConversationTests.cs" />
     <Compile Include="BotPrograms\Chat\LetterReaderTests.cs" />
@@ -129,6 +130,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\full-3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\full-other-players.png" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

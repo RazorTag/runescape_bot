@@ -1,7 +1,9 @@
 ﻿using RunescapeBot.ImageTools;
 using RunescapeBot.ImageTools.Filters.FilterFactories;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Net.Http;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
@@ -12,7 +14,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// The different "speakers" for a line of text.
         /// </summary>
-        public enum ChatRowType
+        public enum RowType
         {
             Undetermined,
             Unknown,
@@ -26,11 +28,11 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// The type of speaker that wrote the chat row.
         /// </summary>
-        public ChatRowType Type
+        public RowType Type
         {
             get
             {
-                if (_speakerType == ChatRowType.Undetermined)
+                if (_speakerType == RowType.Undetermined)
                     ChatRowSpeaker();
                 return _speakerType;
             }
@@ -39,7 +41,7 @@ namespace RunescapeBot.BotPrograms.Chat
                 _speakerType = value;
             }
         }
-        private ChatRowType _speakerType;
+        private RowType _speakerType;
 
         /// <summary>
         /// True if this chat row was spoken by this player or another player.
@@ -78,6 +80,7 @@ namespace RunescapeBot.BotPrograms.Chat
                     _speakerName = GetSpeakerName();
                 return _speakerName;
             }
+            private set { _speakerName = value; }
         }
         private string _speakerName;
 
@@ -92,6 +95,7 @@ namespace RunescapeBot.BotPrograms.Chat
                     _message = GetChatMessage();
                 return _message;
             }
+            private set { _message = value; }
         }
         private string _message;
 
@@ -107,7 +111,7 @@ namespace RunescapeBot.BotPrograms.Chat
         {
             get
             {
-                if (Type != ChatRowType.OtherPlayer && Type != ChatRowType.ThisPlayer)
+                if (Type != RowType.OtherPlayer && Type != RowType.ThisPlayer)
                     return 0;
                 return _speakerNameWidth;
             }
@@ -150,20 +154,56 @@ namespace RunescapeBot.BotPrograms.Chat
         //Empty column value
         static readonly int EMPTY = 0;
 
+        /// <summary>
+        /// The moment at which this ChatRow was first read from the client and created.
+        /// </summary>
+        public DateTime Time { get; private set; }
+
+        /// <summary>
+        /// Unique identifier for this ChatRow
+        /// </summary>
+        public int ID
+        {
+            get { return _id; }
+            set
+            {
+                if (_id > 0)
+                    throw new Exception("Illegal attempt to overwrite ID=" + _id + " with ID=" + value);
+                _id = value;
+            }        
+        }
+        private int _id;
+
         #endregion
 
         #region constructors
 
         /// <summary>
-        /// Creates a chat row.
+        /// Creates a chat row based on an image of the row.
         /// </summary>
         /// <param name="rowImage">image of the chat row from the inside of the left border to the inside of the right scroll bar</param>
         /// <param name="playerName">the name of the player that the bot is controlling</param>
         public ChatRow(Color[,] rowImage, string playerName)
         {
+            Time = DateTime.Now;
             RowImage = rowImage;
             PlayerName = playerName;
             Reader = LetterReader.GetInstance();
+        }
+
+        /// <summary>
+        /// Creates a chat row using assumed values.
+        /// </summary>
+        /// <param name="type">the source of the chat row</param>
+        /// <param name="playerName">name of the player being controlled by the bot</param>
+        /// <param name="speakerName">name of the player speaking the row</param>
+        /// <param name="message">message spoken on this row</param>
+        public ChatRow(RowType type, string playerName, string speakerName, string message)
+        {
+            Type = type;
+            PlayerName = playerName;
+            SpeakerName = speakerName;
+            Message = message;
         }
 
         #endregion
@@ -176,15 +216,15 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <returns>The speaker type</returns>
         private void ChatRowSpeaker()
         {
-            ChatRowType speaker;
+            RowType speaker;
 
             if (IsPlayer)
             {
-                speaker = OtherPlayer() ? ChatRowType.OtherPlayer : ChatRowType.ThisPlayer;
+                speaker = OtherPlayer() ? RowType.OtherPlayer : RowType.ThisPlayer;
             }
             else
             {
-                speaker = ChatRowType.Unknown;
+                speaker = RowType.Unknown;
             }
 
             Type = speaker;
@@ -333,6 +373,33 @@ namespace RunescapeBot.BotPrograms.Chat
             }
 
             return columnValues;
+        }
+
+        /// <summary>
+        /// Determines if another ChatRow is the same as this ChatRow.
+        /// </summary>
+        /// <param name="otherRow">the other ChatRow to check</param>
+        /// <returns>True if both rows are identical</returns>
+        public bool Equals(ChatRow otherRow)
+        {
+            return 
+                Type == otherRow.Type &&
+                SpeakerName == otherRow.SpeakerName &&
+                Message == otherRow.Message;
+        }
+
+        /// <summary>
+        /// Encodes this ChatRow to be sent via HttpClient.
+        /// </summary>
+        /// <returns>Encoded version of this ChatRow</returns>
+        public FormUrlEncodedContent Encode()
+        {
+            var values = new Dictionary<string, string>();
+            values.Add("ID", ID.ToString());
+            values.Add("Time", Time.ToString());
+            values.Add("Speaker", SpeakerName);
+            values.Add("Message", Message);
+            return new FormUrlEncodedContent(values);
         }
 
         #endregion

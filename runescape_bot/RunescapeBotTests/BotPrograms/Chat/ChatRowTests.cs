@@ -20,12 +20,12 @@ namespace RunescapeBot.BotPrograms.Chat.Tests
         };
 
         [TestMethod()]
-        [DataRow(0, "BioGalt", "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z", "OtherPlayer", ChatRow.ChatRowType.OtherPlayer, true)]
-        [DataRow(1, "BioGalt", "~abcdefghijklmnopqrstuvwxyz", "BioGalt", ChatRow.ChatRowType.ThisPlayer, true)]
-        [DataRow(2, "BioGalt", "0123456789", "BioGalt", ChatRow.ChatRowType.ThisPlayer, true)]
-        [DataRow(3, "BioGalt", "`~!@#$%^&*()_-+={}[]:;\'<>,.?/\\", "BioGalt", ChatRow.ChatRowType.ThisPlayer, true)]
-        [DataRow(4, "", "", "", ChatRow.ChatRowType.Unknown, false)]
-        public void ChatRowTest(int rowImageIndex, string speakerName, string text, string playerName, ChatRow.ChatRowType rowType, bool isPlayer)
+        [DataRow(0, "BioGalt", "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z", "OtherPlayer", ChatRow.RowType.OtherPlayer, true)]
+        [DataRow(1, "BioGalt", "~abcdefghijklmnopqrstuvwxyz", "BioGalt", ChatRow.RowType.ThisPlayer, true)]
+        [DataRow(2, "BioGalt", "0123456789", "BioGalt", ChatRow.RowType.ThisPlayer, true)]
+        [DataRow(3, "BioGalt", "`~!@#$%^&*()_-+={}[]:;\'<>,.?/\\", "BioGalt", ChatRow.RowType.ThisPlayer, true)]
+        [DataRow(4, "", "", "", ChatRow.RowType.Unknown, false)]
+        public void ChatRowTest(int rowImageIndex, string speakerName, string text, string playerName, ChatRow.RowType rowType, bool isPlayer)
         {
             Color[,] rowImage = ScreenScraper.GetRGB(rowImages[rowImageIndex]);
             ChatRow chatRow = new ChatRow(rowImage, playerName);
