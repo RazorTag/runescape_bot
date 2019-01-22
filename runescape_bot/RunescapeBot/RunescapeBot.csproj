@@ -69,6 +69,9 @@
     <ApplicationIcon>project.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -87,6 +90,7 @@
     <Compile Include="BotPrograms\BotManagers\PhasmatysRotation.cs" />
     <Compile Include="BotPrograms\BotManagers\SimpleRotation.cs" />
     <Compile Include="BotPrograms\Chat\ChatAssemblyLine.cs" />
+    <Compile Include="Networking\IUrlEncodable.cs" />
     <Compile Include="BotPrograms\Chat\Letter.cs" />
     <Compile Include="BotPrograms\Chat\LetterReader.cs" />
     <Compile Include="BotPrograms\Chat\ChatRow.cs" />
@@ -198,7 +202,7 @@
     <Compile Include="ImageTools\Blob\BlobSizeComparer.cs" />
     <Compile Include="ImageTools\Blob\BlobVerticalComparer.cs" />
     <Compile Include="ImageTools\Cluster.cs" />
-    <Compile Include="ImageTools\Filters\ColorFilter.cs" />
+    <Compile Include="ImageTools\Filters\IColorFilter.cs" />
     <Compile Include="ImageTools\Filters\FilterFactories\RGBExactFactory.cs" />
     <Compile Include="ImageTools\Filters\FilterFactories\RGBHSBRangeFactory.cs" />
     <Compile Include="BotPrograms\Diagnostics\DebugUtilities.cs" />
@@ -223,7 +227,7 @@
     <Compile Include="ImageTools\Filters\RGBHSBRangeGroup.cs" />
     <Compile Include="ImageTools\ImageProcessing.cs" />
     <Compile Include="ImageTools\ScreenScraper.cs" />
-    <Compile Include="Networking\Networking.cs" />
+    <Compile Include="Networking\HttpInstance.cs" />
     <Compile Include="UITools\Spline\ArrayUtil.cs" />
     <Compile Include="UITools\Spline\CubicSpline.cs" />
     <Compile Include="UITools\Spline\TriDiagonalMatrix.cs" />

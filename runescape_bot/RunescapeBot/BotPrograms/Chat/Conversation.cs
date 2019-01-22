@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Net.Http;
 using System.Threading;
+using RunescapeBot.Networking;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
@@ -43,7 +44,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Networking utilities
         /// </summary>
-        private readonly HttpClient httpClient = Networking.HttpClient;
+        private readonly HttpClient httpClient = HttpInstance.HttpClient;
 
         /// <summary>
         /// The different "speakers" for a line of text for the most recent check.
@@ -231,17 +232,17 @@ namespace RunescapeBot.BotPrograms.Chat
 
             while (!BotProgram.StopFlag && ChatAssemblyLine.NextComment(out chatRow))
             {
-                //Thread
-                SendAndReceiveResponse(chatRow);
+                Thread contactChatServer = new Thread(SendAndReceiveResponse);
+                contactChatServer.Start(chatRow);
             }
         }
 
         /// <summary>
         /// Receives a response to a message from the chat server.
         /// </summary>
-        public void SendAndReceiveResponse(ChatRow chatRow)
+        public void SendAndReceiveResponse(object chatRow)
         {
-            FormUrlEncodedContent encodedRow = chatRow.Encode();
+            //FormUrlEncodedContent encodedRow = chatRow.Encode();
 
             //TODO send and receive a response from the chat server
 

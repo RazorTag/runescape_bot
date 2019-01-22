@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunescapeBot", "RunescapeBo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunescapeBotTests", "RunescapeBotTests\RunescapeBotTests.csproj", "{8BB9A026-80F6-418E-8A17-83E35A3F5D82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer", "ChatServer\ChatServer.csproj", "{8830B257-83C6-4576-981B-73CA8C9ECD70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer.Tests", "ChatServer.Tests\ChatServer.Tests.csproj", "{B0333F1F-9782-4D95-B712-4795CAFBAA7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +25,19 @@ Global
 		{8BB9A026-80F6-418E-8A17-83E35A3F5D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BB9A026-80F6-418E-8A17-83E35A3F5D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BB9A026-80F6-418E-8A17-83E35A3F5D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8830B257-83C6-4576-981B-73CA8C9ECD70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8830B257-83C6-4576-981B-73CA8C9ECD70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8830B257-83C6-4576-981B-73CA8C9ECD70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8830B257-83C6-4576-981B-73CA8C9ECD70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0333F1F-9782-4D95-B712-4795CAFBAA7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0333F1F-9782-4D95-B712-4795CAFBAA7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0333F1F-9782-4D95-B712-4795CAFBAA7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0333F1F-9782-4D95-B712-4795CAFBAA7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F98D91CC-B112-4DAA-88C2-A9B25889B593}
 	EndGlobalSection
 EndGlobal

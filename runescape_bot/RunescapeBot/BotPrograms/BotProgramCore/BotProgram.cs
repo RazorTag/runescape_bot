@@ -1070,7 +1070,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="directory">directory in which to save test images</param>
         /// <param name="name">base name for test images</param>
         /// <param name="readWindow">Set to true to always read the window</param>
-        protected void MaskTest(ColorFilter filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", bool readWindow = false)
+        protected void MaskTest(IColorFilter filter, string name = "maskTest", string directory = "C:\\Projects\\Roboport\\test_pictures\\mask_tests\\", bool readWindow = false)
         {
             Screen.MakeSureWindowHasBeenRead();
             bool[,] thing = Vision.ColorFilter(filter);

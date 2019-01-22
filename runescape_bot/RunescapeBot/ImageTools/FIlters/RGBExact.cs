@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.ImageTools.Filters
 {
-    public class RGBExact : ColorFilter
+    public class RGBExact : IColorFilter
     {
         private Color ColorMatch;
 

@@ -142,7 +142,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
         /// <returns>true if an ore rock is found</returns>
-        protected bool LocateFishingTile(ColorFilter fishFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
+        protected bool LocateFishingTile(IColorFilter fishFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
         {
             foundObject = new Blob();
             Screen.ReadWindow();

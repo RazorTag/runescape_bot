@@ -122,7 +122,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minimumSize"></param>
         /// <param name="shiftObject">set to true to shift the position of the object from minimap coordinates to game screen coordinates</param>
         /// <returns>the biggest object on the minimap that matches the search criteria</returns>
-        public Blob LocateObject(ColorFilter stationaryObject, int minimumSize = 1, int maximumSize = int.MaxValue, bool shiftObject = false)
+        public Blob LocateObject(IColorFilter stationaryObject, int minimumSize = 1, int maximumSize = int.MaxValue, bool shiftObject = false)
         {
             bool[,] objectPixels = MinimapFilter(stationaryObject);
             List<Blob> objectBlobs = ImageProcessing.FindBlobs(objectPixels, true, minimumSize, maximumSize);
@@ -151,7 +151,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="filter">the filter to use on the minimap</param>
         /// <param name="offset">gets set to the offset from the game screen to the minimap piece</param>
         /// <returns>true for the pixels on the minimap that match the filter</returns>
-        public bool[,] MinimapFilter(ColorFilter filter, out Point offset)
+        public bool[,] MinimapFilter(IColorFilter filter, out Point offset)
         {
             if (Screen.Width < 1)    //the screen has not been read yet
             {
@@ -189,7 +189,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="filter">the filter to use on the minimap</param>
         /// <returns>true for the pixels on the minimap that match the filter</returns>
-        public bool[,] MinimapFilter(ColorFilter filter)
+        public bool[,] MinimapFilter(IColorFilter filter)
         {
             Point offset;
             return MinimapFilter(filter, out offset);

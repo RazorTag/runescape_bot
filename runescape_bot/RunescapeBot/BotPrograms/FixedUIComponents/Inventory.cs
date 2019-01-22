@@ -339,7 +339,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="emptySlotNumber">Set to a number higher than 1 to find the second, third, etc empty slot.</param>
         /// <returns>The first matching inventory slot scanning left to right then top to bottom. Returns null if no match is found.</returns>
-        public Point? FirstColorMatchingSlot(ColorFilter colorFilter, double matchStrictness = 0.1, bool safeTab = true, int emptySlotNumber = 1)
+        public Point? FirstColorMatchingSlot(IColorFilter colorFilter, double matchStrictness = 0.1, bool safeTab = true, int emptySlotNumber = 1)
         {
             emptySlotNumber = (int) Numerical.LimitToRange(emptySlotNumber, 1, INVENTORY_CAPACITY);
             if (OpenInventory(safeTab))
@@ -387,7 +387,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="readScreen">set to true to reread the game screen before checking</param>
         /// <param name="safeTab">set to true to switch to the inventory tab even if it already thinks that it is selected</param>
         /// <returns>true if the slot matches a color filter</returns>
-        public bool SlotMatchesColorFilter(int xSlot, int ySlot, ColorFilter colorFilter, double matchStrictness = 0.1, bool readScreen = false, bool safeTab = false)
+        public bool SlotMatchesColorFilter(int xSlot, int ySlot, IColorFilter colorFilter, double matchStrictness = 0.1, bool readScreen = false, bool safeTab = false)
         {
             int x = xSlot;
             int y = ySlot;

@@ -5,7 +5,7 @@ namespace RunescapeBot.ImageTools
     /// <summary>
     /// Represents a range of RGB colors used to identify artifacts of a known color
     /// </summary>
-    public class RGBHSBRange : ColorFilter
+    public class RGBHSBRange : IColorFilter
     {
         /// <summary>
         /// The color with the values closest to black that occur in an artifact

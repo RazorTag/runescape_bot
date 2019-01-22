@@ -39,7 +39,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="afterClickWait">time to wait after clicking on the stationary object</param>
         /// <param name="maxWaitTime">maximum time to wait before giving up</param>
         /// <returns></returns>
-        internal bool ClickStationaryObject(ColorFilter stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
+        internal bool ClickStationaryObject(IColorFilter stationaryObject, double tolerance, int afterClickWait, int maxWaitTime, int minimumSize)
         {
             Blob foundObject;
 
@@ -96,7 +96,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="textColor">color of text expected to be in the top-left on mouseover</param>
         /// <param name="randomization">maximum number of pixels from the center of the blob that it is safe to click</param>
         /// <returns>true if a matching object is found and clicked on</returns>
-        internal bool MouseOver(List<Blob> ObjectsToCheck, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000)
+        internal bool MouseOver(List<Blob> ObjectsToCheck, IColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000)
         {
             randomization = (int)((Screen.Height / 1000.0) * randomization);
             Point clickLocation;
@@ -125,7 +125,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="maxWait">max time to wait before concluding that the mouse over failed</param>
         /// <param name="lagTime">time to wait before checking and clicking after mousing over</param>
         /// <returns>true if a matching object is found and clicked on</returns>
-        internal bool MouseOver(Point mouseover, ColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 250)
+        internal bool MouseOver(Point mouseover, IColorFilter textColor, bool click = true, int randomization = 5, int maxWait = 1000, int lagTime = 250)
         {
             randomization = (int)((Screen.Height / 1000.0) * randomization);
             mouseover = Probability.GaussianCircle(mouseover, randomization);

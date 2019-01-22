@@ -190,7 +190,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="furnaceFloor"></param>
         /// <param name="offset"></param>
         /// <returns>true if at least the furnace icon is found</returns>
-        protected bool FurnaceLocation(out Blob furnaceIcon, out Blob furnaceFloor, out Point offset, ColorFilter floorColor)
+        protected bool FurnaceLocation(out Blob furnaceIcon, out Blob furnaceFloor, out Point offset, IColorFilter floorColor)
         {
             floorColor = floorColor ?? BuildingFloor;
             bool[,] minimapFurnace = Minimap.MinimapFilter(FurnaceIconOrange, out offset);

@@ -15,11 +15,11 @@ namespace RunescapeBot.BotPrograms
     /// </summary>
     public class Kebbit
     {
-        public static ColorFilter KebbitBlackSpot = RGBHSBRangeFactory.KebbitBlackSpot();
-        public static ColorFilter KebbitWhiteSpot = RGBHSBRangeFactory.KebbitWhiteSpot();
-        public static ColorFilter KebbitSpottedFur = RGBHSBRangeFactory.KebbitSpottedFur();
-        public static ColorFilter KebbitDarkFur = RGBHSBRangeGroupFactory.KebbitDarkFur();
-        public static ColorFilter KebbitDashingFur = RGBHSBRangeFactory.KebbitDashingFur();
+        public static IColorFilter KebbitBlackSpot = RGBHSBRangeFactory.KebbitBlackSpot();
+        public static IColorFilter KebbitWhiteSpot = RGBHSBRangeFactory.KebbitWhiteSpot();
+        public static IColorFilter KebbitSpottedFur = RGBHSBRangeFactory.KebbitSpottedFur();
+        public static IColorFilter KebbitDarkFur = RGBHSBRangeGroupFactory.KebbitDarkFur();
+        public static IColorFilter KebbitDashingFur = RGBHSBRangeFactory.KebbitDashingFur();
 
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace RunescapeBot.BotPrograms
         /// </summary>
         /// <param name="kebbitType">The type of kebbit.</param>
         /// <returns>A color filter for the given kebbit type.</returns>
-        public static ColorFilter GetKebbitFilter(KebbitType kebbitType)
+        public static IColorFilter GetKebbitFilter(KebbitType kebbitType)
         {
             switch(kebbitType)
             {

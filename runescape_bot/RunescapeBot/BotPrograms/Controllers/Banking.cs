@@ -130,7 +130,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="bankBoothColor">not used</param>
         /// <param name="bankBooth">returns the found bank booth blob</param>
         /// <returns>true if a bank booth is found</returns>
-        internal bool LocateBankBooth(ColorFilter bankBoothColor, out Blob bankBooth)
+        internal bool LocateBankBooth(IColorFilter bankBoothColor, out Blob bankBooth)
         {
             bankBooth = null;
 
@@ -247,7 +247,7 @@ namespace RunescapeBot.BotPrograms
         /// Finds the closest bank booth in the Port Phasmatys bank
         /// </summary>
         /// <returns>True if a bank booths is found</returns>
-        internal bool LocateBankBoothPhasmatys(ColorFilter bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
+        internal bool LocateBankBoothPhasmatys(IColorFilter bankBoothColor, out Blob bankBooth, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             return LocateBankBoothPhasmatys(out bankBooth);
         }

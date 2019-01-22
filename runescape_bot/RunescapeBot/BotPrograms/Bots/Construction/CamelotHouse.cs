@@ -344,7 +344,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="minimumSize">not used</param>
         /// <param name="maximumSize">not used</param>
         /// <returns></returns>
-        protected bool FindBankChest(ColorFilter stationaryObject, out Blob foundObject, int minimumSize, int maximumSize)
+        protected bool FindBankChest(IColorFilter stationaryObject, out Blob foundObject, int minimumSize, int maximumSize)
         {
             int widthRadius = Screen.ArtifactLength(0.35);
             int heightRadius = Screen.ArtifactLength(0.25);

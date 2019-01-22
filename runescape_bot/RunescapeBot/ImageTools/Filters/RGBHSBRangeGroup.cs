@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace RunescapeBot.ImageTools
 {
-    public class RGBHSBRangeGroup : ColorFilter
+    public class RGBHSBRangeGroup : IColorFilter
     {
         protected List<RGBHSBRange> ColorRanges;
 

@@ -1,13 +1,13 @@
 ﻿using RunescapeBot.ImageTools;
 using RunescapeBot.ImageTools.Filters.FilterFactories;
+using RunescapeBot.Networking;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Net.Http;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
-    public class ChatRow
+    public class ChatRow : IUrlEncodable
     {
         #region properties
 
@@ -178,6 +178,9 @@ namespace RunescapeBot.BotPrograms.Chat
 
         #region constructors
 
+
+        public ChatRow() { }
+
         /// <summary>
         /// Creates a chat row based on an image of the row.
         /// </summary>
@@ -200,6 +203,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <param name="message">message spoken on this row</param>
         public ChatRow(RowType type, string playerName, string speakerName, string message)
         {
+            Time = DateTime.Now;
             Type = type;
             PlayerName = playerName;
             SpeakerName = speakerName;
@@ -389,17 +393,20 @@ namespace RunescapeBot.BotPrograms.Chat
         }
 
         /// <summary>
-        /// Encodes this ChatRow to be sent via HttpClient.
+        /// Creates a dictionary containing the members 
         /// </summary>
-        /// <returns>Encoded version of this ChatRow</returns>
-        public FormUrlEncodedContent Encode()
+        /// <returns></returns>
+        public Dictionary<string, string> GetUrlDictionary()
         {
-            var values = new Dictionary<string, string>();
-            values.Add("ID", ID.ToString());
-            values.Add("Time", Time.ToString());
-            values.Add("Speaker", SpeakerName);
-            values.Add("Message", Message);
-            return new FormUrlEncodedContent(values);
+            var urlDictionary = new Dictionary<string, string>
+            {
+                { nameof(Message), Message },
+                { nameof(PlayerName), PlayerName },
+                { nameof(SpeakerName), SpeakerName },
+                { nameof(Time), Time.ToString() },
+                { nameof(Type), Type.ToString() }
+            };
+            return urlDictionary;
         }
 
         #endregion

@@ -93,7 +93,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="foundObject"></param>
         /// <param name="minimumSize"></param>
         /// <returns>true if an ore rock is found</returns>
-        protected bool LocateUnminedOre(ColorFilter ironFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
+        protected bool LocateUnminedOre(IColorFilter ironFilter, out Blob foundObject, int minimumSize, int maximumSize = int.MaxValue)
         {
             Screen.ReadWindow();
             bool[,] ironBoolArray = Vision.ColorFilter(ironFilter);

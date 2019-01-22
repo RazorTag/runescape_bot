@@ -204,7 +204,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="cargoNet">returns the top of the middle cargo net</param>
         /// <param name="minimumSize">conservative size floor</param>
         /// <returns>true if a set of cargo nets is found</returns>
-        private bool LocateMiddleCargoNet(ColorFilter cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1, int maximumSize = int.MaxValue)
+        private bool LocateMiddleCargoNet(IColorFilter cargoNetFrameColor, out Blob cargoNet, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             cargoNet = null;
             Screen.ReadWindow();
@@ -331,7 +331,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="trunk">returns a climbable tree trunk if found</param>
         /// <param name="minimumSize">not used</param>
         /// <returns>true if a climbable tree trunk is found</returns>
-        private bool FindTreeTrunk(ColorFilter trunkColor, out Blob trunk, int minimumSize = 1, int maximumSize = int.MaxValue)
+        private bool FindTreeTrunk(IColorFilter trunkColor, out Blob trunk, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             trunk = null;
             Screen.ReadWindow();
@@ -471,7 +471,7 @@ namespace RunescapeBot.BotPrograms
         /// <param name="drainPipe"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        private bool LocateDrainPipe(ColorFilter drainPipeColor, out Blob drainPipe, int minimumSize = 1, int maximumSize = int.MaxValue)
+        private bool LocateDrainPipe(IColorFilter drainPipeColor, out Blob drainPipe, int minimumSize = 1, int maximumSize = int.MaxValue)
         {
             drainPipe = null;
             Screen.ReadWindow();

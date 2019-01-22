@@ -163,7 +163,7 @@ namespace RunescapeBot.BotPrograms
         public double DialogBodyText()
         {
             Screen.Value = ScreenScraper.ReadWindow(true);
-            ColorFilter filter = RGBHSBRangeGroupFactory.DialogText();
+            IColorFilter filter = RGBHSBRangeGroupFactory.DialogText();
             double match = ImageProcessing.FractionalMatchPiece(Screen, filter, Left + 119, Right - 103, Top + 39, Bottom - 32);
             return match;
         }

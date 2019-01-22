@@ -16,7 +16,7 @@ namespace RunescapeBot.BotPrograms
 {
     public class Falconry : BotProgram
     {
-        public static ColorFilter FlashingArrow = RGBHSBRangeFactory.FlashingArrow();
+        public static IColorFilter FlashingArrow = RGBHSBRangeFactory.FlashingArrow();
 
         public Falconry(RunParams startParams) : base(startParams)
         {

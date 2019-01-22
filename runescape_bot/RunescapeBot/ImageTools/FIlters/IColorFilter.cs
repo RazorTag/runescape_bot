@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RunescapeBot.ImageTools
 {
-    public interface ColorFilter
+    public interface IColorFilter
     {
         /// <summary>
         /// Determines if the given color's RGB and HSB falls within this color range
@@ -75,7 +75,7 @@ namespace RunescapeBot.ImageTools
     /// <summary>
     /// Does not pass any pixels ever.
     /// </summary>
-    public class RejectFilter : ColorFilter
+    public class RejectFilter : IColorFilter
     {
         public bool BlueInRange(Color color)
         {
