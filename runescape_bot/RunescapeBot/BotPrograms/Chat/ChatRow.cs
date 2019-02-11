@@ -1,4 +1,5 @@
-﻿using RunescapeBot.ImageTools;
+﻿using Newtonsoft.Json;
+using RunescapeBot.ImageTools;
 using RunescapeBot.ImageTools.Filters.FilterFactories;
 using RunescapeBot.Networking;
 using System;
@@ -407,6 +408,44 @@ namespace RunescapeBot.BotPrograms.Chat
                 { nameof(Type), Type.ToString() }
             };
             return urlDictionary;
+        }
+
+        /// <summary>
+        /// Lightweight version of ChatRow to use for server calls
+        /// </summary>
+        public class ChatRowRequest
+        {
+            [JsonProperty("message")]
+            public string Message;
+
+            [JsonProperty("playerName")]
+            public string PlayerName;
+
+            [JsonProperty("speakerName")]
+            public string SpeakerName;
+
+            [JsonProperty("time")]
+            public DateTime Time;
+
+            [JsonProperty("type")]
+            public RowType Type;
+        }
+
+        /// <summary>
+        /// Gets a lightweigth version of the ChatRow for use in server calls.
+        /// </summary>
+        /// <returns></returns>
+        public ChatRowRequest GetRequest()
+        {
+            var request = new ChatRowRequest
+            {
+                Message = Message,
+                PlayerName = PlayerName,
+                SpeakerName = SpeakerName,
+                Time = Time,
+                Type = Type
+            };
+            return request;
         }
 
         #endregion

@@ -18,7 +18,15 @@ namespace RunescapeBot.Networking
         /// <summary>
         /// base URL of the chat server
         /// </summary>
-        public static readonly string ChatServer = "http://www.evannorsworthy.com/OSRS-chat/";
+        public static readonly string ChatServer = "http://www.evannorsworthy.com/OSRS-chat";
+
+        /// <summary>
+        /// URL to send a POST request to the API
+        /// </summary>
+        public static readonly string ChatServerApiPost = ChatServer + "/values";
+
+
+        public static readonly string ChatServerApiGet = ChatServer + "/values/5";
 
 
         public static HttpInstance Instance
@@ -34,19 +42,7 @@ namespace RunescapeBot.Networking
         private HttpInstance()
         {
             HttpClient.BaseAddress = new Uri(ChatServer);
-        }
-
-        public async Task<string> JsonPost(string uri, FormUrlEncodedContent content)
-        {
-            HttpResponseMessage result = await HttpClient.PostAsync(uri, content);
-            string responseString = await result.Content.ReadAsStringAsync();
-            return responseString;
-        }
-
-        public async Task JsonPost(string uri, IUrlEncodable request)
-        {
-            var content = new FormUrlEncodedContent(request.GetUrlDictionary());
-            await JsonPost(uri, request);
+            HttpClient.Timeout = new TimeSpan(0, 0, 30);
         }
     }
 }

@@ -36,10 +36,11 @@ namespace ChatServer.Tests.Controllers
             ValuesController controller = new ValuesController();
 
             // Act
-            string result = controller.Get(5);
+            int id = 5;
+            string result = controller.Get(id);
 
             // Assert
-            Assert.AreEqual("value", result);
+            Assert.AreEqual(id.ToString(), result);
         }
 
         [TestMethod]

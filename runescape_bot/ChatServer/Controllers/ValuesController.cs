@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatServer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,6 +10,8 @@ namespace ChatServer.Controllers
 {
     public class ValuesController : ApiController
     {
+        private ChatDbContext db = new ChatDbContext();
+
         // GET api/values
         public IEnumerable<string> Get()
         {
@@ -24,6 +27,7 @@ namespace ChatServer.Controllers
         // POST api/values
         public void Post([FromBody]string value)
         {
+            bool test = true;
         }
 
         // PUT api/values/5

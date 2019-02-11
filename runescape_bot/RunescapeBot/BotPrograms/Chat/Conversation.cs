@@ -4,6 +4,11 @@ using System.Drawing;
 using System.Net.Http;
 using System.Threading;
 using RunescapeBot.Networking;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Text;
+using static RunescapeBot.BotPrograms.Chat.ChatRow;
 
 namespace RunescapeBot.BotPrograms.Chat
 {
@@ -15,6 +20,11 @@ namespace RunescapeBot.BotPrograms.Chat
         /// Number of rows visible in the public chat history.
         /// </summary>
         public const int CHAT_ROW_COUNT = TextBoxTool.CHAT_ROW_COUNT;
+
+        /// <summary>
+        /// Interval in milliseconds between scans of the game chat.
+        /// </summary>
+        private const int SCAN_INTERVAL = 5000;
 
         /// <summary>
         /// Only scan the chat when set to true.
@@ -39,7 +49,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// <summary>
         /// Stores chat rows while they are being processed.
         /// </summary>
-        internal ChatAssemblyLine ChatAssemblyLine;
+        internal MessageQueues MessageQueues;
 
         /// <summary>
         /// Networking utilities
@@ -120,12 +130,6 @@ namespace RunescapeBot.BotPrograms.Chat
         }
         private bool _safeToType;
 
-        /// <summary>
-        /// Method to be called when we the chat server sends a response to a chat message.
-        /// </summary>
-        /// <param name="chatResponse"></param>
-        public delegate void ChatServerCallback(string chatResponse);
-
         #endregion
 
         public Conversation(TextBoxTool textBox, GameScreen screen, Keyboard keyboard, bool conversate)
@@ -145,7 +149,7 @@ namespace RunescapeBot.BotPrograms.Chat
         /// </summary>
         public void StartConversation()
         {
-            ChatAssemblyLine = new ChatAssemblyLine();
+            MessageQueues = new MessageQueues();
             ChatRows = new ChatRow[CHAT_ROW_COUNT];
             PreviousChatRows = new ChatRow[CHAT_ROW_COUNT];
 
@@ -167,12 +171,15 @@ namespace RunescapeBot.BotPrograms.Chat
         /// </summary>
         private void RunChatScanner()
         {
+            Stopwatch watch = new Stopwatch();
+
             while (_scanChat == true && !BotProgram.StopFlag)
             {
+                watch.Restart();
                 if (Screen.LooksValid() && Screen.IsLoggedIn())
                     ScanChat();
 
-                BotProgram.SafeWait(10000);
+                BotProgram.SafeWait(SCAN_INTERVAL - watch.ElapsedMilliseconds);
             }
         }
 
@@ -185,8 +192,7 @@ namespace RunescapeBot.BotPrograms.Chat
                 return; //unable to read chat this time
 
             FindChatChanges();
-            SendComments();
-            WriteResponses();
+            SendAndReceive();
         }
 
         /// <summary>
@@ -219,37 +225,42 @@ namespace RunescapeBot.BotPrograms.Chat
             for (int i = 0; i < NewChatLines; i++)
             {
                 if(ChatRows[i].Type == ChatRow.RowType.OtherPlayer)
-                    ChatAssemblyLine.NewComment(ChatRows[i]);
+                    MessageQueues.NewComment(ChatRows[i]);
             }
         }
 
         /// <summary>
         /// Uploads all of the waiting new comments from other players to the chat server.
         /// </summary>
-        internal void SendComments()
+        internal void SendAndReceive()
         {
-            ChatRow chatRow;
+            List<ChatRowRequest> comments = MessageQueues.RetrieveComments();
+            SendComments(comments);
+            ReceiveComments();
+        }
 
-            while (!BotProgram.StopFlag && ChatAssemblyLine.NextComment(out chatRow))
+        /// <summary>
+        /// Sends pending comments from other player(s) to the chat server.
+        /// </summary>
+        public async void SendComments(List<ChatRowRequest> comments)
+        {
+            string commentRequests = JsonConvert.SerializeObject(comments);
+            HttpContent httpContent = new StringContent(commentRequests, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(HttpInstance.ChatServerApiPost, httpContent);
+
+            if (!response.IsSuccessStatusCode)
             {
-                Thread contactChatServer = new Thread(SendAndReceiveResponse);
-                contactChatServer.Start(chatRow);
+                //TODO re-add failed request rows to the queue
             }
         }
 
         /// <summary>
-        /// Receives a response to a message from the chat server.
+        /// Get new comment responses from the chat server and type them into game chat.
         /// </summary>
-        public void SendAndReceiveResponse(object chatRow)
+        public async void ReceiveComments()
         {
-            //FormUrlEncodedContent encodedRow = chatRow.Encode();
-
-            //TODO send and receive a response from the chat server
-
-            int ID = 0;
-            string message = "";
-            var response = new Response(ID, message);
-            ChatAssemblyLine.ResponseReceived(response);
+            var response = await httpClient.GetAsync(HttpInstance.ChatServerApiGet + "?player=" + PlayerName);
+            //TODO add responses to queue
             WriteResponses();
         }
 
@@ -258,14 +269,23 @@ namespace RunescapeBot.BotPrograms.Chat
         /// </summary>
         public void WriteResponses()
         {
-            string response;
+            if (!SafeToType)
+                return;
 
-            while (!BotProgram.StopFlag &&
-                SafeToType &&
-                ChatAssemblyLine.NextResponse(out response) &&
-                Screen.IsLoggedIn())
+            List<string> responses = MessageQueues.GetResponses();
+            foreach (string response in responses)
             {
+                if (BotProgram.StopFlag)
+                    return;
+
+                if (!SafeToType)
+                {
+                    MessageQueues.ResponseReceived(responses);  //Save the remaining responses for when it is safe to type again.
+                    return;
+                }
+
                 Keyboard.WriteLine(response);
+                responses.Remove(response);
             }
         }
     }
