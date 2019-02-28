@@ -17,7 +17,7 @@ namespace ChatServer.Tests.Controllers
         public void Get()
         {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ChatController controller = new ChatController();
 
             // Act
             IEnumerable<string> result = controller.Get();
@@ -33,7 +33,7 @@ namespace ChatServer.Tests.Controllers
         public void GetById()
         {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ChatController controller = new ChatController();
 
             // Act
             int id = 5;
@@ -47,7 +47,7 @@ namespace ChatServer.Tests.Controllers
         public void Post()
         {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ChatController controller = new ChatController();
 
             // Act
             controller.Post("value");
@@ -59,7 +59,7 @@ namespace ChatServer.Tests.Controllers
         public void Put()
         {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ChatController controller = new ChatController();
 
             // Act
             controller.Put(5, "value");
@@ -71,7 +71,7 @@ namespace ChatServer.Tests.Controllers
         public void Delete()
         {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ChatController controller = new ChatController();
 
             // Act
             controller.Delete(5);

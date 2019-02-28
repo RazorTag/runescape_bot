@@ -168,7 +168,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\ChatController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -196,11 +196,20 @@
     <Compile Include="Migrations\201901250433530_PlayerName.Designer.cs">
       <DependentUpon>201901250433530_PlayerName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902260639335_User.cs" />
+    <Compile Include="Migrations\201902260639335_User.Designer.cs">
+      <DependentUpon>201902260639335_User.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902260702025_User-Password.cs" />
+    <Compile Include="Migrations\201902260702025_User-Password.Designer.cs">
+      <DependentUpon>201902260702025_User-Password.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ChatDbContext.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Conversation.cs" />
     <Compile Include="Models\Player.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +314,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901250433530_PlayerName.resx">
       <DependentUpon>201901250433530_PlayerName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902260639335_User.resx">
+      <DependentUpon>201902260639335_User.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902260702025_User-Password.resx">
+      <DependentUpon>201902260702025_User-Password.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

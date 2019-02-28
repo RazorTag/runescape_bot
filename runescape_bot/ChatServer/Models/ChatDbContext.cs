@@ -17,6 +17,7 @@ namespace ChatServer.Models
 
         public ChatDbContext() : base("ChatDbConnection") { }
 
+        public DbSet<User> Users { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<Comment> Comments { get; set; }
